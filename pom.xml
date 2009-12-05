@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   
+   <parent>
+      <artifactId>seam-parent</artifactId>
+      <groupId>org.jboss.seam</groupId>
+      <version>3.0.0-SNAPSHOT</version>
+   </parent>
+
+   <artifactId>seam-security</artifactId>
+   <packaging>jar</packaging>
+   <version>3.0.0-SNAPSHOT</version>
+   <name>Seam Security</name>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>javax.faces</groupId>
+         <artifactId>jsf-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.ejb</groupId>
+         <artifactId>ejb-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.el</groupId>
+         <artifactId>el-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.persistence</groupId>
+         <artifactId>persistence-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- Is this an acceptable dependency? -->
+      <dependency>
+         <groupId>javax.validation</groupId>
+         <artifactId>validation-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.drools</groupId>
+         <artifactId>drools-core</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.hibernate</groupId>
+         <artifactId>hibernate</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-drools</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-el</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-international</artifactId>
+      </dependency>
+
+      <!--
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-faces</artifactId>
+      </dependency>
+      -->
+      
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-web</artifactId>
+      </dependency>
+
+      <!--
+      <dependency>
+         <groupId>${seam.groupId}</groupId>
+         <artifactId>seam-persistence</artifactId>
+      </dependency>
+      -->
+
+      <dependency>
+         <groupId>${webbeans.groupId}</groupId>
+         <artifactId>jsr299-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>${webbeans.groupId}</groupId>
+         <artifactId>webbeans-logger</artifactId>
+      </dependency>
+
+   </dependencies>
+
+</project>
