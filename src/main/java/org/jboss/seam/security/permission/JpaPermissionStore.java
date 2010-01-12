@@ -15,7 +15,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.annotations.permission.PermissionAction;
@@ -26,10 +25,11 @@ import org.jboss.seam.security.annotations.permission.PermissionUser;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.management.JpaIdentityStoreConfig;
+import org.jboss.seam.security.management.LdapIdentityStore;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
 import org.jboss.seam.security.util.AnnotatedBeanProperty;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A permission store implementation that uses JPA as its persistence mechanism.
@@ -41,7 +41,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
 {
    private static final long serialVersionUID = 4764590939669047915L;
    
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(LdapIdentityStore.class);
    
    private enum Discrimination { user, role, either }
    

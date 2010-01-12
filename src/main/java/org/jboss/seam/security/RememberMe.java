@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Named;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.events.CredentialsInitializedEvent;
 import org.jboss.seam.security.events.LoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
@@ -31,7 +30,7 @@ import org.jboss.seam.web.ManagedCookie;
  * 
  * @author Shane Bryzak
  */
-@Named//("org.jboss.seam.security.rememberMe")
+@Named
 @SessionScoped
 public class RememberMe implements Serializable
 {

@@ -13,12 +13,12 @@ import java.util.Set;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.crypto.BinTools;
@@ -26,8 +26,9 @@ import org.jboss.seam.security.events.PrePersistUserEvent;
 import org.jboss.seam.security.events.PrePersistUserRoleEvent;
 import org.jboss.seam.security.events.UserAuthenticatedEvent;
 import org.jboss.seam.security.events.UserCreatedEvent;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default identity store implementation, uses JPA as its persistence mechanism.
@@ -41,9 +42,11 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
    protected FeatureSet featureSet;
 
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);
           
    @PersistenceContext EntityManager entityManager;
+   
+   @Inject Instance<PasswordHash> passwordHashInstance;
   
    private JpaIdentityStoreConfig config;
    private BeanManager manager;
@@ -904,6 +907,6 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    protected PasswordHash getPasswordHash()
    {
-      return BeanManagerHelper.getInstanceByType(manager, PasswordHash.class);
+      return passwordHashInstance.get();
    }
 }

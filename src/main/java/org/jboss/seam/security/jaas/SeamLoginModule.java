@@ -21,8 +21,9 @@ import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.management.IdentityManager;
-import org.jboss.webbeans.log.LogProvider;
-import org.jboss.webbeans.log.Logging;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs authentication using a Seam component or Identity Management
@@ -31,7 +32,7 @@ import org.jboss.webbeans.log.Logging;
  */
 public class SeamLoginModule implements LoginModule
 {   
-   private static final LogProvider log = Logging.getLogProvider(SeamLoginModule.class);   
+   private Logger log = LoggerFactory.getLogger(SeamLoginModule.class);
    
    protected Set<String> roles = new HashSet<String>();
    

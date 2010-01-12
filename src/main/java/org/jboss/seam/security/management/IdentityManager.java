@@ -7,16 +7,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.util.Strings;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Identity Management API, deals with user name/password-based identity management.
@@ -37,28 +35,17 @@ public class IdentityManager implements Serializable
    public static final String PERMISSION_UPDATE = "update";
    public static final String PERMISSION_DELETE = "delete";
    
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(IdentityManager.class);
    
    @Inject BeanManager manager;
    @Inject Identity identity;
    
-   private IdentityStore identityStore;
+   @Inject private IdentityStore identityStore;
    private IdentityStore roleIdentityStore;
    
    @Inject
    public void create()
    {
-      initIdentityStore();
-   }
-   
-   protected void initIdentityStore()
-   {
-      // Default to JpaIdentityStore
-      if (identityStore == null)
-      {
-         identityStore = BeanManagerHelper.getInstanceByType(manager,JpaIdentityStore.class);
-      }
-      
       if (roleIdentityStore == null && identityStore != null)
       {
          roleIdentityStore = identityStore;

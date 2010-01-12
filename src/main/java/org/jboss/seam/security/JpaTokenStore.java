@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.annotations.TokenUsername;
 import org.jboss.seam.security.annotations.TokenValue;
 import org.jboss.seam.security.management.IdentityManagementException;
@@ -31,6 +31,8 @@ public class JpaTokenStore implements TokenStore, Serializable
    private AnnotatedBeanProperty<TokenValue> tokenValueProperty;
    
    @Inject BeanManager manager;
+   
+   @Inject Instance<EntityManager> entityManagerInstance;
    
    @Inject
    public void create()
@@ -138,6 +140,6 @@ public class JpaTokenStore implements TokenStore, Serializable
    
    private EntityManager lookupEntityManager()
    {
-      return BeanManagerHelper.getInstanceByType(manager, EntityManager.class);
+      return entityManagerInstance.get();
    }
 }

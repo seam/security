@@ -15,7 +15,6 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.annotations.PermissionCheck;
 import org.jboss.seam.security.annotations.Restrict;
 import org.jboss.seam.security.annotations.RoleCheck;
@@ -38,6 +37,7 @@ public class SecurityInterceptor implements Serializable
    private transient volatile Map<Method,Restriction> restrictions = new HashMap<Method,Restriction>();
    
    @Inject BeanManager manager;
+   @Inject Identity identity;
    
    private class Restriction
    {
@@ -162,7 +162,7 @@ public class SecurityInterceptor implements Serializable
          Restriction restriction = getRestriction(interfaceMethod);
          if ( restriction != null )
          {
-            Identity identity = BeanManagerHelper.getInstanceByType(manager, Identity.class);
+            
             restriction.check(identity, invocation.getParameters());
          }
       }

@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.el.Expressions;
 import org.jboss.seam.security.annotations.permission.Identifier;
 import org.jboss.seam.security.util.Strings;
@@ -23,8 +23,10 @@ public class EntityIdentifierStrategy implements IdentifierStrategy
    private Map<Class,String> identifierNames = new ConcurrentHashMap<Class,String>();
    
    //@Inject PersistenceProvider persistenceProvider;
-   @Inject Expressions expressions;
+   //@Inject Expressions expressions;
+   
    @Inject BeanManager manager;
+   @Inject Instance<EntityManager> entityManagerInstance;
 
    public boolean canIdentify(Class targetClass)
    {
@@ -71,6 +73,7 @@ public class EntityIdentifierStrategy implements IdentifierStrategy
    private EntityManager lookupEntityManager()
    {
       //return entityManager.getValue();
-      return BeanManagerHelper.getInstanceByType(manager, EntityManager.class);
+      //return BeanManagerHelper.getInstanceByType(manager, EntityManager.class);
+      return entityManagerInstance.get();
    }
 }

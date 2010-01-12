@@ -14,6 +14,7 @@ import javax.el.ValueExpression;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.security.auth.Subject;
@@ -26,7 +27,6 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.el.Expressions;
 import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
@@ -42,8 +42,9 @@ import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * API for authorization and authentication via Seam security.
@@ -60,12 +61,16 @@ public class Identity implements Serializable
    
    public static final String ROLES_GROUP = "Roles";
    
-   @Logger Log log;
+   Logger log = LoggerFactory.getLogger(Identity.class);
 
    @Inject private BeanManager manager;
    @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
    @Inject private Expressions expressions;
+   
+   @Inject private IdentityManager identityManager;
+   
+   @Inject Instance<RequestSecurityState> requestSecurityState;
    
    private Principal principal;
    private Subject subject;
@@ -114,12 +119,11 @@ public class Identity implements Serializable
     * @return true if the user is logged in, false otherwise
     */
    public boolean tryLogin()
-   {
-      RequestSecurityState state = BeanManagerHelper.getInstanceByType(manager, RequestSecurityState.class);
-      
-      if (!authenticating && getPrincipal() == null && credentials.isSet() && !state.isLoginTried())
+   {      
+      if (!authenticating && getPrincipal() == null && credentials.isSet() && 
+            !requestSecurityState.get().isLoginTried())
       {
-         state.setLoginTried(true);
+         requestSecurityState.get().setLoginTried(true);
          quietLogin();
       }
       
@@ -212,8 +216,7 @@ public class Identity implements Serializable
             // If authentication has already occurred during this request via a silent login,
             // and login() is explicitly called then we still want to raise the LOGIN_SUCCESSFUL event,
             // and then return.
-            RequestSecurityState state = BeanManagerHelper.getInstanceByType(manager, RequestSecurityState.class);
-            if (state.isSilentLogin())
+            if (requestSecurityState.get().isSilentLogin())
             {
                manager.fireEvent(new LoggedInEvent(principal));
                return "loggedIn";
@@ -271,10 +274,9 @@ public class Identity implements Serializable
             {
                authenticate();
                
-               RequestSecurityState state = BeanManagerHelper.getInstanceByType(manager, RequestSecurityState.class);
                if (isLoggedIn())
                {
-                  state.setSilentLogin(true);
+                  requestSecurityState.get().setSilentLogin(true);
                }
             }
          }
@@ -401,7 +403,6 @@ public class Identity implements Serializable
    {
       final Identity identity = this;
       final Authenticator authenticator;
-      final IdentityManager identityManager = BeanManagerHelper.getInstanceByType(manager, IdentityManager.class);
       
       Set<Bean<?>> authenticators = manager.getBeans(Authenticator.class);
       if (authenticators.size() == 1)

@@ -22,8 +22,8 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An IdentityStore implementation that integrates with a directory service.
@@ -39,7 +39,7 @@ public class LdapIdentityStore implements IdentityStore, Serializable
    private static final String LDAP_BOOLEAN_TRUE = "TRUE";
    private static final String LDAP_BOOLEAN_FALSE = "FALSE";
    
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(LdapIdentityStore.class);
    
    protected FeatureSet featureSet = new FeatureSet();
    
