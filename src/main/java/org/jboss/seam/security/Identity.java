@@ -27,7 +27,6 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.jboss.seam.el.Expressions;
 import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
@@ -66,7 +65,6 @@ public class Identity implements Serializable
    @Inject private BeanManager manager;
    @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
-   @Inject private Expressions expressions;
    
    @Inject private IdentityManager identityManager;
    
@@ -150,6 +148,9 @@ public class Identity implements Serializable
     * the user is authenticated
     */
    // QUESTION should we add the dependency on el-api for the sake of avoiding reinstantiating the VE?
+   
+   // TODO redesign restrictions system to be typesafe
+   /*
    public void checkRestriction(ValueExpression expression)
    {
       if (!securityEnabled)
@@ -174,7 +175,7 @@ public class Identity implements Serializable
                "Authorization check failed for expression [%s]", expression.getExpressionString()));
          }
       }
-   }
+   }*/
    
    /**
     * Performs an authorization check, based on the specified security expression string.
@@ -185,6 +186,8 @@ public class Identity implements Serializable
     * @throws AuthorizationException Thrown if the authorization check fails and
     * the user is authenticated
     */
+   
+   /*
    public void checkRestriction(String expr)
    {
       if (!securityEnabled)
@@ -193,7 +196,7 @@ public class Identity implements Serializable
       }
       
       checkRestriction(expressions.createValueExpression(expr, Boolean.class).toUnifiedValueExpression());
-   }
+   }*/
 
    /**
     * Attempts to authenticate the user.  This method is distinct to the
@@ -626,10 +629,11 @@ public class Identity implements Serializable
     * @param expr String The expression to evaluate
     * @return boolean The result of the expression evaluation
     */
+   /*
    protected boolean evaluateExpression(String expr)
    {
       return expressions.createValueExpression(expr, Boolean.class).getValue();
-   }
+   }*/
    
    public String getJaasConfigName()
    {

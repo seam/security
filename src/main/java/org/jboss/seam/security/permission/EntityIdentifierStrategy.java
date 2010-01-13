@@ -9,7 +9,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.el.Expressions;
 import org.jboss.seam.security.annotations.permission.Identifier;
 import org.jboss.seam.security.util.Strings;
 

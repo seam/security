@@ -17,14 +17,14 @@ import javax.enterprise.event.Observes;
 import org.drools.FactHandle;
 import org.drools.RuleBase;
 import org.drools.StatefulSession;
-import org.drools.base.ClassObjectFilter;
+import org.drools.ClassObjectFilter;
 import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.events.LoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
@@ -36,7 +36,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
 {
    private static final long serialVersionUID = -7572627522601793024L;
 
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(RuleBasedPermissionResolver.class);
    
    private StatefulSession securityContext;
    
@@ -214,7 +214,8 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                   Principal role = (Principal) e.nextElement();
    
                   boolean found = false;
-                  Iterator<Role> iter = getSecurityContext().iterateObjects(new ClassObjectFilter(Role.class));
+                  Iterator<Role> iter = (Iterator<Role>) getSecurityContext()
+                     .iterateObjects(new ClassObjectFilter(Role.class));
                   while (iter.hasNext())
                   {
                      Role r = iter.next();
@@ -234,7 +235,8 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
             }
          }
          
-         Iterator<Role> iter = getSecurityContext().iterateObjects(new ClassObjectFilter(Role.class));
+         Iterator<Role> iter = (Iterator<Role>) getSecurityContext()
+            .iterateObjects(new ClassObjectFilter(Role.class));
          while (iter.hasNext())
          {
             Role r = iter.next();

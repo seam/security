@@ -5,15 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
 
 /**
  * Resolves dynamically-assigned permissions, mapped to a user or a role, and kept in persistent
@@ -24,28 +21,11 @@ import org.jboss.webbeans.log.Logger;
 public class PersistentPermissionResolver implements PermissionResolver, Serializable
 {
    private static final long serialVersionUID = -603389172032219059L;
-
-   private PermissionStore permissionStore;
-   
-   @Logger Log log;
    
    @Inject BeanManager manager;
    @Inject Identity identity;
    @Inject RuleBasedPermissionResolver ruleBasedPermissionResolver;
-
-   @Inject
-   public void initPermissionStore()
-   {
-      if (permissionStore == null)
-      {
-         permissionStore = BeanManagerHelper.getInstanceByType(manager, JpaPermissionStore.class);
-      }
-      
-      if (permissionStore == null)
-      {
-         log.warn("no permission store available - please install a PermissionStore if persistent permissions are required.");
-      }
-   }
+   @Inject PermissionStore permissionStore;
    
    public PermissionStore getPermissionStore()
    {
@@ -103,7 +83,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       
       String username = identity.getPrincipal().getName();
       
-      Iterator iter = targets.iterator();
+      Iterator<?> iter = targets.iterator();
       while (iter.hasNext())
       {
          Object target = iter.next();

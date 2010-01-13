@@ -18,7 +18,7 @@ import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.util.Base64;
-import org.jboss.seam.web.ManagedCookie;
+//import org.jboss.seam.web.ManagedCookie;
 
 /**
  * Remember-me functionality is provided by this class, in two different flavours.  The first mode
@@ -27,6 +27,7 @@ import org.jboss.seam.web.ManagedCookie;
  * is NOT considered to be secure and is vulnerable to XSS attacks compromising the user's account.
  * 
  * Use the auto-login mode with caution!
+ * 
  * 
  * @author Shane Bryzak
  */
@@ -42,15 +43,17 @@ public class RememberMe implements Serializable
    @Inject Identity identity;
    @Inject Credentials credentials;
    @Inject IdentityManager identityManager;
+   
+   // Heaps of stuff commented out here because we need to add generic cookie support
 
-   private ManagedCookie usernameSelector;
-   private ManagedCookie tokenSelector;
+   //private ManagedCookie usernameSelector;
+   //private ManagedCookie tokenSelector;
    
    private TokenStore tokenStore;
    
    private boolean enabled;
 
-   private int cookieMaxAge = ManagedCookie.DEFAULT_MAX_AGE;
+   //private int cookieMaxAge = ManagedCookie.DEFAULT_MAX_AGE;
    
    private boolean autoLoggedIn;
    
@@ -60,6 +63,7 @@ public class RememberMe implements Serializable
    
    public RememberMe() {}
    
+   /*
    public
    @Inject
    void create()
@@ -130,7 +134,7 @@ public class RememberMe implements Serializable
             }
          }
       }
-   }
+   }*/
 
    public void quietLogin(@Observes QuietLoginEvent event)
    {
@@ -179,7 +183,7 @@ public class RememberMe implements Serializable
          }
       }
    }
-   
+   /*
    public void postAuthenticate(@Observes PostAuthenticateEvent event)
    {
       if (mode.equals(Mode.usernameOnly))
@@ -218,14 +222,16 @@ public class RememberMe implements Serializable
          }
       }
    }
+   */
    
+   /*
    public void loggedOut(@Observes LoggedOutEvent event)
    {
       if (mode.equals(Mode.autoLogin))
       {
          tokenSelector.clearCookieValue();
       }
-   }
+   }*/
 
    public Mode getMode()
    {
@@ -242,6 +248,7 @@ public class RememberMe implements Serializable
       return enabled;
    }
    
+   /*
    public void setEnabled(boolean enabled)
    {
       if (this.enabled != enabled)
@@ -258,15 +265,16 @@ public class RememberMe implements Serializable
             tokenSelector.setCookieEnabled(enabled);
          }
       }
-   }
+   }*/
 
+   /*
    public int getCookieMaxAge() {
        return cookieMaxAge;
    }
 
    public void setCookieMaxAge(int cookieMaxAge) {
        this.cookieMaxAge = cookieMaxAge;
-   }
+   }*/
    
    public TokenStore getTokenStore()
    {

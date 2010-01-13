@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.seam.beans.BeanManagerHelper;
 import org.jboss.seam.security.events.DefaultResolverChainCreatedEvent;
 
 /**
@@ -35,7 +34,7 @@ public class PermissionMapper implements Serializable
    
    private ResolverChain getResolverChain(Object target, String action)
    {
-      Class targetClass = null;
+      Class<?> targetClass = null;
       
       if (target instanceof Class)
       {
@@ -47,12 +46,15 @@ public class PermissionMapper implements Serializable
          // we need to deal with all of these possibilities
       }
       
+      // TODO configure resolver chains differently - scan for all beans of type ResolverChain
+      
+      /*
       if (targetClass != null)
       {
          Map<String,String> chains = resolverChains.get(target);
          if (chains != null && chains.containsKey(action))
          {
-                return (ResolverChain) BeanManagerHelper.getInstanceByName(manager, chains.get(action));
+            return (ResolverChain) BeanManagerHelper.getInstanceByName(manager, chains.get(action));
          }
       }
       
@@ -60,6 +62,7 @@ public class PermissionMapper implements Serializable
       {
          return (ResolverChain) BeanManagerHelper.getInstanceByName(manager,defaultResolverChain);
       }
+      */
       
       return createDefaultResolverChain();
    }

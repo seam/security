@@ -10,21 +10,21 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.jboss.seam.security.Role;
-import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.annotations.permission.PermissionAction;
 import org.jboss.seam.security.annotations.permission.PermissionDiscriminator;
 import org.jboss.seam.security.annotations.permission.PermissionRole;
 import org.jboss.seam.security.annotations.permission.PermissionTarget;
 import org.jboss.seam.security.annotations.permission.PermissionUser;
 import org.jboss.seam.security.management.IdentityManager;
+import org.jboss.seam.security.management.IdentityStore;
 import org.jboss.seam.security.management.JpaIdentityStore;
-import org.jboss.seam.security.management.JpaIdentityStoreConfig;
 import org.jboss.seam.security.management.LdapIdentityStore;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
 import org.jboss.seam.security.util.AnnotatedBeanProperty;
@@ -65,6 +65,9 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    @Inject IdentifierPolicy identifierPolicy;
    @Inject BeanManager manager;
    @Inject IdentityManager identityManager;
+   @Inject IdentityStore identityStore;
+   
+   @Inject Instance<EntityManager> entityManagerInstance;
    
    @Inject
    public void init()
@@ -526,21 +529,21 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    protected Object resolvePrincipalEntity(Principal recipient)
    {
       boolean recipientIsRole = recipient instanceof Role;
-         
-      JpaIdentityStore identityStore = BeanManagerHelper.getInstanceByType(manager, JpaIdentityStore.class);
-      JpaIdentityStoreConfig config = BeanManagerHelper.getInstanceByType(manager, JpaIdentityStoreConfig.class);
-      
-      if (identityStore != null)
+            
+      if (identityStore != null && identityStore instanceof JpaIdentityStore)
       {
-         if (recipientIsRole && roleProperty.isSet() &&
-               roleProperty.getPropertyType().equals(config.getRoleEntityClass()))
+         // TODO review this code
+         
+         if (recipientIsRole && roleProperty.isSet() //&&
+               //roleProperty.getPropertyType().equals(config.getRoleEntityClass()))
+               )
          {
-            return identityStore.lookupRole(recipient.getName());
+            return ((JpaIdentityStore) identityStore).lookupRole(recipient.getName());
          }
-         else if (userProperty.getPropertyType().equals(config.getUserEntityClass()))
-         {
-            return identityStore.lookupUser(recipient.getName());
-         }
+         //else if (userProperty.getPropertyType().equals(config.getUserEntityClass()))
+         //{
+            //return ((JpaIdentityStore) identityStore).lookupUser(recipient.getName());
+         //}
       }
       
       return recipient.getName();
@@ -549,10 +552,10 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    protected Principal resolvePrincipal(Object principal, boolean isUser)
    {
       identityManager.getRoleIdentityStore();
+         
+      // TODO review this
       
-      JpaIdentityStore identityStore = BeanManagerHelper.getInstanceByType(manager, JpaIdentityStore.class);
-      JpaIdentityStoreConfig config = BeanManagerHelper.getInstanceByType(manager, JpaIdentityStoreConfig.class);
-      
+      /*
       if (principal instanceof String)
       {
          return isUser ? new SimplePrincipal((String) principal) : new Role((String) principal,
@@ -571,7 +574,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
             String name = identityStore.getRoleName(principal);
             return new Role(name, identityStore.isRoleConditional(name));
          }
-      }
+      }*/
       
       throw new IllegalArgumentException("Cannot resolve principal name for principal " + principal);
    }
@@ -753,7 +756,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
 
    private EntityManager lookupEntityManager()
    {
-      return BeanManagerHelper.getInstanceByType(manager, EntityManager.class);
+      return entityManagerInstance.get();
    }
    
    public Class<?> getUserPermissionClass()

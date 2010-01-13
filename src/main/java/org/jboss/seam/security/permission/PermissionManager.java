@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.security.Identity;
-import org.jboss.webbeans.log.Log;
-import org.jboss.webbeans.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Permission management component, used to grant or revoke permissions on specific objects or of
@@ -25,7 +25,7 @@ public class PermissionManager implements Serializable
    public static final String PERMISSION_GRANT = "seam.grant-permission";
    public static final String PERMISSION_REVOKE = "seam.revoke-permission";
    
-   @Logger Log log;
+   private Logger log = LoggerFactory.getLogger(PermissionManager.class);
    
    @Inject PermissionStore permissionStore;
    @Inject Identity identity;

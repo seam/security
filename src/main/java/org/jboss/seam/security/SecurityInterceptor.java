@@ -111,10 +111,11 @@ public class SecurityInterceptor implements Serializable
       {
          if (Identity.isSecurityEnabled())
          {
-            if (expression != null)
+            // TODO rewrite EL based restrictions
+            /*if (expression != null)
             {
                identity.checkRestriction(expression);
-            }
+            }*/
             
             if (methodRestrictions != null)
             {
