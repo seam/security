@@ -30,6 +30,11 @@
       </repository>
    </repositories>
    
+   <prerequisites>
+     <maven>2.0.10</maven>
+   </prerequisites>
+   
+   
    <properties>
       <seam.version>3.0.0-SNAPSHOT</seam.version>
    </properties>
