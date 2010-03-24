@@ -4,55 +4,18 @@
    <modelVersion>4.0.0</modelVersion>
    
    <parent>
-      <artifactId>seam-parent</artifactId>
-      <groupId>org.jboss.seam</groupId>
-      <version>3.0.0-SNAPSHOT</version>
+      <artifactId>weld-parent</artifactId>
+      <groupId>org.jboss.weld</groupId>
+      <version>8</version>
    </parent>
 
-   <artifactId>seam-security</artifactId>
-   <packaging>jar</packaging>
+   <groupId>org.jboss.seam.security</groupId>
+   <artifactId>seam-security-parent</artifactId>
+   <packaging>pom</packaging>
    <version>3.0.0-SNAPSHOT</version>
-   <name>Seam Security</name>
+   <name>Seam Security Parent</name>
    
-   <!-- Snapshots repo to get parent -->
-   <repositories>
-      <repository>
-         <id>oss.sonatype.org/jboss-snapshots</id>
-         <name>JBoss (Nexus) Snapshots Repository</name>
-         <url>http://oss.sonatype.org/content/repositories/jboss-snapshots</url>
-         <releases>
-            <enabled>false</enabled>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-   
-   <prerequisites>
-     <maven>2.0.10</maven>
-   </prerequisites>
-   
-   
-   <properties>
-      <seam.version>3.0.0-SNAPSHOT</seam.version>
-   </properties>
-
-   <dependencies>
-
-      <dependency>
-         <groupId>javax.faces</groupId>
-         <artifactId>jsf-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.ejb3</groupId>
-         <artifactId>jboss-ejb3-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
+   <dependencyManagement>
       <dependency>
          <groupId>javax.el</groupId>
          <artifactId>el-api</artifactId>
@@ -84,37 +47,12 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam</groupId>
-         <artifactId>seam-drools</artifactId>
-      </dependency>
-
-<!--      <dependency>-->
-<!--         <groupId>org.jboss.seam</groupId>-->
-<!--         <artifactId>seam-international</artifactId>-->
-<!--      </dependency>-->
-
-      <!--
-      <dependency>
-         <groupId>org.jboss.seam</groupId>
-         <artifactId>seam-faces</artifactId>
-      </dependency>
-      -->
-
-      <!--
-      <dependency>
-         <groupId>org.jboss.seam</groupId>
-         <artifactId>seam-persistence</artifactId>
-      </dependency>
-      -->
-
-      <dependency>
          <groupId>javax.enterprise</groupId>
          <artifactId>cdi-api</artifactId>
          <scope>provided</scope>
       </dependency>
 
-   </dependencies>
-   
+   </dependencyManagement>
    
    <scm>
       <connection>scm:svn:http://anonsvn.jboss.org/repos/seam/modules/security/trunk</connection>
