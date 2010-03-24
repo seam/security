@@ -18,7 +18,7 @@ import org.drools.FactHandle;
 import org.drools.RuleBase;
 import org.drools.StatefulSession;
 import org.drools.ClassObjectFilter;
-import org.jboss.seam.drools.SeamGlobalResolver;
+//import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.events.LoggedOutEvent;
@@ -57,7 +57,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       if (getSecurityRules() != null)
       {
          setSecurityContext(getSecurityRules().newStatefulSession(false));
-         getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
+         //getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
       }
    }
    
