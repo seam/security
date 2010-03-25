@@ -5,7 +5,15 @@
    version="1.0">
    <persistence-unit name="seamspace">
       <jta-data-source>seamspaceDatasource</jta-data-source>
-      <!--class>org.jboss.seam.remoting.examples.model.Person</class-->
+      <class>org.jboss.seam.security.examples.seamspace.model.AccountPermission</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.BlogComment</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.FriendComment</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.Member</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.MemberAccount</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.MemberBlog</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.MemberFriend</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.MemberImage</class>
+      <class>org.jboss.seam.security.examples.seamspace.model.MemberRole</class>
       <properties>
          <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
          <property name="hibernate.show_sql" value="true"/>
