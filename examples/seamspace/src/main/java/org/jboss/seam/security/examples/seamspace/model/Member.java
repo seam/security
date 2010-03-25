@@ -118,7 +118,7 @@ public class Member implements Serializable
       this.lastName = lastName;
    }   
    
-   @NotNull @Email
+   @NotNull //@Email
    public String getEmail()
    {
       return email;

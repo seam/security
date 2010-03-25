@@ -11,6 +11,10 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
+import org.jboss.seam.security.examples.seamspace.model.BlogComment;
+import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
+
 @Named("blog")
 @ConversationScoped
 public class BlogAction
@@ -40,12 +44,15 @@ public class BlogAction
            .setParameter("memberName", name)
            .getSingleResult();
       }
-      catch (NoResultException ex) { }
+      catch (NoResultException ex) 
+      { 
+         return null;
+      }
    }   
    
-   @Begin
    public void createEntry()
    {
+      conversation.begin();
       selectedBlog = new MemberBlog();              
    }
    

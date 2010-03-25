@@ -4,11 +4,15 @@ package org.jboss.seam.security.examples.seamspace.action;
 import java.util.List;
 import java.util.Random;
 
-import javax.ejb.Remove;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+
+import org.jboss.seam.security.examples.seamspace.model.FriendComment;
+import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
 
 @RequestScoped
 @Named
@@ -17,10 +21,10 @@ public class ProfileAction
    @RequestParameter
    private String name;
 
-   @In(required = false) @Out(required = false, scope = CONVERSATION)
-   private Member selectedMember;
+   @Inject Member selectedMember;
    
-   @In(required = false)
+   
+   @Inject
    private Member authenticatedMember;
    
    @Out(required = false)
@@ -29,8 +33,7 @@ public class ProfileAction
    @Out(required = false)
    List<MemberBlog> memberBlogs;   
    
-   @In
-   private EntityManager entityManager;
+   @Inject EntityManager entityManager;
 
    @Factory("selectedMember")
    public void display()
@@ -117,8 +120,5 @@ public class ProfileAction
             "from FriendComment c where c.member = :member order by commentDate desc")
             .setParameter("member", selectedMember)
             .getResultList();
-   }
-   
-   @Remove @Destroy
-   public void destroy() { }   
+   }  
 }

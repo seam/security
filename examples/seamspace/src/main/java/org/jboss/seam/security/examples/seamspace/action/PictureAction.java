@@ -1,22 +1,30 @@
 package org.jboss.seam.security.examples.seamspace.action;
 
 
-import javax.enterprise.inject.Model;
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 
-@Model
+import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
+
+@Named
+@ConversationScoped
 public class PictureAction
 {
    private MemberImage memberImage;
    
-   @In(required = false)
-   private Member authenticatedMember;
+   @Inject Member authenticatedMember;
    
-   @In EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
-   @Begin
+   @Inject Conversation conversation;
+      
    public void uploadPicture()
    {
+      conversation.begin();
       memberImage = new MemberImage();
    }
    
@@ -24,7 +32,7 @@ public class PictureAction
    {
       memberImage.setMember(entityManager.find(Member.class, authenticatedMember.getMemberId()));
       entityManager.persist(memberImage);
-      Conversation.instance().end();
+      conversation.end();
    }
 
    public MemberImage getMemberImage()

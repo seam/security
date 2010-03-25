@@ -1,10 +1,11 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.action;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
 @Named
 public class ContentAction

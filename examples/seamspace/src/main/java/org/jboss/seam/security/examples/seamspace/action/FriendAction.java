@@ -50,7 +50,7 @@ public class FriendAction implements Serializable
          .getSingleResult();
                   
          Contexts.getMethodContext().set("friends", member.getFriends());
-         Identity.instance().checkPermission(member, "createFriendComment");
+         identity.checkPermission(member, "createFriendComment");
 
          friendComment = new FriendComment();
          friendComment.setFriend(authenticatedMember);

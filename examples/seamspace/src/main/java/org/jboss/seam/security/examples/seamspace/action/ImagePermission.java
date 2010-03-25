@@ -5,12 +5,16 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.context.Conversation;
 import javax.enterprise.inject.Model;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.Permission;
 import org.jboss.seam.security.permission.PermissionManager;
@@ -29,21 +33,23 @@ public class ImagePermission implements Serializable
    
    private List<Member> availableFriends;   
    
-   @In IdentityManager identityManager;
-   @In PermissionManager permissionManager;
+   @Inject IdentityManager identityManager;
+   @Inject PermissionManager permissionManager;
    
-   @In EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
-   @In PermissionSearch permissionSearch;   
+   @Inject PermissionSearch permissionSearch;
+   
+   @Inject Conversation conversation;
    
    private MemberImage target; 
    
    private Principal recipient;
    
    @SuppressWarnings("unchecked")
-   @Begin(nested = true)
    public void createPermission()
    {
+      conversation.begin();
       target = (MemberImage) permissionSearch.getTarget();
       
       selectedFriends = new ArrayList<Member>();
@@ -54,9 +60,9 @@ public class ImagePermission implements Serializable
             .getResultList();      
    }
    
-   @Begin(nested = true)
    public void editPermission()
    {
+      conversation.begin();
       target = (MemberImage) permissionSearch.getTarget();
       recipient = permissionSearch.getSelectedRecipient();
             
@@ -140,7 +146,7 @@ public class ImagePermission implements Serializable
       {
          if (selectedActions.size() == 0)
          {
-            FacesMessages.instance().add("You must select at least one action");
+            //FacesMessages.instance().add("You must select at least one action");
             return "failure";
          }
          
@@ -172,7 +178,7 @@ public class ImagePermission implements Serializable
          
          permissionManager.grantPermissions(permissions);
       }
-      Conversation.instance().endBeforeRedirect();
+      conversation.end();
       return "success";
    }
    

@@ -1,15 +1,24 @@
 package org.jboss.seam.security.examples.seamspace.util;
 
-import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Produces;
 
-import org.jboss.seam.security.management.JpaIdentityStore;
+import org.jboss.seam.security.events.UserAuthenticatedEvent;
+import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
 
-@Named
+@SessionScoped
 public class AuthenticationEvents
 {
-   //@Observer(JpaIdentityStore.EVENT_USER_AUTHENTICATED)
-   public void loginSuccessful(MemberAccount account)
+   private MemberAccount account;
+   
+   @Produces @Authenticated MemberAccount getAuthenticatedAccount()
    {
-     // Contexts.getSessionContext().set("authenticatedMember", account.getMember());
+      return account;
+   }
+   
+   public void loginSuccessful(@Observes UserAuthenticatedEvent event)
+   {
+      account = (MemberAccount) event.getUser();
    }
 }

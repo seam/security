@@ -94,13 +94,12 @@ public class RegisterAction
       member.setMemberSince(new Date());      
       entityManager.persist(member);      
       
-      new RunAsOperation() {
+      identity.runAs(new RunAsOperation() {
          public void execute() {
             identityManager.createUser(username, password);
             identityManager.grantRole(username, "user");            
          }         
-      }.addRole("admin")
-       .run();
+      }.addRole("admin"));
             
       newAccount.setMember(member);
       newAccount = entityManager.merge(newAccount);

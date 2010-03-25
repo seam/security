@@ -5,10 +5,13 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.annotations.Delete;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
 @RequestScoped
 @Named
@@ -18,8 +21,9 @@ public class PictureSearch implements Serializable
    
    private String memberName;
    
-   @In
-   private EntityManager entityManager;
+   @Inject EntityManager entityManager;
+   
+   @Inject Identity identity;
    
    @Out(required = false)
    private List<MemberImage> memberImages;
@@ -54,6 +58,6 @@ public class PictureSearch implements Serializable
             "select i from MemberImage i where i.member.memberName = :name and not i = i.member.picture")
             .setParameter("name", memberName)
             .getResultList();      
-      Identity.instance().filterByPermission(memberImages, "view");
+      identity.filterByPermission(memberImages, "view");
    }
 }

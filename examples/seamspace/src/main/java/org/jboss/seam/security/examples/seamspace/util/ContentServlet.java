@@ -7,12 +7,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.ImageIcon;
+
+import org.jboss.seam.security.examples.seamspace.action.ContentAction;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
 
 /**
@@ -56,13 +61,19 @@ public class ContentServlet extends HttpServlet
       
    }
 
+   @SuppressWarnings("unchecked")
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response)
          throws ServletException, IOException
    {
       if (IMAGES_PATH.equals(request.getPathInfo()))
       {
-         ContentAction contentAction = (ContentAction) Component.getInstance(ContentAction.class);
+         BeanManager manager = (BeanManager) getServletContext().getAttribute(BeanManager.class.getName());
+         
+         Bean<ContentAction> bean = (Bean<ContentAction>) manager.getBeans(
+               ContentAction.class).iterator().next();
+         
+         ContentAction contentAction = bean.create(manager.createCreationalContext(bean));
 
          String id = request.getParameter("id");
          MemberImage mi = (id != null && !"".equals(id)) ? 
