@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -14,11 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
-import org.jboss.seam.annotations.security.management.PasswordSalt;
-import org.jboss.seam.annotations.security.management.UserEnabled;
-import org.jboss.seam.annotations.security.management.UserPassword;
-import org.jboss.seam.annotations.security.management.UserPrincipal;
-import org.jboss.seam.annotations.security.management.UserRoles;
+import org.jboss.seam.security.annotations.management.PasswordSalt;
+import org.jboss.seam.security.annotations.management.UserEnabled;
+import org.jboss.seam.security.annotations.management.UserPassword;
+import org.jboss.seam.security.annotations.management.UserPrincipal;
+import org.jboss.seam.security.annotations.management.UserRoles;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "username"))

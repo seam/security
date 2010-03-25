@@ -1,22 +1,17 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
-import static org.jboss.seam.ScopeType.EVENT;
 
 import java.io.Serializable;
 import java.util.List;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Delete;
-import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.security.Identity;
 
-@Name("pictureSearch")
-@Scope(EVENT)
+@RequestScoped
+@Named
 public class PictureSearch implements Serializable
 {
    private static final long serialVersionUID = -1868188969326866331L;

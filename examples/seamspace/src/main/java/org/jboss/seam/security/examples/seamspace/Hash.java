@@ -1,12 +1,9 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.security.MessageDigest;
 
-import org.jboss.seam.Component;
-import org.jboss.seam.annotations.Name;
 import org.jboss.seam.util.Hex;
 
-@Name("hash")
 public class Hash {
     String hashFunction = "MD5";
     String charset      = "UTF-8";
@@ -38,8 +35,4 @@ public class Hash {
     public void setHashFunction(String hashFunction) {
         this.hashFunction = hashFunction;
     }    
-    
-    public static Hash instance() {
-        return (Hash) Component.getInstance(Hash.class);
-    }
 }

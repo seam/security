@@ -1,20 +1,13 @@
-package org.jboss.seam.example.seamspace;
-
-import static org.jboss.seam.ScopeType.CONVERSATION;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.inject.Model;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.core.Conversation;
-import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.management.IdentityManager;
@@ -22,8 +15,7 @@ import org.jboss.seam.security.permission.Permission;
 import org.jboss.seam.security.permission.PermissionManager;
 import org.jboss.seam.security.permission.action.PermissionSearch;
 
-@Name("imagePermission")
-@Scope(CONVERSATION)
+@Model
 public class ImagePermission implements Serializable
 {
    private static final long serialVersionUID = -4943654157860780587L;

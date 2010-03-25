@@ -1,16 +1,15 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.contexts.Contexts;
+import javax.inject.Named;
+
 import org.jboss.seam.security.management.JpaIdentityStore;
 
-@Name("authenticationEvents")
+@Named
 public class AuthenticationEvents
 {
-   @Observer(JpaIdentityStore.EVENT_USER_AUTHENTICATED)
+   //@Observer(JpaIdentityStore.EVENT_USER_AUTHENTICATED)
    public void loginSuccessful(MemberAccount account)
    {
-      Contexts.getSessionContext().set("authenticatedMember", account.getMember());
+     // Contexts.getSessionContext().set("authenticatedMember", account.getMember());
    }
 }

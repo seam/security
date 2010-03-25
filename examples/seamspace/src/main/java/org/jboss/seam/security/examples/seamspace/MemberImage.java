@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 
@@ -9,8 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
-import org.jboss.seam.annotations.security.permission.Permission;
-import org.jboss.seam.annotations.security.permission.Permissions;
+import org.jboss.seam.security.annotations.permission.Permission;
+import org.jboss.seam.security.annotations.permission.Permissions;
 
 @Permissions({
    @Permission(action = "view"),

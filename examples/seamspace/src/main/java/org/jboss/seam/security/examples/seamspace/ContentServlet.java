@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.ImageIcon;
 
-import org.jboss.seam.Component;
 
 /**
  * Serves images and other member content

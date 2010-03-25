@@ -1,27 +1,17 @@
-package org.jboss.seam.example.seamspace;
-
-import static org.jboss.seam.ScopeType.CONVERSATION;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.util.Date;
 
 import javax.ejb.Remove;
+import javax.enterprise.inject.Model;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.Destroy;
-import org.jboss.seam.annotations.End;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.RunAsOperation;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.management.JpaIdentityStore;
 
-@Scope(CONVERSATION)
-@Name("register")
+@Model
 public class RegisterAction
 {
    private Member member;

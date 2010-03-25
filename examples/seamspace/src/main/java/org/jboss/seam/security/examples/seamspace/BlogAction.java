@@ -1,47 +1,40 @@
-package org.jboss.seam.example.seamspace;
-
-import static org.jboss.seam.ScopeType.CONVERSATION;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
-import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.End;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
-import org.jboss.seam.annotations.Scope;
-
-@Scope(CONVERSATION)
-@Name("blog")
+@Named("blog")
+@ConversationScoped
 public class BlogAction
 {    
    private String name;   
    private Integer blogId;
    
-   @In
-   private EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
-   @In(required = false) @Out(required = false)
-   private MemberBlog selectedBlog;
+   @Inject MemberBlog selectedBlog;
    
-   @In(required = false)
-   private Member authenticatedMember;
+   @Inject Member authenticatedMember;
+   
+   @Inject Conversation conversation;
    
    /**
     * Used to read a single blog entry for a member
-    */
-   @Factory("selectedBlog") 
-   @Begin(join=true)
-   public void getBlog()
+    */   
+   public @Produces @Named("selectedBlog") MemberBlog getBlog()
    {     
+      conversation.begin();
       try
       {
-         selectedBlog = (MemberBlog) entityManager.createQuery(
+         return (MemberBlog) entityManager.createQuery(
            "from MemberBlog b where b.blogId = :blogId and b.member.memberName = :memberName")
            .setParameter("blogId", blogId)
            .setParameter("memberName", name)
@@ -56,7 +49,6 @@ public class BlogAction
       selectedBlog = new MemberBlog();              
    }
    
-   @End
    public void saveEntry()
    {
       selectedBlog.setMember(authenticatedMember);
@@ -64,6 +56,8 @@ public class BlogAction
       selectedBlog.setComments(new ArrayList<BlogComment>());
       
       entityManager.persist(selectedBlog);
+      
+      conversation.end();
    }
    
    public String getName()

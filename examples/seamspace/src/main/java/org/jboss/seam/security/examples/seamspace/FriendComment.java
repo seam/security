@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -11,10 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import org.jboss.seam.annotations.Name;
-
 @Entity
-@Name("friendComment")
 public class FriendComment implements Serializable
 {
    private static final long serialVersionUID = -288494386341008371L;

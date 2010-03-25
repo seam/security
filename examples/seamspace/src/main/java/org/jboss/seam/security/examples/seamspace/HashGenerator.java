@@ -1,18 +1,17 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import javax.enterprise.inject.Model;
+import javax.inject.Inject;
+
 import org.jboss.seam.security.crypto.BinTools;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.management.PasswordHash;
 
-@Scope(ScopeType.EVENT)
-@Name("hashgenerator")
+@Model
 public class HashGenerator
 {
-   @In JpaIdentityStore identityStore;
+   @Inject JpaIdentityStore identityStore;
+   @Inject PasswordHash hash;
    
    private String password;
    private String passwordHash;
@@ -54,7 +53,7 @@ public class HashGenerator
       
       if (passwordSalt == null || "".equals(passwordSalt.trim()))
       {
-         salt = PasswordHash.instance().generateRandomSalt();
+         salt = hash.generateRandomSalt();
          passwordSalt = BinTools.bin2hex(salt);
       }
       else

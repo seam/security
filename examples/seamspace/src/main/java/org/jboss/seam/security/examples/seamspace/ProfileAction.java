@@ -1,25 +1,17 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
-import static org.jboss.seam.ScopeType.CONVERSATION;
-import static org.jboss.seam.ScopeType.EVENT;
 
 import java.util.List;
 import java.util.Random;
 
 import javax.ejb.Remove;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
-import org.jboss.seam.annotations.Destroy;
-import org.jboss.seam.annotations.Factory;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
-import org.jboss.seam.annotations.web.RequestParameter;
-import org.jboss.seam.annotations.Scope;
-
-@Name("profile")
-@Scope(EVENT)
+@RequestScoped
+@Named
 public class ProfileAction
 {
    @RequestParameter

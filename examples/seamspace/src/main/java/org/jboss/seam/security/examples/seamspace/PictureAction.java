@@ -1,17 +1,10 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
-import static org.jboss.seam.ScopeType.CONVERSATION;
 
+import javax.enterprise.inject.Model;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.annotations.Begin;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.core.Conversation;
-
-@Scope(CONVERSATION)
-@Name("pictureAction")
+@Model
 public class PictureAction
 {
    private MemberImage memberImage;

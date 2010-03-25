@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 
@@ -8,10 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.jboss.seam.annotations.Name;
-
 @Entity
-@Name("memberFriend")
 public class MemberFriend implements Serializable
 {
    private static final long serialVersionUID = -167586088947004386L;

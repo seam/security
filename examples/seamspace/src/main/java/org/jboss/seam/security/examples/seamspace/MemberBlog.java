@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -16,11 +16,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.security.Restrict;
+import org.jboss.seam.security.annotations.Restrict;
 
 @Entity
-@Name("memberBlog")
 public class MemberBlog implements Serializable
 {
    private static final long serialVersionUID = 7824113911888715595L;

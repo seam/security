@@ -1,4 +1,4 @@
-package org.jboss.seam.example.seamspace;
+package org.jboss.seam.security.examples.seamspace;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -29,7 +29,6 @@ import org.jboss.seam.annotations.Name;
  * @author Shane Bryzak
  */
 @Entity
-@Name("member")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "membername"))
 public class Member implements Serializable
 {
