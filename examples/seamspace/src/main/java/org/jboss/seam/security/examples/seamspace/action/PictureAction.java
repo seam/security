@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.action;
 
 
 import javax.enterprise.inject.Model;

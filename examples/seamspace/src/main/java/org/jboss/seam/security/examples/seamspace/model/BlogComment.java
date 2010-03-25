@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 
 @Entity

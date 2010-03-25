@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.action;
 
 import java.io.Serializable;
 import java.security.Principal;
@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
+import org.jboss.seam.security.examples.seamspace.model.Member;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.Permission;
 import org.jboss.seam.security.permission.PermissionManager;

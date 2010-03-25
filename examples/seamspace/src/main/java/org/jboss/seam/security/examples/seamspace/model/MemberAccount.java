@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.model;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -12,8 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.NotNull;
 import org.jboss.seam.security.annotations.management.PasswordSalt;
 import org.jboss.seam.security.annotations.management.UserEnabled;
 import org.jboss.seam.security.annotations.management.UserPassword;

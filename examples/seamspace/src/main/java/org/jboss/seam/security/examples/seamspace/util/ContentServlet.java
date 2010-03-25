@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.util;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

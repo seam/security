@@ -1,13 +1,18 @@
-package org.jboss.seam.security.examples.seamspace;
+package org.jboss.seam.security.examples.seamspace.action;
 
 import java.util.Date;
 
-import javax.ejb.Remove;
+import javax.enterprise.context.Conversation;
 import javax.enterprise.inject.Model;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.RunAsOperation;
+import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.management.JpaIdentityStore;
 
@@ -16,14 +21,15 @@ public class RegisterAction
 {
    private Member member;
    
-   @In
-   private EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
-   @In
-   private Identity identity;
+   @Inject Identity identity;
    
-   @In
-   private IdentityManager identityManager;
+   @Inject Credentials credentials;
+   
+   @Inject IdentityManager identityManager;
+   
+   @Inject Conversation conversation;
       
    private MemberAccount newAccount;
    
@@ -42,9 +48,9 @@ public class RegisterAction
    
    private boolean verified;
 
-   @Begin
    public void start()
    {
+      conversation.begin();
       member = new Member();
    }
    
@@ -60,7 +66,7 @@ public class RegisterAction
       }           
    }
    
-   @Observer(JpaIdentityStore.EVENT_USER_CREATED)
+   //@Observer(JpaIdentityStore.EVENT_USER_CREATED)
    public void accountCreated(MemberAccount account)
    {
       // The user *may* have been created from the user manager screen. In that
@@ -83,7 +89,6 @@ public class RegisterAction
       this.newAccount = account;
    }
 
-   @End
    public void uploadPicture() 
    {  
       member.setMemberSince(new Date());      
@@ -113,9 +118,11 @@ public class RegisterAction
       }
       
       // Login the user
-      identity.getCredentials().setUsername(username);
-      identity.getCredentials().setPassword(password);
+      credentials.setUsername(username);
+      credentials.setPassword(password);
       identity.login();
+      
+      conversation.end();
    }
    
    public Member getMember()
@@ -187,7 +194,4 @@ public class RegisterAction
    {
       return verified;
    }
-   
-   @Destroy @Remove
-   public void destroy() {}
 }
