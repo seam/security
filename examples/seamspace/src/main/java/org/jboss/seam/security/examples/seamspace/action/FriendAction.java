@@ -10,6 +10,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
+//import org.jboss.seam.international.StatusMessages;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.examples.seamspace.model.FriendComment;
 import org.jboss.seam.security.examples.seamspace.model.Member;
@@ -21,13 +22,13 @@ public class FriendAction implements Serializable
 {
    private static final long serialVersionUID = 4565339001481077911L;
 
-   @RequestParameter("name")
+   //@RequestParameter("name")
    private String name;
    
-   @Out(required = false)
+   //@Out(required = false)
    private FriendComment friendComment;
    
-   @Out(required = false)
+   //@Out(required = false)
    private MemberFriend friendRequest;
    
    @Inject Member authenticatedMember;
@@ -37,8 +38,10 @@ public class FriendAction implements Serializable
    @Inject Conversation conversation;
    
    @Inject Identity identity;
+   
+   //@Inject StatusMessages messages;
       
-   @Factory("friendComment")
+   //@Factory("friendComment")
    public void createComment()
    {      
       conversation.begin();
@@ -49,7 +52,7 @@ public class FriendAction implements Serializable
          .setParameter("memberName", name)
          .getSingleResult();
                   
-         Contexts.getMethodContext().set("friends", member.getFriends());
+         //Contexts.getMethodContext().set("friends", member.getFriends());
          identity.checkPermission(member, "createFriendComment");
 
          friendComment = new FriendComment();
@@ -58,7 +61,7 @@ public class FriendAction implements Serializable
       }
       catch (NoResultException ex) 
       { 
-         FacesMessages.instance().add("Member not found.");
+         //FacesMessages.instance().add("Member not found.");
       }
    }
    
@@ -79,7 +82,7 @@ public class FriendAction implements Serializable
          .setParameter("memberName", name)
          .getSingleResult();
                   
-         Contexts.getMethodContext().set("friends", member.getFriends());
+         //Contexts.getMethodContext().set("friends", member.getFriends());
          identity.checkPermission(member, "createFriendRequest");
 
          friendRequest = new MemberFriend();
@@ -88,7 +91,7 @@ public class FriendAction implements Serializable
       }
       catch (NoResultException ex) 
       { 
-         FacesMessages.instance().add("Member not found.");
+         //FacesMessages.instance().add("Member not found.");
          conversation.end();
       }
    }
@@ -97,7 +100,7 @@ public class FriendAction implements Serializable
    {
       friendRequest.getMember().getFriends().add(friendRequest);
       entityManager.persist(friendRequest);      
-      FacesMessages.instance().add("Friend request sent");
+      //FacesMessages.instance().add("Friend request sent");
       conversation.end();
    }
    

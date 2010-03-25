@@ -6,7 +6,6 @@
    <toc/>
    
    <title>Seam Remoting</title>      
-   <xi:include href="remoting-general.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-   <xi:include href="remoting-model.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />     
+   <xi:include href="security-general.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
 </book>

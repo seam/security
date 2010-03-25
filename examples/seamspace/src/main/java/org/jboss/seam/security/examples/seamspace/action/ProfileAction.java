@@ -18,7 +18,7 @@ import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
 @Named
 public class ProfileAction
 {
-   @RequestParameter
+   //@RequestParameter
    private String name;
 
    @Inject Member selectedMember;
@@ -27,15 +27,15 @@ public class ProfileAction
    @Inject
    private Member authenticatedMember;
    
-   @Out(required = false)
+   //@Out(required = false)
    List<Member> newMembers;
    
-   @Out(required = false)
+   //@Out(required = false)
    List<MemberBlog> memberBlogs;   
    
    @Inject EntityManager entityManager;
 
-   @Factory("selectedMember")
+   //@Factory("selectedMember")
    public void display()
    {      
       if (name == null && authenticatedMember != null)
@@ -73,7 +73,7 @@ public class ProfileAction
     * Used to read all blog entries for a member
     */
    @SuppressWarnings("unchecked")
-   @Factory("memberBlogs")
+   //@Factory("memberBlogs")
    public void getMemberBlogs()
    {
       if (name == null && authenticatedMember != null)
@@ -88,7 +88,7 @@ public class ProfileAction
    }   
    
    @SuppressWarnings("unchecked")
-   @Factory("newMembers")
+   //@Factory("newMembers")
    public void newMembers()
    {
       newMembers = entityManager.createQuery(

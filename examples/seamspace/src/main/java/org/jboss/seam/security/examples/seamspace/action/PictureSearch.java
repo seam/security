@@ -25,10 +25,10 @@ public class PictureSearch implements Serializable
    
    @Inject Identity identity;
    
-   @Out(required = false)
+   //@Out(required = false)
    private List<MemberImage> memberImages;
    
-   @RequestParameter
+   //@RequestParameter
    private Integer imageId;
    
    public String getMemberName()

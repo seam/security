@@ -62,7 +62,7 @@ public class RegisterAction
       
       if (!verified)
       {
-         FacesMessages.instance().addToControl("confirmPassword", "Passwords do not match");
+         //FacesMessages.instance().addToControl("confirmPassword", "Passwords do not match");
       }           
    }
    
