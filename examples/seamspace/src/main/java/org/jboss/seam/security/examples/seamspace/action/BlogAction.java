@@ -1,5 +1,6 @@
 package org.jboss.seam.security.examples.seamspace.action;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -17,8 +18,10 @@ import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
 
 @Named("blog")
 @ConversationScoped
-public class BlogAction
+public class BlogAction implements Serializable
 {    
+   private static final long serialVersionUID = 4537854484817638134L;
+   
    private String name;   
    private Integer blogId;
    

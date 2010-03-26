@@ -4,24 +4,23 @@ package org.jboss.seam.security.examples.seamspace.action;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Model;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.annotations.Delete;
 import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
-@RequestScoped
-@Named
+@Model
 public class PictureSearch implements Serializable
 {
    private static final long serialVersionUID = -1868188969326866331L;
    
    private String memberName;
    
-   @Inject EntityManager entityManager;
+   @PersistenceContext EntityManager entityManager;
    
    @Inject Identity identity;
    

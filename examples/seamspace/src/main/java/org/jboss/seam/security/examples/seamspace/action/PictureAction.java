@@ -1,6 +1,8 @@
 package org.jboss.seam.security.examples.seamspace.action;
 
 
+import java.io.Serializable;
+
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
@@ -12,8 +14,10 @@ import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
 @Named
 @ConversationScoped
-public class PictureAction
+public class PictureAction implements Serializable
 {
+   private static final long serialVersionUID = -3768106941393643629L;
+
    private MemberImage memberImage;
    
    @Inject Member authenticatedMember;

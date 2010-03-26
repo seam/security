@@ -14,7 +14,6 @@ import org.jboss.seam.security.examples.seamspace.model.Member;
 import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
 import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 import org.jboss.seam.security.management.IdentityManager;
-import org.jboss.seam.security.management.JpaIdentityStore;
 
 @Model
 public class RegisterAction
