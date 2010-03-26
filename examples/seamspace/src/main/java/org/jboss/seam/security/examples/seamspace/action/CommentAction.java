@@ -22,7 +22,7 @@ public class CommentAction
    
    @Inject Member authenticatedMember;
    
-   @Inject MemberBlog selectedBlog;
+   /*@Inject */MemberBlog selectedBlog;
    
    @Inject Conversation conversation;
    

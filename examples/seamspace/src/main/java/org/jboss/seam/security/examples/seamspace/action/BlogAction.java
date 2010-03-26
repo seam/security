@@ -27,7 +27,7 @@ public class BlogAction implements Serializable
    
    @Inject EntityManager entityManager;
    
-   @Inject MemberBlog selectedBlog;
+   /*@Inject*/ MemberBlog selectedBlog;
    
    @Inject Member authenticatedMember;
    

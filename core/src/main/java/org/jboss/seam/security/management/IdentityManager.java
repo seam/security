@@ -6,10 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Model;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.util.Strings;
@@ -21,8 +20,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@Named
-@RequestScoped
+@Model
 public class IdentityManager implements Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;
@@ -40,7 +38,7 @@ public class IdentityManager implements Serializable
    @Inject BeanManager manager;
    @Inject Identity identity;
    
-   @Inject private IdentityStore identityStore;
+   private IdentityStore identityStore;
    private IdentityStore roleIdentityStore;
    
    @Inject
@@ -53,7 +51,7 @@ public class IdentityManager implements Serializable
       
       if (identityStore == null || roleIdentityStore == null)
       {
-         log.warn("no identity store available - please configure an identityStore if identity " +
+         log.warn("No identity store available - please configure an identityStore if identity " +
                "management is required.");
       }
    }

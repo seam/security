@@ -65,7 +65,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    @Inject IdentifierPolicy identifierPolicy;
    @Inject BeanManager manager;
    @Inject IdentityManager identityManager;
-   @Inject IdentityStore identityStore;
+   //@Inject IdentityStore identityStore;
    
    @Inject Instance<EntityManager> entityManagerInstance;
    
@@ -530,7 +530,8 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    {
       boolean recipientIsRole = recipient instanceof Role;
             
-      if (identityStore != null && identityStore instanceof JpaIdentityStore)
+      if (identityManager.getIdentityStore() != null && 
+            identityManager.getIdentityStore() instanceof JpaIdentityStore)
       {
          // TODO review this code
          
@@ -538,7 +539,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
                //roleProperty.getPropertyType().equals(config.getRoleEntityClass()))
                )
          {
-            return ((JpaIdentityStore) identityStore).lookupRole(recipient.getName());
+            return ((JpaIdentityStore) identityManager.getIdentityStore()).lookupRole(recipient.getName());
          }
          //else if (userProperty.getPropertyType().equals(config.getUserEntityClass()))
          //{

@@ -20,7 +20,7 @@ public class PictureSearch implements Serializable
    
    private String memberName;
    
-   @PersistenceContext EntityManager entityManager;
+   /*@PersistenceContext */EntityManager entityManager;
    
    @Inject Identity identity;
    
