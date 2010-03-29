@@ -19,14 +19,14 @@
         <div class="headerMenu">
   
           <ui:fragment rendered="#{identity.loggedIn}">
-            <s:link id="profile" view="/profile.xhtml" value="My Profile" propagation="none">
+            <h:link id="profile" view="/profile.xhtml" value="My Profile" propagation="none">
               <f:param name="name" value="#{authenticatedMember.memberName}"/>
-            </s:link>
+            </h:link>
             <h:outputText styleClass="divider" value=" | "/>
           </ui:fragment>
   
-          <ui:fragment rendered="#{s:hasRole('admin')}">
-            <s:link id="security" view="/security.xhtml" value="Security" propagation="none"/>
+          <ui:fragment rendered="#{identity.hasRole('admin')}">
+            <h:link id="security" view="/security.xhtml" value="Security" propagation="none"/>
             <h:outputText styleClass="divider" value=" | "/>
           </ui:fragment>
           

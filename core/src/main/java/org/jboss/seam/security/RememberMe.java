@@ -248,6 +248,11 @@ public class RememberMe implements Serializable
       return enabled;
    }
    
+   public void setEnabled(boolean enabled)
+   {
+      this.enabled = enabled;
+   }
+   
    /*
    public void setEnabled(boolean enabled)
    {
