@@ -11,9 +11,17 @@
    <idm:IdentityManager>
       <s:extends/>
       <idm:identityStore>
-         <s:Inject/>
-         <s:New>org.jboss.seam.security.management.JpaIdentityStore</s:New>
+        <s:Inject/>
+        <s:type>
+           <idm:JpaIdentityStore/>
+        </s:type>
       </idm:identityStore>
    </idm:IdentityManager>
+   
+   <idm:JpaIdentityStore>
+      <s:extends/>
+      <idm:userEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberAccount</idm:userEntityClass>
+      <idm:roleEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberRole</idm:roleEntityClass>
+   </idm:JpaIdentityStore>
    
 </beans>

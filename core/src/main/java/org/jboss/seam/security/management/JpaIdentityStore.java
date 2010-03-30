@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.enterprise.inject.Instance;
@@ -21,11 +22,23 @@ import javax.persistence.PersistenceContext;
 
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
+import org.jboss.seam.security.annotations.management.PasswordSalt;
+import org.jboss.seam.security.annotations.management.RoleConditional;
+import org.jboss.seam.security.annotations.management.RoleGroups;
+import org.jboss.seam.security.annotations.management.RoleName;
+import org.jboss.seam.security.annotations.management.UserEnabled;
+import org.jboss.seam.security.annotations.management.UserFirstName;
+import org.jboss.seam.security.annotations.management.UserLastName;
+import org.jboss.seam.security.annotations.management.UserPassword;
+import org.jboss.seam.security.annotations.management.UserPrincipal;
+import org.jboss.seam.security.annotations.management.UserRoles;
 import org.jboss.seam.security.crypto.BinTools;
 import org.jboss.seam.security.events.PrePersistUserEvent;
 import org.jboss.seam.security.events.PrePersistUserRoleEvent;
 import org.jboss.seam.security.events.UserAuthenticatedEvent;
 import org.jboss.seam.security.events.UserCreatedEvent;
+import org.jboss.seam.security.util.AnnotatedBeanProperty;
+import org.jboss.seam.security.util.TypedBeanProperty;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@RequestScoped
+@ApplicationScoped
 public class JpaIdentityStore implements IdentityStore, Serializable
 {
    private static final long serialVersionUID = 1171875389743972646L;
@@ -44,12 +57,28 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);
           
-   @PersistenceContext EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
    @Inject Instance<PasswordHash> passwordHashInstance;
+   
+   @Inject BeanManager manager;
   
-   private JpaIdentityStoreConfig config;
-   private BeanManager manager;
+   private Class<?> userEntityClass;
+   private Class<?> roleEntityClass;
+   private Class<?> xrefEntityClass;
+   private TypedBeanProperty xrefUserProperty;
+   private TypedBeanProperty xrefRoleProperty;
+   
+   private AnnotatedBeanProperty<UserPrincipal> userPrincipalProperty;
+   private AnnotatedBeanProperty<UserPassword> userPasswordProperty;
+   private AnnotatedBeanProperty<PasswordSalt> passwordSaltProperty;
+   private AnnotatedBeanProperty<UserRoles> userRolesProperty;
+   private AnnotatedBeanProperty<UserEnabled> userEnabledProperty;
+   private AnnotatedBeanProperty<UserFirstName> userFirstNameProperty;
+   private AnnotatedBeanProperty<UserLastName> userLastNameProperty;
+   private AnnotatedBeanProperty<RoleName> roleNameProperty;
+   private AnnotatedBeanProperty<RoleGroups> roleGroupsProperty;
+   private AnnotatedBeanProperty<RoleConditional> roleConditionalProperty;
    
    public Set<Feature> getFeatures()
    {
@@ -67,29 +96,87 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    }
    
    @Inject
-   public void init(JpaIdentityStoreConfig config, BeanManager manager)
-   {
-      this.config = config;
-      this.manager = manager;
-      
+   public void init()
+   {      
       if (featureSet == null)
       {
          featureSet = new FeatureSet();
          featureSet.enableAll();
       }
       
-      if (config.getUserEntityClass() == null)
+      userPrincipalProperty = new AnnotatedBeanProperty<UserPrincipal>(getUserEntityClass(), UserPrincipal.class);
+      userPasswordProperty = new AnnotatedBeanProperty<UserPassword>(getUserEntityClass(), UserPassword.class);
+      passwordSaltProperty = new AnnotatedBeanProperty<PasswordSalt>(getUserEntityClass(), PasswordSalt.class);
+      userRolesProperty = new AnnotatedBeanProperty<UserRoles>(getUserEntityClass(), UserRoles.class);
+      userEnabledProperty = new AnnotatedBeanProperty<UserEnabled>(getUserEntityClass(), UserEnabled.class);
+      userFirstNameProperty = new AnnotatedBeanProperty<UserFirstName>(getUserEntityClass(), UserFirstName.class);
+      userLastNameProperty = new AnnotatedBeanProperty<UserLastName>(getUserEntityClass(), UserLastName.class);
+             
+      if (!userPrincipalProperty.isSet())
       {
-         log.error("Error in JpaIdentityStore configuration - userClass must be configured.");
-         return;
+         throw new IdentityManagementException("Invalid userClass " + getUserEntityClass().getName() +
+               " - required annotation @UserPrincipal not found on any Field or Method.");
       }
+      
+      if (!userRolesProperty.isSet())
+      {
+         throw new IdentityManagementException("Invalid userClass " + getUserEntityClass().getName() +
+         " - required annotation @UserRoles not found on any Field or Method.");
+      }
+      
+      if (getRoleEntityClass() != null)
+      {
+         roleNameProperty = new AnnotatedBeanProperty<RoleName>(getRoleEntityClass(), RoleName.class);
+         roleGroupsProperty = new AnnotatedBeanProperty<RoleGroups>(getRoleEntityClass(), RoleGroups.class);
+         roleConditionalProperty = new AnnotatedBeanProperty<RoleConditional>(getRoleEntityClass(), RoleConditional.class);
+         
+         if (!roleNameProperty.isSet())
+         {
+            throw new IdentityManagementException("Invalid roleClass " + getRoleEntityClass().getName() +
+            " - required annotation @RoleName not found on any Field or Method.");
+         }
+                 
+         Type type = userRolesProperty.getPropertyType();
+         if (type instanceof ParameterizedType &&
+               Collection.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType()))
+         {
+            Type genType = Object.class;
+
+            for (Type t : ((ParameterizedType) type).getActualTypeArguments())
+            {
+               genType = t;
+               break;
+            }
+         
+            // If the @UserRoles property isn't a collection of <roleClass>, then assume the relationship
+            // is going through a cross-reference table
+            if (!genType.equals(getRoleEntityClass()))
+            {
+               xrefEntityClass = (Class<?>) genType;
+               xrefUserProperty = new TypedBeanProperty(xrefEntityClass, getUserEntityClass());
+               xrefRoleProperty = new TypedBeanProperty(xrefEntityClass, getRoleEntityClass());
+               
+               if (!xrefUserProperty.isSet())
+               {
+                  throw new IdentityManagementException("Error configuring JpaIdentityStore - it looks like " +
+                        "you're using a cross-reference table, however the user property cannot be determined.");
+               }
+               
+               if (!xrefRoleProperty.isSet())
+               {
+                  throw new IdentityManagementException("Error configuring JpaIdentityStore - it looks like " +
+                  "you're using a cross-reference table, however the role property cannot be determined.");
+               }
+            }
+         }
+      }      
    }
    
    public boolean createUser(String username, String password, String firstname, String lastname)
    {
       try
       {
-         if (config.getUserEntityClass() == null)
+         if (getUserEntityClass() == null)
          {
             throw new IdentityManagementException("Could not create account, userClass not set");
          }
@@ -99,21 +186,21 @@ public class JpaIdentityStore implements IdentityStore, Serializable
             throw new IdentityManagementException("Could not create account, already exists");
          }
          
-         Object user = config.getUserEntityClass().newInstance();
+         Object user = getUserEntityClass().newInstance();
 
-         config.getUserPrincipalProperty().setValue(user, username);
+         getUserPrincipalProperty().setValue(user, username);
 
-         if (config.getUserFirstNameProperty().isSet()) config.getUserFirstNameProperty().setValue(user, firstname);
-         if (config.getUserLastNameProperty().isSet()) config.getUserLastNameProperty().setValue(user, lastname);
+         if (getUserFirstNameProperty().isSet()) getUserFirstNameProperty().setValue(user, firstname);
+         if (getUserLastNameProperty().isSet()) getUserLastNameProperty().setValue(user, lastname);
          
          if (password == null)
          {
-            if (config.getUserEnabledProperty().isSet()) config.getUserEnabledProperty().setValue(user, false);
+            if (getUserEnabledProperty().isSet()) getUserEnabledProperty().setValue(user, false);
          }
          else
          {
             setUserPassword(user, password);
-            if (config.getUserEnabledProperty().isSet()) config.getUserEnabledProperty().setValue(user, true);
+            if (getUserEnabledProperty().isSet()) getUserEnabledProperty().setValue(user, true);
          }
          
          manager.fireEvent(new PrePersistUserEvent(user));
@@ -139,15 +226,15 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    protected void setUserPassword(Object user, String password)
    {
-      if (config.getPasswordSaltProperty().isSet())
+      if (getPasswordSaltProperty().isSet())
       {
          byte[] salt = generateUserSalt(user);
-         config.getPasswordSaltProperty().setValue(user, BinTools.bin2hex(salt));
-         config.getUserPasswordProperty().setValue(user, generatePasswordHash(password, salt));
+         getPasswordSaltProperty().setValue(user, BinTools.bin2hex(salt));
+         getUserPasswordProperty().setValue(user, generatePasswordHash(password, salt));
       }
       else
       {
-         config.getUserPasswordProperty().setValue(user, generatePasswordHash(password, getUserAccountSalt(user)));
+         getUserPasswordProperty().setValue(user, generatePasswordHash(password, getUserAccountSalt(user)));
       }
    }
    
@@ -158,7 +245,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    protected String getUserAccountSalt(Object user)
    {
       // By default, we'll use the user's username as the password salt
-      return config.getUserPrincipalProperty().getValue(user).toString();
+      return getUserPrincipalProperty().getValue(user).toString();
    }
    
    /**
@@ -189,12 +276,12 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    public boolean grantRole(String username, String role)
    {
-      if (config.getRoleEntityClass() == null) return false;
+      if (getRoleEntityClass() == null) return false;
       
       Object user = lookupUser(username);
       if (user == null)
       {
-         if (config.getUserPasswordProperty().isSet())
+         if (getUserPasswordProperty().isSet())
          {
             // If no userPasswordProperty is set, it means that authentication is being performed
             // by another identity store and this one is just managing roles
@@ -221,10 +308,10 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          throw new NoSuchRoleException("Could not grant role, role '" + role + "' does not exist");
       }
       
-      Collection<?> userRoles = (Collection<?>) config.getUserRolesProperty().getValue(user);
+      Collection<?> userRoles = (Collection<?>) getUserRolesProperty().getValue(user);
       if (userRoles == null)
       {
-         Type propType = config.getUserRolesProperty().getPropertyType();
+         Type propType = getUserRolesProperty().getPropertyType();
          Class<?> collectionType;
          
          if (propType instanceof Class && Collection.class.isAssignableFrom((Class<?>) propType))
@@ -251,30 +338,30 @@ public class JpaIdentityStore implements IdentityStore, Serializable
             userRoles = new ArrayList<Object>();
          }
          
-         config.getUserRolesProperty().setValue(user, userRoles);
+         getUserRolesProperty().setValue(user, userRoles);
       }
-      else if (((Collection<?>) config.getUserRolesProperty().getValue(user)).contains(roleToGrant))
+      else if (((Collection<?>) getUserRolesProperty().getValue(user)).contains(roleToGrant))
       {
          return false;
       }
 
-      if (config.getXrefEntityClass() == null)
+      if (getXrefEntityClass() == null)
       {
          // If this is a Many-To-Many relationship, simply add the role
-         ((Collection<Object>) config.getUserRolesProperty().getValue(user)).add(roleToGrant);
+         ((Collection<Object>) getUserRolesProperty().getValue(user)).add(roleToGrant);
       }
       else
       {
          // Otherwise we need to insert a cross-reference entity instance
          try
          {
-            Object xref = config.getXrefEntityClass().newInstance();
-            config.getXrefUserProperty().setValue(xref, user);
-            config.getXrefRoleProperty().setValue(xref, roleToGrant);
+            Object xref = getXrefEntityClass().newInstance();
+            getXrefUserProperty().setValue(xref, user);
+            getXrefRoleProperty().setValue(xref, roleToGrant);
             
             manager.fireEvent(new PrePersistUserRoleEvent(xref));
             
-            ((Collection<Object>) config.getUserRolesProperty().getValue(user)).add(entityManager.merge(xref));
+            ((Collection<Object>) getUserRolesProperty().getValue(user)).add(entityManager.merge(xref));
          }
          catch (Exception ex)
          {
@@ -301,17 +388,17 @@ public class JpaIdentityStore implements IdentityStore, Serializable
              
       boolean success = false;
       
-      if (config.getXrefEntityClass() == null)
+      if (getXrefEntityClass() == null)
       {
-         success = ((Collection<?>) config.getUserRolesProperty().getValue(user)).remove(roleToRevoke);
+         success = ((Collection<?>) getUserRolesProperty().getValue(user)).remove(roleToRevoke);
       }
       else
       {
-         Collection<?> roles = ((Collection<?>) config.getUserRolesProperty().getValue(user));
+         Collection<?> roles = ((Collection<?>) getUserRolesProperty().getValue(user));
 
          for (Object xref : roles)
          {
-            if (config.getXrefRoleProperty().getValue(xref).equals(roleToRevoke))
+            if (getXrefRoleProperty().getValue(xref).equals(roleToRevoke))
             {
                success = roles.remove(xref);
                break;
@@ -325,7 +412,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    public boolean addRoleToGroup(String role, String group)
    {
-      if (!config.getRoleGroupsProperty().isSet()) return false;
+      if (!getRoleGroupsProperty().isSet()) return false;
       
       Object targetRole = lookupRole(role);
       if (targetRole == null)
@@ -339,14 +426,14 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          throw new NoSuchRoleException("Could not grant role, group '" + group + "' does not exist");
       }
       
-      Collection<?> roleGroups = (Collection<?>) config.getRoleGroupsProperty().getValue(targetRole);
+      Collection<?> roleGroups = (Collection<?>) getRoleGroupsProperty().getValue(targetRole);
       if (roleGroups == null)
       {
          // This should either be a Set, or a List...
          Class<?> rawType = null;
-         if (config.getRoleGroupsProperty().getPropertyType() instanceof ParameterizedType)
+         if (getRoleGroupsProperty().getPropertyType() instanceof ParameterizedType)
          {
-            rawType = (Class<?>) ((ParameterizedType) config.getRoleGroupsProperty().getPropertyType()).getRawType();
+            rawType = (Class<?>) ((ParameterizedType) getRoleGroupsProperty().getPropertyType()).getRawType();
          }
          else
          {
@@ -362,21 +449,21 @@ public class JpaIdentityStore implements IdentityStore, Serializable
             roleGroups = new ArrayList<Object>();
          }
          
-         config.getRoleGroupsProperty().setValue(targetRole, roleGroups);
+         getRoleGroupsProperty().setValue(targetRole, roleGroups);
       }
-      else if (((Collection<?>) config.getRoleGroupsProperty().getValue(targetRole)).contains(targetGroup))
+      else if (((Collection<?>) getRoleGroupsProperty().getValue(targetRole)).contains(targetGroup))
       {
          return false;
       }
 
-      ((Collection<Object>) config.getRoleGroupsProperty().getValue(targetRole)).add(targetGroup);
+      ((Collection<Object>) getRoleGroupsProperty().getValue(targetRole)).add(targetGroup);
       
       return true;
    }
 
    public boolean removeRoleFromGroup(String role, String group)
    {
-      if (!config.getRoleGroupsProperty().isSet()) return false;
+      if (!getRoleGroupsProperty().isSet()) return false;
       
       Object roleToRemove = lookupRole(role);
       if (role == null)
@@ -390,7 +477,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          throw new NoSuchRoleException("Could not remove role from group, no such group '" + group + "'");
       }
        
-      boolean success = ((Collection<?>) config.getRoleGroupsProperty().getValue(roleToRemove)).remove(targetGroup);
+      boolean success = ((Collection<?>) getRoleGroupsProperty().getValue(roleToRemove)).remove(targetGroup);
       
       return success;
    }
@@ -399,7 +486,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    {
       try
       {
-         if (config.getRoleEntityClass() == null)
+         if (getRoleEntityClass() == null)
          {
             throw new IdentityManagementException("Could not create role, roleClass not set");
          }
@@ -409,8 +496,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
             throw new IdentityManagementException("Could not create role, already exists");
          }
          
-         Object instance = config.getRoleEntityClass().newInstance();
-         config.getRoleNameProperty().setValue(instance, role);
+         Object instance = getRoleEntityClass().newInstance();
+         getRoleNameProperty().setValue(instance, role);
          entityManager.persist(instance);
          
          return true;
@@ -436,9 +523,9 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          throw new NoSuchRoleException("Could not delete role, role '" + role + "' does not exist");
       }
       
-      if (config.getXrefEntityClass() != null)
+      if (getXrefEntityClass() != null)
       {
-         entityManager.createQuery("delete " + config.getXrefEntityClass().getName() + " where role = :role")
+         entityManager.createQuery("delete " + getXrefEntityClass().getName() + " where role = :role")
          .setParameter("role", roleToDelete)
          .executeUpdate();
       }
@@ -463,10 +550,10 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    public boolean enableUser(String name)
    {
-      if (!config.getUserEnabledProperty().isSet())
+      if (!getUserEnabledProperty().isSet())
       {
          log.debug("Can not enable user, no @UserEnabled property configured in userClass " +
-               config.getUserEntityClass().getName());
+               getUserEntityClass().getName());
          return false;
       }
       
@@ -477,21 +564,21 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       }
       
       // Can't enable an already-enabled user, return false
-      if (((Boolean) config.getUserEnabledProperty().getValue(user)) == true)
+      if (((Boolean) getUserEnabledProperty().getValue(user)) == true)
       {
          return false;
       }
       
-      config.getUserEnabledProperty().setValue(user, true);
+      getUserEnabledProperty().setValue(user, true);
       return true;
    }
    
    public boolean disableUser(String name)
    {
-      if (!config.getUserEnabledProperty().isSet())
+      if (!getUserEnabledProperty().isSet())
       {
          log.debug("Can not disable user, no @UserEnabled property configured in userClass " +
-               config.getUserEntityClass().getName());
+               getUserEntityClass().getName());
          return false;
       }
       
@@ -502,12 +589,12 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       }
       
       // Can't disable an already-disabled user, return false
-      if (((Boolean) config.getUserEnabledProperty().getValue(user)) == false)
+      if (((Boolean) getUserEnabledProperty().getValue(user)) == false)
       {
          return false;
       }
       
-      config.getUserEnabledProperty().setValue(user, false);
+      getUserEnabledProperty().setValue(user, false);
       return true;
    }
    
@@ -537,8 +624,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    public boolean isUserEnabled(String name)
    {
       Object user = lookupUser(name);
-      return user != null && (!config.getUserEnabledProperty().isSet() ||
-            (((Boolean) config.getUserEnabledProperty().getValue(user))) == true);
+      return user != null && (!getUserEnabledProperty().isSet() ||
+            (((Boolean) getUserEnabledProperty().getValue(user))) == true);
    }
    
    public List<String> getGrantedRoles(String name)
@@ -551,20 +638,20 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
       List<String> roles = new ArrayList<String>();
       
-      Collection<?> userRoles = (Collection<?>) config.getUserRolesProperty().getValue(user);
+      Collection<?> userRoles = (Collection<?>) getUserRolesProperty().getValue(user);
       if (userRoles != null)
       {
          for (Object role : userRoles)
          {
-            if (config.getXrefEntityClass() == null)
+            if (getXrefEntityClass() == null)
             {
-               roles.add((String) config.getRoleNameProperty().getValue(role));
+               roles.add((String) getRoleNameProperty().getValue(role));
             }
             else
             {
-               Object xref = config.getRoleNameProperty().getValue(role);
-               Object userRole = config.getXrefRoleProperty().getValue(xref);
-               roles.add((String) config.getRoleNameProperty().getValue(userRole));
+               Object xref = getRoleNameProperty().getValue(role);
+               Object userRole = getXrefRoleProperty().getValue(xref);
+               roles.add((String) getRoleNameProperty().getValue(userRole));
             }
          }
       }
@@ -582,14 +669,14 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
       List<String> groups = new ArrayList<String>();
       
-      if (config.getRoleGroupsProperty().isSet())
+      if (getRoleGroupsProperty().isSet())
       {
-         Collection<?> roleGroups = (Collection<?>) config.getRoleGroupsProperty().getValue(role);
+         Collection<?> roleGroups = (Collection<?>) getRoleGroupsProperty().getValue(role);
          if (roleGroups != null)
          {
             for (Object group : roleGroups)
             {
-               groups.add((String) config.getRoleNameProperty().getValue(group));
+               groups.add((String) getRoleNameProperty().getValue(group));
             }
          }
       }
@@ -606,12 +693,12 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       }
 
       Set<String> roles = new HashSet<String>();
-      Collection<?> userRoles = (Collection<?>) config.getUserRolesProperty().getValue(user);
+      Collection<?> userRoles = (Collection<?>) getUserRolesProperty().getValue(user);
       if (userRoles != null)
       {
          for (Object role : userRoles)
          {
-            addRoleAndMemberships((String) config.getRoleNameProperty().getValue(role), roles);
+            addRoleAndMemberships((String) getRoleNameProperty().getValue(role), roles);
          }
       }
       
@@ -624,15 +711,15 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       {
          Object instance = lookupRole(role);
          
-         if (config.getRoleGroupsProperty().isSet())
+         if (getRoleGroupsProperty().isSet())
          {
-            Collection<?> groups = (Collection<?>) config.getRoleGroupsProperty().getValue(instance);
+            Collection<?> groups = (Collection<?>) getRoleGroupsProperty().getValue(instance);
             
             if (groups != null)
             {
                for (Object group : groups)
                {
-                  addRoleAndMemberships((String) config.getRoleNameProperty().getValue(group), roles);
+                  addRoleAndMemberships((String) getRoleNameProperty().getValue(group), roles);
                }
             }
          }
@@ -641,12 +728,12 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    public String generatePasswordHash(String password, byte[] salt)
    {
-      if (config.getPasswordSaltProperty().isSet())
+      if (getPasswordSaltProperty().isSet())
       {
          try
          {
             return getPasswordHash().createPasswordKey(password.toCharArray(), salt,
-                  config.getUserPasswordProperty().getAnnotation().iterations());
+                  getUserPasswordProperty().getAnnotation().iterations());
          }
          catch (GeneralSecurityException ex)
          {
@@ -666,7 +753,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @Deprecated
    protected String generatePasswordHash(String password, String salt)
    {
-      String algorithm = config.getUserPasswordProperty().getAnnotation().hash();
+      String algorithm = getUserPasswordProperty().getAnnotation().hash();
       
       if (algorithm == null || "".equals(algorithm))
       {
@@ -699,17 +786,17 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    public boolean authenticate(String username, String password)
    {
       Object user = lookupUser(username);
-      if (user == null || (config.getUserEnabledProperty().isSet() &&
-            ((Boolean) config.getUserEnabledProperty().getValue(user) == false)))
+      if (user == null || (getUserEnabledProperty().isSet() &&
+            ((Boolean) getUserEnabledProperty().getValue(user) == false)))
       {
          return false;
       }
       
       String passwordHash = null;
       
-      if (config.getPasswordSaltProperty().isSet())
+      if (getPasswordSaltProperty().isSet())
       {
-         String encodedSalt = (String) config.getPasswordSaltProperty().getValue(user);
+         String encodedSalt = (String) getPasswordSaltProperty().getValue(user);
          if (encodedSalt == null)
          {
             throw new IdentityManagementException("A @PasswordSalt property was found on entity " + user +
@@ -724,7 +811,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       }
       
        
-      boolean success = passwordHash.equals(config.getUserPasswordProperty().getValue(user));
+      boolean success = passwordHash.equals(getUserPasswordProperty().getValue(user));
             
       if (success)
       {
@@ -739,8 +826,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       try
       {
          Object user = entityManager.createQuery(
-            "select u from " + config.getUserEntityClass().getName() + " u where " +
-            config.getUserPrincipalProperty().getName() + " = :username")
+            "select u from " + getUserEntityClass().getName() + " u where " +
+            getUserPrincipalProperty().getName() + " = :username")
             .setParameter("username", username)
             .getSingleResult();
          
@@ -754,17 +841,17 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    public String getUserName(Object user)
    {
-      return (String) config.getUserPrincipalProperty().getValue(user);
+      return (String) getUserPrincipalProperty().getValue(user);
    }
    
    public String getRoleName(Object role)
    {
-      return (String) config.getRoleNameProperty().getValue(role);
+      return (String) getRoleNameProperty().getValue(role);
    }
    
    public boolean isRoleConditional(String role)
    {
-      return config.getRoleConditionalProperty().isSet() ? (Boolean) config.getRoleConditionalProperty().getValue(
+      return getRoleConditionalProperty().isSet() ? (Boolean) getRoleConditionalProperty().getValue(
             lookupRole(role)) : false;
    }
    
@@ -773,7 +860,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       try
       {
          Object value = entityManager.createQuery(
-            "select r from " + config.getRoleEntityClass().getName() + " r where " + config.getRoleNameProperty().getName() +
+            "select r from " + getRoleEntityClass().getName() + " r where " + getRoleNameProperty().getName() +
             " = :role")
             .setParameter("role", role)
             .getSingleResult();
@@ -790,8 +877,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    public List<String> listUsers()
    {
       return entityManager.createQuery(
-            "select u." + config.getUserPrincipalProperty().getName() + " from " +
-            config.getUserEntityClass().getName() + " u")
+            "select u." + getUserPrincipalProperty().getName() + " from " +
+            getUserEntityClass().getName() + " u")
             .getResultList();
    }
    
@@ -799,8 +886,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    public List<String> listUsers(String filter)
    {
       return entityManager.createQuery(
-            "select u." + config.getUserPrincipalProperty().getName() + " from " + config.getUserEntityClass().getName() +
-            " u where lower(" + config.getUserPrincipalProperty().getName() + ") like :username")
+            "select u." + getUserPrincipalProperty().getName() + " from " + getUserEntityClass().getName() +
+            " u where lower(" + getUserPrincipalProperty().getName() + ") like :username")
             .setParameter("username", "%" + (filter != null ? filter.toLowerCase() : "") +
                   "%")
             .getResultList();
@@ -810,8 +897,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    public List<String> listRoles()
    {
       return entityManager.createQuery(
-            "select r." + config.getRoleNameProperty().getName() + " from " +
-            config.getRoleEntityClass().getName() + " r").getResultList();
+            "select r." + getRoleNameProperty().getName() + " from " +
+            getRoleEntityClass().getName() + " r").getResultList();
    }
    
    public List<Principal> listMembers(String role)
@@ -836,20 +923,20 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    {
       Object roleEntity = lookupRole(role);
 
-      if (config.getXrefEntityClass() == null)
+      if (getXrefEntityClass() == null)
       {
          return entityManager.createQuery("select u." +
-               config.getUserPrincipalProperty().getName() +
-               " from " + config.getUserEntityClass().getName() + " u where :role member of u." +
-               config.getUserRolesProperty().getName())
+               getUserPrincipalProperty().getName() +
+               " from " + getUserEntityClass().getName() + " u where :role member of u." +
+               getUserRolesProperty().getName())
                .setParameter("role", roleEntity)
                .getResultList();
       }
       else
       {
          List<?> xrefs = entityManager.createQuery("select x from " +
-               config.getXrefEntityClass().getName() + " x where x." +
-               config.getXrefRoleProperty().getName() + " = :role")
+               getXrefEntityClass().getName() + " x where x." +
+               getXrefRoleProperty().getName() + " = :role")
                .setParameter("role", roleEntity)
                .getResultList();
 
@@ -857,8 +944,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          
          for (Object xref : xrefs)
          {
-            Object user = config.getXrefUserProperty().getValue(xref);
-            members.add(config.getUserPrincipalProperty().getValue(user).toString());
+            Object user = getXrefUserProperty().getValue(xref);
+            members.add(getUserPrincipalProperty().getValue(user).toString());
          }
          
          return members;
@@ -869,14 +956,14 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    private List<String> listRoleMembers(String role)
    {
-      if (config.getRoleGroupsProperty().isSet())
+      if (getRoleGroupsProperty().isSet())
       {
          Object roleEntity = lookupRole(role);
          
          return entityManager.createQuery("select r." +
-               config.getRoleNameProperty().getName() +
-               " from " + config.getRoleEntityClass().getName() + " r where :role member of r." +
-               config.getRoleGroupsProperty().getName())
+               getRoleNameProperty().getName() +
+               " from " + getRoleEntityClass().getName() + " r where :role member of r." +
+               getRoleGroupsProperty().getName())
                .setParameter("role", roleEntity)
                .getResultList();
       }
@@ -890,15 +977,15 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       StringBuilder roleQuery = new StringBuilder();
       
       roleQuery.append("select r.");
-      roleQuery.append(config.getRoleNameProperty().getName());
+      roleQuery.append(getRoleNameProperty().getName());
       roleQuery.append(" from ");
-      roleQuery.append(config.getRoleEntityClass().getName());
+      roleQuery.append(getRoleEntityClass().getName());
       roleQuery.append(" r");
       
-      if (config.getRoleConditionalProperty().isSet())
+      if (getRoleConditionalProperty().isSet())
       {
          roleQuery.append(" where r.");
-         roleQuery.append(config.getRoleConditionalProperty().getName());
+         roleQuery.append(getRoleConditionalProperty().getName());
          roleQuery.append(" = false");
       }
       
@@ -909,4 +996,81 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    {
       return passwordHashInstance.get();
    }
+   
+   public Class<?> getUserEntityClass()
+   {     
+      return userEntityClass;
+   }
+   
+   public void setUserEntityClass(Class<?> userEntityClass)
+   {
+      this.userEntityClass = userEntityClass;
+   }
+   
+   public Class<?> getRoleEntityClass()
+   {      
+      return roleEntityClass;
+   }
+   
+   public void setRoleEntityClass(Class<?> roleEntityClass)
+   {
+      this.roleEntityClass = roleEntityClass;
+   }
+   
+   public Class<?> getXrefEntityClass()
+   {
+      return xrefEntityClass;
+   }
+   
+   public TypedBeanProperty getXrefUserProperty()
+   {
+      return xrefUserProperty;
+   }
+   
+   public TypedBeanProperty getXrefRoleProperty()
+   {
+      return xrefRoleProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserPrincipal> getUserPrincipalProperty()
+   {
+      return userPrincipalProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserPassword> getUserPasswordProperty()
+   {
+      return userPasswordProperty;
+   }
+   
+   public AnnotatedBeanProperty<PasswordSalt> getPasswordSaltProperty() {
+      return passwordSaltProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserRoles> getUserRolesProperty() {
+      return userRolesProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserEnabled> getUserEnabledProperty() {
+      return userEnabledProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserFirstName> getUserFirstNameProperty() {
+      return userFirstNameProperty;
+   }
+   
+   public AnnotatedBeanProperty<UserLastName> getUserLastNameProperty() {
+      return userLastNameProperty;
+   }
+      
+   public AnnotatedBeanProperty<RoleName> getRoleNameProperty() {
+      return roleNameProperty;
+   }
+   
+   public AnnotatedBeanProperty<RoleGroups> getRoleGroupsProperty() {
+      return roleGroupsProperty;
+   }
+   
+   public AnnotatedBeanProperty<RoleConditional> getRoleConditionalProperty() {
+      return roleConditionalProperty;
+   }   
 }
