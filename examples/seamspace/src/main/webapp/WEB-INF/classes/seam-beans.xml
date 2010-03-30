@@ -8,12 +8,12 @@
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                            http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
                            
-   <!--idm:IdentityManager>
+   <idm:IdentityManager>
       <s:extends/>
       <idm:identityStore>
          <s:Inject/>
          <s:New>org.jboss.seam.security.management.JpaIdentityStore</s:New>
       </idm:identityStore>
-   </idm:IdentityManager-->
+   </idm:IdentityManager>
    
 </beans>

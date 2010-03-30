@@ -125,9 +125,8 @@ public class SeamLoginModule implements LoginModule
          }
          else
          {
-            log.error("No authentication method defined - " +
-                  "please define authenticate-method for <security:identity/> in components.xml");
-            throw new LoginException("No authentication method defined");
+            log.error("No Authenticator bean found.");
+            throw new LoginException("No Authenticator bean found");
          }
       }
       catch (Exception ex)

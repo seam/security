@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.enterprise.inject.Model;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.util.Strings;
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@Model
+@Named @ApplicationScoped
 public class IdentityManager implements Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;
@@ -41,7 +43,7 @@ public class IdentityManager implements Serializable
    private IdentityStore identityStore;
    private IdentityStore roleIdentityStore;
    
-   @Inject
+   @PostConstruct
    public void create()
    {
       if (roleIdentityStore == null && identityStore != null)
@@ -49,9 +51,15 @@ public class IdentityManager implements Serializable
          roleIdentityStore = identityStore;
       }
       
-      if (identityStore == null || roleIdentityStore == null)
+      if (identityStore == null)
       {
          log.warn("No identity store available - please configure an identityStore if identity " +
+               "management is required.");
+      }
+      
+      if (roleIdentityStore == null)
+      {
+         log.warn("No role identity store available - please configure a roleIdentityStore if identity " +
                "management is required.");
       }
    }
