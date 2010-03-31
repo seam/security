@@ -6,7 +6,6 @@ import java.util.Date;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -16,7 +15,7 @@ import org.jboss.seam.security.examples.seamspace.model.BlogComment;
 import org.jboss.seam.security.examples.seamspace.model.Member;
 import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
 
-@Named("blog")
+@Named
 @ConversationScoped
 public class BlogAction implements Serializable
 {    
@@ -27,21 +26,26 @@ public class BlogAction implements Serializable
    
    @Inject EntityManager entityManager;
    
-   /*@Inject*/ MemberBlog selectedBlog;
+   private MemberBlog selectedBlog;
    
    @Inject Member authenticatedMember;
    
    @Inject Conversation conversation;
    
+   public MemberBlog getSelectedBlog()
+   {
+      return selectedBlog;
+   }
+      
    /**
     * Used to read a single blog entry for a member
     */   
-   public @Produces @Named("selectedBlog") MemberBlog getBlog()
+   public void loadBlog()
    {     
       conversation.begin();
       try
       {
-         return (MemberBlog) entityManager.createQuery(
+         selectedBlog = (MemberBlog) entityManager.createQuery(
            "from MemberBlog b where b.blogId = :blogId and b.member.memberName = :memberName")
            .setParameter("blogId", blogId)
            .setParameter("memberName", name)
@@ -49,7 +53,7 @@ public class BlogAction implements Serializable
       }
       catch (NoResultException ex) 
       { 
-         return null;
+         
       }
    }   
    

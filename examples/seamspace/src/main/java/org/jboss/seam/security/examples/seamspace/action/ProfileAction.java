@@ -2,30 +2,26 @@ package org.jboss.seam.security.examples.seamspace.action;
 
 
 import java.util.List;
-import java.util.Random;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Model;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.examples.seamspace.model.FriendComment;
 import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
 import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
+import org.jboss.seam.security.examples.seamspace.util.Authenticated;
 
-@RequestScoped
-@Named
+@Model
 public class ProfileAction
 {
-   //@RequestParameter
    private String name;
 
-   @Inject Member selectedMember;
-   
-   
-   @Inject
-   private Member authenticatedMember;
+   private Member selectedMember;   
+      
+   private @Inject @Authenticated MemberAccount authenticatedAccount;
    
    //@Out(required = false)
    List<Member> newMembers;
@@ -35,25 +31,29 @@ public class ProfileAction
    
    @Inject EntityManager entityManager;
 
-   //@Factory("selectedMember")
-   public void display()
-   {      
-      if (name == null && authenticatedMember != null)
+   public Member getSelectedMember()
+   {   
+      if (selectedMember == null)
       {
-         selectedMember = (Member) entityManager.find(Member.class, 
-               authenticatedMember.getMemberId());
-      }
-      else if (name != null)
-      {
-         try
+         if (name == null && authenticatedAccount != null)
          {
-            selectedMember = (Member) entityManager.createQuery(
-            "from Member where memberName = :memberName")
-            .setParameter("memberName", name)
-            .getSingleResult(); 
+            selectedMember = (Member) entityManager.find(Member.class, 
+                  authenticatedAccount.getMember().getMemberId());
          }
-         catch (NoResultException ex) { }
+         else if (name != null)
+         {
+            try
+            {
+               selectedMember = (Member) entityManager.createQuery(
+               "from Member where memberName = :memberName")
+               .setParameter("memberName", name)
+               .getSingleResult(); 
+            }
+            catch (NoResultException ex) { }
+         }
       }
+      
+      return selectedMember;
    }
    
    /**
@@ -76,9 +76,9 @@ public class ProfileAction
    //@Factory("memberBlogs")
    public void getMemberBlogs()
    {
-      if (name == null && authenticatedMember != null)
+      if (name == null && authenticatedAccount != null)
       {
-         name = authenticatedMember.getMemberName();
+         name = authenticatedAccount.getMember().getMemberName();
       }      
       
       memberBlogs = entityManager.createQuery(

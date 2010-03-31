@@ -9,52 +9,52 @@
       
       <div class="errors"><h:messages globalOnly="true"/></div>     
 
-      <ui:fragment rendered="#{selectedMember == null}">
+      <ui:fragment rendered="#{profileAction.selectedMember == null}">
         <div>Sorry, but this member does not exist.</div>
       </ui:fragment>
     
-      <ui:fragment rendered="#{selectedMember != null}">
+      <ui:fragment rendered="#{profileAction.selectedMember != null}">
         <div id="memberCard">
-          <h1>#{selectedMember.memberName}'s profile</h1>
+          <h1>#{profileAction.selectedMember.memberName}'s profile</h1>
            
-          <ui:fragment rendered="#{selectedMember.picture ne null}">
+          <ui:fragment rendered="#{profileAction.selectedMember.picture ne null}">
             <div id="memberCardPicture">
-              <h:graphicImage value="/content/images?id=#{selectedMember.picture.imageId}&amp;width=170"/>
+              <h:graphicImage value="/content/images?id=#{profileAction.selectedMember.picture.imageId}&amp;width=170"/>
             </div>
           </ui:fragment>
           
           <div id="memberCardText">
-            <span class="tagline">"#{selectedMember.tagline}"</span><br/><br/>
-            #{selectedMember.gender.descr}<br/>
-            #{selectedMember.age}<br/>
-            #{selectedMember.location}<br/>
+            <span class="tagline">"#{profileAction.selectedMember.tagline}"</span><br/><br/>
+            #{profileAction.selectedMember.gender.descr}<br/>
+            #{profileAction.selectedMember.age}<br/>
+            #{profileAction.selectedMember.location}<br/>
           </div>
           
           <br style="clear:both"/>
           
           View My: 
           <h:link outcome="/pictures.xhtml" value="Pics">
-            <f:param name="name" value="#{selectedMember.memberName}"/>
+            <f:param name="name" value="#{profileAction.selectedMember.memberName}"/>
           </h:link>            
         </div>
                
         <div id="memberBlog">
-          <div class="sectionHeader">#{selectedMember.memberName}'s latest blog entries</div>
+          <div class="sectionHeader">#{profileAction.selectedMember.memberName}'s latest blog entries</div>
           
-          <ui:repeat value="#{profile.latestBlogs}" var="latestBlog">
+          <ui:repeat value="#{profileAction.latestBlogs}" var="latestBlog">
             <div class="blogSummary">#{latestBlog.title} 
               (<h:link outcome="/blogentry.xhtml" value="view more">
-                 <f:param name="name" value="#{selectedMember.memberName}"/>
+                 <f:param name="name" value="#{profileAction.selectedMember.memberName}"/>
                  <f:param name="blogId" value="#{latestBlog.blogId}"/>
                </h:link>)
             </div>
           </ui:repeat>            
           
           [<h:link id="viewBlog" outcome="/blog.xhtml" value="View all blog entries" propagation="none">
-             <f:param name="name" value="#{selectedMember.memberName}"/>
+             <f:param name="name" value="#{profileAction.selectedMember.memberName}"/>
            </h:link>]
           
-          <ui:fragment rendered="#{identity.hasPermission(selectedMember, 'createBlog')}">
+          <ui:fragment rendered="#{identity.hasPermission(profileAction.selectedMember, 'createBlog')}">
             <span>
               [<h:link id="createBlog" action="#{blog.createEntry}" value="Create new blog entry"/>]
             </span>
@@ -62,7 +62,7 @@
         </div>
         
         <div id="memberFriends">
-          <div class="sectionHeader">#{selectedMember.memberName}'s friends</div>
+          <div class="sectionHeader">#{profileAction.selectedMember.memberName}'s friends</div>
           
           <ui:repeat value="#{profile.friends}" var="f">
             <div class="friend">
@@ -78,7 +78,7 @@
           
           <br class="clear"/>
         
-          <ui:fragment rendered="#{selectedMember.memberId != authenticatedMember.memberId and identity.hasPermission(selectedMember, 'createFriendRequest')}">
+          <ui:fragment rendered="#{profileAction.selectedMember.memberId != authenticatedMember.memberId and identity.hasPermission(selectedMember, 'createFriendRequest')}">
             <span>
               [<h:link outcome="/friendrequest.xhtml" action="#{friendAction.createRequest}" value="Send a friend request"/>]
             </span>
@@ -87,7 +87,7 @@
         </div>
         
         <div id="friendComments">
-          <div class="sectionHeader">#{selectedMember.memberName}'s friend's comments</div>
+          <div class="sectionHeader">#{profileAction.selectedMember.memberName}'s friend's comments</div>
           
 	        <ui:repeat value="#{profile.friendComments}" var="c">
 	          <table class="friendComments">
@@ -108,7 +108,7 @@
 	          </table>	          	          
 	        </ui:repeat>            
           
-          <ui:fragment rendered="#{identity.hasPermission(selectedMember, 'createFriendComment')}">
+          <ui:fragment rendered="#{identity.hasPermission(profileAction.selectedMember, 'createFriendComment')}">
             <span>
               [<h:link outcome="/friendcomment.xhtml" value="Add Comment"/>]
             </span>          

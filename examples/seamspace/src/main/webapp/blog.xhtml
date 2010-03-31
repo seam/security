@@ -2,55 +2,57 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:s="http://jboss.com/products/seam/taglib">
+    xmlns:h="http://java.sun.com/jsf/html">
 
   <ui:composition template="template.xhtml">
     <ui:define name="content">
       
       <div class="errors"><h:messages globalOnly="true"/></div>       
 
-      <s:div rendered="#{selectedMember == null}">
-        Sorry, but this member does not exist.
-      </s:div>
+      <ui:fragment rendered="#{selectedMember == null}">
+        <div>Sorry, but this member does not exist.</div>
+      </ui:fragment>
     
-      <s:div rendered="#{selectedMember != null}">
-      
-        <s:div id="blogMemberCard">	        
-	        <s:link view="/profile.seam" propagation="none">
-	          #{selectedMember.memberName}<br/>
-              <h:graphicImage value="/content/images?id=#{selectedMember.picture.imageId}&amp;width=90"/>	          
-	        </s:link>
-                           
-          <br style="clear:both"/>          
-        </s:div>
-
-				<s:div id="blog">
-	        <ui:repeat value="#{memberBlogs}" var="memberBlog">
-	          <div class="blogEntry">
-  	          <div class="blogDate">#{memberBlog.formattedEntryDate}</div>
-	            <div class="blogTitle">#{memberBlog.title}</div>
-	            <div class="blogText"><s:formattedText value="#{memberBlog.text}"/></div>
-	            <div class="blogFooter">
-
-	              [<s:link view="/blogentry.seam" propagation="none">
-	                <f:param name="name" value="#{selectedMember.memberName}"/>
-	                <f:param name="blogId" value="#{memberBlog.blogId}"/>
-  	              #{memberBlog.commentCount} Comment#{memberBlog.commentCount != 1 ? "s" : ""}
-  	             </s:link>]
-	              
-	              <s:span rendered="#{s:hasPermission('blog','createComment')}">
-	                [<s:link view="/comment.seam" value="Add Comment" propagation="none">
-	                   <f:param name="name" value="#{selectedMember.memberName}"/>
-	                   <f:param name="blogId" value="#{memberBlog.blogId}"/>
-	                 </s:link>]
-	              </s:span>
-	            </div>
-	          </div>
-	        </ui:repeat>
-	      </s:div>
-                
-      </s:div>  
+      <ui:fragment rendered="#{selectedMember != null}">
+        <div>        
+          <div id="blogMemberCard">
+  	        <h:link outcome="/profile.seam">
+  	          #{selectedMember.memberName}<br/>
+                <h:graphicImage value="/content/images?id=#{selectedMember.picture.imageId}&amp;width=90"/>	          
+  	        </h:link>
+                             
+            <br style="clear:both"/>          
+          </div>
+  
+  				<div id="blog">
+  	        <ui:repeat value="#{memberBlogs}" var="memberBlog">
+  	          <div class="blogEntry">
+    	          <div class="blogDate">#{memberBlog.formattedEntryDate}</div>
+  	            <div class="blogTitle">#{memberBlog.title}</div>
+  	            <div class="blogText"><s:formattedText value="#{memberBlog.text}"/></div>
+  	            <div class="blogFooter">
+  
+  	              [<h:link outcome="/blogentry.seam">
+  	                <f:param name="name" value="#{selectedMember.memberName}"/>
+  	                <f:param name="blogId" value="#{memberBlog.blogId}"/>
+    	              #{memberBlog.commentCount} Comment#{memberBlog.commentCount != 1 ? "s" : ""}
+    	             </h:link>]
+  	              
+  	              <ui:fragment rendered="#{s:hasPermission('blog','createComment')}">
+    	              <span>
+    	                [<h:link outcome="/comment.seam" value="Add Comment">
+    	                   <f:param name="name" value="#{selectedMember.memberName}"/>
+    	                   <f:param name="blogId" value="#{memberBlog.blogId}"/>
+    	                 </h:link>]
+    	              </span>
+    	            </ui:fragment>
+  	            </div>
+  	          </div>
+  	        </ui:repeat>
+  	      </div>
+                  
+        </div>  
+      </ui:fragment>
       
       <br class="clear"/>                    
           

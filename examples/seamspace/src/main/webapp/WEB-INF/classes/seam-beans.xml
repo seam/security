@@ -4,6 +4,7 @@
        xmlns:s="urn:java:seam:core"
        xmlns:security="urn:java:org.jboss.seam.security"
        xmlns:idm="urn:java:org.jboss.seam.security.management"
+       xmlns:pm="urn:java:org.jboss.seam.security.permission"
        xmlns:seamspace="urn:java:org.jboss.seam.security.examples.seamspace"
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                            http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
@@ -23,5 +24,10 @@
       <idm:userEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberAccount</idm:userEntityClass>
       <idm:roleEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberRole</idm:roleEntityClass>
    </idm:JpaIdentityStore>
+   
+   <pm:JpaPermissionStore>
+      <s:extends/>
+      <pm:userPermissionClass>org.jboss.seam.security.examples.seamspace.model.AccountPermission</pm:userPermissionClass>
+   </pm:JpaPermissionStore>
    
 </beans>
