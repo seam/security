@@ -10,7 +10,7 @@
                            http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
                            
    <idm:IdentityManager>
-      <s:extends/>
+      <s:specializes/>
       <idm:identityStore>
         <s:Inject/>
         <s:type>
@@ -20,13 +20,13 @@
    </idm:IdentityManager>
    
    <idm:JpaIdentityStore>
-      <s:extends/>
+      <s:specializes/>
       <idm:userEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberAccount</idm:userEntityClass>
       <idm:roleEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberRole</idm:roleEntityClass>
    </idm:JpaIdentityStore>
    
    <pm:JpaPermissionStore>
-      <s:extends/>
+      <s:specializes/>
       <pm:userPermissionClass>org.jboss.seam.security.examples.seamspace.model.AccountPermission</pm:userPermissionClass>
    </pm:JpaPermissionStore>
    
