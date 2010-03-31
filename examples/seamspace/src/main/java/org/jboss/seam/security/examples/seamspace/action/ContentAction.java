@@ -1,5 +1,6 @@
 package org.jboss.seam.security.examples.seamspace.action;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -7,7 +8,7 @@ import javax.persistence.EntityManager;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
-@Named
+@Dependent @Named
 public class ContentAction
 {
    @Inject EntityManager entityManager;
@@ -17,9 +18,9 @@ public class ContentAction
    {
       MemberImage img = entityManager.find(MemberImage.class, imageId);
       
-      if (img == null || !identity.hasPermission(img, "view"))
+    /*  if (img == null || !identity.hasPermission(img, "view"))
          return null;
-      else
+      else*/
          return img;
    }
 }

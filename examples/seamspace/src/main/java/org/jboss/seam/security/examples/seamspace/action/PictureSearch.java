@@ -7,7 +7,6 @@ import java.util.List;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.annotations.Delete;
@@ -20,7 +19,7 @@ public class PictureSearch implements Serializable
    
    private String memberName;
    
-   /*@PersistenceContext */EntityManager entityManager;
+   @Inject EntityManager entityManager;
    
    @Inject Identity identity;
    

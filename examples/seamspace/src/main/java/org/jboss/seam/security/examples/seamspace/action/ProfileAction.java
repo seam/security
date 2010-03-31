@@ -86,24 +86,7 @@ public class ProfileAction
             .setParameter("memberName", name)
             .getResultList();
    }   
-   
-   @SuppressWarnings("unchecked")
-   //@Factory("newMembers")
-   public void newMembers()
-   {
-      newMembers = entityManager.createQuery(
-            "from Member order by memberSince desc")
-            .setMaxResults(10)
-            .getResultList();
       
-      // Randomly select 3 of the latest 10 members
-      Random rnd = new Random(System.currentTimeMillis());
-      while (newMembers.size() > 3)
-      {
-         newMembers.remove(rnd.nextInt(newMembers.size()));
-      }
-   }
-   
    @SuppressWarnings("unchecked")
    public List<Member> getFriends()
    {

@@ -10,7 +10,7 @@ import org.jboss.seam.security.events.UserAuthenticatedEvent;
 import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
 
 @SessionScoped
-public class AuthenticationEvents implements Serializable
+class AuthenticationEvents implements Serializable
 {
    private static final long serialVersionUID = -2747242953250092889L;
    

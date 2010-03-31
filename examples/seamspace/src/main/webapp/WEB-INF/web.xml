@@ -22,7 +22,7 @@
    
     <!-- Content Servlet -->
     
-    <!--servlet>
+    <servlet>
         <servlet-name>Content Servlet</servlet-name>
         <servlet-class>org.jboss.seam.security.examples.seamspace.util.ContentServlet</servlet-class>
     </servlet>
@@ -30,6 +30,6 @@
     <servlet-mapping>
         <servlet-name>Content Servlet</servlet-name>
         <url-pattern>/content/*</url-pattern>
-    </servlet-mapping-->
+    </servlet-mapping>
 
 </web-app>
