@@ -76,7 +76,7 @@
           <ui:repeat value="#{memberSearch.newMembers}" var="newMember">
             <div class="newMember">
   
-              <h:link view="/profile.seam" propagation="none">
+              <h:link outcome="/profile.xhtml">
                 <f:param name="name" value="#{newMember.memberName}"/>
                 #{newMember.memberName}<br/>
                 <h:graphicImage value="/content/images?id=#{newMember.picture.imageId}&amp;width=90"/>

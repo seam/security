@@ -2,6 +2,7 @@ package org.jboss.seam.security.examples.seamspace.util;
 
 import java.io.Serializable;
 
+import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
@@ -13,7 +14,7 @@ public class EntityManagerProducer implements Serializable
    
    @PersistenceContext EntityManager entityManager;
 
-   public @Produces @Dependent EntityManager getEntityManager()
+   public @Produces @ConversationScoped EntityManager getEntityManager()
    {
       return entityManager;
    }

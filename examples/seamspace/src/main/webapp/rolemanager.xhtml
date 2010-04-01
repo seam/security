@@ -14,8 +14,7 @@
     <ui:define name="content">
         
       <script type="text/javascript">
-        function confirmDelete()
-        {
+        function confirmDelete() {
           return confirm("Are you sure you wish to delete this role? This action cannot be undone.");
         }
       </script>
@@ -24,7 +23,7 @@
 
   	    <h2>Role Manager</h2>  
   	    
-        <s:button id="newRole" action="#{roleAction.createRole}" styleClass="newrole" rendered="#{s:hasPermission('seam.account', 'create', null)}"/>
+        <h:button id="newRole" action="#{roleAction.createRole}" styleClass="newrole" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
   	    
         <h:dataTable 
             id="threads"
@@ -45,11 +44,11 @@
           </h:column>
           <h:column width="auto">
             <f:facet name="header">Action</f:facet>          
-            <s:fragment rendered="#{s:hasPermission('seam.role', 'update')}">
+            <s:fragment rendered="#{identity.hasPermission('seam.role', 'update')}">
               <s:link id="edit" value="Edit" action="#{roleAction.editRole(roleSearch.selectedRole)}"/><span> | </span>
             </s:fragment>
             <s:link id="delete" value="Delete" action="#{identityManager.deleteRole(roleSearch.selectedRole)}"
-                    rendered="#{s:hasPermission('seam.role', 'delete')}"
+                    rendered="#{identity.hasPermission('seam.role', 'delete')}"
                     onclick="return confirmDelete()"/>              
           </h:column>
   	    </h:dataTable>

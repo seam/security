@@ -26,7 +26,7 @@
           </ui:fragment>
   
           <ui:fragment rendered="#{identity.hasRole('admin')}">
-            <h:link id="security" view="/security.xhtml" value="Security" propagation="none"/>
+            <h:link id="security" outcome="/security.xhtml" value="Security" propagation="none"/>
             <h:outputText styleClass="divider" value=" | "/>
           </ui:fragment>
           

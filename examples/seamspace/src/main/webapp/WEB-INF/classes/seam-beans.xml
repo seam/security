@@ -4,8 +4,12 @@
        xmlns:s="urn:java:seam:core"
        xmlns:security="urn:java:org.jboss.seam.security"
        xmlns:idm="urn:java:org.jboss.seam.security.management"
-       xmlns:pm="urn:java:org.jboss.seam.security.permission"
+       xmlns:permission="urn:java:org.jboss.seam.security.permission"
+       xmlns:drools="urn:java:org.jboss.seam.drools"
        xmlns:seamspace="urn:java:org.jboss.seam.security.examples.seamspace"
+       xmlns:drools="urn:java:org.jboss.seam.drools"
+       xmlns:drools-config="urn:java:org.jboss.seam.drools.config"
+       xmlns:drools-qualifier="urn:java:org.jboss.seam.drools.qualifier"
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                            http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
                            
@@ -18,16 +22,46 @@
         </s:type>
       </idm:identityStore>
    </idm:IdentityManager>
-   
+      
    <idm:JpaIdentityStore>
       <s:specializes/>
       <idm:userEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberAccount</idm:userEntityClass>
       <idm:roleEntityClass>org.jboss.seam.security.examples.seamspace.model.MemberRole</idm:roleEntityClass>
    </idm:JpaIdentityStore>
    
-   <pm:JpaPermissionStore>
+   <permission:JpaPermissionStore>
       <s:specializes/>
-      <pm:userPermissionClass>org.jboss.seam.security.examples.seamspace.model.AccountPermission</pm:userPermissionClass>
-   </pm:JpaPermissionStore>
+      <permission:userPermissionClass>org.jboss.seam.security.examples.seamspace.model.AccountPermission</permission:userPermissionClass>
+   </permission:JpaPermissionStore>
    
+   <drools-config:KnowledgeBaseConfig>
+   		<s:overrides/>
+   		<drools-qualifier:KBaseConfig name="security-rules-config"/>
+   		<drools-config:knowledgeBuilderConfig>kbuilderconfig.properties</drools-config:knowledgeBuilderConfig>
+   		<drools-config:knowledgeBaseConfig>kbaseconfig.properties</drools-config:knowledgeBaseConfig>
+   		<drools-config:ruleResources>
+   			<s:value>classpath:security-rules.drl:DRL</s:value>
+   		</drools-config:ruleResources>
+   		<drools-config:eventListeners>
+   			<s:value>org.drools.event.knowledgebase.DefaultKnowledgeBaseEventListener</s:value>
+   		</drools-config:eventListeners>
+   </drools-config:KnowledgeBaseConfig>
+   
+   <drools:KnowledgeBaseProducer>
+   		 <s:specializes/>
+   		 <drools:produceKBase>
+   		 	<drools-qualifier:KBase name="permission-rules"/>
+   		 	<s:Inject/>
+   		 	<drools-qualifier:KBaseConfig name="security-rules-config"/>
+   		 </drools:produceKBase>
+   </drools:KnowledgeBaseProducer>
+   
+   <permission:RuleBasedPermissionResolver>
+      <s:specializes/>
+      <permission:securityRules>
+        <s:Inject/>
+        <drools-qualifier:KBase name="permission-rules"/>        
+      </permission:securityRules>
+   </permission:RuleBasedPermissionResolver>
+       
 </beans>
