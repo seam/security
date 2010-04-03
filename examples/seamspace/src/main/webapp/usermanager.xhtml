@@ -11,6 +11,8 @@
     </ui:define>  
    
     <ui:define name="content">
+    
+      <f:event type="preRenderView" listener="#{userSearch.loadUsers}"/>
         
       <script type="text/javascript">
         function confirmDelete() {
@@ -26,7 +28,7 @@
   	    
         <h:dataTable 
             id="threads"
-            value="#{users}" 
+            value="#{userSearch.users}" 
             var="user" 
             styleClass="security"
             cellspacing="0"

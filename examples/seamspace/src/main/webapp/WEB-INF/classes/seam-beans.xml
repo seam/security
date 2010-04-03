@@ -7,7 +7,6 @@
        xmlns:permission="urn:java:org.jboss.seam.security.permission"
        xmlns:drools="urn:java:org.jboss.seam.drools"
        xmlns:seamspace="urn:java:org.jboss.seam.security.examples.seamspace"
-       xmlns:drools="urn:java:org.jboss.seam.drools"
        xmlns:drools-config="urn:java:org.jboss.seam.drools.config"
        xmlns:drools-qualifier="urn:java:org.jboss.seam.drools.qualifier"
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
@@ -36,7 +35,7 @@
    
    <drools-config:KnowledgeBaseConfig>
    		<s:overrides/>
-   		<drools-qualifier:KBaseConfig name="security-rules-config"/>
+   		<drools-qualifier:KBaseConfig value="security-rules-config"/>
    		<drools-config:knowledgeBuilderConfig>kbuilderconfig.properties</drools-config:knowledgeBuilderConfig>
    		<drools-config:knowledgeBaseConfig>kbaseconfig.properties</drools-config:knowledgeBaseConfig>
    		<drools-config:ruleResources>
@@ -48,19 +47,23 @@
    </drools-config:KnowledgeBaseConfig>
    
    <drools:KnowledgeBaseProducer>
-   		 <s:specializes/>
-   		 <drools:produceKBase>
-   		 	<drools-qualifier:KBase name="permission-rules"/>
-   		 	<s:Inject/>
-   		 	<drools-qualifier:KBaseConfig name="security-rules-config"/>
-   		 </drools:produceKBase>
+   		<s:specializes/>
+   		<drools:produceKBase>
+   		   <drools-qualifier:KBase value="permission-rules"/>
+   		 	 <s:parameters>
+   		 	    <drools-config:KnowledgeBaseConfig>
+   		 	       <s:Inject/>
+   		 	       <drools-qualifier:KBaseConfig value="security-rules-config"/>
+   		 	    </drools-config:KnowledgeBaseConfig>
+   		 	 </s:parameters>
+      </drools:produceKBase>
    </drools:KnowledgeBaseProducer>
    
    <permission:RuleBasedPermissionResolver>
       <s:specializes/>
       <permission:securityRules>
+        <drools-qualifier:KBase value="permission-rules"/>
         <s:Inject/>
-        <drools-qualifier:KBase name="permission-rules"/>        
       </permission:securityRules>
    </permission:RuleBasedPermissionResolver>
        

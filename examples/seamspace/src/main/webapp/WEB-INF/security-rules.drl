@@ -8,12 +8,12 @@ import org.jboss.seam.security.permission.PermissionCheck;
 import org.jboss.seam.security.permission.RoleCheck;
 import org.jboss.seam.security.Role;
 
-import org.jboss.seam.example.seamspace.BlogComment;
-import org.jboss.seam.example.seamspace.Member;
-import org.jboss.seam.example.seamspace.MemberAccount;
-import org.jboss.seam.example.seamspace.MemberBlog;
-import org.jboss.seam.example.seamspace.MemberFriend;
-import org.jboss.seam.example.seamspace.MemberImage;
+import org.jboss.seam.security.examples.seamspace.model.BlogComment;
+import org.jboss.seam.security.examples.seamspace.model.Member;
+import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
+import org.jboss.seam.security.examples.seamspace.model.MemberBlog;
+import org.jboss.seam.security.examples.seamspace.model.MemberFriend;
+import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 
 # These rules allow members to manage permissions on their own images
 
