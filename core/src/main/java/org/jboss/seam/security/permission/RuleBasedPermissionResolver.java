@@ -14,10 +14,12 @@ import javax.inject.Inject;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.event.Observes;
 
-import org.drools.FactHandle;
+import org.drools.KnowledgeBase;
 import org.drools.RuleBase;
 import org.drools.StatefulSession;
 import org.drools.ClassObjectFilter;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.FactHandle;
 //import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
@@ -38,9 +40,9 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
 
    private Logger log = LoggerFactory.getLogger(RuleBasedPermissionResolver.class);
    
-   private StatefulSession securityContext;
+   private StatefulKnowledgeSession securityContext;
    
-   private RuleBase securityRules;
+   private KnowledgeBase securityRules;
    
    @Inject BeanManager manager;
    @Inject Identity identity;
@@ -56,7 +58,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    {
       if (getSecurityRules() != null)
       {
-         setSecurityContext(getSecurityRules().newStatefulSession(false));
+         setSecurityContext(getSecurityRules().newStatefulKnowledgeSession());
          //getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
       }
    }
@@ -70,7 +72,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
     */
    public boolean hasPermission(Object target, String action)
    {
-      StatefulSession securityContext = getSecurityContext();
+      StatefulKnowledgeSession securityContext = getSecurityContext();
       
       if (securityContext == null) return false;
       
@@ -125,7 +127,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    
    public boolean checkConditionalRole(String roleName, Object target, String action)
    {
-      StatefulSession securityContext = getSecurityContext();
+      StatefulKnowledgeSession securityContext = getSecurityContext();
       if (securityContext == null) return false;
       
       RoleCheck roleCheck = new RoleCheck(roleName);
@@ -214,11 +216,10 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                   Principal role = (Principal) e.nextElement();
    
                   boolean found = false;
-                  Iterator<Role> iter = (Iterator<Role>) getSecurityContext()
-                     .iterateObjects(new ClassObjectFilter(Role.class));
+                  Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(Role.class)).iterator();
                   while (iter.hasNext())
                   {
-                     Role r = iter.next();
+                     Role r = (Role) iter.next();
                      if (r.getName().equals(role.getName()))
                      {
                         found = true;
@@ -235,11 +236,10 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
             }
          }
          
-         Iterator<Role> iter = (Iterator<Role>) getSecurityContext()
-            .iterateObjects(new ClassObjectFilter(Role.class));
+         Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(Role.class)).iterator();
          while (iter.hasNext())
          {
-            Role r = iter.next();
+            Role r = (Role) iter.next();
             if (!identity.hasRole(r.getName()))
             {
                FactHandle fh = getSecurityContext().getFactHandle(r);
@@ -250,23 +250,23 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    }
    
    
-   public StatefulSession getSecurityContext()
+   public StatefulKnowledgeSession getSecurityContext()
    {
       return securityContext;
    }
    
-   public void setSecurityContext(StatefulSession securityContext)
+   public void setSecurityContext(StatefulKnowledgeSession securityContext)
    {
       this.securityContext = securityContext;
    }
    
 
-   public RuleBase getSecurityRules()
+   public KnowledgeBase getSecurityRules()
    {
       return securityRules;
    }
 
-   public void setSecurityRules(RuleBase securityRules)
+   public void setSecurityRules(KnowledgeBase securityRules)
    {
       this.securityRules = securityRules;
    }

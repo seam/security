@@ -1,9 +1,13 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.jboss.seam.security.management.IdentityManager;
 
 @Named
 @SessionScoped
@@ -11,14 +15,12 @@ public class UserSearch implements Serializable
 {
    private static final long serialVersionUID = 8592034786339372510L;
 
-   /*
-   @DataModel
    List<String> users;
    
-   @DataModelSelection
-   String selectedUser;
+   //@DataModelSelection
+   //String selectedUser;
    
-   @Current IdentityManager identityManager;
+   @Inject IdentityManager identityManager;
    
    public void loadUsers()
    {
@@ -41,10 +43,14 @@ public class UserSearch implements Serializable
       return sb.toString();
    }
    
-   public String getSelectedUser()
-   {
-      return selectedUser;
-   }
+   //public String getSelectedUser()
+   //{
+      //return selectedUser;
+   //}
    
-   */
+   public List<String> getUsers()
+   {
+      return users;
+   }   
+   
 }

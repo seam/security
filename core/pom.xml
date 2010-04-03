@@ -43,8 +43,8 @@
       </dependency>
 
       <dependency>
-         <groupId>org.drools</groupId>
-         <artifactId>drools-core</artifactId>
+         <groupId>org.jboss.seam.drools</groupId>
+         <artifactId>seam-drools-core</artifactId>
       </dependency>
        
       <dependency>
