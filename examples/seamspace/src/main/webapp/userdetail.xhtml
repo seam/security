@@ -1,10 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:rich="http://richfaces.org/rich"       
-    xmlns:s="http://jboss.com/products/seam/taglib">
+    xmlns:f="http://java.sun.com/jsf/core">
 
   <ui:composition template="template.xhtml">
   
@@ -24,19 +23,19 @@
   	    
           <div class="formRow">
             <h:outputLabel for="firstname" value="First name" styleClass="formLabel"/>
-            <h:inputText id="firstname" value="#{userAction.firstname}" readonly="#{identityManager.userExists(userAction.username)}"/>
+            <h:inputText id="firstname" value="#{userAction.firstname}"/>
             <div class="validationError"><h:message for="firstname"/></div>
           </div>  
           
           <div class="formRow">
             <h:outputLabel for="lastname" value="Last name" styleClass="formLabel"/>
-            <h:inputText id="lastname" value="#{userAction.lastname}" readonly="#{identityManager.userExists(userAction.username)}"/>
+            <h:inputText id="lastname" value="#{userAction.lastname}"/>
             <div class="validationError"><h:message for="lastname"/></div>
           </div>            
               
           <div class="formRow">
             <h:outputLabel for="username" value="Username" styleClass="formLabel"/>
-            <h:inputText id="username" value="#{userAction.username}" readonly="#{identityManager.userExists(userAction.username)}"/>
+            <h:inputText id="username" value="#{userAction.username}"/>
             <div class="validationError"><h:message for="username"/></div>
           </div>              
 
@@ -55,7 +54,7 @@
             <h:outputLabel for="roles" value="Member of" styleClass="formLabel"/>
             <div class="selectMany">
               <h:selectManyCheckbox id="roles" value="#{userAction.roles}" layout="pageDirection" styleClass="roles">
-                <s:selectItems value="#{identityManager.listGrantableRoles()}" var="role" label="#{role}"/>
+                <!--s:selectItems value="#{identityManager.grantableRoles}" var="role" label="#{role}"/-->
               </h:selectManyCheckbox>
             </div>
             <div class="validationError"><h:message for="roles"/></div>            
@@ -68,7 +67,7 @@
                                       
           <div class="formButtons">
             <h:commandButton id="save" value="Save" action="#{userAction.save}" styleClass="formButton"/>
-            <s:button id="cancel" view="/usermanager.xhtml" value="Cancel" propagation="end" styleClass="formButton"/>
+            <h:button id="cancel" outcome="/usermanager.xhtml" action="#{conversation.end}" value="Cancel" styleClass="formButton"/>
           </div>
     
           <br class="clear"/>
