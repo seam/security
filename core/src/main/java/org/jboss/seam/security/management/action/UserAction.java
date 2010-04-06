@@ -20,6 +20,8 @@ import org.jboss.seam.security.management.IdentityManager;
 @ConversationScoped
 public class UserAction implements Serializable
 {
+   private static final long serialVersionUID = 5820385095080724087L;
+   
    private String firstname;
    private String lastname;
    private String username;

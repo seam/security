@@ -152,7 +152,7 @@ public class IdentityManager implements Serializable
       return roleIdentityStore.roleExists(name);
    }
    
-   public List<String> listUsers()
+   public List<String> getUsers()
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
       List<String> users = identityStore.listUsers();
@@ -166,7 +166,7 @@ public class IdentityManager implements Serializable
       return users;
    }
    
-   public List<String> listUsers(String filter)
+   public List<String> getUsers(String filter)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
       List<String> users = identityStore.listUsers(filter);
@@ -180,7 +180,7 @@ public class IdentityManager implements Serializable
       return users;
    }
    
-   public List<String> listRoles()
+   public List<String> getRoles()
    {
       identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
       List<String> roles = roleIdentityStore.listRoles();
@@ -194,7 +194,7 @@ public class IdentityManager implements Serializable
       return roles;
    }
    
-   public List<String> listGrantableRoles()
+   public List<String> getGrantableRoles()
    {
       List<String> roles = roleIdentityStore.listGrantableRoles();
       

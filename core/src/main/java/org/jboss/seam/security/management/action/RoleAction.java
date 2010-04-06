@@ -101,7 +101,7 @@ public class RoleAction implements Serializable
    
    public List<String> getAssignableRoles()
    {
-      List<String> roles = identityManager.listGrantableRoles();
+      List<String> roles = identityManager.getGrantableRoles();
       roles.remove(role);
       return roles;
    }
