@@ -12,6 +12,7 @@ import org.jboss.seam.security.examples.seamspace.model.MemberImage;
 public class ContentAction
 {
    @Inject EntityManager entityManager;
+   
    @Inject Identity identity;
    
    public MemberImage getImage(int imageId)

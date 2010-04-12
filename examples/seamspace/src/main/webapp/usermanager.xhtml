@@ -24,7 +24,9 @@
 
   	    <h2>User Manager</h2>  
   	    
-        <h:button id="newUser" outcome="userdetail.xhtml" action="#{userAction.createUser}" styleClass="newuser" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
+  	    <h:form>
+          <h:commandButton id="newUser" action="#{userAction.createUser}" styleClass="newuser" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
+        </h:form>
   	    
         <h:dataTable 
             id="threads"

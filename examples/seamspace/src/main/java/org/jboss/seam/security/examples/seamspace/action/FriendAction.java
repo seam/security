@@ -10,7 +10,6 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
-//import org.jboss.seam.international.StatusMessages;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.examples.seamspace.model.FriendComment;
 import org.jboss.seam.security.examples.seamspace.model.Member;

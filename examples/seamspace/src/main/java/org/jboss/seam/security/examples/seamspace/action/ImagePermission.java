@@ -34,6 +34,7 @@ public class ImagePermission implements Serializable
    private List<Member> availableFriends;   
    
    @Inject IdentityManager identityManager;
+   
    @Inject PermissionManager permissionManager;
    
    @Inject EntityManager entityManager;

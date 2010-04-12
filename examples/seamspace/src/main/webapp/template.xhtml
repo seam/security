@@ -17,21 +17,24 @@
     <div id="header">
       <div class="headerRight">
         <div class="headerMenu">
-  
-          <ui:fragment rendered="#{identity.loggedIn}">
-            <h:link id="profile" outcome="/profile.xhtml" value="My Profile" propagation="none">
-              <f:param name="name" value="#{authenticatedMember.memberName}"/>
-            </h:link>
-            <h:outputText styleClass="divider" value=" | "/>
-          </ui:fragment>
-  
-          <ui:fragment rendered="#{identity.hasRole('admin')}">
-            <h:link id="security" outcome="/security.xhtml" value="Security" propagation="none"/>
-            <h:outputText styleClass="divider" value=" | "/>
-          </ui:fragment>
-          
-          <h:link id="logout" action="#{identity.logout}" value="Log out" rendered="#{identity.loggedIn}"/>
-          <h:outputLink id="login" value="home.seam" rendered="#{not identity.loggedIn}">Log in</h:outputLink>
+
+          <h:form>  
+            <ui:fragment rendered="#{identity.loggedIn}">
+              <h:link id="profile" outcome="/profile.xhtml" value="My Profile" propagation="none">
+                <f:param name="name" value="#{authenticatedMember.memberName}"/>
+              </h:link>
+              <h:outputText styleClass="divider" value=" | "/>
+            </ui:fragment>
+    
+            <ui:fragment rendered="#{identity.hasRole('admin')}">
+              <h:link id="security" outcome="/security.xhtml" value="Security" propagation="none"/>
+              <h:outputText styleClass="divider" value=" | "/>
+            </ui:fragment>
+            
+            <h:commandLink id="logout" action="#{identity.logout}" value="Log out" rendered="#{identity.loggedIn}"/>
+           
+            <h:outputLink id="login" value="home.seam" rendered="#{not identity.loggedIn}">Log in</h:outputLink>
+          </h:form>
         </div>
         <br style="clear:both"/>
         <h:form>

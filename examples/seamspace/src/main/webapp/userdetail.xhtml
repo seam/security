@@ -54,7 +54,7 @@
             <h:outputLabel for="roles" value="Member of" styleClass="formLabel"/>
             <div class="selectMany">
               <h:selectManyCheckbox id="roles" value="#{userAction.roles}" layout="pageDirection" styleClass="roles">
-                <!--s:selectItems value="#{identityManager.grantableRoles}" var="role" label="#{role}"/-->
+                <f:selectItems value="#{identityManager.grantableRoles}" var="role" label="#{role}"/>
               </h:selectManyCheckbox>
             </div>
             <div class="validationError"><h:message for="roles"/></div>            
