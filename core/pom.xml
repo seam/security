@@ -46,6 +46,11 @@
          <groupId>org.jboss.seam.drools</groupId>
          <artifactId>seam-drools-core</artifactId>
       </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam</groupId>
+         <artifactId>seam-persistence</artifactId>
+      </dependency>
        
       <dependency>
          <groupId>org.hibernate</groupId>

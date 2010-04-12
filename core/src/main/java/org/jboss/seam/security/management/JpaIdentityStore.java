@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.SimplePrincipal;
@@ -39,7 +37,7 @@ import org.jboss.seam.security.events.UserAuthenticatedEvent;
 import org.jboss.seam.security.events.UserCreatedEvent;
 import org.jboss.seam.security.util.AnnotatedBeanProperty;
 import org.jboss.seam.security.util.TypedBeanProperty;
-
+import org.jboss.seam.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +46,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@ApplicationScoped
-public class JpaIdentityStore implements IdentityStore, Serializable
+public @ApplicationScoped @Transactional class JpaIdentityStore implements IdentityStore, Serializable
 {
    private static final long serialVersionUID = 1171875389743972646L;
 
@@ -57,7 +54,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);
           
-   @Inject EntityManager entityManager;
+   @Inject Instance<EntityManager> entityManagerInstance;
    
    @Inject Instance<PasswordHash> passwordHashInstance;
    
@@ -205,7 +202,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          
          manager.fireEvent(new PrePersistUserEvent(user));
          
-         entityManager.persist(user);
+         getEntityManager().persist(user);
 
          manager.fireEvent(new UserCreatedEvent(user));
          
@@ -269,7 +266,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          throw new NoSuchUserException("Could not delete, user '" + name + "' does not exist");
       }
       
-      entityManager.remove(user);
+      getEntityManager().remove(user);
       return true;
    }
    
@@ -361,7 +358,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
             
             manager.fireEvent(new PrePersistUserRoleEvent(xref));
             
-            ((Collection<Object>) getUserRolesProperty().getValue(user)).add(entityManager.merge(xref));
+            ((Collection<Object>) getUserRolesProperty().getValue(user)).add(getEntityManager().merge(xref));
          }
          catch (Exception ex)
          {
@@ -498,7 +495,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          
          Object instance = getRoleEntityClass().newInstance();
          getRoleNameProperty().setValue(instance, role);
-         entityManager.persist(instance);
+         getEntityManager().persist(instance);
          
          return true;
       }
@@ -525,7 +522,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       
       if (getXrefEntityClass() != null)
       {
-         entityManager.createQuery("delete " + getXrefEntityClass().getName() + " where role = :role")
+         getEntityManager().createQuery("delete " + getXrefEntityClass().getName() + " where role = :role")
          .setParameter("role", roleToDelete)
          .executeUpdate();
       }
@@ -544,7 +541,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          removeRoleFromGroup(r, role);
       }
             
-      entityManager.remove(roleToDelete);
+      getEntityManager().remove(roleToDelete);
       return true;
    }
    
@@ -825,8 +822,8 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    {
       try
       {
-         Object user = entityManager.createQuery(
-            "select u from " + getUserEntityClass().getName() + " u where " +
+         Object user = getEntityManager().createQuery(
+            "select u from " + getUserEntityClass().getName() + " u where u." +
             getUserPrincipalProperty().getName() + " = :username")
             .setParameter("username", username)
             .getSingleResult();
@@ -859,7 +856,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    {
       try
       {
-         Object value = entityManager.createQuery(
+         Object value = getEntityManager().createQuery(
             "select r from " + getRoleEntityClass().getName() + " r where " + getRoleNameProperty().getName() +
             " = :role")
             .setParameter("role", role)
@@ -876,7 +873,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    public List<String> listUsers()
    {
-      return entityManager.createQuery(
+      return getEntityManager().createQuery(
             "select u." + getUserPrincipalProperty().getName() + " from " +
             getUserEntityClass().getName() + " u")
             .getResultList();
@@ -885,7 +882,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    public List<String> listUsers(String filter)
    {
-      return entityManager.createQuery(
+      return getEntityManager().createQuery(
             "select u." + getUserPrincipalProperty().getName() + " from " + getUserEntityClass().getName() +
             " u where lower(" + getUserPrincipalProperty().getName() + ") like :username")
             .setParameter("username", "%" + (filter != null ? filter.toLowerCase() : "") +
@@ -896,7 +893,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    @SuppressWarnings("unchecked")
    public List<String> listRoles()
    {
-      return entityManager.createQuery(
+      return getEntityManager().createQuery(
             "select r." + getRoleNameProperty().getName() + " from " +
             getRoleEntityClass().getName() + " r").getResultList();
    }
@@ -925,7 +922,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
 
       if (getXrefEntityClass() == null)
       {
-         return entityManager.createQuery("select u." +
+         return getEntityManager().createQuery("select u." +
                getUserPrincipalProperty().getName() +
                " from " + getUserEntityClass().getName() + " u where :role member of u." +
                getUserRolesProperty().getName())
@@ -934,7 +931,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       }
       else
       {
-         List<?> xrefs = entityManager.createQuery("select x from " +
+         List<?> xrefs = getEntityManager().createQuery("select x from " +
                getXrefEntityClass().getName() + " x where x." +
                getXrefRoleProperty().getName() + " = :role")
                .setParameter("role", roleEntity)
@@ -960,7 +957,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       {
          Object roleEntity = lookupRole(role);
          
-         return entityManager.createQuery("select r." +
+         return getEntityManager().createQuery("select r." +
                getRoleNameProperty().getName() +
                " from " + getRoleEntityClass().getName() + " r where :role member of r." +
                getRoleGroupsProperty().getName())
@@ -989,7 +986,14 @@ public class JpaIdentityStore implements IdentityStore, Serializable
          roleQuery.append(" = false");
       }
       
-      return entityManager.createQuery(roleQuery.toString()).getResultList();
+      return getEntityManager().createQuery(roleQuery.toString()).getResultList();
+   }
+   
+   protected EntityManager getEntityManager()
+   {
+      EntityManager em = entityManagerInstance.get();
+      em.joinTransaction();
+      return em;
    }
    
    protected PasswordHash getPasswordHash()
