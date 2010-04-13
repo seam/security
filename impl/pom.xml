@@ -51,6 +51,13 @@
          <groupId>org.jboss.seam</groupId>
          <artifactId>seam-persistence</artifactId>
       </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-api</artifactId>
+         <version>${project.version}</version>
+         <scope>compile</scope>
+      </dependency>
        
       <dependency>
          <groupId>org.hibernate</groupId>

@@ -46,13 +46,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * API for authorization and authentication via Seam security.
+ * Identity implementation for authorization and authentication via Seam security.
  * 
  * @author Shane Bryzak
  */
 @Named
 @SessionScoped
-public class Identity implements Serializable
+public class IdentityImpl implements Identity, Serializable
 {
    private static final long serialVersionUID = 3751659008033189259L;
    
@@ -98,24 +98,12 @@ public class Identity implements Serializable
       securityEnabled = enabled;
    }
    
-   /**
-    * Simple check that returns true if the user is logged in, without attempting to authenticate
-    * 
-    * @return true if the user is logged in
-    */
    public boolean isLoggedIn()
    {
       // If there is a principal set, then the user is logged in.
       return getPrincipal() != null;
    }
    
-   /**
-    * Will attempt to authenticate quietly if the user's credentials are set and they haven't
-    * authenticated already.  A quiet authentication doesn't throw any exceptions if authentication
-    * fails.
-    * 
-    * @return true if the user is logged in, false otherwise
-    */
    public boolean tryLogin()
    {      
       if (!authenticating && getPrincipal() == null && credentials.isSet() && 
@@ -198,18 +186,6 @@ public class Identity implements Serializable
       checkRestriction(expressions.createValueExpression(expr, Boolean.class).toUnifiedValueExpression());
    }*/
 
-   /**
-    * Attempts to authenticate the user.  This method is distinct to the
-    * authenticate() method in that it raises events in response to whether
-    * authentication is successful or not.  The following events may be raised
-    * by calling login():
-    * 
-    * org.jboss.seam.security.loginSuccessful - raised when authentication is successful
-    * org.jboss.seam.security.loginFailed - raised when authentication fails
-    * org.jboss.seam.security.alreadyLoggedIn - raised if the user is already authenticated
-    * 
-    * @return String returns "loggedIn" if user is authenticated, or null if not.
-    */
    public String login()
    {
       try
@@ -259,11 +235,6 @@ public class Identity implements Serializable
       return null;
    }
    
-   /**
-    * Attempts a quiet login, suppressing any login exceptions and not creating
-    * any faces messages. This method is intended to be used primarily as an
-    * internal API call, however has been made public for convenience.
-    */
    public void quietLogin()
    {
       try
@@ -475,12 +446,6 @@ public class Identity implements Serializable
       }
    }
 
-   /**
-    * Checks if the authenticated user is a member of the specified role.
-    * 
-    * @param role String The name of the role to check
-    * @return boolean True if the user is a member of the specified role
-    */
    public boolean hasRole(String role)
    {
       if (!securityEnabled) return true;
@@ -498,14 +463,6 @@ public class Identity implements Serializable
       return false;
    }
    
-   /**
-    * Adds a role to the authenticated user.  If the user is not logged in,
-    * the role will be added to a list of roles that will be granted to the
-    * user upon successful authentication, but only during the authentication
-    * process.
-    * 
-    * @param role The name of the role to add
-    */
    public boolean addRole(String role)
    {
       if (role == null || "".equals(role)) return false;
@@ -558,13 +515,6 @@ public class Identity implements Serializable
       }
    }
    
-   /**
-    * Checks that the current authenticated user is a member of
-    * the specified role.
-    * 
-    * @param role String The name of the role to check
-    * @throws AuthorizationException if the authenticated user is not a member of the role
-    */
    public void checkRole(String role)
    {
       tryLogin();
