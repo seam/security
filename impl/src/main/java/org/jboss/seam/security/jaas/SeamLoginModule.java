@@ -1,6 +1,6 @@
 package org.jboss.seam.security.jaas;
 
-import static org.jboss.seam.security.Identity.ROLES_GROUP;
+import static org.jboss.seam.security.IdentityImpl.ROLES_GROUP;
 
 import java.security.acl.Group;
 import java.util.HashSet;

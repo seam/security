@@ -8,17 +8,13 @@ import java.util.Random;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.events.CredentialsInitializedEvent;
-import org.jboss.seam.security.events.LoggedOutEvent;
-import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.util.Base64;
-//import org.jboss.seam.web.ManagedCookie;
 
 /**
  * Remember-me functionality is provided by this class, in two different flavours.  The first mode
@@ -41,6 +37,7 @@ public class RememberMe implements Serializable
 
    @Inject BeanManager manager;
    @Inject Identity identity;
+   @Inject IdentityImpl identityImpl;
    @Inject Credentials credentials;
    @Inject IdentityManager identityManager;
    
@@ -147,7 +144,7 @@ public class RememberMe implements Serializable
          // Double check our credentials again
          if (tokenStore.validateToken(username, credentials.getPassword()))
          {
-            identity.runAs(new RunAsOperation(true) {
+            identityImpl.runAs(new RunAsOperation(true) {
                @Override
                public void execute()
                {
@@ -165,8 +162,8 @@ public class RememberMe implements Serializable
             
             if (userEnabled.value)
             {
-               identity.unAuthenticate();
-               identity.preAuthenticate();
+               identityImpl.unAuthenticate();
+               identityImpl.preAuthenticate();
                
                // populate the roles
                for (String role : roles)
@@ -176,7 +173,7 @@ public class RememberMe implements Serializable
    
                // Set the principal
                identity.getSubject().getPrincipals().add(new SimplePrincipal(username));
-               identity.postAuthenticate();
+               identityImpl.postAuthenticate();
             
                autoLoggedIn = true;
             }

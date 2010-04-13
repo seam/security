@@ -621,4 +621,10 @@ public class IdentityImpl implements Identity, Serializable
          subject = savedSubject;
       }
    }
+
+   public void checkRestriction(String expr)
+   {
+      // TODO Auto-generated method stub
+      
+   }
 }

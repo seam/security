@@ -51,14 +51,14 @@ public abstract class RunAsOperation
    {
       for ( Group sg : getSubject().getPrincipals(Group.class) )      
       {
-         if ( Identity.ROLES_GROUP.equals( sg.getName() ) )
+         if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
          {
             sg.addMember(new SimplePrincipal(role));
             break;
          }
       }
                
-      SimpleGroup roleGroup = new SimpleGroup(Identity.ROLES_GROUP);
+      SimpleGroup roleGroup = new SimpleGroup(IdentityImpl.ROLES_GROUP);
       roleGroup.addMember(new SimplePrincipal(role));
       getSubject().getPrincipals().add(roleGroup); 
       

@@ -22,6 +22,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 //import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.IdentityImpl;
 import org.jboss.seam.security.Role;
 import org.jboss.seam.security.events.LoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
@@ -208,7 +209,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
          
          for ( Group sg : identity.getSubject().getPrincipals(Group.class) )
          {
-            if ( Identity.ROLES_GROUP.equals( sg.getName() ) )
+            if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
             {
                Enumeration e = sg.members();
                while (e.hasMoreElements())

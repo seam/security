@@ -109,7 +109,7 @@ public class SecurityInterceptor implements Serializable
       
       public void check(Identity identity, Object[] parameters)
       {
-         if (Identity.isSecurityEnabled())
+         if (IdentityImpl.isSecurityEnabled())
          {
             // TODO rewrite EL based restrictions
             /*if (expression != null)
