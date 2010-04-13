@@ -63,7 +63,7 @@ public class IdentityImpl implements Identity, Serializable
    Logger log = LoggerFactory.getLogger(Identity.class);
 
    @Inject private BeanManager manager;
-   @Inject private Credentials credentials;
+   @Inject private CredentialsImpl credentials;
    @Inject private PermissionMapper permissionMapper;
    
    @Inject private IdentityManager identityManager;

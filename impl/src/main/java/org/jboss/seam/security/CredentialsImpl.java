@@ -12,7 +12,7 @@ import org.jboss.seam.security.events.CredentialsUpdatedEvent;
 
 @Named//("org.jboss.seam.security.credentials")
 @SessionScoped
-public class Credentials implements Serializable
+public class CredentialsImpl implements Credentials, Serializable
 {
    private static final long serialVersionUID = -2271248957776488426L;
    
@@ -25,7 +25,7 @@ public class Credentials implements Serializable
    
    private boolean initialized;
    
-   public Credentials() {}
+   public CredentialsImpl() {}
    
    public boolean isInitialized()
    {

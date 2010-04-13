@@ -33,7 +33,7 @@ class SecurityEventMessages
    private static final String DEFAULT_NOT_LOGGED_IN_MESSAGE = "Please log in first.";
    
    //@Inject StatusMessages statusMessages;
-   @Inject Credentials credentials;
+   @Inject CredentialsImpl credentials;
 
    public void postAuthenticate(@Observes PostAuthenticateEvent event)
    {

@@ -14,20 +14,12 @@ public class PermissionCheck
 {
    private Object target;
 
-   @Deprecated
-   private String name;
-
    private String action;
    private boolean granted;
    private Set<String> requirements;
    
    public PermissionCheck(Object target, String action)
-   {
-      if (target instanceof String)
-      {
-         this.name = (String) target;
-      }
-      
+   {      
       this.target = target;
       this.action = action;
       granted = false;
@@ -37,12 +29,6 @@ public class PermissionCheck
    {
       return target;
    }   
-
-   @Deprecated
-   public String getName() 
-   {
-      return name;
-   }
 
    public String getAction() 
    {

@@ -38,7 +38,7 @@ public class RememberMe implements Serializable
    @Inject BeanManager manager;
    @Inject Identity identity;
    @Inject IdentityImpl identityImpl;
-   @Inject Credentials credentials;
+   @Inject CredentialsImpl credentials;
    @Inject IdentityManager identityManager;
    
    // Heaps of stuff commented out here because we need to add generic cookie support
