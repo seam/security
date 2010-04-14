@@ -23,7 +23,6 @@ import org.jboss.seam.security.annotations.permission.PermissionRole;
 import org.jboss.seam.security.annotations.permission.PermissionTarget;
 import org.jboss.seam.security.annotations.permission.PermissionUser;
 import org.jboss.seam.security.management.IdentityManager;
-import org.jboss.seam.security.management.IdentityStore;
 import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.management.LdapIdentityStore;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
@@ -43,7 +42,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    
    private Logger log = LoggerFactory.getLogger(LdapIdentityStore.class);
    
-   private enum Discrimination { user, role, either }
+   protected enum Discrimination { user, role, either }
    
    private Class<?> userPermissionClass;
    private Class<?> rolePermissionClass;
@@ -154,7 +153,8 @@ public class JpaPermissionStore implements PermissionStore, Serializable
     * @param discrimination A discrimination (either user, role or both), required
     * @return Query The query generated for the provided parameters
     */
-   protected Query createPermissionQuery(Object target, Set targets, Principal recipient, Discrimination discrimination)
+   protected Query createPermissionQuery(Object target, Set<?> targets, 
+         Principal recipient, Discrimination discrimination)
    {
       if (target != null && targets != null)
       {
@@ -274,7 +274,8 @@ public class JpaPermissionStore implements PermissionStore, Serializable
          {
             if (rolePermissionClass != null)
             {
-               List permissions = createPermissionQuery(target, null, recipient, Discrimination.role).getResultList();
+               List<?> permissions = createPermissionQuery(target, null, 
+                     recipient, Discrimination.role).getResultList();
 
                if (permissions.isEmpty())
                {
@@ -350,7 +351,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
             throw new RuntimeException("Could not grant permission, userPermissionClass not set");
          }
                          
-         List permissions = createPermissionQuery(target, null, recipient, recipientIsRole ?
+         List<?> permissions = createPermissionQuery(target, null, recipient, recipientIsRole ?
                Discrimination.role : Discrimination.user).getResultList();
 
          if (permissions.isEmpty())
