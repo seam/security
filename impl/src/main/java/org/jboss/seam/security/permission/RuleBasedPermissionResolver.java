@@ -24,7 +24,7 @@ import org.drools.runtime.rule.FactHandle;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.IdentityImpl;
 import org.jboss.seam.security.Role;
-import org.jboss.seam.security.events.LoggedOutEvent;
+import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,7 +188,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    }
    
    @SuppressWarnings("unchecked")
-   public void unAuthenticate(@Observes LoggedOutEvent event)
+   public void unAuthenticate(@Observes PostLoggedOutEvent event)
    {
       if (getSecurityContext() != null)
       {

@@ -31,12 +31,13 @@ import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
-import org.jboss.seam.security.events.LoggedOutEvent;
+import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
 import org.jboss.seam.security.events.NotAuthorizedEvent;
 import org.jboss.seam.security.events.NotLoggedInEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.PreAuthenticateEvent;
+import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
@@ -434,7 +435,9 @@ public class IdentityImpl implements Identity, Serializable
    {
       if (isLoggedIn())
       {
-         LoggedOutEvent loggedOutEvent = new LoggedOutEvent(principal);
+         PostLoggedOutEvent loggedOutEvent = new PostLoggedOutEvent(principal);
+         
+         manager.fireEvent(new PreLoggedOutEvent());
          unAuthenticate();
          
          // TODO - invalidate the session

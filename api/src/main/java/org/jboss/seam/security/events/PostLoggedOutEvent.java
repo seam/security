@@ -7,11 +7,11 @@ import java.security.Principal;
  * 
  * @author Shane Bryzak
  */
-public class LoggedOutEvent
+public class PostLoggedOutEvent
 {
    private Principal principal;
    
-   public LoggedOutEvent(Principal principal)
+   public PostLoggedOutEvent(Principal principal)
    {
       this.principal = principal;
    }
