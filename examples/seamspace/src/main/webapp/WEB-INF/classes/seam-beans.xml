@@ -12,7 +12,7 @@
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                            http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
                            
-   <idm:IdentityManager>
+   <idm:IdentityManagerImpl>
       <s:specializes/>
       <idm:identityStore>
         <s:Inject/>
@@ -20,7 +20,7 @@
            <idm:JpaIdentityStore/>
         </s:type>
       </idm:identityStore>
-   </idm:IdentityManager>
+   </idm:IdentityManagerImpl>
       
    <idm:JpaIdentityStore>
       <s:specializes/>

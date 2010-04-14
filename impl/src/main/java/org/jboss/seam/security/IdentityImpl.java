@@ -10,13 +10,12 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
-import javax.el.ValueExpression;
 import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -41,7 +40,6 @@ import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

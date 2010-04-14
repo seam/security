@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.IdentityImpl;
 import org.jboss.seam.security.RunAsOperation;
 import org.jboss.seam.security.examples.seamspace.model.Member;
 import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
@@ -23,6 +24,8 @@ public class RegisterAction
    @Inject EntityManager entityManager;
    
    @Inject Identity identity;
+   
+   @Inject IdentityImpl identityImpl;
    
    @Inject Credentials credentials;
    
@@ -93,7 +96,7 @@ public class RegisterAction
       member.setMemberSince(new Date());      
       entityManager.persist(member);      
       
-      identity.runAs(new RunAsOperation() {
+      identityImpl.runAs(new RunAsOperation() {
          public void execute() {
             identityManager.createUser(username, password);
             identityManager.grantRole(username, "user");            
