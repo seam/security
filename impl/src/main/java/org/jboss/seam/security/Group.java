@@ -1,7 +1,7 @@
-package org.jboss.seam.security.api;
+package org.jboss.seam.security;
 
 /**
- * Seam implementation of the PicketLink Group interface
+ * Seam implementation of the PicketLink Group interface.
  * 
  * @author Shane Bryzak
  */

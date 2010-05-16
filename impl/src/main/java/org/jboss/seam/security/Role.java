@@ -1,30 +1,49 @@
 package org.jboss.seam.security;
 
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.RoleType;
+import org.picketlink.idm.api.User;
+
 /**
- * Represents a user role.  A conditional role is a special type of role that is assigned to a user
- * based on the contextual state of a permission check.
+ * Seam implementation of the PicketLink Role interface.  Each role is a direct
+ * one-to-one mapping between User and Group.  
  *  
  * @author Shane Bryzak
  */
-public class Role extends SimplePrincipal
+public class Role implements org.picketlink.idm.api.Role 
 {   
    private static final long serialVersionUID = 1187276024036531700L;
    
    private boolean conditional;
    
-   public Role(String name)
-   {
-      super(name);
-   }   
+   private Group group;
+   private RoleType roleType;
+   private User user;
    
-   public Role(String name, boolean conditional)
+   public Role(Group group, RoleType roleType, User user)
    {
-      this(name);
-      this.conditional = conditional;
+      this.group = group;
+      this.roleType = roleType;
+      this.user = user;
    }
-   
+     
    public boolean isConditional()
    {
       return conditional;
+   }
+
+   public Group getGroup()
+   {
+      return group;
+   }
+
+   public RoleType getRoleType()
+   {
+      return roleType;
+   }
+
+   public User getUser()
+   {
+      return user;
    }
 }

@@ -1,5 +1,7 @@
 package org.jboss.seam.security;
 
+import org.picketlink.idm.api.Credential;
+
 /**
  * Represents the credentials the current user will use to authenticate
  * 
@@ -12,9 +14,9 @@ public interface Credentials
    
    void setUsername(String username);
    
-   String getPassword();
+   Credential getCredential();
    
-   void setPassword(String password);
+   void setCredential(Credential credential);
    
    boolean isSet();
    

@@ -1,4 +1,4 @@
-package org.jboss.seam.security.api;
+package org.jboss.seam.security;
 
 /**
  * Seam implementation of the PicketLink RoleType interface.  A RoleType is

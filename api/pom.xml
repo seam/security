@@ -21,6 +21,12 @@
          <scope>provided</scope>
       </dependency>
 
+      <dependency>
+         <groupId>org.picketlink.idm</groupId>
+         <artifactId>picketlink-idm-api</artifactId>
+         <version>1.1.2.CR01</version>
+      </dependency>
+
    </dependencies>
 
    <build>

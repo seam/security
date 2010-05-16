@@ -1,4 +1,4 @@
-package org.jboss.seam.security.api;
+package org.jboss.seam.security;
 
 import java.util.Collection;
 

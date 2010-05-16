@@ -9,8 +9,16 @@ import javax.inject.Named;
 
 import org.jboss.seam.security.events.CredentialsInitializedEvent;
 import org.jboss.seam.security.events.CredentialsUpdatedEvent;
+import org.picketlink.idm.api.Credential;
 
-@Named//("org.jboss.seam.security.credentials")
+/**
+ * The default Credentials implementation.  This implementation allows for a
+ * username and plain text password to be set, and uses the PasswordCredential
+ * implementation of the Credential interface for authentication.
+ * 
+ * @author Shane Bryzak
+ */
+@Named
 @SessionScoped
 public class CredentialsImpl implements Credentials, Serializable
 {
@@ -19,7 +27,7 @@ public class CredentialsImpl implements Credentials, Serializable
    @Inject BeanManager manager;
    
    private String username;
-   private String password;
+   private Credential credential;
    
    private boolean invalid;
    
@@ -48,6 +56,16 @@ public class CredentialsImpl implements Credentials, Serializable
       return username;
    }
    
+   public Credential getCredential()
+   {
+      return credential;
+   }
+   
+   public void setCredential(Credential credential)
+   {
+      this.credential = credential;
+   }
+   
    public void setUsername(String username)
    {
       if (this.username != username && (this.username == null || !this.username.equals(username)))
@@ -60,14 +78,23 @@ public class CredentialsImpl implements Credentials, Serializable
    
    public String getPassword()
    {
-      return password;
+      return credential != null && credential instanceof PasswordCredential ? 
+            ((PasswordCredential) credential).getPassword() : null;
    }
    
    public void setPassword(String password)
    {
-      if (this.password != password && (this.password == null || !this.password.equals(password)))
+      if (this.credential == null)
       {
-         this.password = password;
+         this.credential = new PasswordCredential();
+         ((PasswordCredential) this.credential).setPassword(password);
+      }
+      else if (this.credential != null && this.credential instanceof PasswordCredential &&
+            ((PasswordCredential) this.credential).getPassword() != password && 
+            ((PasswordCredential) this.credential).getPassword() == null || 
+            !((PasswordCredential) this.credential).getPassword().equals(password))
+      {
+         ((PasswordCredential) this.credential).setPassword(password);
          invalid = false;
          manager.fireEvent(new CredentialsUpdatedEvent());
       }
@@ -75,7 +102,8 @@ public class CredentialsImpl implements Credentials, Serializable
    
    public boolean isSet()
    {
-      return getUsername() != null && password != null;
+      return getUsername() != null && this.credential != null && 
+        ((PasswordCredential) this.credential).getPassword() != null;
    }
    
    public boolean isInvalid()
@@ -91,7 +119,7 @@ public class CredentialsImpl implements Credentials, Serializable
    public void clear()
    {
       username = null;
-      password = null;
+      this.credential = null;
       initialized = false;
    }
    
