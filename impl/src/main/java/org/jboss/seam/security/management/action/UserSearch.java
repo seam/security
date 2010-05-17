@@ -29,16 +29,17 @@ public class UserSearch implements Serializable
    
    public String getUserRoles(String username)
    {
-      List<String> roles = identityManager.getGrantedRoles(username);
+      // TODO rewrite
+      //List<String> roles = identityManager.getGrantedRoles(username);
       
-      if (roles == null) return "";
+      //if (roles == null) return "";
       
       StringBuilder sb = new StringBuilder();
       
-      for (String role : roles)
-      {
-         sb.append((sb.length() > 0 ? ", " : "") + role);
-      }
+      //for (String role : roles)
+      //{
+      //   sb.append((sb.length() > 0 ? ", " : "") + role);
+      //}
       
       return sb.toString();
    }

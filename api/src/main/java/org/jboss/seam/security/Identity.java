@@ -85,7 +85,7 @@ public interface Identity
     * @param role String The name of the role to check
     * @return boolean True if the user is a member of the specified role
     */
-   boolean hasRole(String role);
+   boolean hasRole(String role, String group);
    
    /**
     * Adds a role to the authenticated user.  If the user is not logged in,
@@ -95,13 +95,14 @@ public interface Identity
     * 
     * @param role The name of the role to add
     */
-   boolean addRole(String role);   /**
+   boolean addRole(String role, String group, String groupType);
    
+   /**   
     * Removes a role from the authenticated user
     * 
     * @param role The name of the role to remove
     */
-   void removeRole(String role);
+   void removeRole(String role, String group);
    
    /**
     * Checks that the current authenticated user is a member of
@@ -110,7 +111,7 @@ public interface Identity
     * @param role String The name of the role to check
     * @throws AuthorizationException if the authenticated user is not a member of the role
     */
-   void checkRole(String role);
+   void checkRole(String role, String group);
    
    /**
     * Checks if the currently authenticated user can perform the specified action

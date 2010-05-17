@@ -7,7 +7,9 @@ import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
@@ -72,7 +74,12 @@ public class IdentityImpl implements Identity, Serializable
    private Principal principal;
    private Subject subject;
    private String jaasConfigName = null;
-   private List<String> preAuthenticationRoles = new ArrayList<String>();
+
+   // Contains a group to role list mapping of roles assigned during the authentication process
+   private Map<String,List<String>> preAuthenticationRoles = new HashMap<String,List<String>>();
+
+   // Contains a group to role list mapping of roles granted after the authentication process has completed   
+   private Map<String,List<String>> activeRoles = new HashMap<String,List<String>>();
    
    private transient ThreadLocal<Boolean> systemOp;
    
@@ -328,9 +335,13 @@ public class IdentityImpl implements Identity, Serializable
       
       if (!preAuthenticationRoles.isEmpty() && isLoggedIn())
       {
-         for (String role : preAuthenticationRoles)
+         for (String group : preAuthenticationRoles.keySet())
          {
-            addRole(role);
+            for (String role : preAuthenticationRoles.get(group))
+            {
+               // TODO fix
+               addRole(role, group, null);
+            }
          }
          preAuthenticationRoles.clear();
       }
@@ -447,47 +458,37 @@ public class IdentityImpl implements Identity, Serializable
       }
    }
 
-   public boolean hasRole(String role)
+   public boolean hasRole(String roleType, String group)
    {
       if (!securityEnabled) return true;
       if (systemOp != null && Boolean.TRUE.equals(systemOp.get())) return true;
       
       tryLogin();
       
-      for ( Group sg : getSubject().getPrincipals(Group.class) )
-      {
-         if ( ROLES_GROUP.equals( sg.getName() ) )
-         {
-            return sg.isMember( new Role(role) );
-         }
-      }
-      return false;
+      List<String> roles = activeRoles.get(group);
+      return (roles != null && roles.contains(roleType));
    }
    
-   public boolean addRole(String role)
+   public boolean addRole(String roleType, String group, String groupType)
    {
-      if (role == null || "".equals(role)) return false;
+      if (roleType == null || "".equals(roleType)) return false;
       
-      if (!isLoggedIn())
+      Map<String,List<String>> roleMap = isLoggedIn() ? activeRoles : 
+         preAuthenticationRoles;
+      
+      List<String> roles = null;
+      
+      if (!roleMap.containsKey(group))
       {
-         preAuthenticationRoles.add(role);
-         return false;
+         roles = new ArrayList<String>();
+         roleMap.put(group, roles);            
       }
       else
       {
-         for ( Group sg : getSubject().getPrincipals(Group.class) )
-         {
-            if ( ROLES_GROUP.equals( sg.getName() ) )
-            {
-               return sg.addMember(new Role(role));
-            }
-         }
-                  
-         SimpleGroup roleGroup = new SimpleGroup(ROLES_GROUP);
-         roleGroup.addMember(new Role(role));
-         getSubject().getPrincipals().add(roleGroup);
-         return true;
+         roles = roleMap.get(group);
       }
+      
+      return roles.add(roleType);
    }
 
    /**
@@ -495,32 +496,19 @@ public class IdentityImpl implements Identity, Serializable
     * 
     * @param role The name of the role to remove
     */
-   public void removeRole(String role)
+   public void removeRole(String roleType, String group)
    {
-      for ( Group sg : getSubject().getPrincipals(Group.class) )
+      if (activeRoles.containsKey(group))
       {
-         if ( ROLES_GROUP.equals( sg.getName() ) )
-         {
-            Enumeration<?> e = sg.members();
-            while (e.hasMoreElements())
-            {
-               Principal member = (Principal) e.nextElement();
-               if (member.getName().equals(role))
-               {
-                  sg.removeMember(member);
-                  break;
-               }
-            }
-
-         }
+         activeRoles.get(group).remove(roleType);
       }
    }
    
-   public void checkRole(String role)
+   public void checkRole(String roleType, String group)
    {
       tryLogin();
       
-      if ( !hasRole(role) )
+      if ( !hasRole(roleType, group) )
       {
          if ( !isLoggedIn() )
          {
@@ -531,7 +519,7 @@ public class IdentityImpl implements Identity, Serializable
          {
             manager.fireEvent(new NotAuthorizedEvent());
             throw new AuthorizationException(String.format(
-                  "Authorization check failed for role [%s]", role));
+                  "Authorization check failed for role [%s:%s]", roleType, group));
          }
       }
    }
@@ -572,20 +560,7 @@ public class IdentityImpl implements Identity, Serializable
       
       return permissionMapper.resolvePermission(target, action);
    }
-   
-   /**
-    * Evaluates the specified security expression, which must return a boolean
-    * value.
-    * 
-    * @param expr String The expression to evaluate
-    * @return boolean The result of the expression evaluation
-    */
-   /*
-   protected boolean evaluateExpression(String expr)
-   {
-      return expressions.createValueExpression(expr, Boolean.class).getValue();
-   }*/
-   
+     
    public String getJaasConfigName()
    {
       return jaasConfigName;

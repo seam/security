@@ -3,6 +3,10 @@ package org.jboss.seam.security.management;
 import java.security.Principal;
 import java.util.List;
 
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.IdentityType;
+import org.picketlink.idm.api.Role;
+
 /**
  * Identity Management API, deals with user name/password-based identity management.
  * 
@@ -10,35 +14,29 @@ import java.util.List;
  */
 public interface IdentityManager
 {  
-   boolean createUser(String name, String password);
-
-   boolean createUser(String name, String password, String firstname, String lastname);
+   boolean createUser(String username, String password);
    
-   boolean deleteUser(String name);
+   boolean deleteUser(String username);
    
-   boolean enableUser(String name);
+   boolean enableUser(String username);
    
-   boolean disableUser(String name);
+   boolean disableUser(String username);
    
-   boolean changePassword(String name, String password);
+   boolean changePassword(String username, String password);
    
-   boolean isUserEnabled(String name);
+   boolean isUserEnabled(String username);
    
-   boolean grantRole(String name, String role);
+   boolean grantRole(String username, String roleType, Group group);
    
-   boolean revokeRole(String name, String role);
+   boolean revokeRole(String username, String roleType, Group group);
    
-   boolean createRole(String role);
+   boolean createRoleType(String roleType);
    
-   boolean deleteRole(String role);
+   boolean deleteRoleType(String roleType);
+     
+   boolean userExists(String username);
    
-   boolean addRoleToGroup(String role, String group);
-   
-   boolean removeRoleFromGroup(String role, String group);
-   
-   boolean userExists(String name);
-   
-   boolean roleExists(String name);
+   boolean roleExists(String username);
    
    List<String> getUsers();
    
@@ -54,7 +52,7 @@ public interface IdentityManager
     * @param name The user for which to return a list of roles
     * @return List containing the names of the granted roles
     */
-   List<String> getGrantedRoles(String name);
+   List<Role> getGrantedRoles(String name);
    
    /**
     * Returns a list of roles that are either explicitly or indirectly granted to the specified user.
@@ -62,12 +60,10 @@ public interface IdentityManager
     * @param name The user for which to return the list of roles
     * @return List containing the names of the implied roles
     */
-   List<String> getImpliedRoles(String name);
+   List<Role> getImpliedRoles(String name);
    
-   List<Principal> listMembers(String role);
-   
-   List<String> getRoleGroups(String name);
-   
+   List<IdentityType> listRoleMembers(String roleType, Group group);
+      
    boolean authenticate(String username, String password);
    
    IdentityStore getIdentityStore();

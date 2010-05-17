@@ -11,8 +11,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import org.jboss.seam.security.annotations.management.RoleConditional;
-import org.jboss.seam.security.annotations.management.RoleGroups;
-import org.jboss.seam.security.annotations.management.RoleName;
+import org.jboss.seam.security.annotations.management.MemberOf;
+import org.jboss.seam.security.annotations.management.RoleType;
 
 @Entity
 public class MemberRole implements Serializable
@@ -36,7 +36,7 @@ public class MemberRole implements Serializable
       this.roleId = roleId;
    }
    
-   @RoleName
+   @RoleType
    public String getName()
    {
       return name;
@@ -47,7 +47,7 @@ public class MemberRole implements Serializable
       this.name = name;
    }
    
-   @RoleGroups
+   @MemberOf
    @ManyToMany(targetEntity = MemberRole.class)
    @JoinTable(name = "RoleGroup", 
          joinColumns = @JoinColumn(name = "RoleId"),

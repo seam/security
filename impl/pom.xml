@@ -57,6 +57,12 @@
          <artifactId>seam-security-api</artifactId>
          <version>${project.version}</version>
       </dependency>
+
+      <dependency>
+         <groupId>org.picketlink.idm</groupId>
+         <artifactId>picketlink-idm-core</artifactId>
+         <version>1.1.2.CR01</version>
+      </dependency>
        
       <dependency>
          <groupId>org.hibernate</groupId>

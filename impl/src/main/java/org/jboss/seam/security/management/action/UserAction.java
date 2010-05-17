@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.security.management.IdentityManager;
+import org.picketlink.idm.api.Role;
 
 /**
  * A conversation-scoped component for creating and managing user accounts
@@ -27,7 +28,7 @@ public class UserAction implements Serializable
    private String username;
    private String password;
    private String confirm;
-   private List<String> roles;
+   private List<Role> roles;
    private boolean enabled;
    
    private boolean newUserFlag;
@@ -38,7 +39,7 @@ public class UserAction implements Serializable
    public void createUser()
    {
       conversation.begin();
-      roles = new ArrayList<String>();
+      roles = new ArrayList<Role>();
       newUserFlag = true;
    }
    
@@ -46,7 +47,7 @@ public class UserAction implements Serializable
    {
       conversation.begin();
       this.username = username;
-      roles = identityManager.getGrantedRoles(username);
+      //roles = identityManager.getGrantedRoles(username);
       enabled = identityManager.isUserEnabled(username);
       newUserFlag = false;
    }
@@ -72,14 +73,14 @@ public class UserAction implements Serializable
          return "failure";
       }
       
-      boolean success = identityManager.createUser(username, password, firstname, lastname);
+      boolean success = identityManager.createUser(username, password);
       
       if (success)
       {
-         for (String role : roles)
+         /*for (String role : roles)
          {
             identityManager.grantRole(username, role);
-         }
+         }*/
          
          if (!enabled)
          {
@@ -111,21 +112,22 @@ public class UserAction implements Serializable
          }
       }
       
-      List<String> grantedRoles = identityManager.getGrantedRoles(username);
+      List<Role> grantedRoles = identityManager.getGrantedRoles(username);
       
       if (grantedRoles != null)
       {
-         for (String role : grantedRoles)
+         for (Role role : grantedRoles)
          {
-            if (!roles.contains(role)) identityManager.revokeRole(username, role);
+            if (!roles.contains(role)) identityManager.revokeRole(username, 
+                  role.getRoleType().getName(), role.getGroup());
          }
       }
       
-      for (String role : roles)
+      for (Role role : roles)
       {
          if (grantedRoles == null || !grantedRoles.contains(role))
          {
-            identityManager.grantRole(username, role);
+            identityManager.grantRole(username, role.getRoleType().getName(), role.getGroup());
          }
       }
       
@@ -192,12 +194,12 @@ public class UserAction implements Serializable
       this.confirm = confirm;
    }
    
-   public List<String> getRoles()
+   public List<Role> getRoles()
    {
       return roles;
    }
    
-   public void setRoles(List<String> roles)
+   public void setRoles(List<Role> roles)
    {
       this.roles = roles;
    }

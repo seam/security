@@ -19,7 +19,6 @@ public class RoleAction implements Serializable
    
    private String originalRole;
    private String role;
-   private List<String> groups;
    
    @Inject IdentityManager identityManager;
    @Inject Conversation conversation;
@@ -27,7 +26,6 @@ public class RoleAction implements Serializable
    public void createRole()
    {
       conversation.begin();
-      groups = new ArrayList<String>();
    }
    
    public void editRole(String role)
@@ -36,14 +34,13 @@ public class RoleAction implements Serializable
       
       this.originalRole = role;
       this.role = role;
-      groups = identityManager.getRoleGroups(role);
    }
       
    public String save()
    {
       if (role != null && originalRole != null && !role.equals(originalRole))
       {
-         identityManager.deleteRole(originalRole);
+         //identityManager.deleteRole(originalRole);
       }
       
       if (identityManager.roleExists(role))
@@ -58,9 +55,10 @@ public class RoleAction implements Serializable
    
    private String saveNewRole()
    {
-      boolean success = identityManager.createRole(role);
+      // TODO rewrite
+      //boolean success = identityManager.createRole(role);
       
-      if (success)
+      /*if (success)
       {
          for (String r : groups)
          {
@@ -68,14 +66,15 @@ public class RoleAction implements Serializable
          }
          
          conversation.end();
-      }
+      }*/
       
       return "success";
    }
    
    private String saveExistingRole()
    {
-      List<String> grantedRoles = identityManager.getRoleGroups(role);
+      // TODO rewrite
+      /*List<String> grantedRoles = identityManager.getRoleGroups(role);
       
       if (grantedRoles != null)
       {
@@ -88,7 +87,7 @@ public class RoleAction implements Serializable
       for (String r : groups)
       {
          if (grantedRoles == null || !grantedRoles.contains(r)) identityManager.addRoleToGroup(role, r);
-      }
+      }*/
                
       conversation.end();
       return "success";
@@ -111,13 +110,4 @@ public class RoleAction implements Serializable
       this.role = role;
    }
 
-   public List<String> getGroups()
-   {
-      return groups;
-   }
-   
-   public void setGroups(List<String> groups)
-   {
-      this.groups = groups;
-   }
 }

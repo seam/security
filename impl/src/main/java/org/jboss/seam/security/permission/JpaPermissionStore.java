@@ -16,15 +16,14 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.jboss.seam.security.Role;
+import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.annotations.permission.PermissionAction;
 import org.jboss.seam.security.annotations.permission.PermissionDiscriminator;
 import org.jboss.seam.security.annotations.permission.PermissionRole;
 import org.jboss.seam.security.annotations.permission.PermissionTarget;
 import org.jboss.seam.security.annotations.permission.PermissionUser;
 import org.jboss.seam.security.management.IdentityManager;
-import org.jboss.seam.security.management.JpaIdentityStore;
-import org.jboss.seam.security.management.LdapIdentityStore;
+//import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
 import org.jboss.seam.security.util.AnnotatedBeanProperty;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
 {
    private static final long serialVersionUID = 4764590939669047915L;
    
-   private Logger log = LoggerFactory.getLogger(LdapIdentityStore.class);
+   private Logger log = LoggerFactory.getLogger(JpaPermissionStore.class);
    
    protected enum Discrimination { user, role, either }
    
@@ -266,7 +265,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    protected boolean updatePermissionActions(Object target, Principal recipient, String[] actions,
          boolean set)
    {
-      boolean recipientIsRole = recipient instanceof Role;
+      boolean recipientIsRole = recipient instanceof RoleImpl;
       
       try
       {
@@ -529,10 +528,11 @@ public class JpaPermissionStore implements PermissionStore, Serializable
     */
    protected Object resolvePrincipalEntity(Principal recipient)
    {
-      boolean recipientIsRole = recipient instanceof Role;
+      boolean recipientIsRole = recipient instanceof RoleImpl;
             
-      if (identityManager.getIdentityStore() != null && 
-            identityManager.getIdentityStore() instanceof JpaIdentityStore)
+      if (identityManager.getIdentityStore() != null //&& 
+            //identityManager.getIdentityStore() instanceof JpaIdentityStore)
+            )
       {
          // TODO review this code
          
@@ -540,7 +540,9 @@ public class JpaPermissionStore implements PermissionStore, Serializable
                //roleProperty.getPropertyType().equals(config.getRoleEntityClass()))
                )
          {
-            return ((JpaIdentityStore) identityManager.getIdentityStore()).lookupRole(recipient.getName());
+            // TODO re-enable this
+            //return ((JpaIdentityStore) identityManager.getIdentityStore()).lookupRole(recipient.getName());
+            return null;
          }
          //else if (userProperty.getPropertyType().equals(config.getUserEntityClass()))
          //{

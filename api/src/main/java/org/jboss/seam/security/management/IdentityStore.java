@@ -1,10 +1,13 @@
 package org.jboss.seam.security.management;
 
 import java.io.Serializable;
-import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.IdentityType;
+import org.picketlink.idm.api.Role;
 
 /**
  * The identity store does the actual work of persisting user accounts and roles in a
@@ -14,8 +17,9 @@ import java.util.Set;
  */
 public interface IdentityStore
 {     
-   public enum Feature { createUser, deleteUser, enableUser, disableUser, changePassword, 
-      createRole, deleteRole, grantRole, revokeRole }
+   public enum Feature { createUser, deleteUser, enableUser, disableUser, 
+      changePassword, createRole, deleteRole, grantRole, revokeRole, 
+      createGroup, addToGroup, removeFromGroup, deleteGroup }
    
    /**
     * Represents a set of optional features that an IdentityStore implementation might support.
@@ -92,132 +96,158 @@ public interface IdentityStore
     * Deletes the user with the specified username.
     * @return true if the user was successfully deleted.
     */
-   boolean deleteUser(String name);   
+   boolean deleteUser(String username);   
    
    /**
     * Enables the user with the specified username.  Enabled users are able to authenticate.
     * @return true if the specified user was successfully enabled.
     */
-   boolean enableUser(String name);
+   boolean enableUser(String username);
    
    /**
     * Disables the user with the specified username.  Disabled users are unable to authenticate.
     * @return true if the specified user was successfully disabled.
     */
-   boolean disableUser(String name);   
+   boolean disableUser(String username);   
    
    /**
     * Returns true if the specified user is enabled.
     */
-   boolean isUserEnabled(String name);
+   boolean isUserEnabled(String username);
    
    /**
     * Changes the password of the specified user to the specified password.
     * @return true if the user's password was successfully changed.
     */
-   boolean changePassword(String name, String password);   
+   boolean changePassword(String username, String password);   
    
    /**
     * Returns true if the specified user exists.
     */
-   boolean userExists(String name);
+   boolean userExists(String username);
 
    /**
-    * Creates a new role with the specified role name.
-    * @return true if the role was created successfully.
+    * Creates a new role type with the specified role type name.
+    * @return true if the role type was created successfully.
     */
-   boolean createRole(String role);
+   boolean createRoleType(String roleType);
    
    /**
     * Grants the specified role to the specified user.
     * 
     * @param name The name of the user
-    * @param role The name of the role to grant to the user.
+    * @param roleType The name of the role type to grant to the user.
+    * @param group The name of the group to grant the role in
     * @return true if the role was successfully granted.
     */
-   boolean grantRole(String name, String role);
+   boolean grantRole(String username, String roleType, Group group);
    
    /**
     * Revokes the specified role from the specified user.
     * 
     * @param name The name of the user
-    * @param role The name of the role to grant to the user.
+    * @param roleType The name of the role type to revoke from the user.
+    * @param group The name of the group which contains the user role
     * @return true if the role was successfully revoked.
     */
-   boolean revokeRole(String name, String role);
+   boolean revokeRole(String username, String roleType, Group group);   
    
    /**
-    * Deletes the specified role.
-    * @return true if the role was successfully deleted.
+    * Deletes the specified role type.
+    * @return true if the role type was successfully deleted.
     */
-   boolean deleteRole(String role);
+   boolean deleteRoleType(String roleType);
    
    /**
-    * Returns true if the specified role exists.
+    * Returns true if the specified role type exists.
     */
-   boolean roleExists(String name);
+   boolean roleTypeExists(String roleType);
    
    /**
-    * Adds the specified role as a member of the specified group.
+    * Creates a new group with the specified name
     * 
-    * @param role The name of the role to add as a member
-    * @param group The name of the group that the specified role will be added to.
-    * @return true if the role was successfully added to the group.
+    * @param name The name of the group
+    * @return true if the group was created successfully
     */
-   boolean addRoleToGroup(String role, String group);
+   boolean createGroup(String name, String groupType);
    
    /**
-    * Removes the specified role from the specified group.
+    * Add the specified user to the specified group
     * 
-    * @param role The name of the role to remove from the group.
-    * @param group The group from which to remove the role.
-    * @return true if the role was successfully removed from the group.
+    * @param user The name of the user
+    * @param group  The name of the group
+    * @return true if the user was successfully added
     */
-   boolean removeRoleFromGroup(String role, String group);   
+   boolean addUserToGroup(String username, Group group);
+   
+   /**
+    * Removes the specified user from the specified group
+    * 
+    * @param user The user to remove
+    * @param group The group to remove the user from
+    * @return true if the user was successfully removed
+    */
+   boolean removeUserFromGroup(String username, Group group);
+   
+   /**
+    * Deletes the specified group
+    * 
+    * @param group The name of the group to delete
+    * @return true if the group was successfully deleted
+    */
+   boolean deleteGroup(String name, String groupType);
+   
+   /**
+    * 
+    * @param name
+    * @param type
+    * @return
+    */
+   Group findGroup(String name, String groupType);
 
    /**
-    * Returns a list of all users.
+    * Returns a list of all user names.
     */
-   List<String> listUsers();
+   List<String> findUsers();
    
    /**
-    * Returns a list of all users containing the specified filter text within their username.
+    * Returns a list of all user names containing the specified filter text within their username.
 
     */
-   List<String> listUsers(String filter);
+   List<String> findUsers(String filter);
    
    /**
-    * Returns a list of all the roles.
+    * Returns a list of all the role types.
     */
-   List<String> listRoles();
+   List<String> listRoleTypes();
    
    /**
-    * Returns a list of roles that can be granted (i.e, excluding conditional roles)
+    * Returns a list of role types that can be granted (i.e, excluding conditional roles)
     */
-   List<String> listGrantableRoles();
+   List<String> listGrantableRoleTypes();
 
    /**
     * Returns a list of all the roles explicitly granted to the specified user.
     */
-   List<String> getGrantedRoles(String name);
+   List<Role> listGrantedRoles(String username);
    
    /**
     * Returns a list of all roles that the specified user is a member of.  This list may contain
     * roles that may not have been explicitly granted to the user, which are indirectly implied
-    * due to group memberships.
+    * due to role memberships.
 
     */
-   List<String> getImpliedRoles(String name);
+   List<Role> listImpliedRoles(String username);
+     
+   /**
+    * Lists the members of the specified role
+    */
+   List<IdentityType> listRoleMembers(String roleType, Group group);
    
    /**
-    * Returns a list of all the groups that the specified role is a member of.
+    * Lists the members of the specified group
     */
-   List<String> getRoleGroups(String name);
-   
-   /**
-    * Lists the members of the specified role.
-    */
-   List<Principal> listMembers(String role);
+   List<IdentityType> listGroupMembers(Group group);
 
    /**
     * Authenticates the specified user, using the specified password.

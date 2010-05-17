@@ -5,12 +5,12 @@ package org.jboss.seam.security;
  * 
  * @author Shane Bryzak
  */
-public class Group implements org.picketlink.idm.api.Group
+public class GroupImpl implements org.picketlink.idm.api.Group
 {
    private String groupType;
    private String name;
    
-   public Group(String groupType, String name)
+   public GroupImpl(String groupType, String name)
    {
       this.groupType = groupType;
       this.name = name;

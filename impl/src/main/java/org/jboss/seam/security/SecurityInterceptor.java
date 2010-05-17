@@ -139,10 +139,11 @@ public class SecurityInterceptor implements Serializable
             
             if (roleRestrictions != null)
             {
-               for (String role : roleRestrictions)
-               {
-                  identity.checkRole(role);
-               }
+               // TODO rewrite role restriction logic
+               //for (String role : roleRestrictions)
+               //{
+               //   identity.checkRole(role);
+               //}
             }
             
             if (permissionTarget != null && permissionAction != null)

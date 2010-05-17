@@ -10,7 +10,7 @@ import org.picketlink.idm.api.User;
  *  
  * @author Shane Bryzak
  */
-public class Role implements org.picketlink.idm.api.Role 
+public class RoleImpl implements org.picketlink.idm.api.Role 
 {   
    private static final long serialVersionUID = 1187276024036531700L;
    
@@ -20,7 +20,7 @@ public class Role implements org.picketlink.idm.api.Role
    private RoleType roleType;
    private User user;
    
-   public Role(Group group, RoleType roleType, User user)
+   public RoleImpl(Group group, RoleType roleType, User user)
    {
       this.group = group;
       this.roleType = roleType;

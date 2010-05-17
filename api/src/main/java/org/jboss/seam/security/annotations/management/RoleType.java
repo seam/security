@@ -10,7 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Flags an entity field or method as representing the group memberships for a role
+ * Flags an entity field or method as representing the name of a role
  *  
  * @author Shane Bryzak
  */
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Inherited
-public @interface RoleGroups
+public @interface RoleType
 {
 
 }

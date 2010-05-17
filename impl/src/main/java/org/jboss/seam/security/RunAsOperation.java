@@ -57,10 +57,11 @@ public abstract class RunAsOperation
             break;
          }
       }
-               
-      SimpleGroup roleGroup = new SimpleGroup(IdentityImpl.ROLES_GROUP);
-      roleGroup.addMember(new SimplePrincipal(role));
-      getSubject().getPrincipals().add(roleGroup); 
+        
+      // TODO fix this
+      //SimpleGroup roleGroup = new SimpleGroup(IdentityImpl.ROLES_GROUP);
+      //roleGroup.addMember(new SimplePrincipal(role));
+      //getSubject().getPrincipals().add(roleGroup); 
       
       return this;
    }

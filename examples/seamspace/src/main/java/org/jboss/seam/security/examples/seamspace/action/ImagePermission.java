@@ -10,7 +10,7 @@ import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.security.Role;
+import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.examples.seamspace.model.Member;
 import org.jboss.seam.security.examples.seamspace.model.MemberAccount;
@@ -155,7 +155,7 @@ public class ImagePermission implements Serializable
    
          for (String role : selectedRoles)
          {
-            Principal r = new Role(role);
+            Principal r = new RoleImpl(role);
             for (String action : selectedActions)
             {            
                permissions.add(new Permission(target, action, r));

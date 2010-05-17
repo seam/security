@@ -15,6 +15,7 @@ import javax.inject.Named;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.util.Base64;
+import org.picketlink.idm.api.Role;
 
 /**
  * Remember-me functionality is provided by this class, in two different flavours.  The first mode
@@ -139,7 +140,7 @@ public class RememberMe implements Serializable
       {
          final String username = credentials.getUsername();
          final BoolWrapper userEnabled = new BoolWrapper();
-         final List<String> roles = new ArrayList<String>();
+         final List<Role> roles = new ArrayList<Role>();
          
          // Double check our credentials again
          if (tokenStore.validateToken(username, credentials.getPassword()))
@@ -152,7 +153,7 @@ public class RememberMe implements Serializable
                   {
                      userEnabled.value = true;
 
-                     for (String role : identityManager.getImpliedRoles(username))
+                     for (Role role : identityManager.getImpliedRoles(username))
                      {
                         roles.add(role);
                      }
@@ -166,9 +167,10 @@ public class RememberMe implements Serializable
                identityImpl.preAuthenticate();
                
                // populate the roles
-               for (String role : roles)
+               for (Role role : roles)
                {
-                  identity.addRole(role);
+                  identity.addRole(role.getRoleType().getName(), 
+                        role.getGroup().getName(), role.getGroup().getGroupType());
                }
    
                // Set the principal

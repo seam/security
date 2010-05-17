@@ -9,7 +9,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.Role;
+import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.SimplePrincipal;
 
 /**
@@ -55,18 +55,19 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
             return true;
          }
          
-         if (permission.getRecipient() instanceof Role)
+         if (permission.getRecipient() instanceof RoleImpl)
          {
-            Role role = (Role) permission.getRecipient();
+            RoleImpl role = (RoleImpl) permission.getRecipient();
             
-            if (role.isConditional())
+            // TODO fix this
+            /*if (role.isConditional())
             {
-               if (ruleBasedPermissionResolver.checkConditionalRole(role.getName(), target, action)) return true;
+               if (ruleBasedPermissionResolver.checkConditionalRole(role.getRoleType(), target, action)) return true;
             }
-            else if (identity.hasRole(role.getName()))
+            else if (identity.hasRole(role.getRoleType()))
             {
                return true;
-            }
+            }*/
          }
       }
       
@@ -99,10 +100,12 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
                   break;
                }
                
-               if (permission.getRecipient() instanceof Role)
+               if (permission.getRecipient() instanceof RoleImpl)
                {
-                  Role role = (Role) permission.getRecipient();
+                  RoleImpl role = (RoleImpl) permission.getRecipient();
                   
+                  // TODO fix this
+                  /*
                   if (role.isConditional())
                   {
                      if (ruleBasedPermissionResolver.checkConditionalRole(role.getName(), target, action))
@@ -111,11 +114,11 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
                         break;
                      }
                   }
-                  else if (identity.hasRole(role.getName()))
+                  else if (identity.hasRole(role.getRoleType()))
                   {
                      iter.remove();
                      break;
-                  }
+                  }*/
                }
             }
          }
