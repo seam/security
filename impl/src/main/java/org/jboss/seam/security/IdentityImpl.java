@@ -6,7 +6,6 @@ import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +32,11 @@ import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
-import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
 import org.jboss.seam.security.events.NotAuthorizedEvent;
 import org.jboss.seam.security.events.NotLoggedInEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
+import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
@@ -75,11 +74,11 @@ public class IdentityImpl implements Identity, Serializable
    private Subject subject;
    private String jaasConfigName = null;
 
-   // Contains a group to role list mapping of roles assigned during the authentication process
-   private Map<String,List<String>> preAuthenticationRoles = new HashMap<String,List<String>>();
+   // Contains a group name to group type:role list mapping of roles assigned during the authentication process
+   private Map<String,Map<String,List<String>>> preAuthenticationRoles = new HashMap<String,Map<String,List<String>>>();
 
-   // Contains a group to role list mapping of roles granted after the authentication process has completed   
-   private Map<String,List<String>> activeRoles = new HashMap<String,List<String>>();
+   // Contains a group name to group type:role list mapping of roles granted after the authentication process has completed   
+   private Map<String,Map<String,List<String>>> activeRoles = new HashMap<String,Map<String,List<String>>>();
    
    private transient ThreadLocal<Boolean> systemOp;
    
@@ -337,10 +336,13 @@ public class IdentityImpl implements Identity, Serializable
       {
          for (String group : preAuthenticationRoles.keySet())
          {
-            for (String role : preAuthenticationRoles.get(group))
+            Map<String,List<String>> groupTypeRoles = preAuthenticationRoles.get(group);
+            for (String groupType : groupTypeRoles.keySet())
             {
-               // TODO fix
-               addRole(role, group, null);
+               for (String roleType : groupTypeRoles.get(groupType))
+               {
+                  addRole(roleType, group, groupType);
+               }
             }
          }
          preAuthenticationRoles.clear();
@@ -458,37 +460,46 @@ public class IdentityImpl implements Identity, Serializable
       }
    }
 
-   public boolean hasRole(String roleType, String group)
+   public boolean hasRole(String roleType, String group, String groupType)
    {
       if (!securityEnabled) return true;
       if (systemOp != null && Boolean.TRUE.equals(systemOp.get())) return true;
       
       tryLogin();
       
-      List<String> roles = activeRoles.get(group);
+      Map<String,List<String>> groupTypes = activeRoles.get(group);      
+      List<String> roles = groupTypes != null ? groupTypes.get(groupType) : null;      
       return (roles != null && roles.contains(roleType));
    }
    
    public boolean addRole(String roleType, String group, String groupType)
    {
-      if (roleType == null || "".equals(roleType)) return false;
+      if (roleType == null || "".equals(roleType) || group == null || "".equals(group) 
+            || groupType == null || "".equals(groupType)) return false;
       
-      Map<String,List<String>> roleMap = isLoggedIn() ? activeRoles : 
+      Map<String,Map<String,List<String>>> roleMap = isLoggedIn() ? activeRoles : 
          preAuthenticationRoles;
+
+      List<String> roleTypes = null;
       
-      List<String> roles = null;
-      
-      if (!roleMap.containsKey(group))
+      Map<String,List<String>> groupTypes = roleMap.get(group);
+      if (groupTypes != null)
       {
-         roles = new ArrayList<String>();
-         roleMap.put(group, roles);            
+         roleTypes = groupTypes.get(groupType);
       }
       else
       {
-         roles = roleMap.get(group);
+         groupTypes = new HashMap<String,List<String>>();
+         roleMap.put(group, groupTypes);
       }
       
-      return roles.add(roleType);
+      if (roleTypes == null)
+      {
+         roleTypes = new ArrayList<String>();
+         groupTypes.put(groupType, roleTypes);         
+      }
+      
+      return roleTypes.add(roleType);
    }
 
    /**
@@ -496,19 +507,23 @@ public class IdentityImpl implements Identity, Serializable
     * 
     * @param role The name of the role to remove
     */
-   public void removeRole(String roleType, String group)
-   {
+   public void removeRole(String roleType, String group, String groupType)
+   {      
       if (activeRoles.containsKey(group))
       {
-         activeRoles.get(group).remove(roleType);
+         Map<String,List<String>> groupTypes = activeRoles.get(group);
+         if (groupTypes.containsKey(groupType))
+         {
+            groupTypes.get(groupType).remove(roleType);
+         }
       }
    }
    
-   public void checkRole(String roleType, String group)
+   public void checkRole(String roleType, String group, String groupType)
    {
       tryLogin();
       
-      if ( !hasRole(roleType, group) )
+      if ( !hasRole(roleType, group, groupType) )
       {
          if ( !isLoggedIn() )
          {
