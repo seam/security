@@ -97,6 +97,33 @@ public interface Identity
     */
    boolean addRole(String role, String group, String groupType);
    
+   /**
+    * Checks if the authenticated user is a member of the specified group
+    * 
+    * @param name The name of the group
+    * @param groupType The type of the group, e.g. "office", "department", "global role", etc
+    * @return true if the user is a member of the group
+    */
+   boolean inGroup(String name, String groupType);
+   
+   /**
+    * Adds the user to the specified group. See hasRole() for semantics in 
+    * relationship to the authenticated status of the user.
+    * 
+    * @param name The name of the group
+    * @param groupType The type of the group
+    * @return true if the group was successfully added
+    */
+   boolean addGroup(String name, String groupType);
+   
+   /**
+    * Removes the currently authenticated user from the specified group
+    *  
+    * @param name The name of the group
+    * @param groupType The type of the group
+    */
+   void removeGroup(String name, String groupType);
+   
    /**   
     * Removes a role from the authenticated user
     * 

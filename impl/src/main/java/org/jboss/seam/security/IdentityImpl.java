@@ -60,10 +60,10 @@ public class IdentityImpl implements Identity, Serializable
    
    public static final String ROLES_GROUP = "Roles";
    
-   Logger log = LoggerFactory.getLogger(Identity.class);
+   Logger log = LoggerFactory.getLogger(IdentityImpl.class);
 
    @Inject private BeanManager manager;
-   @Inject private CredentialsImpl credentials;
+   @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
    
    @Inject private IdentityManager identityManager;
@@ -74,11 +74,29 @@ public class IdentityImpl implements Identity, Serializable
    private Subject subject;
    private String jaasConfigName = null;
 
-   // Contains a group name to group type:role list mapping of roles assigned during the authentication process
+   /**
+    * Contains a group name to group type:role list mapping of roles assigned 
+    * during the authentication process
+    */
    private Map<String,Map<String,List<String>>> preAuthenticationRoles = new HashMap<String,Map<String,List<String>>>();
 
-   // Contains a group name to group type:role list mapping of roles granted after the authentication process has completed   
+   /**
+    * Contains a group name to group type:role list mapping of roles granted 
+    * after the authentication process has completed   
+    */
    private Map<String,Map<String,List<String>>> activeRoles = new HashMap<String,Map<String,List<String>>>();
+   
+   /**
+    * Map of group name:group type group memberships assigned during the 
+    * authentication process
+    */
+   private Map<String,List<String>> preAuthenticationGroups = new HashMap<String,List<String>>();
+   
+   /**
+    * Map of group name:group type group memberships granted after the 
+    * authentication process has completed
+    */
+   private Map<String,List<String>> activeGroups = new HashMap<String,List<String>>();
    
    private transient ThreadLocal<Boolean> systemOp;
    
@@ -295,8 +313,8 @@ public class IdentityImpl implements Identity, Serializable
       }
       finally
       {
-         // Set password to null whether authentication is successful or not
-         credentials.setPassword(null);
+         // Set credential to null whether authentication is successful or not
+         credentials.setCredential(null);
          authenticating = false;
       }
    }
@@ -332,23 +350,35 @@ public class IdentityImpl implements Identity, Serializable
          }
       }
       
-      if (!preAuthenticationRoles.isEmpty() && isLoggedIn())
+      if (isLoggedIn())
       {
-         for (String group : preAuthenticationRoles.keySet())
+         if (!preAuthenticationRoles.isEmpty())
          {
-            Map<String,List<String>> groupTypeRoles = preAuthenticationRoles.get(group);
-            for (String groupType : groupTypeRoles.keySet())
+            for (String group : preAuthenticationRoles.keySet())
             {
-               for (String roleType : groupTypeRoles.get(groupType))
+               Map<String,List<String>> groupTypeRoles = preAuthenticationRoles.get(group);
+               for (String groupType : groupTypeRoles.keySet())
                {
-                  addRole(roleType, group, groupType);
+                  for (String roleType : groupTypeRoles.get(groupType))
+                  {
+                     addRole(roleType, group, groupType);
+                  }
                }
             }
+            preAuthenticationRoles.clear();
          }
-         preAuthenticationRoles.clear();
+         
+         if (!preAuthenticationGroups.isEmpty())
+         {
+            for (String group : preAuthenticationGroups.keySet())
+            {
+               activeGroups.put(group, preAuthenticationGroups.get(group));
+            }
+            preAuthenticationGroups.clear();
+         }         
       }
 
-      credentials.setPassword(null);
+      credentials.setCredential(null);
       
       manager.fireEvent(new PostAuthenticateEvent());
    }
@@ -420,8 +450,12 @@ public class IdentityImpl implements Identity, Serializable
                }
                else if (callbacks[i] instanceof PasswordCallback)
                {
-                  ( (PasswordCallback) callbacks[i] ).setPassword( credentials.getPassword() != null ?
-                           credentials.getPassword().toCharArray() : null );
+                  if (credentials.getCredential() instanceof PasswordCredential)
+                  {
+                     PasswordCredential credential = (PasswordCredential) credentials.getCredential();
+                     ( (PasswordCallback) callbacks[i] ).setPassword( credential.getPassword() != null ?
+                           credential.getPassword().toCharArray() : null );                     
+                  }
                }
                else if (callbacks[i] instanceof IdentityCallback)
                {
@@ -500,6 +534,42 @@ public class IdentityImpl implements Identity, Serializable
       }
       
       return roleTypes.add(roleType);
+   }
+   
+   public boolean inGroup(String name, String groupType)
+   {
+      return activeGroups.containsKey(name) && activeGroups.get(name).contains(groupType);
+   }
+   
+   public boolean addGroup(String name, String groupType)
+   {
+      if (name == null || "".equals(name) || groupType == null || "".equals(groupType))
+      {
+         return false;
+      }
+      
+      Map<String,List<String>> groupMap = isLoggedIn() ? activeGroups : preAuthenticationGroups;
+      
+      List<String> groupTypes = null;
+      if (groupMap.containsKey(name))
+      {
+         groupTypes = groupMap.get(name);
+      }
+      else
+      {
+         groupTypes = new ArrayList<String>();
+         groupMap.put(name, groupTypes);
+      }
+      
+      return groupTypes.add(groupType);
+   }
+   
+   public void removeGroup(String name, String groupType)
+   {
+      if (activeGroups.containsKey(name))
+      {
+         activeGroups.get(name).remove(groupType);
+      }
    }
 
    /**
