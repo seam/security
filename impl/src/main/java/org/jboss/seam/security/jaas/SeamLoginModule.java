@@ -50,25 +50,6 @@ public class SeamLoginModule implements LoginModule
    public boolean commit() throws LoginException
    {        
       subject.getPrincipals().add(new SimplePrincipal(username));
-      
-      Group roleGroup = null;
-      
-      for ( Group g : subject.getPrincipals(Group.class) )      
-      {
-         if ( ROLES_GROUP.equalsIgnoreCase( g.getName() ) )
-         {
-            roleGroup = g;
-            break;
-         }
-      }
-
-      for (String role : roles)
-      {
-         roleGroup.addMember(new SimplePrincipal(role));
-      }
-      
-      subject.getPrincipals().add(roleGroup);
-      
       return true;
    }
 
