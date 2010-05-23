@@ -1,0 +1,68 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html">
+        
+  <ui:composition template="/template.xhtml">
+      
+    <ui:define name="content">
+      <div id="contentMain">
+        <h1>Identity Management Console</h1>
+        
+      </div>
+  
+      <div id="contentDivider">
+      </div>
+  
+      <div id="contentSide">
+        <div class="advertising"></div>
+               
+        <h:form id="loginForm" rendered="#{not identity.loggedIn}">
+          <div class="memberLogin">
+            <div class="loginHeader">Member Login</div>
+            
+            <h:messages id="messages" globalOnly="true"/>
+            
+            <div class="loginRow">
+              <h:outputLabel for="name" value="Username" styleClass="loginLabel"/>
+              <h:inputText id="name" value="#{credentials.username}"/>
+            </div>
+            
+            <div class="validationMsg">
+              <h:message for="name"/>
+            </div>
+            
+            <div class="loginRow">
+              <h:outputLabel for="password" value="Password" styleClass="loginLabel"/>
+              <h:inputSecret id="password" value="#{credentials.password}" redisplay="true"/>
+            </div>
+            
+            <div class="validationMsg">
+              <h:message for="password"/>
+            </div>          
+            
+            <div class="loginRow">
+              <h:outputLabel for="rememberMe" value="Remember me" styleClass="loginLabel"/>
+              <h:selectBooleanCheckbox id="rememberMe" value="#{rememberMe.enabled}"/>
+            </div>
+  
+            <div class="buttons">
+              <h:commandButton id="login" value="LOGIN" action="#{identity.login}" styleClass="loginButton"/>
+            </div>
+  
+            <br class="clear"/>
+          
+          </div>
+          
+          <span>Tip: You can log in using <b>demo/demo</b> as the username/password</span>
+        </h:form>
+        
+      </div>
+     
+    </ui:define>
+    
+  </ui:composition>
+</html>

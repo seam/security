@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is not required if you don't need any extra configuration. -->
+<faces-config version="2.0"
+   xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+      http://java.sun.com/xml/ns/javaee
+      http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+
+   <!-- Write your navigation rules here. You are encouraged to use CDI for creating @Named managed beans. -->
+   
+  <navigation-rule>
+    <from-view-id>/usermanager.xhtml</from-view-id>
+    
+    <navigation-case>
+      <from-action>#{userAction.createUser}</from-action>
+      <if>#{true}</if>
+      <to-view-id>/userdetail.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+ 
+  </navigation-rule>  
+  
+  <navigation-rule>
+    <from-view-id>/userdetail.xhtml</from-view-id>
+    
+    <navigation-case>
+      <from-action>#{userAction.save}</from-action>
+      <from-outcome>success</from-outcome>
+      <if>#{true}</if>
+      <to-view-id>/usermanager.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    
+  </navigation-rule>
+
+</faces-config>
