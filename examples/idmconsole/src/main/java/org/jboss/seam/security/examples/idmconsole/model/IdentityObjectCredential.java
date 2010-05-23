@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.seamspace.model;
+package org.jboss.seam.security.examples.idmconsole.model;
 
 import java.io.Serializable;
 
