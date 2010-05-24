@@ -12,12 +12,12 @@ import java.lang.annotation.Target;
 /**
  * 
  * @author Shane Bryzak
+ *
  */
 @Target({METHOD,FIELD})
 @Documented
 @Retention(RUNTIME)
 @Inherited
-public @interface EntityValue 
-{
+public @interface RelationshipTo {
 
 }
