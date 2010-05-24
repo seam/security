@@ -7,6 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.jboss.seam.security.annotations.management.IdentityProperty;
+import org.jboss.seam.security.annotations.management.PropertyType;
+
 /**
  * 
  * @author Shane Bryzak
@@ -33,6 +36,7 @@ public class IdentityObjectRelationship implements Serializable
       this.id = id;
    }
    
+   @IdentityProperty(PropertyType.NAME)
    public String getName()
    {
       return name;
@@ -43,7 +47,7 @@ public class IdentityObjectRelationship implements Serializable
       this.name = name;
    }
    
-   @ManyToOne
+   @ManyToOne @IdentityProperty(PropertyType.TYPE)
    public IdentityObjectRelationshipType getRelationshipType()
    {
       return relationshipType;
@@ -54,7 +58,7 @@ public class IdentityObjectRelationship implements Serializable
       this.relationshipType = relationshipType;
    }
    
-   @ManyToOne
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_FROM)
    public IdentityObject getFromObject()
    {
       return fromObject;
@@ -65,7 +69,7 @@ public class IdentityObjectRelationship implements Serializable
       this.fromObject = fromObject;
    }
    
-   @ManyToOne
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_TO)
    public IdentityObject getToObject()
    {
       return toObject;

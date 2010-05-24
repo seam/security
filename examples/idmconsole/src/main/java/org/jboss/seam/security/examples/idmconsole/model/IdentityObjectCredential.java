@@ -7,6 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.jboss.seam.security.annotations.management.IdentityEntityType;
+import org.jboss.seam.security.annotations.management.IdentityEntityValue;
+import org.jboss.seam.security.annotations.management.IdentityProperty;
+import org.jboss.seam.security.annotations.management.PropertyType;
+
 /**
  * 
  * @author Shane Bryzak
@@ -43,6 +48,7 @@ public class IdentityObjectCredential implements Serializable
       this.identityObject = identityObject;
    }
 
+   @ManyToOne @IdentityProperty(PropertyType.TYPE)
    public IdentityObjectCredentialType getCredentialType()
    {
       return credentialType;
@@ -53,6 +59,7 @@ public class IdentityObjectCredential implements Serializable
       this.credentialType = credentialType;
    }
    
+   @IdentityProperty(PropertyType.VALUE)
    public String getValue()
    {
       return value;
