@@ -10,14 +10,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Flags an entity field or method as representing the name of the role group
- *  
+ * 
  * @author Shane Bryzak
  */
 @Target({METHOD,FIELD})
 @Documented
 @Retention(RUNTIME)
 @Inherited
-public @interface RoleGroup {
+public @interface EntityName 
+{
 
 }

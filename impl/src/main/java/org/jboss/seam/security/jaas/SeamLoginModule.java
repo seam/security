@@ -1,8 +1,5 @@
 package org.jboss.seam.security.jaas;
 
-import static org.jboss.seam.security.IdentityImpl.ROLES_GROUP;
-
-import java.security.acl.Group;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +17,6 @@ import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.management.IdentityManager;
-
 import org.picketlink.idm.api.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

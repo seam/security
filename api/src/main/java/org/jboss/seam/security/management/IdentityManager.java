@@ -1,6 +1,5 @@
 package org.jboss.seam.security.management;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.picketlink.idm.api.Group;
