@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
@@ -21,12 +22,90 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
 {
    private static final long serialVersionUID = 7729139146633529501L;
    
+   private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
+   private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
+   private static final String DEFAULT_GROUP_IDENTITY_TYPE = "GROUP";
+   
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);
    
    private Class<?> identityObjectEntity;
    private Class<?> identityObjectRelationshipEntity;
    private Class<?> identityObjectCredentialEntity;
    private Class<?> identityObjectAttributeEntity;
+   
+   private String userIdentityType = DEFAULT_USER_IDENTITY_TYPE;
+   private String roleIdentityType = DEFAULT_ROLE_IDENTITY_TYPE;
+   private String groupIdentityType = DEFAULT_GROUP_IDENTITY_TYPE;
+   
+   public Class<?> getIdentityObjectEntity()
+   {
+      return identityObjectEntity;
+   }
+   
+   public void setIdentityObjectEntity(Class<?> identityObjectEntity)
+   {
+      this.identityObjectEntity = identityObjectEntity;
+   }
+   
+   public Class<?> getIdentityObjectRelationshipEntity()
+   {
+      return identityObjectRelationshipEntity;
+   }
+   
+   public void setIdentityObjectRelationshipEntity(Class<?> identityObjectRelationshipEntity)
+   {
+      this.identityObjectRelationshipEntity = identityObjectRelationshipEntity;
+   }
+   
+   public Class<?> getIdentityObjectCredentialEntity()
+   {
+      return identityObjectCredentialEntity;
+   }
+   
+   public void setIdentityObjectCredentialEntity(Class<?> identityObjectCredentialEntity)
+   {
+      this.identityObjectCredentialEntity = identityObjectCredentialEntity;
+   }
+   
+   public Class<?> getIdentityObjectAttributeEntity()
+   {
+      return identityObjectAttributeEntity;
+   }
+   
+   public void setIdentityObjectAttributeEntity(Class<?> identityObjectAttributeEntity)
+   {
+      this.identityObjectAttributeEntity = identityObjectAttributeEntity;
+   }
+   
+   public String getUserIdentityType()
+   {
+      return userIdentityType;
+   }
+   
+   public void setUserIdentityType(String userIdentityType)
+   {
+      this.userIdentityType = userIdentityType;
+   }
+   
+   public String getRoleIdentityType()
+   {
+      return roleIdentityType;
+   }
+   
+   public void setRoleIdentityType(String roleIdentityType)
+   {
+      this.roleIdentityType = roleIdentityType;
+   }
+   
+   public String getGroupIdentityType()
+   {
+      return groupIdentityType;
+   }
+   
+   public void setGroupIdentityType(String groupIdentityType)
+   {
+      this.groupIdentityType = groupIdentityType;
+   }
    
    @Inject PasswordEncoder passwordEncoder;
 
@@ -198,5 +277,4 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       // TODO Auto-generated method stub
       return false;
    }
-
 }
