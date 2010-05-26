@@ -5,6 +5,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A convenience class for working with an annotated property (either a field or method) of
@@ -24,12 +26,35 @@ public class AnnotatedBeanProperty<T extends Annotation>
    private boolean isFieldProperty;
    private boolean set = false;
    
-   public AnnotatedBeanProperty(Class<?> cls, Class<T> annotationClass)
-   {      
+   public static class AttributeValue
+   {
+      private String name;
+      private Object value;
+      
+      public AttributeValue(String name, Object value)
+      {
+         this.name = name;
+         this.value = value;
+      }
+      
+      public String getName()
+      {
+         return name;
+      }
+      
+      public Object getValue()
+      {
+         return value;
+      }
+   }
+   
+   public AnnotatedBeanProperty(Class<?> cls, Class<T> annotationClass, AttributeValue... attributes)
+   {            
       // First check declared fields
       for (Field f : cls.getDeclaredFields())
       {
-         if (f.isAnnotationPresent(annotationClass)) 
+         if (f.isAnnotationPresent(annotationClass) && 
+               attributesMatch(f.getAnnotation(annotationClass), attributes)) 
          {
             setupFieldProperty(f);
             this.annotation = f.getAnnotation(annotationClass);            
@@ -41,7 +66,8 @@ public class AnnotatedBeanProperty<T extends Annotation>
       // Then check public fields, in case it's inherited
       for (Field f : cls.getFields())
       {
-         if (f.isAnnotationPresent(annotationClass)) 
+         if (f.isAnnotationPresent(annotationClass) && 
+               attributesMatch(f.getAnnotation(annotationClass), attributes)) 
          {
             this.annotation = f.getAnnotation(annotationClass);
             setupFieldProperty(f);
@@ -53,7 +79,8 @@ public class AnnotatedBeanProperty<T extends Annotation>
       // Then check public methods (we ignore private methods)
       for (Method m : cls.getMethods())
       {
-         if (m.isAnnotationPresent(annotationClass))
+         if (m.isAnnotationPresent(annotationClass) && 
+               attributesMatch(m.getAnnotation(annotationClass), attributes))
          {
             this.annotation = m.getAnnotation(annotationClass);
             String methodName = m.getName();
@@ -82,6 +109,32 @@ public class AnnotatedBeanProperty<T extends Annotation>
             }
          }
       }      
+   }
+   
+   private boolean attributesMatch(T annotation, AttributeValue[] attributes)
+   {
+      Class<?> cls = annotation.getClass();
+      for (AttributeValue attrib : attributes)
+      {
+         try
+         {
+            Field f = cls.getField(attrib.getName());
+            if (!f.get(annotation).equals(attrib.getValue()))
+            {
+               return false;
+            }
+         }
+         catch (IllegalAccessException e)
+         {
+            return false;
+         }
+         catch (NoSuchFieldException e)
+         {
+            return false;
+         }         
+      }
+      
+      return true;
    }
 
    private void setupFieldProperty(Field propertyField)

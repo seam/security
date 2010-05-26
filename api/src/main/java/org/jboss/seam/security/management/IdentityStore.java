@@ -3,8 +3,10 @@ package org.jboss.seam.security.management;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
@@ -80,18 +82,11 @@ public interface IdentityStore
    boolean supportsFeature(Feature feature);
 
    /**
-    * Creates a new user with the specified username and password.
+    * Creates a new user with the specified username and credential.
     * @return true if the user was successfully created.
     */
-   boolean createUser(String username, String password);
-   
-   /**
-    * Creates a new user with the specified username, password, first name and last name.
-    * 
-    * @return true if the user was successfully created.
-    */
-   boolean createUser(String username, String password, String firstname, String lastname);
-   
+   boolean createUser(String username, Credential credential, Map<String,?> attributes);
+     
    /**
     * Deletes the user with the specified username.
     * @return true if the user was successfully deleted.
@@ -116,10 +111,10 @@ public interface IdentityStore
    boolean isUserEnabled(String username);
    
    /**
-    * Changes the password of the specified user to the specified password.
-    * @return true if the user's password was successfully changed.
+    * Updates the credential of the specified user.
+    * @return true if the user's credential was successfully changed.
     */
-   boolean changePassword(String username, String password);   
+   boolean updateCredential(String username, Credential credential);   
    
    /**
     * Returns true if the specified user exists.
@@ -250,9 +245,9 @@ public interface IdentityStore
    List<IdentityType> listGroupMembers(Group group);
 
    /**
-    * Authenticates the specified user, using the specified password.
+    * Authenticates the specified user, using the specified credential.
     * 
     * @return true if authentication is successful.
     */
-   boolean authenticate(String username, String password);
+   boolean authenticate(String username, Credential credential);
 }
