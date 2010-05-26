@@ -79,9 +79,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       
       public EntityProperty(Class<?> cls, Class<IdentityProperty> annotationClass, PropertyType pt)
       {
-         super();
-         this.pt = pt;
-         scan(cls, annotationClass);                 
+         super(cls, annotationClass);
+         this.pt = pt;                 
       }
    
       public boolean isMatch(IdentityProperty p)

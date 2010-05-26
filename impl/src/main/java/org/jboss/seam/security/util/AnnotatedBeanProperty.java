@@ -268,39 +268,31 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       }      
    }
    
-   private Object invokeMethod(Method method, Object obj, Object... args) throws Exception
+   private Object invokeMethod(Method method, Object obj, Object... args)
    {
       try
       {
          return method.invoke(obj, args);
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-         if (e instanceof InvocationTargetException)
+         StringBuilder message = new StringBuilder(String.format(
+               "Exception invoking method [%s] on object [%s], using arguments [",
+               method.getName(), obj));
+         if (args != null) for (int i = 0; i < args.length; i++) message.append((i > 0 ? "," : "") + args[i]);
+         message.append("]");
+         
+         if (ex instanceof InvocationTargetException) ex = (Exception) ex.getCause();
+         
+         if (ex instanceof IllegalAccessException ||
+               ex instanceof IllegalArgumentException ||
+               ex instanceof InvocationTargetException ||
+               ex instanceof NullPointerException ||
+               ex instanceof ExceptionInInitializerException) 
          {
-            InvocationTargetException ite = (InvocationTargetException) e;
-            throw (Exception) ite.getCause();
+            throw new RuntimeException(message.toString(), ex);
          }
-         else if (e instanceof RuntimeException)
-         {
-            throw (RuntimeException) e;
-         }
-         else
-         {
-            StringBuilder sb = null;
-            if (args != null)
-            {
-               sb = new StringBuilder();
-               for (Object arg : args)
-               {
-                  sb.append((sb.length() > 0 ? "," : ":") + arg);
-               }
-            }
-            throw new IllegalArgumentException(
-                  String.format("Exception invoking method [%s] on object [%s], with arguments [%s].",
-                        method.getName(), obj, sb != null ? sb.toString() : ""));            
-         }
-      }   
+      }
    }   
    
    private Method getSetterMethod(Class<?> clazz, String name)

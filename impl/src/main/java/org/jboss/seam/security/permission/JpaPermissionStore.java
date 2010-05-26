@@ -83,7 +83,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    }
    
    protected void initProperties()
-   {
+   {      
       recipientProperty = new AnnotatedBeanProperty<PermissionRecipient>(userPermissionClass, PermissionRecipient.class);
       targetProperty = new AnnotatedBeanProperty<PermissionTarget>(userPermissionClass, PermissionTarget.class);
       actionProperty = new AnnotatedBeanProperty<PermissionAction>(userPermissionClass, PermissionAction.class);
@@ -643,17 +643,17 @@ public class JpaPermissionStore implements PermissionStore, Serializable
          
          if (targets != null)
          {
-            target = identifierCache.get(targetProperty.getValue(permission));
+            //target = identifierCache.get(targetProperty.getValue(permission));
             if (target != null)
             {
-               actionSet = metadata.createActionSet(target.getClass(),
-                  actionProperty.getValue(permission).toString());
+               //actionSet = metadata.createActionSet(target.getClass(),
+                 // actionProperty.getValue(permission).toString());
             }
          }
          else
          {
-            actionSet = metadata.createActionSet(target.getClass(),
-                  actionProperty.getValue(permission).toString());
+            //actionSet = metadata.createActionSet(target.getClass(),
+              //    actionProperty.getValue(permission).toString());
          }
          
          if (target != null && (action == null || (actionSet != null && actionSet.contains(action))))
@@ -702,14 +702,14 @@ public class JpaPermissionStore implements PermissionStore, Serializable
                target = identifierCache.get(roleTargetProperty.getValue(permission));
                if (target != null)
                {
-                  actionSet = metadata.createActionSet(target.getClass(),
-                     roleActionProperty.getValue(permission).toString());
+                  //actionSet = metadata.createActionSet(target.getClass(),
+                    // roleActionProperty.getValue(permission).toString());
                }
             }
             else
             {
-               actionSet = metadata.createActionSet(target.getClass(),
-                     roleActionProperty.getValue(permission).toString());
+               //actionSet = metadata.createActionSet(target.getClass(),
+                 //    roleActionProperty.getValue(permission).toString());
             }
                        
             if (target != null && (action == null || (actionSet != null && actionSet.contains(action))))
@@ -736,8 +736,8 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    
    private Principal lookupPrincipal(Map<String,Principal> cache, Object permission, boolean isUser)
    {
-      Principal principal = resolvePrincipal(isUser ? recipientProperty.getValue(permission) :
-         roleProperty.getValue(permission), isUser);
+      Principal principal = null; //resolvePrincipal(isUser ? recipientProperty.getValue(permission) :
+         //roleProperty.getValue(permission), isUser);
       
       String key = (isUser ? "u:" : "r:") + principal.getName();
       
