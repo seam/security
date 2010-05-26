@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.ExceptionInInitializerError;
 
 /**
  * A convenience class for working with an annotated property (either a field or method) of
@@ -274,7 +275,7 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       {
          return method.invoke(obj, args);
       }
-      catch (Exception ex)
+      catch (Throwable ex)
       {
          StringBuilder message = new StringBuilder(String.format(
                "Exception invoking method [%s] on object [%s], using arguments [",
@@ -288,7 +289,7 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
                ex instanceof IllegalArgumentException ||
                ex instanceof InvocationTargetException ||
                ex instanceof NullPointerException ||
-               ex instanceof ExceptionInInitializerException) 
+               ex instanceof ExceptionInInitializerError) 
          {
             throw new RuntimeException(message.toString(), ex);
          }
