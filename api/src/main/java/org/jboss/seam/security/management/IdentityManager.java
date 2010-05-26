@@ -2,6 +2,7 @@ package org.jboss.seam.security.management;
 
 import java.util.List;
 
+import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
@@ -13,7 +14,7 @@ import org.picketlink.idm.api.Role;
  */
 public interface IdentityManager
 {  
-   boolean createUser(String username, String password);
+   boolean createUser(String username, Credential credential);
    
    boolean deleteUser(String username);
    
@@ -21,7 +22,7 @@ public interface IdentityManager
    
    boolean disableUser(String username);
    
-   boolean changePassword(String username, String password);
+   boolean changePassword(String username, Credential credential);
    
    boolean isUserEnabled(String username);
    
@@ -35,13 +36,21 @@ public interface IdentityManager
      
    boolean userExists(String username);
    
-   boolean roleExists(String username);
+   boolean roleTypeExists(String roleType);
    
-   List<String> getUsers();
+   boolean createGroup(Group group);
    
-   List<String> getUsers(String filter);
+   boolean deleteGroup(Group group);
    
-   List<String> getRoles();
+   boolean addToGroup(String username, Group group);
+   
+   boolean removeFromGroup(String username, Group group);
+   
+   List<String> findUsers();
+   
+   List<String> findUsers(String filter);
+   
+   List<String> getRoleTypes();
    
    List<String> getGrantableRoles();
    
