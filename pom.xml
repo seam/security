@@ -26,10 +26,9 @@
       <plugins>
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2-beta-5</version>
             <configuration>
                <descriptors>
-                  <descriptor>assembly.xml</descriptor>
+                  <descriptor>src/main/assembly/assembly.xml</descriptor>
                </descriptors>
             </configuration>
          </plugin>
