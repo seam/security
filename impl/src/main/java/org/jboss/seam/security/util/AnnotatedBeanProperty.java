@@ -281,15 +281,17 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       }
       catch (IllegalArgumentException ex)
       {
-         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+         throw new IllegalArgumentException(buildInvokeMethodErrorMessage(method, obj, args), ex.getCause()); 
       }
       catch (InvocationTargetException ex)
       {
          throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
       }
       catch (NullPointerException ex)
-      {
-         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+      {         
+         NullPointerException ex2 = new NullPointerException(buildInvokeMethodErrorMessage(method, obj, args));
+         ex2.initCause(ex.getCause());
+         throw ex2;
       }
       catch (ExceptionInInitializerError e)
       {

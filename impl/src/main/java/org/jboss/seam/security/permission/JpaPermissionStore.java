@@ -84,7 +84,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    
    protected void initProperties()
    {      
-      recipientProperty = new AnnotatedBeanProperty<PermissionRecipient>(userPermissionClass, PermissionRecipient.class);
+      /*recipientProperty = new AnnotatedBeanProperty<PermissionRecipient>(userPermissionClass, PermissionRecipient.class);
       targetProperty = new AnnotatedBeanProperty<PermissionTarget>(userPermissionClass, PermissionTarget.class);
       actionProperty = new AnnotatedBeanProperty<PermissionAction>(userPermissionClass, PermissionAction.class);
       
@@ -108,7 +108,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
                   PermissionRecipientType.class);
          }
       }
-      
+      */
       if (!recipientProperty.isSet())
       {
          throw new RuntimeException("Invalid userPermissionClass " + userPermissionClass.getName() +
@@ -699,7 +699,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
             
             if (targets != null)
             {
-               target = identifierCache.get(roleTargetProperty.getValue(permission));
+               //target = identifierCache.get(roleTargetProperty.getValue(permission));
                if (target != null)
                {
                   //actionSet = metadata.createActionSet(target.getClass(),
