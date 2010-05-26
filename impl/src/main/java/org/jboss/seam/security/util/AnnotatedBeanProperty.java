@@ -293,7 +293,7 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       }
       catch (ExceptionInInitializerError e)
       {
-         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), e);
       }
    }   
    
