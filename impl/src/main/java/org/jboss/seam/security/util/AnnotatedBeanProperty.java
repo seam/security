@@ -275,34 +275,37 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       {
          return method.invoke(obj, args);
       }
-      catch (Throwable ex)
+      catch (IllegalAccessException ex)
       {
-         StringBuilder message = new StringBuilder(String.format(
-               "Exception invoking method [%s] on object [%s], using arguments [",
-               method.getName(), obj));
-         if (args != null) for (int i = 0; i < args.length; i++) message.append((i > 0 ? "," : "") + args[i]);
-         message.append("]");
-         
-         if (ex instanceof InvocationTargetException) ex = (Exception) ex.getCause();
-         
-         if (ex instanceof IllegalAccessException ||
-               ex instanceof IllegalArgumentException ||
-               ex instanceof InvocationTargetException ||
-               ex instanceof NullPointerException ||
-               ex instanceof ExceptionInInitializerError) 
-         {
-            throw new RuntimeException(message.toString(), ex);
-         }
-         else if (ex instanceof RuntimeException)
-         {
-            throw (RuntimeException) ex;
-         }
-         else
-         {
-            throw new RuntimeException(ex);
-         }
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+      }
+      catch (IllegalArgumentException ex)
+      {
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+      }
+      catch (InvocationTargetException ex)
+      {
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+      }
+      catch (NullPointerException ex)
+      {
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
+      }
+      catch (ExceptionInInitializerError e)
+      {
+         throw new RuntimeException(buildInvokeMethodErrorMessage(method, obj, args), ex);
       }
    }   
+   
+   private String buildInvokeMethodErrorMessage(Method method, Object obj, Object... args)
+   {
+      StringBuilder message = new StringBuilder(String.format(
+            "Exception invoking method [%s] on object [%s], using arguments [",
+            method.getName(), obj));
+      if (args != null) for (int i = 0; i < args.length; i++) message.append((i > 0 ? "," : "") + args[i]);
+      message.append("]");
+      return message.toString();
+   }
    
    private Method getSetterMethod(Class<?> clazz, String name)
    {
