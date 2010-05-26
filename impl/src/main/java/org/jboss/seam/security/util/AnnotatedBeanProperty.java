@@ -292,6 +292,14 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
          {
             throw new RuntimeException(message.toString(), ex);
          }
+         else if (ex instanceof RuntimeException)
+         {
+            throw (RuntimeException) ex;
+         }
+         else
+         {
+            throw new RuntimeException(ex);
+         }
       }
    }   
    
