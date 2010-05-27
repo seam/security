@@ -16,7 +16,7 @@ import java.lang.ExceptionInInitializerError;
  *  
  * @author Shane Bryzak
  */
-public abstract class AnnotatedBeanProperty<T extends Annotation>
+public class AnnotatedBeanProperty<T extends Annotation>
 {
    private Field propertyField;
    private Method propertyGetter;
@@ -114,14 +114,17 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
    }
    
    /**
-    * This method must be provided by a concrete implementation of this class. It
-    * may be used to scan for an annotation with one or more particular attribute
-    * values.  
+    * This method may be overridden by a subclass. It can be used to scan 
+    * for an annotation with particular attribute values, or to allow a match
+    * based on more complex logic.  
     * 
     * @param annotation The potential match
     * @return true if the specified annotation is a match
     */
-   protected abstract boolean isMatch(T annotation);
+   protected boolean isMatch(T annotation)
+   {
+      return true;
+   }
 
    /**
     * This method sets the property value for a specified bean to the specified 
@@ -228,23 +231,28 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
    
    private Object getFieldValue(Field field, Object obj)
    {
+      field.setAccessible(true);
       try
       {
          return field.get(obj);
       }
-      catch (Exception e)
+      catch (IllegalAccessException e)
       {
-         if (e instanceof RuntimeException)
-         {
-            throw (RuntimeException) e;
-         }
-         else
-         {
-            throw new IllegalArgumentException(
-                  String.format("Exception reading [%s] field from object [%s].",
-                        field.getName(), obj), e);
-         }         
-      }
+         throw new RuntimeException(buildGetFieldValueErrorMessage(field, obj), e);        
+      }      
+      catch (NullPointerException ex)
+      {         
+         NullPointerException ex2 = new NullPointerException(
+               buildGetFieldValueErrorMessage(field, obj));
+         ex2.initCause(ex.getCause());
+         throw ex2;
+      }   
+   }
+   
+   private String buildGetFieldValueErrorMessage(Field field, Object obj)
+   {
+      return String.format("Exception reading [%s] field from object [%s].",
+            field.getName(), obj);
    }
    
    private void setFieldValue(Field field, Object obj, Object value)
@@ -254,19 +262,23 @@ public abstract class AnnotatedBeanProperty<T extends Annotation>
       {
          field.set(obj, value);
       }
-      catch (Exception e)
+      catch (IllegalAccessException e)
       {
-         if (e instanceof RuntimeException)
-         {
-            throw (RuntimeException) e;
-         }
-         else
-         {
-            throw new IllegalArgumentException(
-                  String.format("Exception setting [%s] field on object [%s] to value [%s]",
-                        field.getName(), obj, value), e);
-         }
-      }      
+         throw new RuntimeException(buildSetFieldValueErrorMessage(field, obj, value), e);
+      }
+      catch (NullPointerException ex)
+      {         
+         NullPointerException ex2 = new NullPointerException(
+               buildSetFieldValueErrorMessage(field, obj, value));
+         ex2.initCause(ex.getCause());
+         throw ex2;
+      }
+   }
+   
+   private String buildSetFieldValueErrorMessage(Field field, Object obj, Object value)
+   {
+      return String.format("Exception setting [%s] field on object [%s] to value [%s]",
+            field.getName(), obj, value);
    }
    
    private Object invokeMethod(Method method, Object obj, Object... args)
