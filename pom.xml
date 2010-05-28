@@ -6,7 +6,7 @@
    <parent>
       <artifactId>weld-parent</artifactId>
       <groupId>org.jboss.weld</groupId>
-      <version>8</version>
+      <version>10</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -26,11 +26,6 @@
       <plugins>
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptors>
-                  <descriptor>src/main/assembly/assembly.xml</descriptor>
-               </descriptors>
-            </configuration>
          </plugin>
       </plugins>
    </build>

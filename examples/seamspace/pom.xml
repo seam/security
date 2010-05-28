@@ -105,19 +105,5 @@
 
    </dependencies>
    
-   <build>    
-      <plugins>
-              
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <configuration>
-            <warName>${project.build.finalName}</warName>
-          </configuration>
-        </plugin>
-
-     </plugins>
-  </build>
-   
 </project>
 
