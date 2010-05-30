@@ -13,6 +13,7 @@ import javax.inject.Named;
 
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.util.Strings;
+import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
@@ -68,15 +69,10 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       }
    }
    
-   public boolean createUser(String name, String password)
-   {
-      return createUser(name, password, null, null);
-   }
-
-   public boolean createUser(String name, String password, String firstname, String lastname)
+   public boolean createUser(String name, Credential credential)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_CREATE);
-      return identityStore.createUser(name, password, firstname, lastname);
+      return identityStore.createUser(name, credential, null);
    }
    
    public boolean deleteUser(String name)
@@ -97,10 +93,10 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return identityStore.disableUser(name);
    }
    
-   public boolean changePassword(String name, String password)
+   public boolean updateCredential(String name, Credential credential)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      return identityStore.changePassword(name, password);
+      return identityStore.updateCredential(name, credential);
    }
    
    public boolean isUserEnabled(String name)
@@ -133,16 +129,21 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return roleIdentityStore.deleteRoleType(roleType);
    }
    
-   public boolean createGroup(String name, String groupType)
+   public boolean createGroup(Group group)
    {
       identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_CREATE);
-      return groupIdentityStore.createGroup(name, groupType);
+      return groupIdentityStore.createGroup(group.getName(), group.getGroupType());
    }
    
-   public boolean deleteGroup(String name, String groupType)
+   public boolean deleteGroup(Group group)
    {
       identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_DELETE);
-      return groupIdentityStore.deleteGroup(name, groupType);
+      return groupIdentityStore.deleteGroup(group.getName(), group.getGroupType());
+   }
+   
+   public boolean removeFromGroup(String username, Group group)
+   {
+      return groupIdentityStore.removeUserFromGroup(username, group);
    }
    
    public boolean userExists(String name)
@@ -151,12 +152,12 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return identityStore.userExists(name);
    }
    
-   public boolean roleExists(String roleType)
+   public boolean roleTypeExists(String roleType)
    {
       return roleIdentityStore.roleTypeExists(roleType);
    }
    
-   public List<String> getUsers()
+   public List<String> findUsers()
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
       List<String> users = identityStore.findUsers();
@@ -170,7 +171,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return users;
    }
    
-   public List<String> getUsers(String filter)
+   public List<String> findUsers(String filter)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
       List<String> users = identityStore.findUsers(filter);
@@ -184,7 +185,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return users;
    }
    
-   public List<String> getRoles()
+   public List<String> getRoleTypes()
    {
       identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
       List<String> roles = roleIdentityStore.listRoleTypes();
@@ -239,10 +240,10 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return roleIdentityStore.listRoleMembers(roleType, group);
    }
      
-   public boolean authenticate(String username, String password)
+   public boolean authenticate(String username, Credential credential)
    {
       if (Strings.isEmpty(username)) return false;
-      return identityStore.authenticate(username, password);
+      return identityStore.authenticate(username, credential);
    }
    
    public IdentityStore getIdentityStore()
