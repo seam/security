@@ -25,7 +25,7 @@ import org.jboss.seam.security.annotations.permission.PermissionTarget;
 import org.jboss.seam.security.management.IdentityManager;
 //import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
-import org.jboss.seam.security.util.AnnotatedBeanProperty;
+import org.jboss.weld.extensions.util.AnnotatedBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
