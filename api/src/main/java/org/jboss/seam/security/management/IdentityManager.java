@@ -222,14 +222,4 @@ public interface IdentityManager
     * @return true if authentication was successful, false otherwise.
     */
    boolean authenticate(String username, Credential credential);
-   
-   IdentityStore getIdentityStore();
-   
-   void setIdentityStore(IdentityStore identityStore);
-   
-   IdentityStore getRoleIdentityStore();
-   
-   void setRoleIdentityStore(IdentityStore roleIdentityStore);
-   
-   boolean isEnabled();
 }

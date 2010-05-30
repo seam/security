@@ -105,16 +105,40 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return identityStore.isUserEnabled(name);
    }
    
-   public boolean grantRole(String name, String role, Group group)
+   public boolean setUserAttribute(String username, String attribute, Object value)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      return roleIdentityStore.grantRole(name, role, group);
+      return identityStore.setUserAttribute(username, attribute, value);
    }
    
-   public boolean revokeRole(String name, String role, Group group)
+   public boolean deleteUserAttribute(String username, String attribute)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      return roleIdentityStore.revokeRole(name, role, group);
+      return identityStore.deleteUserAttribute(username, attribute);
+   }
+   
+   public boolean grantRole(String name, String role, String groupName, String groupType)
+   {
+      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      return roleIdentityStore.grantRole(name, role, groupName, groupType);
+   }
+   
+   public boolean revokeRole(String name, String role, String groupName, String groupType)
+   {
+      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      return roleIdentityStore.revokeRole(name, role, groupName, groupType);
+   }
+   
+   public boolean addUserToGroup(String username, String groupName, String groupType)
+   {
+      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      return identityStore.addUserToGroup(username, groupName, groupType);
+   }
+   
+   public boolean removeUserFromGroup(String username, String groupName, String groupType)
+   {
+      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      return identityStore.removeUserFromGroup(username, groupName, groupType);
    }
    
    public boolean createRoleType(String roleType)
@@ -129,16 +153,16 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return roleIdentityStore.deleteRoleType(roleType);
    }
    
-   public boolean createGroup(Group group)
+   public boolean createGroup(String groupName, String groupType)
    {
       identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_CREATE);
-      return groupIdentityStore.createGroup(group.getName(), group.getGroupType());
+      return groupIdentityStore.createGroup(groupName, groupType);
    }
    
-   public boolean deleteGroup(Group group)
+   public boolean deleteGroup(String groupName, String groupType)
    {
       identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_DELETE);
-      return groupIdentityStore.deleteGroup(group.getName(), group.getGroupType());
+      return groupIdentityStore.deleteGroup(groupName, groupType);
    }
    
    public boolean removeFromGroup(String username, Group group)
@@ -156,21 +180,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    {
       return roleIdentityStore.roleTypeExists(roleType);
    }
-   
-   public List<String> findUsers()
-   {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
-      List<String> users = identityStore.findUsers();
       
-      Collections.sort(users, new Comparator<String>() {
-         public int compare(String value1, String value2) {
-            return value1.compareTo(value2);
-         }
-      });
-      
-      return users;
-   }
-   
    public List<String> findUsers(String filter)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
@@ -185,7 +195,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return users;
    }
    
-   public List<String> getRoleTypes()
+   public List<String> listRoleTypes()
    {
       identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
       List<String> roles = roleIdentityStore.listRoleTypes();
@@ -234,10 +244,10 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return roleIdentityStore.listImpliedRoles(username);
    }
    
-   public List<IdentityType> listRoleMembers(String roleType, Group group)
+   public List<IdentityType> listRoleMembers(String roleType, String groupName, String groupType)
    {
       identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
-      return roleIdentityStore.listRoleMembers(roleType, group);
+      return roleIdentityStore.listRoleMembers(roleType, groupName, groupType);
    }
      
    public boolean authenticate(String username, Credential credential)

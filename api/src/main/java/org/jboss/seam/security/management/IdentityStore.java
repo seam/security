@@ -122,6 +122,41 @@ public interface IdentityStore
    boolean userExists(String username);
 
    /**
+    * 
+    * @param username 
+    * @param attribute
+    * @param value
+    * @return
+    */
+   boolean setUserAttribute(String username, String attribute, Object value);
+   
+   /**
+    * 
+    * @param username
+    * @param attribute
+    * @return
+    */
+   boolean deleteUserAttribute(String username, String attribute);
+   
+   /**
+    * 
+    * @param username
+    * @param groupName
+    * @param groupType
+    * @return
+    */
+   boolean addUserToGroup(String username, String groupName, String groupType);
+   
+   /**
+    * 
+    * @param username
+    * @param groupName
+    * @param groupType
+    * @return
+    */
+   boolean removeUserFromGroup(String username, String groupName, String groupType);
+   
+   /**
     * Creates a new role type with the specified role type name.
     * @return true if the role type was created successfully.
     */
@@ -132,20 +167,22 @@ public interface IdentityStore
     * 
     * @param name The name of the user
     * @param roleType The name of the role type to grant to the user.
-    * @param group The name of the group to grant the role in
+    * @param groupName The name of the group to grant the role in
+    * @param groupType The group type
     * @return true if the role was successfully granted.
     */
-   boolean grantRole(String username, String roleType, Group group);
+   boolean grantRole(String username, String roleType, String groupName, String groupType);
    
    /**
     * Revokes the specified role from the specified user.
     * 
     * @param name The name of the user
     * @param roleType The name of the role type to revoke from the user.
-    * @param group The name of the group which contains the user role
+    * @param groupName The name of the group which contains the user role
+    * @param groupType The group type
     * @return true if the role was successfully revoked.
     */
-   boolean revokeRole(String username, String roleType, Group group);   
+   boolean revokeRole(String username, String roleType, String groupName, String groupType);   
    
    /**
     * Deletes the specified role type.
@@ -199,15 +236,9 @@ public interface IdentityStore
     * @return
     */
    Group findGroup(String name, String groupType);
-
-   /**
-    * Returns a list of all user names.
-    */
-   List<String> findUsers();
    
    /**
     * Returns a list of all user names containing the specified filter text within their username.
-
     */
    List<String> findUsers(String filter);
    
@@ -237,7 +268,7 @@ public interface IdentityStore
    /**
     * Lists the members of the specified role
     */
-   List<IdentityType> listRoleMembers(String roleType, Group group);
+   List<IdentityType> listRoleMembers(String roleType, String groupName, String groupType);
    
    /**
     * Lists the members of the specified group

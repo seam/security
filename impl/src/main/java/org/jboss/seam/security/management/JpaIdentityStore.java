@@ -272,8 +272,14 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    /**
     * 
     */
-   @Inject PasswordEncoder passwordEncoder;   
+   @Inject PasswordEncoder passwordEncoder;
 
+   public boolean addUserToGroup(String username, String groupName,
+         String groupType)
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
 
    public boolean addUserToGroup(String username, Group group)
    {
@@ -282,12 +288,6 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    }
 
    public boolean authenticate(String username, Credential credential)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean updateCredential(String username, Credential credential)
    {
       // TODO Auto-generated method stub
       return false;
@@ -305,7 +305,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return false;
    }
 
-   public boolean createUser(String username, Credential credential, Map<String,?> attributes)
+   public boolean createUser(String username, Credential credential,
+         Map<String, ?> attributes)
    {
       // TODO Auto-generated method stub
       return false;
@@ -329,6 +330,12 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return false;
    }
 
+   public boolean deleteUserAttribute(String username, String attribute)
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    public boolean disableUser(String username)
    {
       // TODO Auto-generated method stub
@@ -347,19 +354,14 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return null;
    }
 
-   public List<String> findUsers()
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
    public List<String> findUsers(String filter)
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public boolean grantRole(String username, String roleType, Group group)
+   public boolean grantRole(String username, String roleType, String groupName,
+         String groupType)
    {
       // TODO Auto-generated method stub
       return false;
@@ -395,7 +397,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return null;
    }
 
-   public List<IdentityType> listRoleMembers(String roleType, Group group)
+   public List<IdentityType> listRoleMembers(String roleType, String groupName,
+         String groupType)
    {
       // TODO Auto-generated method stub
       return null;
@@ -407,13 +410,21 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return null;
    }
 
+   public boolean removeUserFromGroup(String username, String groupName,
+         String groupType)
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    public boolean removeUserFromGroup(String username, Group group)
    {
       // TODO Auto-generated method stub
       return false;
    }
 
-   public boolean revokeRole(String username, String roleType, Group group)
+   public boolean revokeRole(String username, String roleType,
+         String groupName, String groupType)
    {
       // TODO Auto-generated method stub
       return false;
@@ -425,7 +436,20 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return false;
    }
 
+   public boolean setUserAttribute(String username, String attribute,
+         Object value)
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    public boolean supportsFeature(Feature feature)
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
+   public boolean updateCredential(String username, Credential credential)
    {
       // TODO Auto-generated method stub
       return false;
@@ -435,5 +459,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    {
       // TODO Auto-generated method stub
       return false;
-   }
+   }   
+
+
+
 }
