@@ -8,10 +8,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
 import org.jboss.weld.extensions.util.AnnotatedBeanProperty;
+import org.jboss.weld.extensions.util.TypedBeanProperty;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
@@ -48,22 +50,26 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    // The following entity classes may be determined automatically
    private Class<?> identityTypeEntity;
    private Class<?> relationshipTypeEntity;
-   private Class<?> credentialTypeEntity;
-   
+   private Class<?> credentialTypeEntity;   
    
    private AnnotatedBeanProperty<IdentityProperty> identityNameProperty;
    private AnnotatedBeanProperty<IdentityProperty> identityTypeProperty;
    private AnnotatedBeanProperty<IdentityProperty> identityTypeNameProperty;
+   
    private AnnotatedBeanProperty<IdentityProperty> relationshipNameProperty;
    private AnnotatedBeanProperty<IdentityProperty> relationshipTypeProperty;
    private AnnotatedBeanProperty<IdentityProperty> relationshipFromProperty;
    private AnnotatedBeanProperty<IdentityProperty> relationshipToProperty;
    private AnnotatedBeanProperty<IdentityProperty> relationshipTypeNameProperty;
+   
    private AnnotatedBeanProperty<IdentityProperty> credentialTypeProperty;
    private AnnotatedBeanProperty<IdentityProperty> credentialValueProperty;
    private AnnotatedBeanProperty<IdentityProperty> credentialTypeNameProperty;
+   private TypedBeanProperty credentialIdentityProperty;
+   
    private AnnotatedBeanProperty<IdentityProperty> attributeNameProperty;
    private AnnotatedBeanProperty<IdentityProperty> attributeValueProperty;
+   
    private AnnotatedBeanProperty<IdentityProperty> roleTypeNameProperty;
    
    private String userIdentityType = DEFAULT_USER_IDENTITY_TYPE;
@@ -77,13 +83,13 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    {
       private PropertyType pt;      
       
-      public EntityProperty(Class<?> cls, Class<IdentityProperty> annotationClass, PropertyType pt)
+      public EntityProperty(Class<?> cls, PropertyType pt)
       {
-         super(cls, annotationClass);
+         super(cls, IdentityProperty.class);
          this.pt = pt;                 
       }
    
-      public boolean isMatch(IdentityProperty p)
+      public boolean annotationMatches(IdentityProperty p)
       {
          return p.value().equals(pt);  
       }           
@@ -104,64 +110,59 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                "Error initializing JpaIdentityStore - identityObjectRelationshipEntity not set");
       }
       
-      identityNameProperty = new EntityProperty(identityObjectEntity, 
-            IdentityProperty.class, PropertyType.NAME);
+      identityNameProperty = new EntityProperty(identityObjectEntity, PropertyType.NAME);
       
-      identityTypeProperty = new EntityProperty(identityObjectEntity, 
-            IdentityProperty.class, PropertyType.TYPE);
+      identityTypeProperty = new EntityProperty(identityObjectEntity, PropertyType.TYPE);
       
       if (!String.class.equals(identityTypeProperty.getPropertyType()))
       {
          // If the identity type property isn't a String, it must be a related entity
          identityTypeEntity = (Class<?>) identityTypeProperty.getPropertyType();
          
-         identityTypeNameProperty = new EntityProperty(identityTypeEntity, 
-               IdentityProperty.class, PropertyType.NAME);
+         identityTypeNameProperty = new EntityProperty(identityTypeEntity, PropertyType.NAME);
       }
       
-      relationshipNameProperty = new EntityProperty(relationshipEntity, 
-            IdentityProperty.class, PropertyType.NAME);
+      relationshipNameProperty = new EntityProperty(relationshipEntity, PropertyType.NAME);
       
-      relationshipFromProperty = new EntityProperty(relationshipEntity, 
-            IdentityProperty.class, PropertyType.RELATIONSHIP_FROM);
+      relationshipFromProperty = new EntityProperty(relationshipEntity, PropertyType.RELATIONSHIP_FROM);
       
-      relationshipToProperty = new EntityProperty(relationshipEntity, 
-            IdentityProperty.class, PropertyType.RELATIONSHIP_TO);
+      relationshipToProperty = new EntityProperty(relationshipEntity, PropertyType.RELATIONSHIP_TO);
       
-      relationshipTypeProperty = new EntityProperty(relationshipEntity, 
-            IdentityProperty.class, PropertyType.TYPE);
+      relationshipTypeProperty = new EntityProperty(relationshipEntity, PropertyType.TYPE);
       
       if (!String.class.equals(relationshipTypeProperty.getPropertyType()))
       {
          relationshipTypeEntity = (Class<?>) relationshipTypeProperty.getPropertyType(); 
-         relationshipTypeNameProperty = new EntityProperty(relationshipTypeEntity, 
-               IdentityProperty.class, PropertyType.NAME);
+         relationshipTypeNameProperty = new EntityProperty(relationshipTypeEntity, PropertyType.NAME);
       }
       
       // If a credential entity has been configured, scan it
       if (credentialEntity != null)
       {
-         credentialTypeProperty = new EntityProperty(credentialEntity, 
-               IdentityProperty.class, PropertyType.TYPE);
+         credentialTypeProperty = new EntityProperty(credentialEntity, PropertyType.TYPE);
          
+         // If the credential type property isn't a string, assume the credential type
+         // is in another table
          if (!String.class.equals(credentialTypeProperty.getPropertyType()))
          {
             credentialTypeEntity = (Class<?>) credentialTypeProperty.getPropertyType();
-            credentialTypeNameProperty = new EntityProperty(credentialTypeEntity, 
-                  IdentityProperty.class, PropertyType.NAME);
+            credentialTypeNameProperty = new EntityProperty(credentialTypeEntity, PropertyType.NAME);
+            
+            credentialIdentityProperty = new TypedBeanProperty(credentialTypeEntity, identityObjectEntity);
          }
          
-         credentialValueProperty = new EntityProperty(credentialEntity, 
-               IdentityProperty.class, PropertyType.VALUE);
+         credentialValueProperty = new EntityProperty(credentialEntity, PropertyType.VALUE);
+         
+         
       }
-      // otherwise assume that the credential value is stored in the identityObjectEntity
       else
       {
-         // TODO implement this, we'll probably need some new PropertyType enums to support it
+         // otherwise assume that the credential value is stored in the identityObjectEntity         
+         credentialTypeProperty = new EntityProperty(identityObjectEntity, PropertyType.CREDENTIAL_TYPE);
+         credentialValueProperty = new EntityProperty(identityObjectEntity, PropertyType.CREDENTIAL);
       }
       
-      
-      
+      roleTypeNameProperty = new EntityProperty(roleTypeEntity, PropertyType.NAME);
    }
    
    public Class<?> getIdentityObjectEntity()
@@ -174,44 +175,44 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       this.identityObjectEntity = identityObjectEntity;
    }
    
-   public Class<?> getIdentityObjectRelationshipEntity()
+   public Class<?> getRelationshipEntity()
    {
       return relationshipEntity;
    }
    
-   public void setIdentityObjectRelationshipEntity(Class<?> identityObjectRelationshipEntity)
+   public void setRelationshipEntity(Class<?> relationshipEntity)
    {
-      this.relationshipEntity = identityObjectRelationshipEntity;
+      this.relationshipEntity = relationshipEntity;
    }
    
-   public Class<?> getIdentityObjectCredentialEntity()
+   public Class<?> getCredentialEntity()
    {
       return credentialEntity;
    }
    
-   public void setIdentityObjectCredentialEntity(Class<?> identityObjectCredentialEntity)
+   public void setCredentialEntity(Class<?> credentialEntity)
    {
-      this.credentialEntity = identityObjectCredentialEntity;
+      this.credentialEntity = credentialEntity;
    }
    
-   public Class<?> getIdentityObjectAttributeEntity()
+   public Class<?> getAttributeEntity()
    {
       return attributeEntity;
    }
    
-   public void setIdentityObjectAttributeEntity(Class<?> identityObjectAttributeEntity)
+   public void setAttributeEntity(Class<?> attributeEntity)
    {
-      this.attributeEntity = identityObjectAttributeEntity;
+      this.attributeEntity = attributeEntity;
    }
    
-   public Class<?> getIdentityRoleTypeEntity()
+   public Class<?> getRoleTypeEntity()
    {
       return roleTypeEntity;
    }
    
-   public void setIdentityRoleTypeEntity(Class<?> identityRoleTypeEntity)
+   public void setRoleTypeEntity(Class<?> roleTypeEntity)
    {
-      this.roleTypeEntity = identityRoleTypeEntity;
+      this.roleTypeEntity = roleTypeEntity;
    }
    
    public String getUserIdentityType()
@@ -273,6 +274,101 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
     * 
     */
    @Inject PasswordEncoder passwordEncoder;
+   
+   public boolean createUser(String username, Credential credential,
+         Map<String, ?> attributes)
+   {      
+      try
+      {
+         if (getIdentityObjectEntity() == null)
+         {
+            throw new IdentityManagementException("Could not create user, identityObjectEntity not set.");
+         }
+         
+         if (userExists(username))
+         {
+            log.warn("Could not create user, already exists.");
+         }
+         
+         Object userInstance = getIdentityObjectEntity().newInstance();
+         Object credentialInstance = null;
+         
+         identityNameProperty.setValue(userInstance, username);
+         
+         if (String.class.equals(identityTypeProperty.getPropertyType()))
+         {
+            identityTypeProperty.setValue(userInstance, userIdentityType);
+         }
+         else
+         {
+            identityTypeProperty.setValue(userInstance, lookupIdentityType(userIdentityType));
+         }
+         
+         if (getCredentialEntity() == null)
+         {
+            // The credential must be stored in the identity object
+            if (credentialValueProperty.isValid())
+            {
+               // TODO need to abstract this out
+               credentialValueProperty.setValue(userInstance, credential);
+            }
+
+         }
+         else
+         {
+            credentialInstance = getCredentialEntity().newInstance();
+            credentialIdentityProperty.setValue(credentialInstance, userInstance);
+            
+            // TODO need to abstract this out
+            credentialValueProperty.setValue(credentialInstance, credential);
+            if (credentialTypeProperty.isValid())
+            {
+               // TODO set the credential type - need some kind of mapper?
+               //credentialTypeProperty.setValue(credentialInstance, lookupCredentialType)
+            }                        
+         }
+         
+         // TODO create attributes
+         
+         entityManagerInstance.get().persist(userInstance);
+         
+         if (credentialInstance != null)
+         {
+            entityManagerInstance.get().persist(credentialInstance);
+         }         
+      }
+      catch (Exception ex)
+      {
+         if (ex instanceof IdentityManagementException)
+         {
+            throw (IdentityManagementException) ex;
+         }
+         else
+         {
+            throw new IdentityManagementException("Could not create user.", ex);
+         }
+      }
+      
+      // TODO Auto-generated method stub
+      return false;
+   }   
+   
+   private Object lookupIdentityType(String identityType)
+   {
+      try
+      {
+         Object val = entityManagerInstance.get().createQuery(
+               "select t from " + identityTypeEntity.getName() + " t where t." +
+               identityTypeNameProperty.getName() + " = :identityType")
+               .setParameter("identityType", identityType)
+               .getSingleResult();
+         return val;
+      }
+      catch (NoResultException ex)
+      {
+         return null;
+      }
+   }
 
    public boolean addUserToGroup(String username, String groupName,
          String groupType)
@@ -300,13 +396,6 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    }
 
    public boolean createRoleType(String roleType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean createUser(String username, Credential credential,
-         Map<String, ?> attributes)
    {
       // TODO Auto-generated method stub
       return false;
@@ -460,7 +549,5 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       // TODO Auto-generated method stub
       return false;
    }   
-
-
 
 }
