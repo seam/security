@@ -139,24 +139,6 @@ public interface IdentityStore
    boolean deleteUserAttribute(String username, String attribute);
    
    /**
-    * 
-    * @param username
-    * @param groupName
-    * @param groupType
-    * @return
-    */
-   boolean addUserToGroup(String username, String groupName, String groupType);
-   
-   /**
-    * 
-    * @param username
-    * @param groupName
-    * @param groupType
-    * @return
-    */
-   boolean removeUserFromGroup(String username, String groupName, String groupType);
-   
-   /**
     * Creates a new role type with the specified role type name.
     * @return true if the role type was created successfully.
     */
@@ -203,23 +185,13 @@ public interface IdentityStore
     */
    boolean createGroup(String name, String groupType);
    
-   /**
-    * Add the specified user to the specified group
-    * 
-    * @param user The name of the user
-    * @param group  The name of the group
-    * @return true if the user was successfully added
-    */
-   boolean addUserToGroup(String username, Group group);
+   boolean associateUser(String groupName, String groupType, String username);
    
-   /**
-    * Removes the specified user from the specified group
-    * 
-    * @param user The user to remove
-    * @param group The group to remove the user from
-    * @return true if the user was successfully removed
-    */
-   boolean removeUserFromGroup(String username, Group group);
+   boolean disassociateUser(String groupName, String groupType, String username);
+   
+   boolean associateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType);
+   
+   boolean disassociateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType);   
    
    /**
     * Deletes the specified group

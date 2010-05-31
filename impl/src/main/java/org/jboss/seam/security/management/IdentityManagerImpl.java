@@ -127,18 +127,28 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
       return roleIdentityStore.revokeRole(name, role, groupName, groupType);
-   }
-   
-   public boolean addUserToGroup(String username, String groupName, String groupType)
+   }   
+
+   public boolean associateUser(String groupName, String groupType, String username)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      return identityStore.addUserToGroup(username, groupName, groupType);
+      return identityStore.associateUser(groupName, groupType, username);
    }
    
-   public boolean removeUserFromGroup(String username, String groupName, String groupType)
+   public boolean disassociateUser(String groupName, String groupType, String username)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      return identityStore.removeUserFromGroup(username, groupName, groupType);
+      return identityStore.disassociateUser(groupName, groupType, username);      
+   }
+   
+   public boolean associateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
+   {
+      return false;
+   }
+   
+   public boolean disassociateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
+   {
+      return false;
    }
    
    public boolean createRoleType(String roleType)

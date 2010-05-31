@@ -2,13 +2,15 @@ package org.jboss.seam.security.management;
 
 import java.util.Map;
 
+import org.picketlink.idm.api.Credential;
+
 /**
  * Default password encoder, creates password hashes.
  * 
  * @author Shane Bryzak
  *
  */
-public class PasswordHashEncoder implements PasswordEncoder
+public class PasswordHashEncoder implements CredentialEncoder
 {
    private String passwordHash;
    private int passwordIterations = 1000;
@@ -32,14 +34,11 @@ public class PasswordHashEncoder implements PasswordEncoder
    {
       this.passwordIterations = passwordIterations;
    }
-   
-   public String encodePassword(String password)
+
+   public String encode(Credential credential, Map<String,Object> options)
    {
-      return encodePassword(password, null);
-   }
-   
-   public String encodePassword(String password, Map options)
-   {
+      
+      // TODO Auto-generated method stub
       return null;
    }
 }

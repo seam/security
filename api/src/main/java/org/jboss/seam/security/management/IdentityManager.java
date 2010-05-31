@@ -149,24 +149,46 @@ public interface IdentityManager
    boolean revokeRole(String username, String roleType, String groupName, String groupType);      
    
    /**
-    * Adds a user to the specified group 
+    * Associates a user with the specified group 
     *  
-    * @param username The username of the user being added to the group
     * @param groupName The name of the group the user is being added to
     * @param groupType The type of the group
-    * @return true if the user was successfully added
+    * @param username The username of the user being added to the group
+    * @return true if the user was successfully associated
     */
-   boolean addUserToGroup(String username, String groupName, String groupType);
+   boolean associateUser(String groupName, String groupType, String username);
    
    /**
-    * Removes a user from the specified group
+    * Disassociates a user with the specified group
     * 
-    * @param username The username of the user being removed
     * @param groupName The name of the group the user is being removed from
     * @param groupType The type of the group
-    * @return true if the user was successfully removed
+    * @param username The username of the user being removed
+    * @return true if the user was successfully disassociated
     */
-   boolean removeUserFromGroup(String username, String groupName, String groupType);    
+   boolean disassociateUser(String groupName, String groupType, String username);   
+   
+   /**
+    * Associates a group with the specified "parent" group
+    * 
+    * @param groupName The name of the parent group
+    * @param groupType The type of the parent group
+    * @param memberGroupName The name of the member group
+    * @param memberGroupType The type of the member group
+    * @return true if the group was successfully associated
+    */
+   boolean associateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType);
+   
+   /**
+    * Disassociates a member group with the specified "parent" group 
+    * 
+    * @param groupNameThe name of the parent group
+    * @param groupType The type of the parent group
+    * @param memberGroupName The name of the member group
+    * @param memberGroupType The type of the member group
+    * @return true if the group was successfully disassociated
+    */
+   boolean disassociateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType);
    
    /**
     * Finds users that match the specified filter.  A filter of null will return

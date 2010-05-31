@@ -1,6 +1,7 @@
 package org.jboss.seam.security.management;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
+import org.jboss.weld.extensions.util.AbstractBeanProperty;
 import org.jboss.weld.extensions.util.AnnotatedBeanProperty;
 import org.jboss.weld.extensions.util.TypedBeanProperty;
 import org.picketlink.idm.api.Credential;
@@ -37,6 +39,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    
    private static final String DEFAULT_RELATIONSHIP_TYPE_MEMBERSHIP = "MEMBERSHIP";
    private static final String DEFAULT_RELATIONSHIP_TYPE_ROLE = "ROLE";
+   
+   private static final String DEFAULT_ATTRIBUTE_USER_ENABLED = "ENABLED";
+   private static final String DEFAULT_ATTRIBUTE_PASSWORD_SALT = "PASSWORD_SALT";
       
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);
    
@@ -71,6 +76,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    private AnnotatedBeanProperty<IdentityProperty> attributeValueProperty;
    
    private AnnotatedBeanProperty<IdentityProperty> roleTypeNameProperty;
+   
+   private Map<String,AnnotatedBeanProperty<IdentityProperty>> annotatedProperties = 
+      new HashMap<String,AnnotatedBeanProperty<IdentityProperty>>();
    
    private String userIdentityType = DEFAULT_USER_IDENTITY_TYPE;
    private String roleIdentityType = DEFAULT_ROLE_IDENTITY_TYPE;
@@ -273,7 +281,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    /**
     * 
     */
-   @Inject PasswordEncoder passwordEncoder;
+   @Inject CredentialEncoder credentialEncoder;
    
    public boolean createUser(String username, Credential credential,
          Map<String, ?> attributes)
@@ -370,16 +378,23 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
    }
 
-   public boolean addUserToGroup(String username, String groupName,
-         String groupType)
+   public boolean associateUser(String groupName, String groupType, String username)
    {
-      // TODO Auto-generated method stub
       return false;
    }
-
-   public boolean addUserToGroup(String username, Group group)
+   
+   public boolean disassociateUser(String groupName, String groupType, String username)
    {
-      // TODO Auto-generated method stub
+      return false;
+   }
+   
+   public boolean associateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
+   {
+      return false;
+   }
+   
+   public boolean disassociateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
+   {
       return false;
    }
 
@@ -497,19 +512,6 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    {
       // TODO Auto-generated method stub
       return null;
-   }
-
-   public boolean removeUserFromGroup(String username, String groupName,
-         String groupType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean removeUserFromGroup(String username, Group group)
-   {
-      // TODO Auto-generated method stub
-      return false;
    }
 
    public boolean revokeRole(String username, String roleType,
