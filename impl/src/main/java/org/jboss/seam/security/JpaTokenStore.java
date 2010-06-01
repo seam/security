@@ -3,9 +3,9 @@ package org.jboss.seam.security;
 import java.io.Serializable;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -13,7 +13,7 @@ import javax.persistence.Query;
 import org.jboss.seam.security.annotations.TokenUsername;
 import org.jboss.seam.security.annotations.TokenValue;
 import org.jboss.seam.security.management.IdentityManagementException;
-import org.jboss.seam.security.util.AnnotatedBeanProperty;
+import org.jboss.weld.extensions.util.properties.AnnotatedBeanProperty;
 
 /**
  * A TokenStore implementation, stores tokens inside a database table.

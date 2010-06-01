@@ -13,9 +13,8 @@ import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
-import org.jboss.weld.extensions.util.AbstractBeanProperty;
-import org.jboss.weld.extensions.util.AnnotatedBeanProperty;
-import org.jboss.weld.extensions.util.TypedBeanProperty;
+import org.jboss.weld.extensions.util.properties.AnnotatedBeanProperty;
+import org.jboss.weld.extensions.util.properties.TypedBeanProperty;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
