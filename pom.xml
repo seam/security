@@ -17,9 +17,11 @@
    <modules>
       <module>api</module>
       <module>impl</module>
-      <!--module>docs</module-->
-      <module>examples/seamspace</module>
    </modules>
+   
+   <prerequisites>
+      <maven>3.0</maven>
+   </prerequisites>
 
    <properties>
       <seam.version>3.0.0.b01</seam.version>
