@@ -11,8 +11,8 @@
    </parent>
 
    <artifactId>seam-security-distribution</artifactId>
-   <name>Seam Faces Distribution</name>
-   <description>Builds a Seam Faces release distribution</description>
+   <name>Seam Security Distribution</name>
+   <description>Builds a Seam Security release distribution</description>
    <packaging>pom</packaging>
 
    <properties>
