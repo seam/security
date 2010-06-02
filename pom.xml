@@ -68,6 +68,22 @@
       </dependencies>
    </dependencyManagement>
 
+   <profiles>
+      <profile>
+         <id>distribution</id>
+         <activation>
+            <property>
+               <name>dist</name>
+            </property>
+         </activation>
+         <modules>
+            <module>dist</module>
+            <module>docs</module>
+            <module>examples/seamspace</module>
+         </modules>
+      </profile>
+   </profiles>
+
    <scm>
       <connection>scm:svn:http://anonsvn.jboss.org/repos/seam/modules/security/trunk</connection>
       <developerConnection>scm:svn:https://svn.jboss.org/repos/seam/modules/security/trunk</developerConnection>
