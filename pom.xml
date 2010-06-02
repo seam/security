@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
-   
+
    <parent>
-      <artifactId>weld-parent</artifactId>
-      <groupId>org.jboss.weld</groupId>
-      <version>10</version>
+      <artifactId>seam-parent</artifactId>
+      <groupId>org.jboss.seam</groupId>
+      <version>1</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -22,72 +21,53 @@
       <module>examples/seamspace</module>
    </modules>
 
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-         </plugin>
-      </plugins>
-   </build>
-   
-   <dependencyManagement> 
+   <properties>
+      <seam.version>3.0.0.b01</seam.version>
+      <!-- Use snapshot WeldX -->
+      <weld.extensions.version>1.0.0-SNAPSHOT</weld.extensions.version>
+      <!-- Seam-Drools is not yet released -->
+      <seam.drools.version>3.0.0-SNAPSHOT</seam.drools.version>
+   </properties>
+
+   <dependencyManagement>
       <dependencies>
 
          <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
-            <version>2.2</version>
-            <scope>provided</scope>
+            <groupId>org.jboss.seam</groupId>
+            <artifactId>seam</artifactId>
+            <version>${seam.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
          </dependency>
-  
+
          <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-extensions</artifactId>
+            <version>${weld.extensions.version}</version>
          </dependency>
-  
-         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>1.0.0.GA</version>
-         </dependency>
-  
+
          <dependency>
             <groupId>org.jboss.seam.drools</groupId>
             <artifactId>seam-drools-core</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${seam.drools.version}</version>
+         </dependency>
+
+         <!-- Override sub-module versions from org.jboss.seam:seam -->
+         <dependency>
+            <groupId>org.jboss.seam.security</groupId>
+            <artifactId>seam-security-api</artifactId>
+            <version>${project.version}</version>
          </dependency>
 
          <dependency>
-            <groupId>org.jboss.seam</groupId>
-            <artifactId>seam-persistence</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
-         </dependency>
-  
-         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>3.3.2.GA</version>
-            <scope>provided</scope>
-         </dependency>
-  
-         <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.0-SP1</version>
-         </dependency>
-
-         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.5.10</version>
-            <scope>provided</scope>
+            <groupId>org.jboss.seam.security</groupId>
+            <artifactId>seam-security-impl</artifactId>
+            <version>${project.version}</version>
          </dependency>
 
       </dependencies>
    </dependencyManagement>
-   
+
    <scm>
       <connection>scm:svn:http://anonsvn.jboss.org/repos/seam/modules/security/trunk</connection>
       <developerConnection>scm:svn:https://svn.jboss.org/repos/seam/modules/security/trunk</developerConnection>
