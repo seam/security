@@ -10,7 +10,7 @@
        xmlns:drools-config="urn:java:org.jboss.seam.drools.config"
        xmlns:drools-qualifier="urn:java:org.jboss.seam.drools.qualifier"
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-                           http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
+                           http://docs.jboss.org/cdi/beans_1_0.xsd">
                            
    <idm:IdentityManagerImpl>
       <s:specializes/>
