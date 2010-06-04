@@ -174,12 +174,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_DELETE);
       return groupIdentityStore.deleteGroup(groupName, groupType);
    }
-   
-   public boolean removeFromGroup(String username, Group group)
-   {
-      return groupIdentityStore.removeUserFromGroup(username, group);
-   }
-   
+      
    public boolean userExists(String name)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);

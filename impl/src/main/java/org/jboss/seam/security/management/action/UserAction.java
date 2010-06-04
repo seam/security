@@ -9,6 +9,7 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jboss.seam.security.PasswordCredential;
 import org.jboss.seam.security.management.IdentityManager;
 import org.picketlink.idm.api.Role;
 
@@ -73,7 +74,7 @@ public class UserAction implements Serializable
          return "failure";
       }
       
-      boolean success = identityManager.createUser(username, password);
+      boolean success = identityManager.createUser(username, new PasswordCredential(password));
       
       if (success)
       {
@@ -108,7 +109,7 @@ public class UserAction implements Serializable
          }
          else
          {
-            identityManager.changePassword(username, password);
+            identityManager.updateCredential(username, new PasswordCredential(password));
          }
       }
       
@@ -119,7 +120,8 @@ public class UserAction implements Serializable
          for (Role role : grantedRoles)
          {
             if (!roles.contains(role)) identityManager.revokeRole(username, 
-                  role.getRoleType().getName(), role.getGroup());
+                  role.getRoleType().getName(), role.getGroup().getName(),
+                  role.getGroup().getGroupType());
          }
       }
       
@@ -127,7 +129,8 @@ public class UserAction implements Serializable
       {
          if (grantedRoles == null || !grantedRoles.contains(role))
          {
-            identityManager.grantRole(username, role.getRoleType().getName(), role.getGroup());
+            identityManager.grantRole(username, role.getRoleType().getName(), 
+                  role.getGroup().getName(), role.getGroup().getGroupType());
          }
       }
       

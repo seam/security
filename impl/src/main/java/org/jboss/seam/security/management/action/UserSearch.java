@@ -24,7 +24,7 @@ public class UserSearch implements Serializable
    
    public void loadUsers()
    {
-      users = identityManager.getUsers();
+      users = identityManager.findUsers(null);
    }
    
    public String getUserRoles(String username)

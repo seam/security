@@ -13,7 +13,7 @@ import javax.persistence.Query;
 import org.jboss.seam.security.annotations.TokenUsername;
 import org.jboss.seam.security.annotations.TokenValue;
 import org.jboss.seam.security.management.IdentityManagementException;
-import org.jboss.weld.extensions.util.properties.AnnotatedBeanProperty;
+import org.jboss.weld.extensions.util.properties.Property;
 
 /**
  * A TokenStore implementation, stores tokens inside a database table.
@@ -27,8 +27,8 @@ public class JpaTokenStore implements TokenStore, Serializable
 
    private Class<?> tokenEntityClass;
    
-   private AnnotatedBeanProperty<TokenUsername> tokenUsernameProperty;
-   private AnnotatedBeanProperty<TokenValue> tokenValueProperty;
+   private Property<String> tokenUsernameProperty;
+   private Property<String> tokenValueProperty;
    
    @Inject BeanManager manager;
    
@@ -37,9 +37,9 @@ public class JpaTokenStore implements TokenStore, Serializable
    @Inject
    public void create()
    {
-      tokenUsernameProperty = new AnnotatedBeanProperty<TokenUsername>(tokenEntityClass, TokenUsername.class);
-      tokenValueProperty = new AnnotatedBeanProperty<TokenValue>(tokenEntityClass, TokenValue.class);
-      
+      //tokenUsernameProperty = new AnnotatedBeanProperty<TokenUsername>(tokenEntityClass, TokenUsername.class);
+      //tokenValueProperty = new AnnotatedBeanProperty<TokenValue>(tokenEntityClass, TokenValue.class);
+      /*
       if (!tokenUsernameProperty.isSet())
       {
          throw new IllegalStateException("Invalid tokenClass " + tokenEntityClass.getName() +
@@ -50,7 +50,7 @@ public class JpaTokenStore implements TokenStore, Serializable
       {
          throw new IllegalStateException("Invalid tokenClass " + tokenEntityClass.getName() +
                " - required annotation @TokenValue not found on any Field or Method.");
-      }
+      }*/
    }
    
    public void createToken(String username, String value)

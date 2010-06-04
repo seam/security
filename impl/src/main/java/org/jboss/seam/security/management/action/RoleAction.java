@@ -43,14 +43,16 @@ public class RoleAction implements Serializable
          //identityManager.deleteRole(originalRole);
       }
       
-      if (identityManager.roleTypeExists(role))
+      /*if (identityManager.roleTypeExists(role))
       {
          return saveExistingRole();
       }
       else
       {
          return saveNewRole();
-      }
+      }*/
+      
+      return null;
    }
    
    private String saveNewRole()

@@ -12,6 +12,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.jboss.seam.security.PasswordCredential;
 import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
@@ -83,10 +84,10 @@ public class SeamLoginModule implements LoginModule
                   
          // Otherwise if identity management is enabled, use it.
          IdentityManager identityManager = idmCallback.getIdentityManager();
-         if (identityManager != null && identityManager.isEnabled())
+         if (identityManager != null)
          {            
             boolean success = identityManager.authenticate(username, 
-                  new String(cbPassword.getPassword()));
+                  new PasswordCredential(new String(cbPassword.getPassword())));
             
             if (success)
             {

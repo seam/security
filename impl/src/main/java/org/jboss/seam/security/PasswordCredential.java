@@ -15,6 +15,11 @@ public class PasswordCredential implements org.picketlink.idm.api.Credential
    
    private String password;
    
+   public PasswordCredential(String password)
+   {
+      this.password = password;
+   }
+   
    public org.picketlink.idm.api.CredentialType getType()
    {
       return CREDENTIAL_TYPE;
@@ -23,10 +28,5 @@ public class PasswordCredential implements org.picketlink.idm.api.Credential
    public String getPassword()
    {
       return password;
-   }
-   
-   public void setPassword(String password)
-   {
-      this.password = password;
    }
 }

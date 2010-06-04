@@ -86,15 +86,14 @@ public class CredentialsImpl implements Credentials, Serializable
    {
       if (this.credential == null)
       {
-         this.credential = new PasswordCredential();
-         ((PasswordCredential) this.credential).setPassword(password);
+         this.credential = new PasswordCredential(password);
       }
       else if (this.credential != null && this.credential instanceof PasswordCredential &&
             ((PasswordCredential) this.credential).getPassword() != password && 
             ((PasswordCredential) this.credential).getPassword() == null || 
             !((PasswordCredential) this.credential).getPassword().equals(password))
       {
-         ((PasswordCredential) this.credential).setPassword(password);
+         this.credential = new PasswordCredential(password);
          invalid = false;
          manager.fireEvent(new CredentialsUpdatedEvent());
       }
