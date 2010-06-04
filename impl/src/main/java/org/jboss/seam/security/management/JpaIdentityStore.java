@@ -55,14 +55,15 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    private static final String PROPERTY_IDENTITY_NAME = "IDENTITY_NAME";
    private static final String PROPERTY_IDENTITY_TYPE = "IDENTITY_TYPE";
    private static final String PROPERTY_IDENTITY_TYPE_NAME = "IDENTITY_TYPE_NAME";
+   private static final String PROPERTY_CREDENTIAL_VALUE = "CREDENTIAL_VALUE";
+   private static final String PROPERTY_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
+   private static final String PROPERTY_CREDENTIAL_TYPE_NAME = "CREDENTIAL_TYPE_NAME";
       
    // Entity classes
    
    private Class<?> identityClass;
    private Class<?> relationshipClass;
-   private Class<?> relationshipTypeClass;
    private Class<?> credentialClass;
-   private Class<?> credentialTypeClass;
    private Class<?> attributeClass;
    private Class<?> roleTypeClass;
    
@@ -76,7 +77,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    /**
     * Model properties
     */
-   private Map<String,Property<?>> modelProperties = new HashMap<String,Property<?>>();   
+   private Map<String,Property<Object>> modelProperties = new HashMap<String,Property<Object>>();   
    
    private class PropertyTypeCriteria implements PropertyCriteria
    {
@@ -122,7 +123,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                "Error initializing JpaIdentityStore - identityClass not set");
       }
       
-      List<Property<String>> props = PropertyQueries.<String>createQuery(identityClass)
+      List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
          .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
          .getResultList();
       
@@ -138,9 +139,10 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       else
       {
          // No name property explicitly configured, let's query by property name
-         String[] possibleNames = new String[] { "username", "userName", "name" };
-         props = PropertyQueries.<String>createQuery(identityClass)
-            .addCriteria(new NamedPropertyCriteria(possibleNames))
+         String[] allowedNames = new String[] { "username", "userName", "name" };
+         props = PropertyQueries.createQuery(identityClass)
+            .addCriteria(new TypedPropertyCriteria(String.class))
+            .addCriteria(new NamedPropertyCriteria(allowedNames))
             .getResultList();
          
          if (props.size() == 1)
@@ -151,9 +153,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
          else if (props.size() > 1)
          {
             // multiple "name" properties found
-            search: for (String name : possibleNames)
+            search: for (String name : allowedNames)
             {
-               for (Property<String> p : props)
+               for (Property<Object> p : props)
                {
                   if (name.equals(p.getName()))
                   {
@@ -163,11 +165,11 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                }
             }
          }
-         else if (props.isEmpty())
+         else 
          {
             // Last resort - check whether the entity class exposes a single String property
             // if so, let's assume it's the identity name
-            props = PropertyQueries.<String>createQuery(identityClass)
+            props = PropertyQueries.createQuery(identityClass)
                .addCriteria(new TypedPropertyCriteria(String.class))
                .getResultList();
             if (props.size() == 1)
@@ -201,11 +203,11 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       else
       {
          // No type property explicitly configured, query by property name
-         String[] possibleNames = new String[] { "identityObjectType", 
+         String[] allowedNames = new String[] { "identityObjectType", 
                "identityType", "identityObjectTypeName", "identityTypeName", 
                "typeName", "discriminator", "accountType", "userType", "type" };
          props = PropertyQueries.createQuery(identityClass)
-            .addCriteria(new NamedPropertyCriteria(possibleNames))
+            .addCriteria(new NamedPropertyCriteria(allowedNames))
             .getResultList();
          
          if (props.size() == 1)
@@ -214,7 +216,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
          }
          else if (props.size() > 1)
          {
-            search: for (String name : possibleNames)
+            search: for (String name : allowedNames)
             {
                for (Property<Object> p : props)
                {
@@ -239,7 +241,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                            typeProp.getJavaClass().getSimpleName().contains("Type")))
                {
                   // we have a potential match, let's check if this entity has a name property
-                  Property<String> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
+                  Property<Object> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
                   if (nameProp != null)
                   {
                      modelProperties.put(PROPERTY_IDENTITY_TYPE, typeProp);
@@ -262,7 +264,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
             !modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME))
       {
          // We're not dealing with a simple type name - validate the lookup type
-         Property<String> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
+         Property<Object> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
          if (nameProp != null)
          {
             modelProperties.put(PROPERTY_IDENTITY_TYPE_NAME, nameProp);
@@ -274,9 +276,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
    }
    
-   protected Property<String> findIdentityTypeNameProperty(Class<?> identityTypeClass)
+   protected Property<Object> findIdentityTypeNameProperty(Class<?> identityTypeClass)
    {
-      List<Property<String>> props = PropertyQueries.<String>createQuery(identityTypeClass)
+      List<Property<Object>> props = PropertyQueries.createQuery(identityTypeClass)
          .addCriteria(new TypedPropertyCriteria(String.class))
          .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
          .getResultList();
@@ -287,15 +289,15 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         String[] possibleNames = new String[] { "identityObjectTypeName", "identityTypeName", "typeName", "name" };
-         props = PropertyQueries.<String>createQuery(identityTypeClass)
+         String[] allowedNames = new String[] { "identityObjectTypeName", "identityTypeName", "typeName", "name" };
+         props = PropertyQueries.createQuery(identityTypeClass)
             .addCriteria(new TypedPropertyCriteria(String.class))
-            .addCriteria(new NamedPropertyCriteria(possibleNames))
+            .addCriteria(new NamedPropertyCriteria(allowedNames))
             .getResultList();
          
-         for (String name : possibleNames)
+         for (String name : allowedNames)
          {
-            for (Property<String> prop : props)
+            for (Property<Object> prop : props)
             {
                if (name.equals(prop.getName())) return prop;
             }
@@ -305,116 +307,152 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       return null;
    }
    
-   protected void configureCredentials()
+   protected Property<Object> findCredentialTypeNameProperty(Class<?> credentialTypeClass)
    {
-      // If a credential entity has been configured, scan it
-      if (credentialEntity != null)
+      List<Property<Object>> props = PropertyQueries.createQuery(credentialTypeClass)
+         .addCriteria(new TypedPropertyCriteria(String.class))
+         .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
+         .getResultList();
+   
+      if (props.size() == 1)
       {
-         credentialTypeProperty = new EntityProperty(credentialEntity, PropertyType.TYPE);
-         
-         // If the credential type property isn't a string, assume the credential type
-         // is in another table
-         if (!String.class.equals(credentialTypeProperty.getPropertyType()))
-         {
-            credentialTypeEntity = (Class<?>) credentialTypeProperty.getPropertyType();
-            credentialTypeNameProperty = new EntityProperty(credentialTypeEntity, PropertyType.NAME);
-            
-            credentialIdentityProperty = new TypedBeanProperty(credentialTypeEntity, identityObjectEntity);
-         }
-         
-         credentialValueProperty = new EntityProperty(credentialEntity, PropertyType.VALUE);
-         
-         
+         return props.get(0);
       }
       else
       {
-         // otherwise assume that the credential value is stored in the identityObjectEntity         
-         credentialTypeProperty = new EntityProperty(identityObjectEntity, PropertyType.CREDENTIAL_TYPE);
-         credentialValueProperty = new EntityProperty(identityObjectEntity, PropertyType.CREDENTIAL);
-      }
+         String[] allowedNames = new String[] { "credentialObjectTypeName", "credentialTypeName", "typeName", "name" };
+         props = PropertyQueries.createQuery(credentialTypeClass)
+            .addCriteria(new TypedPropertyCriteria(String.class))
+            .addCriteria(new NamedPropertyCriteria(allowedNames))
+            .getResultList();
       
+         for (String name : allowedNames)
+         {
+            for (Property<Object> prop : props)
+            {
+               if (name.equals(prop.getName())) return prop;
+            }
+         }
+      }      
+   
+      return null;      
+   }
+   
+   protected void configureCredentials()
+   {
+      // If a credential entity has been explicitly configured, scan it
+      if (credentialClass != null)
+      {
+         List<Property<Object>> props = PropertyQueries.createQuery(credentialClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.VALUE))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_CREDENTIAL_VALUE, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+                  "Ambiguous credential value property in credential class " + 
+                  credentialClass.getName());
+         }
+         else
+         {
+            // Search for the value property by name
+            String[] allowedNames = new String[] { "credentialValue", "password", 
+                  "passwordHash", "credential", "value"};
+            props = PropertyQueries.createQuery(credentialClass)
+               .addCriteria(new NamedPropertyCriteria(allowedNames))
+               .getResultList();
+            
+            search: for (String name : allowedNames)
+            {
+               for (Property<Object> prop : props)
+               {
+                  if (name.equals(prop.getName()))
+                  {
+                     modelProperties.put(PROPERTY_CREDENTIAL_VALUE, prop);
+                     break search;
+                  }
+               }
+            }
+         }  
+      }
+      else
+      {
+         // TODO the credentials are stored somewhere else... 
+      }
+            
+      if (!modelProperties.containsKey(PROPERTY_CREDENTIAL_VALUE))
+      {
+         throw new IdentityManagementException("Error initializing JpaIdentityStore - no credential value property found.");
+      }            
+            
+      // Scan for a credential type property
+      List<Property<Object>> props = PropertyQueries.createQuery(credentialClass)
+         .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
+         .getResultList();
+      
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_CREDENTIAL_TYPE, props.get(0));
+      }
+      else if (props.size() > 1)
+      {
+         throw new IdentityManagementException(
+               "Ambiguous credential type property in credential class " + 
+               credentialClass.getName());
+      }
+      else
+      {
+         // Search for the type property by name
+         String[] allowedNames = new String[] { "credentialType", 
+               "identityObjectCredentialType", "type"};
+         props = PropertyQueries.createQuery(credentialClass)
+            .addCriteria(new NamedPropertyCriteria(allowedNames))
+            .getResultList();
+         
+         search: for (String name : allowedNames)
+         {
+            for (Property<Object> prop : props)
+            {
+               if (name.equals(prop.getName()))
+               {
+                  modelProperties.put(PROPERTY_CREDENTIAL_TYPE, prop);
+                  break search;
+               }
+            }
+         }
+      }      
+
+      Property<?> typeProp = modelProperties.get(PROPERTY_CREDENTIAL_TYPE);      
+      
+      // If the credential type property isn't a String, then validate the lookup type
+      if (!String.class.equals(typeProp.getJavaClass()))
+      {
+         Property<Object> nameProp = findCredentialTypeNameProperty(typeProp.getJavaClass());
+         if (nameProp != null)
+         {
+            modelProperties.put(PROPERTY_CREDENTIAL_TYPE_NAME, nameProp);
+         }
+         else
+         {
+            throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid credential type name property found.");
+         }
+      } 
       
    }
    
    protected void configureRelationships()
    {
-      if (relationshipEntity == null)
-      {
-         throw new IdentityManagementException(
-               "Error initializing JpaIdentityStore - identityObjectRelationshipEntity not set");
-      }
-      
-      relationshipNameProperty = new EntityProperty(relationshipEntity, PropertyType.NAME);
-      
-      relationshipFromProperty = new EntityProperty(relationshipEntity, PropertyType.RELATIONSHIP_FROM);
-      
-      relationshipToProperty = new EntityProperty(relationshipEntity, PropertyType.RELATIONSHIP_TO);
-      
-      relationshipTypeProperty = new EntityProperty(relationshipEntity, PropertyType.TYPE);
-      
-      if (!String.class.equals(relationshipTypeProperty.getPropertyType()))
-      {
-         relationshipTypeEntity = (Class<?>) relationshipTypeProperty.getPropertyType(); 
-         relationshipTypeNameProperty = new EntityProperty(relationshipTypeEntity, PropertyType.NAME);
-      }
-      
+
   
    }
    
    protected void configureAttributes()
    {
       
-   }
-   
-   
-   public Class<?> getIdentityObjectEntity()
-   {
-      return identityObjectEntity;
-   }
-   
-   public void setIdentityObjectEntity(Class<?> identityObjectEntity)
-   {
-      this.identityObjectEntity = identityObjectEntity;
-   }
-   
-   public Class<?> getRelationshipEntity()
-   {
-      return relationshipEntity;
-   }
-   
-   public void setRelationshipEntity(Class<?> relationshipEntity)
-   {
-      this.relationshipEntity = relationshipEntity;
-   }
-   
-   public Class<?> getCredentialEntity()
-   {
-      return credentialEntity;
-   }
-   
-   public void setCredentialEntity(Class<?> credentialEntity)
-   {
-      this.credentialEntity = credentialEntity;
-   }
-   
-   public Class<?> getAttributeEntity()
-   {
-      return attributeEntity;
-   }
-   
-   public void setAttributeEntity(Class<?> attributeEntity)
-   {
-      this.attributeEntity = attributeEntity;
-   }
-   
-   public Class<?> getRoleTypeEntity()
-   {
-      return roleTypeEntity;
-   }
-   
-   public void setRoleTypeEntity(Class<?> roleTypeEntity)
-   {
-      this.roleTypeEntity = roleTypeEntity;
    }
    
    public String getUserIdentityType()
@@ -482,7 +520,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    {      
       try
       {
-         if (getIdentityObjectEntity() == null)
+         if (identityClass == null)
          {
             throw new IdentityManagementException("Could not create user, identityObjectEntity not set.");
          }
@@ -492,38 +530,34 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
             log.warn("Could not create user, already exists.");
          }
          
-         Object userInstance = getIdentityObjectEntity().newInstance();
+         Object userInstance = identityClass.newInstance();
          Object credentialInstance = null;
          
-         identityNameProperty.setValue(userInstance, username);
+         modelProperties.get(PROPERTY_IDENTITY_NAME).setValue(userInstance, username);
          
-         if (String.class.equals(identityTypeProperty.getPropertyType()))
+         Property<Object> identityType = modelProperties.get(PROPERTY_IDENTITY_TYPE);
+         if (String.class.equals(identityType.getJavaClass()))
          {
-            identityTypeProperty.setValue(userInstance, userIdentityType);
+            identityType.setValue(userInstance, userIdentityType);
          }
          else
          {
-            identityTypeProperty.setValue(userInstance, lookupIdentityType(userIdentityType));
+            identityType.setValue(userInstance, lookupIdentityType(userIdentityType));
          }
          
-         if (getCredentialEntity() == null)
+         if (credentialClass == null)
          {
-            // The credential must be stored in the identity object
-            if (credentialValueProperty.isValid())
-            {
-               // TODO need to abstract this out
-               credentialValueProperty.setValue(userInstance, credential);
-            }
-
+            modelProperties.get(PROPERTY_CREDENTIAL_VALUE).setValue(userInstance, credential);
          }
          else
          {
-            credentialInstance = getCredentialEntity().newInstance();
-            credentialIdentityProperty.setValue(credentialInstance, userInstance);
+            credentialInstance = credentialClass.newInstance();
+            // TODO implement this
+            //credentialIdentityProperty.setValue(credentialInstance, userInstance);
             
             // TODO need to abstract this out
-            credentialValueProperty.setValue(credentialInstance, credential);
-            if (credentialTypeProperty.isValid())
+            modelProperties.get(PROPERTY_CREDENTIAL_VALUE).setValue(credentialInstance, credential);
+            if (modelProperties.containsKey(PROPERTY_CREDENTIAL_TYPE))
             {
                // TODO set the credential type - need some kind of mapper?
                //credentialTypeProperty.setValue(credentialInstance, lookupCredentialType)
@@ -560,8 +594,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       try
       {
          Object val = entityManagerInstance.get().createQuery(
-               "select t from " + identityTypeEntity.getName() + " t where t." +
-               identityTypeNameProperty.getName() + " = :identityType")
+               "select t from " + identityClass.getName() + " t where t." +
+               modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME).getName() +
+                " = :identityType")
                .setParameter("identityType", identityType)
                .getSingleResult();
          return val;
