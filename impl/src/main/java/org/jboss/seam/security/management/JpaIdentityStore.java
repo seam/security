@@ -58,12 +58,17 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    private static final String PROPERTY_CREDENTIAL_VALUE = "CREDENTIAL_VALUE";
    private static final String PROPERTY_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
    private static final String PROPERTY_CREDENTIAL_TYPE_NAME = "CREDENTIAL_TYPE_NAME";
+   private static final String PROPERTY_RELATIONSHIP_FROM = "RELATIONSHIP_FROM";
+   private static final String PROPERTY_RELATIONSHIP_TO = "RELATIONSHIP_TO";
+   private static final String PROPERTY_RELATIONSHIP_TYPE = "RELATIONSHIP_TYPE";
+   private static final String PROPERTY_RELATIONSHIP_TYPE_NAME = "RELATIONSHIP_TYPE_NAME";
+   private static final String PROPERTY_RELATIONSHIP_NAME = "RELATIONSHIP_NAME";
       
    // Entity classes
    
    private Class<?> identityClass;
-   private Class<?> relationshipClass;
    private Class<?> credentialClass;
+   private Class<?> relationshipClass;   
    private Class<?> attributeClass;
    private Class<?> roleTypeClass;
    
@@ -138,32 +143,10 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         // No name property explicitly configured, let's query by property name
-         String[] allowedNames = new String[] { "username", "userName", "name" };
-         props = PropertyQueries.createQuery(identityClass)
-            .addCriteria(new TypedPropertyCriteria(String.class))
-            .addCriteria(new NamedPropertyCriteria(allowedNames))
-            .getResultList();
-         
-         if (props.size() == 1)
+         Property<Object> p = findNamedProperty(identityClass, "username", "userName", "name");
+         if (p != null) 
          {
-            // Bingo, use the name property
             modelProperties.put(PROPERTY_IDENTITY_NAME, props.get(0));
-         }
-         else if (props.size() > 1)
-         {
-            // multiple "name" properties found
-            search: for (String name : allowedNames)
-            {
-               for (Property<Object> p : props)
-               {
-                  if (name.equals(p.getName()))
-                  {
-                     modelProperties.put(PROPERTY_IDENTITY_NAME, p);
-                     break search;
-                  }
-               }
-            }
          }
          else 
          {
@@ -202,34 +185,14 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         // No type property explicitly configured, query by property name
-         String[] allowedNames = new String[] { "identityObjectType", 
+         Property<Object> p = findNamedProperty(identityClass, "identityObjectType", 
                "identityType", "identityObjectTypeName", "identityTypeName", 
-               "typeName", "discriminator", "accountType", "userType", "type" };
-         props = PropertyQueries.createQuery(identityClass)
-            .addCriteria(new NamedPropertyCriteria(allowedNames))
-            .getResultList();
-         
-         if (props.size() == 1)
+               "typeName", "discriminator", "accountType", "userType", "type");
+         if (p != null) 
          {
             modelProperties.put(PROPERTY_IDENTITY_TYPE, props.get(0));
          }
-         else if (props.size() > 1)
-         {
-            search: for (String name : allowedNames)
-            {
-               for (Property<Object> p : props)
-               {
-                  if (name.equals(p.getName()))
-                  {
-                     modelProperties.put(PROPERTY_IDENTITY_TYPE, p);
-                     break search;
-                  }
-               }
-            }
-            
-         }
-         else if (props.isEmpty())
+         else 
          {
             // Last resort - let's check all properties, and try to find one
             // with an entity type that has "type" in its name
@@ -241,7 +204,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                            typeProp.getJavaClass().getSimpleName().contains("Type")))
                {
                   // we have a potential match, let's check if this entity has a name property
-                  Property<Object> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
+                  Property<Object> nameProp = findNamedProperty(typeProp.getJavaClass(),
+                        "identityObjectTypeName", "identityTypeName", "typeName", "name");
                   if (nameProp != null)
                   {
                      modelProperties.put(PROPERTY_IDENTITY_TYPE, typeProp);
@@ -264,7 +228,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
             !modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME))
       {
          // We're not dealing with a simple type name - validate the lookup type
-         Property<Object> nameProp = findIdentityTypeNameProperty(typeProp.getJavaClass());
+         Property<Object> nameProp = findNamedProperty(typeProp.getJavaClass(),
+               "identityObjectTypeName", "identityTypeName", "typeName", "name");
          if (nameProp != null)
          {
             modelProperties.put(PROPERTY_IDENTITY_TYPE_NAME, nameProp);
@@ -276,9 +241,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
    }
    
-   protected Property<Object> findIdentityTypeNameProperty(Class<?> identityTypeClass)
+   protected Property<Object> findNamedProperty(Class<?> targetClass, String... allowedNames)
    {
-      List<Property<Object>> props = PropertyQueries.createQuery(identityTypeClass)
+      List<Property<Object>> props = PropertyQueries.createQuery(targetClass)
          .addCriteria(new TypedPropertyCriteria(String.class))
          .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
          .getResultList();
@@ -289,8 +254,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         String[] allowedNames = new String[] { "identityObjectTypeName", "identityTypeName", "typeName", "name" };
-         props = PropertyQueries.createQuery(identityTypeClass)
+         props = PropertyQueries.createQuery(targetClass)
             .addCriteria(new TypedPropertyCriteria(String.class))
             .addCriteria(new NamedPropertyCriteria(allowedNames))
             .getResultList();
@@ -305,37 +269,6 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }      
       
       return null;
-   }
-   
-   protected Property<Object> findCredentialTypeNameProperty(Class<?> credentialTypeClass)
-   {
-      List<Property<Object>> props = PropertyQueries.createQuery(credentialTypeClass)
-         .addCriteria(new TypedPropertyCriteria(String.class))
-         .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
-         .getResultList();
-   
-      if (props.size() == 1)
-      {
-         return props.get(0);
-      }
-      else
-      {
-         String[] allowedNames = new String[] { "credentialObjectTypeName", "credentialTypeName", "typeName", "name" };
-         props = PropertyQueries.createQuery(credentialTypeClass)
-            .addCriteria(new TypedPropertyCriteria(String.class))
-            .addCriteria(new NamedPropertyCriteria(allowedNames))
-            .getResultList();
-      
-         for (String name : allowedNames)
-         {
-            for (Property<Object> prop : props)
-            {
-               if (name.equals(prop.getName())) return prop;
-            }
-         }
-      }      
-   
-      return null;      
    }
    
    protected void configureCredentials()
@@ -359,29 +292,17 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
          }
          else
          {
-            // Search for the value property by name
-            String[] allowedNames = new String[] { "credentialValue", "password", 
-                  "passwordHash", "credential", "value"};
-            props = PropertyQueries.createQuery(credentialClass)
-               .addCriteria(new NamedPropertyCriteria(allowedNames))
-               .getResultList();
-            
-            search: for (String name : allowedNames)
-            {
-               for (Property<Object> prop : props)
-               {
-                  if (name.equals(prop.getName()))
-                  {
-                     modelProperties.put(PROPERTY_CREDENTIAL_VALUE, prop);
-                     break search;
-                  }
-               }
-            }
+            Property<Object> p = findNamedProperty(credentialClass, "credentialValue", 
+                  "password", "passwordHash", "credential", "value");
+            if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
          }  
       }
       else
       {
-         // TODO the credentials are stored somewhere else... 
+         // The credentials may be stored in the identity class - let's search for it by name
+         Property<Object> p = findNamedProperty(identityClass, "credentialValue", 
+               "password", "passwordHash", "credential", "value");
+         if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
       }
             
       if (!modelProperties.containsKey(PROPERTY_CREDENTIAL_VALUE))
@@ -406,24 +327,9 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         // Search for the type property by name
-         String[] allowedNames = new String[] { "credentialType", 
-               "identityObjectCredentialType", "type"};
-         props = PropertyQueries.createQuery(credentialClass)
-            .addCriteria(new NamedPropertyCriteria(allowedNames))
-            .getResultList();
-         
-         search: for (String name : allowedNames)
-         {
-            for (Property<Object> prop : props)
-            {
-               if (name.equals(prop.getName()))
-               {
-                  modelProperties.put(PROPERTY_CREDENTIAL_TYPE, prop);
-                  break search;
-               }
-            }
-         }
+         Property<Object> p = findNamedProperty(credentialClass, "credentialType", 
+               "identityObjectCredentialType", "type");
+         if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
       }      
 
       Property<?> typeProp = modelProperties.get(PROPERTY_CREDENTIAL_TYPE);      
@@ -431,7 +337,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       // If the credential type property isn't a String, then validate the lookup type
       if (!String.class.equals(typeProp.getJavaClass()))
       {
-         Property<Object> nameProp = findCredentialTypeNameProperty(typeProp.getJavaClass());
+         Property<Object> nameProp = findNamedProperty(typeProp.getJavaClass(),
+               "credentialObjectTypeName", "credentialTypeName", "typeName", "name");
          if (nameProp != null)
          {
             modelProperties.put(PROPERTY_CREDENTIAL_TYPE_NAME, nameProp);
@@ -440,14 +347,220 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
          {
             throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid credential type name property found.");
          }
-      } 
-      
+      }       
    }
    
    protected void configureRelationships()
    {
-
+      if (relationshipClass == null)
+      {
+         throw new IdentityManagementException("Error initializing JpaIdentityStore - relationshipClass not set.");
+      }
+      
+      List<Property<Object>> props = PropertyQueries.createQuery(relationshipClass)
+         .addCriteria(new TypedPropertyCriteria(identityClass))
+         .addCriteria(new PropertyTypeCriteria(PropertyType.RELATIONSHIP_FROM))
+         .getResultList();
+      
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_RELATIONSHIP_FROM, props.get(0));
+      }
+      else if (props.size() > 1)
+      {
+         throw new IdentityManagementException(
+               "Ambiguous relationshipFrom property in relationship class " + 
+               relationshipClass.getName());
+      }
+      else
+      {
+         Property<Object> p = findNamedProperty(relationshipClass, "relationshipFrom", 
+               "fromIdentityObject", "fromIdentity");
+         if (p != null) 
+         {
+            modelProperties.put(PROPERTY_RELATIONSHIP_FROM, p);
+         }
+         else
+         {
+            // Last resort - search for a property with a type of identityClass
+            // and a "from" in its name
+            props = PropertyQueries.createQuery(relationshipClass)
+               .addCriteria(new TypedPropertyCriteria(identityClass))
+               .getResultList();
+            
+            for (Property<Object> prop : props)
+            {
+               if (prop.getName().contains("from"))
+               {
+                  modelProperties.put(PROPERTY_RELATIONSHIP_FROM, prop);
+                  break;
+               }
+            }
+         }         
+      }
   
+      
+      props = PropertyQueries.createQuery(relationshipClass)
+         .addCriteria(new TypedPropertyCriteria(identityClass))
+         .addCriteria(new PropertyTypeCriteria(PropertyType.RELATIONSHIP_TO))
+         .getResultList();
+   
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_RELATIONSHIP_TO, props.get(0));
+      }
+      else if (props.size() > 1)
+      {
+         throw new IdentityManagementException(
+               "Ambiguous relationshipTo property in relationship class " + 
+               relationshipClass.getName());
+      }
+      else
+      {
+         Property<Object> p = findNamedProperty(relationshipClass, "relationshipTo", 
+               "toIdentityObject", "toIdentity");
+         if (p != null) 
+         {
+            modelProperties.put(PROPERTY_RELATIONSHIP_TO, p);
+         }
+         else
+         {
+            // Last resort - search for a property with a type of identityClass
+            // and a "to" in its name
+            props = PropertyQueries.createQuery(relationshipClass)
+               .addCriteria(new TypedPropertyCriteria(identityClass))
+               .getResultList();
+            
+            for (Property<Object> prop : props)
+            {
+               if (prop.getName().contains("to"))
+               {
+                  modelProperties.put(PROPERTY_RELATIONSHIP_TO, prop);
+                  break;
+               }
+            }
+         }         
+      }      
+      
+      props = PropertyQueries.createQuery(relationshipClass)
+         .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
+         .getResultList();
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_RELATIONSHIP_TYPE, props.get(0));
+      }
+      else if (props.size() > 1)
+      {
+         throw new IdentityManagementException(
+               "Ambiguous relationshipType property in relationship class " +
+               relationshipClass.getName());
+      }
+      else
+      {
+         Property<Object> p = findNamedProperty(relationshipClass, 
+               "identityRelationshipType", "relationshipType", "type");
+         if (p != null)
+         {
+            modelProperties.put(PROPERTY_RELATIONSHIP_TYPE, p);
+         }
+         else
+         {
+            props = PropertyQueries.createQuery(relationshipClass)
+               .getResultList();
+            for (Property<Object> prop : props)
+            {
+               if (prop.getName().contains("type"))
+               {
+                  modelProperties.put(PROPERTY_RELATIONSHIP_TYPE, prop);
+                  break;
+               }
+            }
+         }
+      }
+      
+      props = PropertyQueries.createQuery(relationshipClass)
+         .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
+         .addCriteria(new TypedPropertyCriteria(String.class))
+         .getResultList();
+      
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_RELATIONSHIP_NAME, props.get(0));
+      }
+      else if (props.size() > 1)
+      {
+         throw new IdentityManagementException(
+               "Ambiguous relationship name property in relationship class " +
+               relationshipClass.getName());
+      }
+      else
+      {
+         Property<Object> p = findNamedProperty(relationshipClass,
+               "relationshipName", "name");
+         if (p != null)
+         {
+            modelProperties.put(PROPERTY_RELATIONSHIP_NAME, p);
+         }
+      }
+      
+      if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_FROM))
+      {
+         throw new IdentityManagementException(
+            "Error initializing JpaIdentityStore - no valid relationship from property found.");
+      }
+      
+      if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TO))
+      {
+         throw new IdentityManagementException(
+            "Error initializing JpaIdentityStore - no valid relationship to property found.");
+      }
+      
+      if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TYPE))
+      {
+         throw new IdentityManagementException(
+            "Error initializing JpaIdentityStore - no valid relationship type property found.");
+      }
+      
+      if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_NAME))
+      {
+         throw new IdentityManagementException(
+            "Error initializing JpaIdentityStore - no valid relationship name property found.");
+      }
+      
+      Class<?> typeClass = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE).getJavaClass();
+      if (!String.class.equals(typeClass))
+      {
+         props = PropertyQueries.createQuery(typeClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
+            .addCriteria(new TypedPropertyCriteria(String.class))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_RELATIONSHIP_TYPE_NAME, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+                  "Ambiguous relationship type name property in class " +
+                  typeClass.getName());
+         }
+         else
+         {
+            Property<Object> p = findNamedProperty(typeClass, "relationshipTypeName",
+                  "typeName", "name");
+            if (p != null)
+            {
+               modelProperties.put(PROPERTY_RELATIONSHIP_TYPE_NAME, p);
+            }
+         }
+         
+         if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TYPE_NAME))
+         {
+            throw new IdentityManagementException(
+                  "Error initializing JpaIdentityStore - no valid relationship type name property found");
+         }
+      }      
    }
    
    protected void configureAttributes()
