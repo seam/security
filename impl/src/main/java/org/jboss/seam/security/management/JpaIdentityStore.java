@@ -63,6 +63,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    private static final String PROPERTY_RELATIONSHIP_TYPE = "RELATIONSHIP_TYPE";
    private static final String PROPERTY_RELATIONSHIP_TYPE_NAME = "RELATIONSHIP_TYPE_NAME";
    private static final String PROPERTY_RELATIONSHIP_NAME = "RELATIONSHIP_NAME";
+   private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
+   private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
       
    // Entity classes
    
@@ -625,15 +627,47 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       if (attributeClass != null)
       {
          List<Property<Object>> props = PropertyQueries.createQuery(attributeClass)
-            .addCriteria(new PropertyTypeCriteria(PropertyType.ATTRIBUTE))
+            .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
+            .addCriteria(new TypedPropertyCriteria(String.class))
             .getResultList();
          
-         for (Property<Object> p : props)
+         if (props.size() == 1)
          {
-            attributeProperties.put(
-                  p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(), 
-                  p);
-         }         
+            modelProperties.put(PROPERTY_ATTRIBUTE_NAME, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+            		"Ambiguous attribute name property in class " +
+            		attributeClass.getName());
+         }
+         else
+         {
+            Property<Object> prop = findNamedProperty(attributeClass,
+                  "attributeName", "name");
+            if (prop != null) modelProperties.put(PROPERTY_ATTRIBUTE_NAME, prop);
+         }
+         
+         props = PropertyQueries.createQuery(attributeClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.VALUE))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_ATTRIBUTE_VALUE, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+                  "Ambiguous attribute value property in class " +
+                  attributeClass.getName());
+         }
+         else
+         {
+            Property<Object> prop = findNamedProperty(attributeClass, 
+                  "attributeValue", "value");
+            if (prop != null) modelProperties.put(PROPERTY_ATTRIBUTE_VALUE, prop);
+         }
       }
 
       // Scan for additional attributes in the identity class also
@@ -647,6 +681,8 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(), 
                p);
       }
+      
+      // TODO scan any entity classes referenced by the identity class also
    }
    
    protected void configureRoleTypeNames()
