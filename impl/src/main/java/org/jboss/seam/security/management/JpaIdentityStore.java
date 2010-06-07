@@ -84,6 +84,11 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
     */
    private Map<String,Property<Object>> modelProperties = new HashMap<String,Property<Object>>();   
    
+   /**
+    * Attribute properties
+    */
+   private Map<String,Property<Object>> attributeProperties = new HashMap<String,Property<Object>>();
+   
    private class PropertyTypeCriteria implements PropertyCriteria
    {
       private PropertyType pt;
@@ -616,14 +621,31 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    
    protected void configureAttributes()
    {
+      // If an attribute class has been configured, scan it for attributes
       if (attributeClass != null)
       {
+         List<Property<Object>> props = PropertyQueries.createQuery(attributeClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.ATTRIBUTE))
+            .getResultList();
          
-         
+         for (Property<Object> p : props)
+         {
+            attributeProperties.put(
+                  p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(), 
+                  p);
+         }         
       }
-      else
+
+      // Scan for additional attributes in the identity class also
+      List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
+         .addCriteria(new PropertyTypeCriteria(PropertyType.ATTRIBUTE))
+         .getResultList();
+   
+      for (Property<Object> p : props)
       {
-         
+         attributeProperties.put(
+               p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(), 
+               p);
       }
    }
    
