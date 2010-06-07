@@ -19,4 +19,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface IdentityProperty {
    PropertyType value();
+   String attributeName() default "";
 }

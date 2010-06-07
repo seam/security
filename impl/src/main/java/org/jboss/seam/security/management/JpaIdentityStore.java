@@ -292,17 +292,51 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
          }
          else
          {
-            Property<Object> p = findNamedProperty(credentialClass, "credentialValue", 
-                  "password", "passwordHash", "credential", "value");
-            if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
+            // Try scanning for a credential property also
+            props = PropertyQueries.createQuery(credentialClass)
+               .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL))
+               .getResultList();
+            if (props.size() == 1)
+            {
+               modelProperties.put(PROPERTY_CREDENTIAL_VALUE, props.get(0));
+            }
+            else if (props.size() > 1)
+            {
+               throw new IdentityManagementException(
+                     "Ambiguous credential value property in credential class " + 
+                     credentialClass.getName());
+            }
+            else
+            {
+               Property<Object> p = findNamedProperty(credentialClass, "credentialValue", 
+                     "password", "passwordHash", "credential", "value");
+               if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
+            }
          }  
       }
       else
       {
-         // The credentials may be stored in the identity class - let's search for it by name
-         Property<Object> p = findNamedProperty(identityClass, "credentialValue", 
-               "password", "passwordHash", "credential", "value");
-         if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
+         // The credentials may be stored in the identity class         
+         List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_CREDENTIAL_VALUE, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+                  "Ambiguous credential property in identity class " +
+                  identityClass.getName());
+         }
+         else
+         {         
+            Property<Object> p = findNamedProperty(identityClass, "credentialValue", 
+                  "password", "passwordHash", "credential", "value");
+            if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
+         }
       }
             
       if (!modelProperties.containsKey(PROPERTY_CREDENTIAL_VALUE))
@@ -327,9 +361,26 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
       else
       {
-         Property<Object> p = findNamedProperty(credentialClass, "credentialType", 
-               "identityObjectCredentialType", "type");
-         if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
+         props = PropertyQueries.createQuery(credentialClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL_TYPE))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_CREDENTIAL_TYPE, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityManagementException(
+                  "Ambiguous credential type property in credential class " + 
+                  credentialClass.getName());            
+         }
+         else
+         {         
+            Property<Object> p = findNamedProperty(credentialClass, "credentialType", 
+                  "identityObjectCredentialType", "type");
+            if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
+         }
       }      
 
       Property<?> typeProp = modelProperties.get(PROPERTY_CREDENTIAL_TYPE);      
@@ -564,6 +615,19 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    }
    
    protected void configureAttributes()
+   {
+      if (attributeClass != null)
+      {
+         
+         
+      }
+      else
+      {
+         
+      }
+   }
+   
+   protected void configureRoleTypeNames()
    {
       
    }
