@@ -3,9 +3,11 @@ package org.jboss.seam.security.management;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
@@ -25,8 +27,23 @@ import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.common.exception.IdentityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
+import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
+import org.picketlink.idm.spi.exception.OperationNotSupportedException;
+import org.picketlink.idm.spi.model.IdentityObject;
+import org.picketlink.idm.spi.model.IdentityObjectAttribute;
+import org.picketlink.idm.spi.model.IdentityObjectCredential;
+import org.picketlink.idm.spi.model.IdentityObjectRelationship;
+import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
+import org.picketlink.idm.spi.model.IdentityObjectType;
+import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
+import org.picketlink.idm.spi.store.FeaturesMetaData;
+import org.picketlink.idm.spi.store.IdentityStore;
+import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
+import org.picketlink.idm.spi.store.IdentityStoreSession;
 
 /**
  * IdentityStore implementation that allows identity related data to be 
@@ -34,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *  
  * @author Shane Bryzak
  */
-public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Serializable
+public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentityStore, Serializable
 {
    private static final long serialVersionUID = 7729139146633529501L;
    
@@ -65,6 +82,7 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
    private static final String PROPERTY_RELATIONSHIP_NAME = "RELATIONSHIP_NAME";
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
+   private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
       
    // Entity classes
    
@@ -682,12 +700,41 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
                p);
       }
       
-      // TODO scan any entity classes referenced by the identity class also
+      // scan any entity classes referenced by the identity class also
+      props = PropertyQueries.createQuery(identityClass)
+         .getResultList();
+      
+      for (Property<Object> p : props)
+      {
+         if (p.getJavaClass().isAnnotationPresent(Entity.class))
+         {
+            List<Property<Object>> pp = PropertyQueries.createQuery(p.getJavaClass())
+               .addCriteria(new PropertyTypeCriteria(PropertyType.ATTRIBUTE))
+               .getResultList();
+            
+            for (Property<Object> attributeProperty : pp)
+            {
+               attributeProperties.put(
+                     attributeProperty.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(), 
+                     attributeProperty);                        
+            }
+         }
+      }
    }
    
    protected void configureRoleTypeNames()
    {
-      
+      if (roleTypeClass != null)
+      {
+         List<Property<Object>> props = PropertyQueries.createQuery(roleTypeClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_ROLE_TYPE_NAME, props.get(0));
+         }
+      }
    }
    
    public String getUserIdentityType()
@@ -760,10 +807,10 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
             throw new IdentityManagementException("Could not create user, identityObjectEntity not set.");
          }
          
-         if (userExists(username))
-         {
-            log.warn("Could not create user, already exists.");
-         }
+         //if (userExists(username))
+         //{
+           // log.warn("Could not create user, already exists.");
+         //}
          
          Object userInstance = identityClass.newInstance();
          Object credentialInstance = null;
@@ -842,178 +889,307 @@ public @ApplicationScoped class JpaIdentityStore implements IdentityStore, Seria
       }
    }
 
-   public boolean associateUser(String groupName, String groupType, String username)
-   {
-      return false;
-   }
-   
-   public boolean disassociateUser(String groupName, String groupType, String username)
-   {
-      return false;
-   }
-   
-   public boolean associateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
-   {
-      return false;
-   }
-   
-   public boolean disassociateGroup(String groupName, String groupType, String memberGroupName, String memberGroupType)
-   {
-      return false;
-   }
-
-   public boolean authenticate(String username, Credential credential)
+   public void bootstrap(IdentityStoreConfigurationContext configurationContext)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
-      return false;
+      
    }
 
-   public boolean createGroup(String name, String groupType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean createRoleType(String roleType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean deleteGroup(String name, String groupType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean deleteRoleType(String roleType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean deleteUser(String username)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean deleteUserAttribute(String username, String attribute)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean disableUser(String username)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean enableUser(String username)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public Group findGroup(String name, String groupType)
+   public IdentityObject createIdentityObject(
+         IdentityStoreInvocationContext invocationCtx, String name,
+         IdentityObjectType identityObjectType) throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<String> findUsers(String filter)
+   public IdentityObject createIdentityObject(
+         IdentityStoreInvocationContext invocationCtx, String name,
+         IdentityObjectType identityObjectType, Map<String, String[]> attributes)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public boolean grantRole(String username, String roleType, String groupName,
-         String groupType)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public boolean isUserEnabled(String username)
-   {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   public List<String> listGrantableRoleTypes()
+   public IdentityObjectRelationship createRelationship(
+         IdentityStoreInvocationContext invocationCxt,
+         IdentityObject fromIdentity, IdentityObject toIdentity,
+         IdentityObjectRelationshipType relationshipType,
+         String relationshipName, boolean createNames) throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<Role> listGrantedRoles(String username)
+   public String createRelationshipName(IdentityStoreInvocationContext ctx,
+         String name) throws IdentityException, OperationNotSupportedException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<IdentityType> listGroupMembers(Group group)
+   public IdentityObject findIdentityObject(
+         IdentityStoreInvocationContext invocationContext, String id)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<Role> listImpliedRoles(String username)
+   public IdentityObject findIdentityObject(
+         IdentityStoreInvocationContext invocationContext, String name,
+         IdentityObjectType identityObjectType) throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<IdentityType> listRoleMembers(String roleType, String groupName,
-         String groupType)
+   public Collection<IdentityObject> findIdentityObject(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObjectType identityType, IdentityObjectSearchCriteria criteria)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public List<String> listRoleTypes()
+   public Collection<IdentityObject> findIdentityObject(
+         IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
+         IdentityObjectRelationshipType relationshipType, boolean parent,
+         IdentityObjectSearchCriteria criteria) throws IdentityException
    {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public boolean revokeRole(String username, String roleType,
-         String groupName, String groupType)
+   public String getId()
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public int getIdentityObjectsCount(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObjectType identityType) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   public Map<String, String> getRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name)
+         throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
+         IdentityObjectSearchCriteria criteria) throws IdentityException,
+         OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
+         IdentityObject identity, IdentityObjectSearchCriteria criteria)
+         throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public Map<String, String> getRelationshipProperties(
+         IdentityStoreInvocationContext ctx,
+         IdentityObjectRelationship relationship) throws IdentityException,
+         OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public FeaturesMetaData getSupportedFeatures()
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public void removeIdentityObject(
+         IdentityStoreInvocationContext invocationCtx, IdentityObject identity)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void removeRelationship(IdentityStoreInvocationContext invocationCxt,
+         IdentityObject fromIdentity, IdentityObject toIdentity,
+         IdentityObjectRelationshipType relationshipType,
+         String relationshipName) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public String removeRelationshipName(IdentityStoreInvocationContext ctx,
+         String name) throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public void removeRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name, Set<String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void removeRelationshipProperties(IdentityStoreInvocationContext ctx,
+         IdentityObjectRelationship relationship, Set<String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void removeRelationships(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObject identity1, IdentityObject identity2, boolean named)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public Set<IdentityObjectRelationship> resolveRelationships(
+         IdentityStoreInvocationContext invocationCxt,
+         IdentityObject fromIdentity, IdentityObject toIdentity,
+         IdentityObjectRelationshipType relationshipType)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public Set<IdentityObjectRelationship> resolveRelationships(
+         IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
+         IdentityObjectRelationshipType relationshipType, boolean parent,
+         boolean named, String name) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public void setRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name,
+         Map<String, String> properties) throws IdentityException,
+         OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void setRelationshipProperties(IdentityStoreInvocationContext ctx,
+         IdentityObjectRelationship relationship, Map<String, String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void updateCredential(IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject, IdentityObjectCredential credential)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public boolean validateCredential(IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject, IdentityObjectCredential credential)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
       return false;
    }
 
-   public boolean roleTypeExists(String roleType)
+   public void addAttributes(IdentityStoreInvocationContext invocationCtx,
+         IdentityObject identity, IdentityObjectAttribute[] attributes)
+         throws IdentityException
    {
       // TODO Auto-generated method stub
-      return false;
+      
    }
 
-   public boolean setUserAttribute(String username, String attribute,
-         Object value)
+   public IdentityObject findIdentityObjectByUniqueAttribute(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObjectType identityObjectType,
+         IdentityObjectAttribute attribute) throws IdentityException
    {
       // TODO Auto-generated method stub
-      return false;
+      return null;
    }
 
-   public boolean supportsFeature(Feature feature)
+   public IdentityObjectAttribute getAttribute(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObject identity, String name) throws IdentityException
    {
       // TODO Auto-generated method stub
-      return false;
+      return null;
    }
 
-   public boolean updateCredential(String username, Credential credential)
+   public Map<String, IdentityObjectAttribute> getAttributes(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObject identity) throws IdentityException
    {
       // TODO Auto-generated method stub
-      return false;
+      return null;
    }
 
-   public boolean userExists(String username)
+   public Map<String, IdentityObjectAttributeMetaData> getAttributesMetaData(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObjectType identityType)
    {
       // TODO Auto-generated method stub
-      return false;
-   }   
+      return null;
+   }
+
+   public Set<String> getSupportedAttributeNames(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObjectType identityType) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public void removeAttributes(IdentityStoreInvocationContext invocationCtx,
+         IdentityObject identity, String[] attributeNames)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void updateAttributes(IdentityStoreInvocationContext invocationCtx,
+         IdentityObject identity, IdentityObjectAttribute[] attributes)
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public IdentityStoreSession createIdentityStoreSession()
+         throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+ 
 
 }
