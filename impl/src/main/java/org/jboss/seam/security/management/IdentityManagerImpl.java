@@ -3,17 +3,19 @@ package org.jboss.seam.security.management;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Model;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.security.util.Strings;
 import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.User;
+import org.picketlink.idm.common.exception.IdentityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@Named @ApplicationScoped
+@Model
 public class IdentityManagerImpl implements IdentityManager, Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;
@@ -41,24 +43,36 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    @Inject BeanManager manager;
    @Inject Identity identity;
    
-   @PostConstruct
-   public void create()
-   {
-      
-   }
+   @Inject IdentitySession identitySession;
    
    public boolean createUser(String name, Credential credential)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_CREATE);
-      //return identityStore.createUser(name, credential, null);
-      return false;
+      try
+      {
+         User user = identitySession.getPersistenceManager().createUser(name);
+         identitySession.getAttributesManager().updateCredential(user, credential);         
+         return true;
+      }
+      catch (IdentityException ex)
+      {
+         throw new RuntimeException("Error creating user", ex);
+      }
    }
    
    public boolean deleteUser(String name)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_DELETE);
-      //return identityStore.deleteUser(name);
-      return false;
+      
+      try
+      {
+         identitySession.getPersistenceManager().removeUser(name, true);
+         return true;
+      }
+      catch (IdentityException ex)
+      {
+         throw new RuntimeException("Failed to delete user", ex);
+      }
    }
    
    public boolean enableUser(String name)
@@ -78,8 +92,16 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    public boolean updateCredential(String name, Credential credential)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      //return identityStore.updateCredential(name, credential);
-      return false;
+      
+      try
+      {
+         identitySession.getAttributesManager().updateCredential(new UserImpl(name), credential);
+         return true;
+      }
+      catch (IdentityException ex)
+      {
+         throw new RuntimeException("Exception updating credential", ex);
+      }
    }
    
    public boolean isUserEnabled(String name)
