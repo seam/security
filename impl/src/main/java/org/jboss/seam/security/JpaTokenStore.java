@@ -12,7 +12,6 @@ import javax.persistence.Query;
 
 import org.jboss.seam.security.annotations.TokenUsername;
 import org.jboss.seam.security.annotations.TokenValue;
-import org.jboss.seam.security.management.IdentityManagementException;
 import org.jboss.weld.extensions.util.properties.Property;
 
 /**
@@ -71,14 +70,7 @@ public class JpaTokenStore implements TokenStore, Serializable
       }
       catch (Exception ex)
       {
-         if (ex instanceof IdentityManagementException)
-         {
-            throw (IdentityManagementException) ex;
-         }
-         else
-         {
-            throw new IdentityManagementException("Could not create account", ex);
-         }
+         throw new RuntimeException("Could not create token", ex);
       }
    }
    

@@ -14,11 +14,13 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.Id;
 import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
 import org.jboss.weld.extensions.util.properties.Property;
+import org.jboss.weld.extensions.util.properties.query.AnnotatedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.NamedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyQueries;
@@ -69,6 +71,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
 
    // Property keys
    
+   private static final String PROPERTY_IDENTITY_ID = "IDENTITY_ID";
    private static final String PROPERTY_IDENTITY_NAME = "IDENTITY_NAME";
    private static final String PROPERTY_IDENTITY_TYPE = "IDENTITY_TYPE";
    private static final String PROPERTY_IDENTITY_TYPE_NAME = "IDENTITY_TYPE_NAME";
@@ -128,31 +131,45 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       {
          return m.isAnnotationPresent(IdentityProperty.class) &&
             m.getAnnotation(IdentityProperty.class).value().equals(pt);
-      }
-      
-   }
-      
-   @Inject
-   public void init()
-   {
-      configureIdentityName();
-      configureIdentityType();
-      
-      //configureCredentials();
-      //configureRelationships();
-      //configureAttributes();
-      
-      //roleTypeNameProperty = new EntityProperty(roleTypeEntity, PropertyType.NAME);
+      }      
    }
    
-   protected void configureIdentityName()
-   {      
+   public void bootstrap(IdentityStoreConfigurationContext configurationContext)
+      throws IdentityException
+   {
       if (identityClass == null)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Error initializing JpaIdentityStore - identityClass not set");
       }
       
+      configureIdentityId();
+      configureIdentityName();
+      configureIdentityType();
+      
+      configureCredentials();
+      configureRelationships();
+      configureAttributes();   
+   }   
+   
+   protected void configureIdentityId() throws IdentityException
+   {
+      List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
+         .addCriteria(new AnnotatedPropertyCriteria(Id.class))
+         .getResultList();
+      
+      if (props.size() == 1)
+      {
+         modelProperties.put(PROPERTY_IDENTITY_ID, props.get(0));
+      }
+      else
+      {
+         throw new IdentityException("Error initializing JpaIdentityStore - no Identity ID found.");
+      }
+   }
+      
+   protected void configureIdentityName() throws IdentityException
+   {      
       List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
          .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
          .getResultList();
@@ -163,7 +180,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous identity name property in identity class " + identityClass.getName());
       }
       else
@@ -189,11 +206,11 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
 
       if (!modelProperties.containsKey(PROPERTY_IDENTITY_NAME))
       {
-         throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid identity name property found.");
+         throw new IdentityException("Error initializing JpaIdentityStore - no valid identity name property found.");
       }
    }
    
-   protected void configureIdentityType()
+   protected void configureIdentityType() throws IdentityException
    {      
       List<Property<Object>> props = PropertyQueries.createQuery(identityClass)
          .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
@@ -205,7 +222,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous identity type property in identity class " + identityClass.getName());
       }
       else
@@ -246,7 +263,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       
       if (typeProp == null)
       {
-         throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid identity type property found.");
+         throw new IdentityException("Error initializing JpaIdentityStore - no valid identity type property found.");
       }
       
       if (!String.class.equals(typeProp.getJavaClass()) && 
@@ -261,7 +278,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else
          {
-            throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid identity type name property found.");
+            throw new IdentityException("Error initializing JpaIdentityStore - no valid identity type name property found.");
          }
       }
    }
@@ -296,7 +313,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       return null;
    }
    
-   protected void configureCredentials()
+   protected void configureCredentials() throws IdentityException
    {
       // If a credential entity has been explicitly configured, scan it
       if (credentialClass != null)
@@ -311,7 +328,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Ambiguous credential value property in credential class " + 
                   credentialClass.getName());
          }
@@ -327,7 +344,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
             }
             else if (props.size() > 1)
             {
-               throw new IdentityManagementException(
+               throw new IdentityException(
                      "Ambiguous credential value property in credential class " + 
                      credentialClass.getName());
             }
@@ -352,7 +369,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Ambiguous credential property in identity class " +
                   identityClass.getName());
          }
@@ -366,7 +383,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
             
       if (!modelProperties.containsKey(PROPERTY_CREDENTIAL_VALUE))
       {
-         throw new IdentityManagementException("Error initializing JpaIdentityStore - no credential value property found.");
+         throw new IdentityException("Error initializing JpaIdentityStore - no credential value property found.");
       }            
             
       // Scan for a credential type property
@@ -380,7 +397,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous credential type property in credential class " + 
                credentialClass.getName());
       }
@@ -396,7 +413,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Ambiguous credential type property in credential class " + 
                   credentialClass.getName());            
          }
@@ -421,16 +438,16 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else
          {
-            throw new IdentityManagementException("Error initializing JpaIdentityStore - no valid credential type name property found.");
+            throw new IdentityException("Error initializing JpaIdentityStore - no valid credential type name property found.");
          }
       }       
    }
    
-   protected void configureRelationships()
+   protected void configureRelationships() throws IdentityException
    {
       if (relationshipClass == null)
       {
-         throw new IdentityManagementException("Error initializing JpaIdentityStore - relationshipClass not set.");
+         throw new IdentityException("Error initializing JpaIdentityStore - relationshipClass not set.");
       }
       
       List<Property<Object>> props = PropertyQueries.createQuery(relationshipClass)
@@ -444,7 +461,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous relationshipFrom property in relationship class " + 
                relationshipClass.getName());
       }
@@ -487,7 +504,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous relationshipTo property in relationship class " + 
                relationshipClass.getName());
       }
@@ -527,7 +544,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous relationshipType property in relationship class " +
                relationshipClass.getName());
       }
@@ -565,7 +582,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       else if (props.size() > 1)
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
                "Ambiguous relationship name property in relationship class " +
                relationshipClass.getName());
       }
@@ -581,25 +598,25 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       
       if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_FROM))
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
             "Error initializing JpaIdentityStore - no valid relationship from property found.");
       }
       
       if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TO))
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
             "Error initializing JpaIdentityStore - no valid relationship to property found.");
       }
       
       if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TYPE))
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
             "Error initializing JpaIdentityStore - no valid relationship type property found.");
       }
       
       if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_NAME))
       {
-         throw new IdentityManagementException(
+         throw new IdentityException(
             "Error initializing JpaIdentityStore - no valid relationship name property found.");
       }
       
@@ -617,7 +634,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Ambiguous relationship type name property in class " +
                   typeClass.getName());
          }
@@ -633,13 +650,13 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          
          if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_TYPE_NAME))
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Error initializing JpaIdentityStore - no valid relationship type name property found");
          }
       }      
    }
    
-   protected void configureAttributes()
+   protected void configureAttributes() throws IdentityException
    {
       // If an attribute class has been configured, scan it for attributes
       if (attributeClass != null)
@@ -655,7 +672,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
             		"Ambiguous attribute name property in class " +
             		attributeClass.getName());
          }
@@ -676,7 +693,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          }
          else if (props.size() > 1)
          {
-            throw new IdentityManagementException(
+            throw new IdentityException(
                   "Ambiguous attribute value property in class " +
                   attributeClass.getName());
          }
@@ -798,13 +815,13 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
    @Inject CredentialEncoder credentialEncoder;
    
    public boolean createUser(String username, Credential credential,
-         Map<String, ?> attributes)
+         Map<String, ?> attributes) throws IdentityException
    {      
       try
       {
          if (identityClass == null)
          {
-            throw new IdentityManagementException("Could not create user, identityObjectEntity not set.");
+            throw new IdentityException("Could not create user, identityObjectEntity not set.");
          }
          
          //if (userExists(username))
@@ -857,27 +874,63 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       catch (Exception ex)
       {
-         if (ex instanceof IdentityManagementException)
+         if (ex instanceof IdentityException)
          {
-            throw (IdentityManagementException) ex;
+            throw (IdentityException) ex;
          }
          else
          {
-            throw new IdentityManagementException("Could not create user.", ex);
+            throw new IdentityException("Could not create user.", ex);
          }
       }
       
       // TODO Auto-generated method stub
       return false;
    }   
-   
-   private Object lookupIdentityType(String identityType)
+
+   public IdentityObject createIdentityObject(
+         IdentityStoreInvocationContext invocationCtx, String name,
+         IdentityObjectType identityObjectType) throws IdentityException
    {
       try
       {
+         Object identityInstance = identityClass.newInstance();
+         modelProperties.get(PROPERTY_IDENTITY_NAME).setValue(identityInstance, name);
+         
+         Property<Object> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE); 
+         
+         if (String.class.equals(typeProp.getJavaClass()))
+         {
+            typeProp.setValue(identityInstance, identityObjectType.getName());
+         }
+         else
+         {
+            typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName()));
+         }
+               
+         entityManagerInstance.get().persist(identityInstance);
+
+         IdentityObject obj = new IdentityObjectImpl(
+               modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance).toString(),
+               name, identityObjectType);
+
+         return obj;
+      }
+      catch (Exception ex)
+      {
+         throw new IdentityException("Error creating identity object", ex);
+      }      
+   }
+   
+   protected Object lookupIdentityType(String identityType) throws IdentityException
+   {      
+      try
+      {
+         Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+         
          Object val = entityManagerInstance.get().createQuery(
-               "select t from " + identityClass.getName() + " t where t." +
-               modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME).getName() +
+               "select t from " + typeNameProp.getDeclaringClass().getName() + 
+               " t where t." + typeNameProp.getName() +
                 " = :identityType")
                .setParameter("identityType", identityType)
                .getSingleResult();
@@ -885,23 +938,8 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       }
       catch (NoResultException ex)
       {
-         return null;
-      }
-   }
-
-   public void bootstrap(IdentityStoreConfigurationContext configurationContext)
-         throws IdentityException
-   {
-      // TODO Auto-generated method stub
-      
-   }
-
-   public IdentityObject createIdentityObject(
-         IdentityStoreInvocationContext invocationCtx, String name,
-         IdentityObjectType identityObjectType) throws IdentityException
-   {
-      // TODO Auto-generated method stub
-      return null;
+         throw new IdentityException("Could not determine identity type [" + identityType + "]");
+      }      
    }
 
    public IdentityObject createIdentityObject(
