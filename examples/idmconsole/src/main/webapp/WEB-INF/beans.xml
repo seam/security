@@ -16,8 +16,4 @@
       </idm:identityStore>
    </idm:IdentityManager-->
    
-   <interceptors>
-      <class>org.jboss.seam.transaction.JtaTxInterceptor</class>
-   </interceptors>
-   
 </beans>

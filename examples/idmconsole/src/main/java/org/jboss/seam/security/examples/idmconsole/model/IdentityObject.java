@@ -7,11 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.jboss.seam.security.annotations.management.IdentityEntityName;
-import org.jboss.seam.security.annotations.management.IdentityEntityType;
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
-import org.picketlink.idm.spi.model.IdentityObjectType;
 
 /**
  * 
@@ -54,7 +51,7 @@ public class IdentityObject implements Serializable
       return type;
    }
    
-   public void setIdentityObjectType(IdentityObjectType type)
+   public void setType(IdentityObjectType type)
    {
       this.type = type;
    }

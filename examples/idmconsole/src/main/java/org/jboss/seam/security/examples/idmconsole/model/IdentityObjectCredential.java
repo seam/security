@@ -7,8 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.jboss.seam.security.annotations.management.IdentityEntityType;
-import org.jboss.seam.security.annotations.management.IdentityEntityValue;
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
 

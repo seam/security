@@ -33,7 +33,7 @@
       <permission:userPermissionClass>org.jboss.seam.security.examples.seamspace.model.AccountPermission</permission:userPermissionClass>
    </permission:JpaPermissionStore-->
    
-   <drools-config:KnowledgeBaseConfig>
+   <!--drools-config:KnowledgeBaseConfig>
    		<s:overrides/>
    		<drools-qualifier:KBaseConfig value="security-rules-config"/>
    		<drools-config:knowledgeBuilderConfig>kbuilderconfig.properties</drools-config:knowledgeBuilderConfig>
@@ -44,9 +44,9 @@
    		<drools-config:eventListeners>
    			<s:value>org.drools.event.knowledgebase.DefaultKnowledgeBaseEventListener</s:value>
    		</drools-config:eventListeners>
-   </drools-config:KnowledgeBaseConfig>
+   </drools-config:KnowledgeBaseConfig-->
    
-   <drools:KnowledgeBaseProducer>
+   <!--drools:KnowledgeBaseProducer>
    		<s:specializes/>
    		<drools:produceKBase>
    		   <drools-qualifier:KBase value="permission-rules"/>
@@ -57,7 +57,7 @@
    		 	    </drools-config:KnowledgeBaseConfig>
    		 	 </s:parameters>
       </drools:produceKBase>
-   </drools:KnowledgeBaseProducer>
+   </drools:KnowledgeBaseProducer-->
    
    <!--permission:RuleBasedPermissionResolver>
       <s:specializes/>
