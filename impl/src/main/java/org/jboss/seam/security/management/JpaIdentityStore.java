@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -19,19 +20,15 @@ import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
+import org.jboss.seam.security.events.PrePersistUserEvent;
+import org.jboss.seam.security.events.UserCreatedEvent;
 import org.jboss.weld.extensions.util.properties.Property;
 import org.jboss.weld.extensions.util.properties.query.AnnotatedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.NamedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyQueries;
 import org.jboss.weld.extensions.util.properties.query.TypedPropertyCriteria;
-import org.picketlink.idm.api.Credential;
-import org.picketlink.idm.api.Group;
-import org.picketlink.idm.api.IdentityType;
-import org.picketlink.idm.api.Role;
 import org.picketlink.idm.common.exception.IdentityException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
 import org.picketlink.idm.spi.exception.OperationNotSupportedException;
@@ -43,9 +40,10 @@ import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
 import org.picketlink.idm.spi.store.FeaturesMetaData;
-import org.picketlink.idm.spi.store.IdentityStore;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * IdentityStore implementation that allows identity related data to be 
@@ -86,6 +84,21 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
    private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
+   
+   /**
+    * The bean manager
+    */
+   @Inject BeanManager beanManager;
+
+   /**
+    * 
+    */
+   @Inject Instance<EntityManager> entityManagerInstance;
+   
+   /**
+    * 
+    */
+   //@Inject CredentialProcessor credentialEncoder;   
       
    // Entity classes
    
@@ -802,124 +815,13 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
    public void setRelationshipTypeRole(String relationshipTypeRole)
    {
       this.relationshipTypeRole = relationshipTypeRole;
-   }
-
-   /**
-    * 
-    */
-   @Inject Instance<EntityManager> entityManagerInstance;
-   
-   /**
-    * 
-    */
-   @Inject CredentialEncoder credentialEncoder;
-   
-   public boolean createUser(String username, Credential credential,
-         Map<String, ?> attributes) throws IdentityException
-   {      
-      try
-      {
-         if (identityClass == null)
-         {
-            throw new IdentityException("Could not create user, identityObjectEntity not set.");
-         }
-         
-         //if (userExists(username))
-         //{
-           // log.warn("Could not create user, already exists.");
-         //}
-         
-         Object userInstance = identityClass.newInstance();
-         Object credentialInstance = null;
-         
-         modelProperties.get(PROPERTY_IDENTITY_NAME).setValue(userInstance, username);
-         
-         Property<Object> identityType = modelProperties.get(PROPERTY_IDENTITY_TYPE);
-         if (String.class.equals(identityType.getJavaClass()))
-         {
-            identityType.setValue(userInstance, userIdentityType);
-         }
-         else
-         {
-            identityType.setValue(userInstance, lookupIdentityType(userIdentityType));
-         }
-         
-         if (credentialClass == null)
-         {
-            modelProperties.get(PROPERTY_CREDENTIAL_VALUE).setValue(userInstance, credential);
-         }
-         else
-         {
-            credentialInstance = credentialClass.newInstance();
-            // TODO implement this
-            //credentialIdentityProperty.setValue(credentialInstance, userInstance);
-            
-            // TODO need to abstract this out
-            modelProperties.get(PROPERTY_CREDENTIAL_VALUE).setValue(credentialInstance, credential);
-            if (modelProperties.containsKey(PROPERTY_CREDENTIAL_TYPE))
-            {
-               // TODO set the credential type - need some kind of mapper?
-               //credentialTypeProperty.setValue(credentialInstance, lookupCredentialType)
-            }                        
-         }
-         
-         // TODO create attributes
-         
-         entityManagerInstance.get().persist(userInstance);
-         
-         if (credentialInstance != null)
-         {
-            entityManagerInstance.get().persist(credentialInstance);
-         }         
-      }
-      catch (Exception ex)
-      {
-         if (ex instanceof IdentityException)
-         {
-            throw (IdentityException) ex;
-         }
-         else
-         {
-            throw new IdentityException("Could not create user.", ex);
-         }
-      }
-      
-      // TODO Auto-generated method stub
-      return false;
-   }   
+   }  
 
    public IdentityObject createIdentityObject(
          IdentityStoreInvocationContext invocationCtx, String name,
          IdentityObjectType identityObjectType) throws IdentityException
    {
-      try
-      {
-         Object identityInstance = identityClass.newInstance();
-         modelProperties.get(PROPERTY_IDENTITY_NAME).setValue(identityInstance, name);
-         
-         Property<Object> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE); 
-         
-         if (String.class.equals(typeProp.getJavaClass()))
-         {
-            typeProp.setValue(identityInstance, identityObjectType.getName());
-         }
-         else
-         {
-            typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName()));
-         }
-               
-         entityManagerInstance.get().persist(identityInstance);
-
-         IdentityObject obj = new IdentityObjectImpl(
-               modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance).toString(),
-               name, identityObjectType);
-
-         return obj;
-      }
-      catch (Exception ex)
-      {
-         throw new IdentityException("Error creating identity object", ex);
-      }      
+      return createIdentityObject(invocationCtx, name, identityObjectType, null);
    }
    
    protected Object lookupIdentityType(String identityType) throws IdentityException
@@ -947,8 +849,40 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          IdentityObjectType identityObjectType, Map<String, String[]> attributes)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
+      try
+      {
+         Object identityInstance = identityClass.newInstance();
+         modelProperties.get(PROPERTY_IDENTITY_NAME).setValue(identityInstance, name);
+         
+         Property<Object> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE); 
+         
+         if (String.class.equals(typeProp.getJavaClass()))
+         {
+            typeProp.setValue(identityInstance, identityObjectType.getName());
+         }
+         else
+         {
+            typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName()));
+         }
+               
+         beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
+         
+         entityManagerInstance.get().persist(identityInstance);
+         
+         beanManager.fireEvent(new UserCreatedEvent(identityInstance));
+         
+         // TODO persist attributes
+
+         IdentityObject obj = new IdentityObjectImpl(
+               modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance).toString(),
+               name, identityObjectType);
+
+         return obj;
+      }
+      catch (Exception ex)
+      {
+         throw new IdentityException("Error creating identity object", ex);
+      }    
    }
 
    public IdentityObjectRelationship createRelationship(
@@ -957,7 +891,49 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          IdentityObjectRelationshipType relationshipType,
          String relationshipName, boolean createNames) throws IdentityException
    {
-      // TODO Auto-generated method stub
+      try
+      {
+         Object relationship = relationshipClass.newInstance();
+         
+         modelProperties.get(PROPERTY_RELATIONSHIP_FROM).setValue(relationship, 
+               lookupIdentity(fromIdentity));
+         modelProperties.get(PROPERTY_RELATIONSHIP_TO).setValue(relationship,
+               lookupIdentity(toIdentity));
+         
+         Property<Object> type = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE);
+         if (String.class.equals(modelProperties.get(PROPERTY_RELATIONSHIP_TYPE).getJavaClass()))
+         {
+            type.setValue(relationship, relationshipType.getName());
+         }
+         else
+         {
+            type.setValue(relationship, lookupRelationshipType(relationshipType));
+         }
+         
+         modelProperties.get(PROPERTY_RELATIONSHIP_NAME).setValue(relationship, 
+               relationshipName);
+         
+         entityManagerInstance.get().persist(relationship);
+         
+         return new IdentityObjectRelationshipImpl(fromIdentity, toIdentity,
+               relationshipName, relationshipType);
+      }
+      catch (Exception ex)
+      {
+         throw new IdentityException("Exception creating relationship", ex);
+      }
+   }
+   
+   protected Object lookupIdentity(IdentityObject obj)
+   {
+      // TODO implement
+      return null;
+      
+   }
+   
+   protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType)
+   {
+      // TODO implement
       return null;
    }
 
@@ -972,7 +948,36 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          IdentityStoreInvocationContext invocationContext, String id)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
+      try
+      {
+        Object identity = entityManagerInstance.get().createQuery("select i from " +
+              identityClass.getName() + " i where i." +
+              modelProperties.get(PROPERTY_IDENTITY_ID).getName() +
+              " = :id")
+              .setParameter("id", id)
+              .getSingleResult();
+        
+        IdentityObjectType type = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ?
+              new IdentityObjectTypeImpl(
+                    modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME).getValue(
+                          modelProperties.get(PROPERTY_IDENTITY_TYPE).getValue(identity)).toString()) :
+              new IdentityObjectTypeImpl(modelProperties.get(PROPERTY_IDENTITY_TYPE).getValue(identity).toString());
+        
+        
+        return new IdentityObjectImpl(
+                  modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+                  modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                  type);
+      }
+      catch (NoResultException ex)
+      {
+         return null;
+      }
+   }
+   
+   protected IdentityObjectType convertType(Object obj)
+   {
+      // TODO implement
       return null;
    }
 
@@ -980,8 +985,30 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          IdentityStoreInvocationContext invocationContext, String name,
          IdentityObjectType identityObjectType) throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
+      try
+      {
+         Object identityType = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ?
+               lookupIdentityType(identityObjectType.getName()) : 
+                  identityObjectType.getName();
+         
+         Object identity = entityManagerInstance.get().createQuery("select i from " +
+              identityClass.getName() + " i where i." +
+              modelProperties.get(PROPERTY_IDENTITY_NAME).getName() +
+              " = :name and i." + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() + 
+              " = :type")
+              .setParameter("name", name)
+              .setParameter("type", identityType)              
+              .getSingleResult();        
+        
+        return new IdentityObjectImpl(
+                  modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+                  modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                  identityObjectType);
+      }
+      catch (NoResultException ex)
+      {
+         return null;
+      }
    }
 
    public Collection<IdentityObject> findIdentityObject(
@@ -989,6 +1016,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          IdentityObjectType identityType, IdentityObjectSearchCriteria criteria)
          throws IdentityException
    {
+      
       // TODO Auto-generated method stub
       return null;
    }
@@ -1227,7 +1255,4 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       // TODO Auto-generated method stub
       return null;
    }
-
- 
-
 }

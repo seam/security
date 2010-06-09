@@ -10,7 +10,7 @@ import org.picketlink.idm.api.Credential;
  * @author Shane Bryzak
  *
  */
-public class PasswordHashEncoder implements CredentialEncoder
+public class PasswordHashEncoder implements CredentialProcessor
 {
    private String passwordHash;
    private int passwordIterations = 1000;
