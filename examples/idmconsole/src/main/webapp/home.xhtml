@@ -4,46 +4,31 @@
    xmlns:f="http://java.sun.com/jsf/core"
    xmlns:h="http://java.sun.com/jsf/html"
    template="/WEB-INF/templates/default.xhtml">
-   <ui:define name="content">
-      <h1>Hello World!</h1>
-      <p>Your CDI bean <code>HelloWorld</code> says <span style="color: blue;">#{helloWorld.text}</span> using the Unified EL.</p>
+  <ui:define name="content">
+    <h2>Identity Management Console</h2>
+    <p>This example demonstrates Seam's identity management features.</p>
+    
+    <h:form id="loginForm" rendered="#{not identity.loggedIn}">
+      <h:messages id="messages" globalOnly="true"/>
 
-      <h:form id="bv">
-         <h2>Bean Validation examples</h2>
-         <p>Enforces annotation-based constraints defined on the model class.</p>
-         <table>
-            <tr>
-               <th style="text-align: right;">
-                  <h:outputLabel for="letters" value="Letters:"/>
-               </th>
-               <td>
-                  <h:inputText id="letters" value="#{helloWorld.letters}"/>
-                  <h:message for="letters" errorClass="invalid"/>
-               </td>
-            </tr>
-            <tr>
-               <th style="text-align: right;">
-                  <h:outputLabel for="numbers" value="Numbers:"/>
-               </th>
-               <td>
-                  <h:inputText id="numbers" value="#{helloWorld.numbers}"/>
-                  <h:message for="numbers" errorClass="invalid"/>
-               </td>
-            </tr>
-            <tr>
-               <th style="text-align: right;">
-                  <h:outputLabel for="email" value="Email:"/>
-               </th>
-               <td>
-                  <h:inputText id="email" value="#{helloWorld.email}"/>
-                  <h:message for="email" errorClass="invalid"/>
-               </td>
-            </tr>
-         </table>
-         <p>
-            <h:commandButton id="check" action="check" value="Check values"/>
-            <h:outputText value=" All clear!" rendered="#{facesContext.postback and empty facesContext.messageList}" style="color: green;"/>
-         </p>
-      </h:form>
-   </ui:define>
+      <div class="loginRow">
+        <h:outputLabel for="name" value="Username" styleClass="loginLabel"/>
+        <h:inputText id="name" value="#{credentials.username}"/>
+      </div>
+
+      <div class="loginRow">
+        <h:outputLabel for="password" value="Password" styleClass="loginLabel"/>
+        <h:inputSecret id="password" value="#{credentials.password}" redisplay="true"/>
+      </div>
+
+      <div class="loginRow">
+        
+      </div>
+
+      <div class="buttons">
+        <h:commandButton id="login" value="LOGIN" action="#{identity.login}" styleClass="loginButton"/>
+      </div>
+    </h:form>    
+     
+  </ui:define>
 </ui:composition>

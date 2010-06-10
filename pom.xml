@@ -5,7 +5,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>1</version>
+      <version>2-SNAPSHOT</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -50,7 +50,7 @@
 
          <dependency>
             <groupId>org.jboss.seam.drools</groupId>
-            <artifactId>seam-drools-core</artifactId>
+            <artifactId>seam-drools-api</artifactId>
             <version>${seam.drools.version}</version>
          </dependency>
 
