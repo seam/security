@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.jboss.seam.security</groupId>
+   <artifactId>idmconsole</artifactId>
+   <packaging>war</packaging>
+   <name>idmconsole</name>
+   <version>1.0.0-SNAPSHOT</version>
+   
+   <properties>
+      <!--
+         Explicitly declaring the source encoding eliminates the following message:
+         [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+      -->
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <!-- To set the jboss.home environment variable the Maven way, set the jboss.home property in an active profile in the Maven 2 settings.xml file -->
+      <jboss.home>${env.JBOSS_HOME}</jboss.home>
+      <jboss.domain>default</jboss.domain>
+      <!-- The version of Weld extensions in use -->
+      <weld.extensions.version>1.0.0-CR2</weld.extensions.version>
+   </properties>
+
+   <repositories>
+       <!-- Several key Java EE APIs and RIs are missing from the Maven Central Repository -->
+       <!-- The goal is to eventually eliminate the reliance on the JBoss repository -->
+       <repository>
+          <id>repository.jboss.org</id>
+          <name>JBoss Repository</name>
+          <url>http://repository.jboss.org/maven2</url>
+       </repository>
+   </repositories>
+
+   <pluginRepositories>
+      <!-- GlassFish repository required for embedded-glassfish plugin -->
+      <pluginRepository>
+         <id>glassfish</id>
+         <name>GlassFish Maven 2 Repository</name>
+         <url>http://download.java.net/maven/glassfish</url>
+      </pluginRepository>
+   </pluginRepositories>
+
+   <dependencyManagement>
+      <dependencies>
+         <!-- Import scope will provide versions for dependencies below. -->
+         <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-extensions-bom</artifactId>
+            <version>${weld.extensions.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+      <!-- CDI (JSR-299) -->
+      <dependency>
+         <groupId>javax.enterprise</groupId>
+         <artifactId>cdi-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <!-- Common annotations (e.g., @PostConstruct, @PreDestroy, @Generated, @Resource)  -->
+      <dependency>
+         <groupId>javax.annotation</groupId>
+         <artifactId>jsr250-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <!-- Bean Validation (JSR-303) -->
+      <dependency>
+         <groupId>javax.validation</groupId>
+         <artifactId>validation-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <!-- Bean Validation Implementation -->
+      <!-- Provides portable constraints such as @NotEmpty, @Email and @Url -->
+      <!-- Hibernate Validator is the only JSR-303 implementation at the moment, so we can assume it's provided -->
+      <dependency>
+         <groupId>org.hibernate</groupId>
+         <artifactId>hibernate-validator</artifactId>
+         <version>4.0.0.GA</version>
+         <scope>provided</scope>
+      </dependency>
+      <!-- JSF -->
+      <dependency>
+         <groupId>javax.faces</groupId>
+         <artifactId>jsf-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- Optional, but highly recommended. -->
+      <dependency>
+         <groupId>org.testng</groupId>
+         <artifactId>testng</artifactId>
+         <version>5.10</version>
+         <scope>test</scope>
+         <classifier>jdk15</classifier>
+      </dependency>
+
+      <!-- Needed on JBoss AS as EL is out of date -->
+      <dependency>
+         <groupId>org.glassfish.web</groupId>
+         <artifactId>el-impl</artifactId>
+         <scope>runtime</scope>
+         <!-- FIXME this version should be in the Weld API BOM -->
+         <version>2.1.2-b04</version>
+         <exclusions>
+            <exclusion>
+               <groupId>javax.el</groupId>
+               <artifactId>el-api</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+   </dependencies>
+   <build>
+      <finalName>${artifactId}</finalName>
+      <plugins>
+         <!-- Compiler plugin enforces Java 1.6 compatibility -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.6</source>
+               <target>1.6</target>
+            </configuration>
+         </plugin>
+
+         <!-- Eclipse plugin can force download of source and JavaDoc jars -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-eclipse-plugin</artifactId>
+            <configuration>
+               <wtpversion>2.0</wtpversion>
+               <!--
+               <downloadSources>true</downloadSources>
+               <downloadJavadocs>true</downloadJavadocs>
+               -->
+            </configuration>
+         </plugin>
+         
+         <!-- Configure the JBoss AS Maven deploy plugin -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jboss-maven-plugin</artifactId>
+            <configuration>
+               <jbossHome>${jboss.home}</jbossHome>
+               <serverName>${jboss.domain}</serverName>
+               <fileNames>
+                  <fileName>${project.build.directory}/${build.finalName}.war</fileName>
+               </fileNames> 
+            </configuration>
+         </plugin>
+         <!-- Configure the Embedded GlassFish Maven plugin -->
+         <plugin>
+            <groupId>org.glassfish</groupId>
+            <artifactId>maven-embedded-glassfish-plugin</artifactId>
+            <version>3.0</version>
+            <configuration>
+               <app>${project.build.directory}/${build.finalName}.war</app>
+               <port>7070</port>
+               <containerType>web</containerType>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>
