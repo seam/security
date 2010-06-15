@@ -50,9 +50,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@Named
-@SessionScoped
-public class IdentityImpl implements Identity, Serializable
+public @Named("identity") @SessionScoped class IdentityImpl implements Identity, Serializable
 {
    private static final long serialVersionUID = 3751659008033189259L;
    

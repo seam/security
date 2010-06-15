@@ -24,7 +24,7 @@
    </prerequisites>
 
    <properties>
-      <seam.version>3.0.0.b01</seam.version>
+      <seam.version>3.0.0-SNAPSHOT</seam.version>
       <!-- Use snapshot WeldX -->
       <weld.extensions.version>1.0.0-SNAPSHOT</weld.extensions.version>
       <!-- Seam-Drools is not yet released -->

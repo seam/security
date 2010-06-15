@@ -16,7 +16,11 @@ public class IdentityConfigurationMetaDataProducer
 {
    @Produces @ApplicationScoped IdentityConfigurationMetaData createConfig()
    {
+      IdentityConfigurationMetaDataImpl config = new IdentityConfigurationMetaDataImpl();
+      
+      //config.setIdentityStores(identityStores)
+      
       // TODO needs actual configuration, realms, identity stores, etc
-      return new IdentityConfigurationMetaDataImpl();
+      return config;            
    }
 }

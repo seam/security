@@ -10,7 +10,7 @@
     
     <h:form id="loginForm" rendered="#{not identity.loggedIn}">
       <h:messages id="messages" globalOnly="true"/>
-
+      
       <div class="loginRow">
         <h:outputLabel for="name" value="Username" styleClass="loginLabel"/>
         <h:inputText id="name" value="#{credentials.username}"/>

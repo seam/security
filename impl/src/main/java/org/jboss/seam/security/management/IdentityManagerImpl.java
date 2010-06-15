@@ -261,8 +261,16 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    public boolean authenticate(String username, Credential credential)
    {
       if (Strings.isEmpty(username)) return false;
-      //return identityStore.authenticate(username, credential);
-      return false;
+      
+      try
+      {
+         return identitySession.getAttributesManager().validateCredentials(
+            new UserImpl(username), new Credential[] {credential});
+      }
+      catch (IdentityException ex)
+      {
+         return false;
+      }
    }
    
 

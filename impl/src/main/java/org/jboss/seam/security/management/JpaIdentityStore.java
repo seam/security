@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *  
  * @author Shane Bryzak
  */
-public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentityStore, Serializable
+public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentityStore, Serializable
 {
    private static final long serialVersionUID = 7729139146633529501L;
    
@@ -86,19 +86,16 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
    private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
    
    /**
-    * The bean manager
-    */
-   @Inject BeanManager beanManager;
-
-   /**
     * 
     */
-   @Inject Instance<EntityManager> entityManagerInstance;
+   //@Inject Instance<EntityManager> entityManagerInstance;
    
    /**
     * 
     */
-   //@Inject CredentialProcessor credentialEncoder;   
+   //@Inject CredentialProcessor credentialEncoder;
+   
+   private String id;
       
    // Entity classes
    
@@ -145,6 +142,11 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          return m.isAnnotationPresent(IdentityProperty.class) &&
             m.getAnnotation(IdentityProperty.class).value().equals(pt);
       }      
+   }
+   
+   public JpaIdentityStore(String id)
+   {
+      this.id = id;
    }
    
    public void bootstrap(IdentityStoreConfigurationContext configurationContext)
@@ -830,12 +832,12 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
       {
          Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
          
-         Object val = entityManagerInstance.get().createQuery(
+         Object val = null; /*entityManagerInstance.get().createQuery(
                "select t from " + typeNameProp.getDeclaringClass().getName() + 
                " t where t." + typeNameProp.getName() +
                 " = :identityType")
                .setParameter("identityType", identityType)
-               .getSingleResult();
+               .getSingleResult();*/
          return val;
       }
       catch (NoResultException ex)
@@ -865,11 +867,11 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
             typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName()));
          }
                
-         beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
+         //beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
          
-         entityManagerInstance.get().persist(identityInstance);
+         //entityManagerInstance.get().persist(identityInstance);
          
-         beanManager.fireEvent(new UserCreatedEvent(identityInstance));
+         //beanManager.fireEvent(new UserCreatedEvent(identityInstance));
          
          // TODO persist attributes
 
@@ -913,7 +915,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
          modelProperties.get(PROPERTY_RELATIONSHIP_NAME).setValue(relationship, 
                relationshipName);
          
-         entityManagerInstance.get().persist(relationship);
+         //entityManagerInstance.get().persist(relationship);
          
          return new IdentityObjectRelationshipImpl(fromIdentity, toIdentity,
                relationshipName, relationshipType);
@@ -950,12 +952,12 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
    {
       try
       {
-        Object identity = entityManagerInstance.get().createQuery("select i from " +
+        Object identity = null; /*entityManagerInstance.get().createQuery("select i from " +
               identityClass.getName() + " i where i." +
               modelProperties.get(PROPERTY_IDENTITY_ID).getName() +
               " = :id")
               .setParameter("id", id)
-              .getSingleResult();
+              .getSingleResult();*/
         
         IdentityObjectType type = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ?
               new IdentityObjectTypeImpl(
@@ -991,14 +993,14 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
                lookupIdentityType(identityObjectType.getName()) : 
                   identityObjectType.getName();
          
-         Object identity = entityManagerInstance.get().createQuery("select i from " +
-              identityClass.getName() + " i where i." +
+         Object identity = null; //entityManagerInstance.get().createQuery("select i from " +
+              /*identityClass.getName() + " i where i." +
               modelProperties.get(PROPERTY_IDENTITY_NAME).getName() +
               " = :name and i." + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() + 
               " = :type")
               .setParameter("name", name)
               .setParameter("type", identityType)              
-              .getSingleResult();        
+              .getSingleResult();*/        
         
         return new IdentityObjectImpl(
                   modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
@@ -1032,8 +1034,7 @@ public @ApplicationScoped class JpaIdentityStore implements org.picketlink.idm.s
 
    public String getId()
    {
-      // TODO Auto-generated method stub
-      return null;
+      return id;
    }
 
    public int getIdentityObjectsCount(

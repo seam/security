@@ -18,9 +18,7 @@ import org.picketlink.idm.api.Credential;
  * 
  * @author Shane Bryzak
  */
-@Named
-@SessionScoped
-public class CredentialsImpl implements Credentials, Serializable
+public @Named("credentials") @SessionScoped class CredentialsImpl implements Credentials, Serializable
 {
    private static final long serialVersionUID = -2271248957776488426L;
    
