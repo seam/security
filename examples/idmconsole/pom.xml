@@ -7,7 +7,14 @@
    <packaging>war</packaging>
    <name>idmconsole</name>
    <version>3.0.0-SNAPSHOT</version>
-   
+  
+   <parent>
+      <groupId>org.jboss.seam.security</groupId>
+      <artifactId>seam-security-parent</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+      <relativePath>../../pom.xml</relativePath>
+   </parent>
+ 
    <properties>
       <!--
          Explicitly declaring the source encoding eliminates the following message:
@@ -17,8 +24,6 @@
       <!-- To set the jboss.home environment variable the Maven way, set the jboss.home property in an active profile in the Maven 2 settings.xml file -->
       <jboss.home>${env.JBOSS_HOME}</jboss.home>
       <jboss.domain>default</jboss.domain>
-      <!-- The version of Weld extensions in use -->
-      <weld.extensions.version>1.0.0-CR2</weld.extensions.version>
    </properties>
 
    <repositories>
@@ -39,19 +44,6 @@
          <url>http://download.java.net/maven/glassfish</url>
       </pluginRepository>
    </pluginRepositories>
-
-   <dependencyManagement>
-      <dependencies>
-         <!-- Import scope will provide versions for dependencies below. -->
-         <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-extensions-bom</artifactId>
-            <version>${weld.extensions.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-         </dependency>
-      </dependencies>
-   </dependencyManagement>
 
    <dependencies>
 
@@ -80,6 +72,13 @@
          <artifactId>jsr250-api</artifactId>
          <scope>provided</scope>
       </dependency>
+
+      <dependency>
+         <groupId>org.hibernate.javax.persistence</groupId>
+         <artifactId>hibernate-jpa-2.0-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
       <!-- Bean Validation (JSR-303) -->
       <dependency>
          <groupId>javax.validation</groupId>
