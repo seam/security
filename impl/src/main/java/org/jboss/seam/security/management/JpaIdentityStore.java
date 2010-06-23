@@ -9,10 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -20,8 +16,6 @@ import javax.persistence.NoResultException;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
-import org.jboss.seam.security.events.PrePersistUserEvent;
-import org.jboss.seam.security.events.UserCreatedEvent;
 import org.jboss.weld.extensions.util.properties.Property;
 import org.jboss.weld.extensions.util.properties.query.AnnotatedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.NamedPropertyCriteria;
@@ -57,15 +51,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);   
    
+   public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
+   
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
    private static final String DEFAULT_GROUP_IDENTITY_TYPE = "GROUP";   
    
    private static final String DEFAULT_RELATIONSHIP_TYPE_MEMBERSHIP = "MEMBERSHIP";
    private static final String DEFAULT_RELATIONSHIP_TYPE_ROLE = "ROLE";
-   
-   private static final String DEFAULT_ATTRIBUTE_USER_ENABLED = "ENABLED";
-   private static final String DEFAULT_ATTRIBUTE_PASSWORD_SALT = "PASSWORD_SALT";
 
    // Property keys
    
@@ -96,6 +89,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    //@Inject CredentialProcessor credentialEncoder;
    
    private String id;
+   
+   private IdentityStoreConfigurationContext configurationContext;
       
    // Entity classes
    
@@ -152,6 +147,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public void bootstrap(IdentityStoreConfigurationContext configurationContext)
       throws IdentityException
    {
+      this.configurationContext = configurationContext;
+      
+      //configurationContext.getStoreConfigurationMetaData().getOptionSingleValue(optionName)
+      
       if (identityClass == null)
       {
          throw new IdentityException(
@@ -165,6 +164,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       configureCredentials();
       configureRelationships();
       configureAttributes();   
+      configureRoleTypeNames();
    }   
    
    protected void configureIdentityId() throws IdentityException
@@ -1253,7 +1253,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public IdentityStoreSession createIdentityStoreSession()
          throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
+      return createIdentityStoreSession(null);
+   }
+
+   public IdentityStoreSession createIdentityStoreSession(
+         Map<String, Object> sessionOptions) throws IdentityException
+   {
+      EntityManager em = (EntityManager) sessionOptions.get("ENTITY_MANAGER");
+      
+      return new JpaIdentityStoreSessionImpl(em);
    }
 }

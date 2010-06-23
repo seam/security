@@ -1,15 +1,21 @@
 package org.jboss.seam.security.management.picketlink;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
+import org.jboss.seam.security.management.JpaIdentityStore;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentitySessionFactory;
+import org.picketlink.idm.api.event.EventListener;
 import org.picketlink.idm.common.exception.IdentityConfigurationException;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.configuration.IdentityConfigurationImpl;
@@ -26,7 +32,7 @@ import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
  * @author Shane Bryzak
  */
 @ApplicationScoped
-public class IdentitySessionProducer
+public class IdentitySessionProducer implements EventListener
 {
    private IdentitySessionFactory factory;
    
@@ -35,7 +41,7 @@ public class IdentitySessionProducer
    @Inject IdentityConfigurationMetaData config;
    
    @Inject
-   public void init() throws IdentityConfigurationException
+   public void init() throws IdentityConfigurationException, IdentityException
    {
       IdentityConfigurationMetaDataImpl metadata = new IdentityConfigurationMetaDataImpl();
 
@@ -43,13 +49,16 @@ public class IdentitySessionProducer
       List<IdentityStoreConfigurationMetaData> stores = new ArrayList<IdentityStoreConfigurationMetaData>();      
       IdentityStoreConfigurationMetaDataImpl store = new IdentityStoreConfigurationMetaDataImpl();
       store.setId("jpa");
-      store.setClassName("org.jboss.seam.security.management.JpaIdentityStore");
+      store.setClassName("org.jboss.seam.security.management.JpaIdentityStore");      
+      Map<String,List<String>> options = new HashMap<String,List<String>>();
+      options.put(JpaIdentityStore.OPTION_IDENTITY_CLASS_NAME, 
+            createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObject"));
+      store.setOptions(options);
       stores.add(store);            
       metadata.setIdentityStores(stores);
       
       // Create the default realm
       RealmConfigurationMetaDataImpl realm = new RealmConfigurationMetaDataImpl();
-      realm.setIdentityRepositoryIdRef("jpa");
       realm.setId("default");      
       List<RealmConfigurationMetaData> realms = new ArrayList<RealmConfigurationMetaData>();      
       realms.add(realm);
@@ -57,14 +66,28 @@ public class IdentitySessionProducer
             
       IdentityConfigurationImpl config = new IdentityConfigurationImpl();
       config.configure(metadata);
+      config.register(this, "identitySessionProducer");
       
       factory = config.buildIdentitySessionFactory();      
    }
    
+   private List<String> createOptionList(String... values)
+   {
+      List<String> vals = new ArrayList<String>();
+      for (String v : values) vals.add(v);
+      return vals;
+   }
+   
+   @Inject Instance<EntityManager> entityManagerInstance;
+      
    @Produces @RequestScoped IdentitySession createIdentitySession()
       throws IdentityException
    {
-      return factory.createIdentitySession(getDefaultRealm());
+      Map<String,Object> sessionOptions = new HashMap<String,Object>();
+      sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());      
+      IdentitySession session = factory.createIdentitySession(getDefaultRealm(), sessionOptions);
+      session.registerListener(this);
+      return session;
    }
    
    public String getDefaultRealm()
