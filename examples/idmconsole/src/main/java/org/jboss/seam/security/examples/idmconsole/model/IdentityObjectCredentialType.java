@@ -10,14 +10,14 @@ import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
 
 /**
- * A lookup table containing identity object types
- *  
+ * Lookup table containing credential types
+ * 
  * @author Shane Bryzak
  */
 @Entity
-public class IdentityObjectType implements Serializable
+public class IdentityObjectCredentialType implements Serializable
 {
-   private static final long serialVersionUID = -8333008038699510742L;
+   private static final long serialVersionUID = 282711089697868242L;
    
    private Long id;
    private String name;
