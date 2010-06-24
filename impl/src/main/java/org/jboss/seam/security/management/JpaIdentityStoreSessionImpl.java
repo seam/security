@@ -20,6 +20,11 @@ public class JpaIdentityStoreSessionImpl implements IdentityStoreSession
       this.em = em;
    }
    
+   public EntityManager getEntityManager()
+   {
+      return em;
+   }
+   
    public void clear() throws IdentityException
    {
       em.clear();      

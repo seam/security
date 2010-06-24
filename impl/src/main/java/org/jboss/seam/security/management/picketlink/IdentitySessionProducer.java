@@ -50,9 +50,13 @@ public class IdentitySessionProducer implements EventListener
       IdentityStoreConfigurationMetaDataImpl store = new IdentityStoreConfigurationMetaDataImpl();
       store.setId("jpa");
       store.setClassName("org.jboss.seam.security.management.JpaIdentityStore");      
+      
+      // temporary hack
       Map<String,List<String>> options = new HashMap<String,List<String>>();
       options.put(JpaIdentityStore.OPTION_IDENTITY_CLASS_NAME, 
             createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObject"));
+      
+      
       store.setOptions(options);
       stores.add(store);            
       metadata.setIdentityStores(stores);

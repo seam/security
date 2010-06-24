@@ -52,22 +52,26 @@
          <scope>provided</scope>
       </dependency>
 
-      <!--dependency>
+      <dependency>
          <groupId>org.hibernate.javax.persistence</groupId>
          <artifactId>hibernate-jpa-2.0-api</artifactId>
-         <scope>provided</scope>
-      </dependency-->
-
-      <dependency>
-         <groupId>javax.persistence</groupId>
-         <artifactId>persistence-api</artifactId>
-         <version>1.0</version>
          <scope>provided</scope>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.drools</groupId>
          <artifactId>seam-drools-api</artifactId>
+
+         <exclusions>
+           <exclusion>
+             <groupId>com.sun.xml.bind</groupId>
+             <artifactId>jaxb-impl</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>com.sun.xml.bind</groupId>
+             <artifactId>jaxb-xjc</artifactId>
+           </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
@@ -79,6 +83,12 @@
       <dependency>
          <groupId>org.picketlink.idm</groupId>
          <artifactId>picketlink-idm-core</artifactId>
+         <exclusions>
+           <exclusion>
+             <groupId>log4j</groupId>
+             <artifactId>log4j</artifactId>
+           </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>

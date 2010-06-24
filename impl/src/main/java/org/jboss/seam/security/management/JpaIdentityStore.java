@@ -149,7 +149,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    {
       this.configurationContext = configurationContext;
       
-      //configurationContext.getStoreConfigurationMetaData().getOptionSingleValue(optionName)
+      String clsName = configurationContext.getStoreConfigurationMetaData()
+         .getOptionSingleValue(OPTION_IDENTITY_CLASS_NAME);
+
+      try
+      {
+         identityClass = Class.forName(clsName);
+      }
+      catch (ClassNotFoundException e)
+      {
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - no identity entity class found: " + clsName);
+      }
       
       if (identityClass == null)
       {
@@ -203,7 +213,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          Property<Object> p = findNamedProperty(identityClass, "username", "userName", "name");
          if (p != null) 
          {
-            modelProperties.put(PROPERTY_IDENTITY_NAME, props.get(0));
+            modelProperties.put(PROPERTY_IDENTITY_NAME, p);
          }
          else 
          {
@@ -826,18 +836,18 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return createIdentityObject(invocationCtx, name, identityObjectType, null);
    }
    
-   protected Object lookupIdentityType(String identityType) throws IdentityException
+   protected Object lookupIdentityType(String identityType, EntityManager em) throws IdentityException
    {      
       try
       {
          Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
          
-         Object val = null; /*entityManagerInstance.get().createQuery(
+         Object val = em.createQuery(
                "select t from " + typeNameProp.getDeclaringClass().getName() + 
                " t where t." + typeNameProp.getName() +
                 " = :identityType")
                .setParameter("identityType", identityType)
-               .getSingleResult();*/
+               .getSingleResult();
          return val;
       }
       catch (NoResultException ex)
@@ -864,7 +874,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          }
          else
          {
-            typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName()));
+            typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName(), 
+                  getEntityManager(invocationCtx)));
          }
                
          //beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
@@ -945,19 +956,23 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       // TODO Auto-generated method stub
       return null;
    }
+   
+   public EntityManager getEntityManager(IdentityStoreInvocationContext invocationContext)
+   {
+      return ((JpaIdentityStoreSessionImpl) invocationContext.getIdentityStoreSession()).getEntityManager();
+   }
 
-   public IdentityObject findIdentityObject(
-         IdentityStoreInvocationContext invocationContext, String id)
+   public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext, String id)
          throws IdentityException
    {
       try
       {
-        Object identity = null; /*entityManagerInstance.get().createQuery("select i from " +
+        Object identity = getEntityManager(invocationContext).createQuery("select i from " +
               identityClass.getName() + " i where i." +
               modelProperties.get(PROPERTY_IDENTITY_ID).getName() +
               " = :id")
               .setParameter("id", id)
-              .getSingleResult();*/
+              .getSingleResult();
         
         IdentityObjectType type = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ?
               new IdentityObjectTypeImpl(
@@ -990,17 +1005,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       try
       {
          Object identityType = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ?
-               lookupIdentityType(identityObjectType.getName()) : 
+               lookupIdentityType(identityObjectType.getName(), getEntityManager(invocationContext)) : 
                   identityObjectType.getName();
          
-         Object identity = null; //entityManagerInstance.get().createQuery("select i from " +
-              /*identityClass.getName() + " i where i." +
+         Object identity = getEntityManager(invocationContext).createQuery("select i from " +
+              identityClass.getName() + " i where i." +
               modelProperties.get(PROPERTY_IDENTITY_NAME).getName() +
               " = :name and i." + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() + 
               " = :type")
               .setParameter("name", name)
               .setParameter("type", identityType)              
-              .getSingleResult();*/        
+              .getSingleResult();
         
         return new IdentityObjectImpl(
                   modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
