@@ -9,9 +9,9 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.PasswordCredential;
 import org.jboss.seam.security.management.IdentityManager;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.impl.api.PasswordCredential;
 
 /**
  * A conversation-scoped component for creating and managing user accounts

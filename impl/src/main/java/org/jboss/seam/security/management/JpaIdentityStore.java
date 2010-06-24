@@ -52,6 +52,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);   
    
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
+   public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
+   public static final String OPTION_RELATIONSHIP_CLASS_NAME = "relationshipEntityClassName";
    
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
@@ -78,19 +80,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
    private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
    
-   /**
-    * 
-    */
-   //@Inject Instance<EntityManager> entityManagerInstance;
-   
-   /**
-    * 
-    */
-   //@Inject CredentialProcessor credentialEncoder;
-   
    private String id;
-   
-   private IdentityStoreConfigurationContext configurationContext;
       
    // Entity classes
    
@@ -146,9 +136,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    
    public void bootstrap(IdentityStoreConfigurationContext configurationContext)
       throws IdentityException
-   {
-      this.configurationContext = configurationContext;
-      
+   {      
       String clsName = configurationContext.getStoreConfigurationMetaData()
          .getOptionSingleValue(OPTION_IDENTITY_CLASS_NAME);
 
@@ -166,6 +154,30 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throw new IdentityException(
                "Error initializing JpaIdentityStore - identityClass not set");
       }
+      
+      clsName = configurationContext.getStoreConfigurationMetaData()
+         .getOptionSingleValue(OPTION_CREDENTIAL_CLASS_NAME);
+      
+      try
+      {
+         credentialClass = Class.forName(clsName);
+      }
+      catch (ClassNotFoundException e)
+      {
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - no credential entity class found: " + clsName);
+      }      
+      
+      clsName = configurationContext.getStoreConfigurationMetaData()
+         .getOptionSingleValue(OPTION_RELATIONSHIP_CLASS_NAME);
+      
+      try
+      {
+         relationshipClass = Class.forName(clsName);
+      }
+      catch (ClassNotFoundException e)
+      {
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - no relationship entity class found: " + clsName);
+      }      
       
       configureIdentityId();
       configureIdentityName();

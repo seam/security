@@ -10,6 +10,7 @@ import javax.inject.Named;
 import org.jboss.seam.security.events.CredentialsInitializedEvent;
 import org.jboss.seam.security.events.CredentialsUpdatedEvent;
 import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.impl.api.PasswordCredential;
 
 /**
  * The default Credentials implementation.  This implementation allows for a
@@ -77,7 +78,7 @@ public @Named("credentials") @SessionScoped class CredentialsImpl implements Cre
    public String getPassword()
    {
       return credential != null && credential instanceof PasswordCredential ? 
-            ((PasswordCredential) credential).getPassword() : null;
+            ((PasswordCredential) credential).getValue() : null;
    }
    
    public void setPassword(String password)
@@ -87,9 +88,9 @@ public @Named("credentials") @SessionScoped class CredentialsImpl implements Cre
          this.credential = new PasswordCredential(password);
       }
       else if (this.credential != null && this.credential instanceof PasswordCredential &&
-            ((PasswordCredential) this.credential).getPassword() != password && 
-            ((PasswordCredential) this.credential).getPassword() == null || 
-            !((PasswordCredential) this.credential).getPassword().equals(password))
+            ((PasswordCredential) this.credential).getValue() != password && 
+            ((PasswordCredential) this.credential).getValue() == null || 
+            !((PasswordCredential) this.credential).getValue().equals(password))
       {
          this.credential = new PasswordCredential(password);
          invalid = false;
@@ -100,7 +101,7 @@ public @Named("credentials") @SessionScoped class CredentialsImpl implements Cre
    public boolean isSet()
    {
       return getUsername() != null && this.credential != null && 
-        ((PasswordCredential) this.credential).getPassword() != null;
+        ((PasswordCredential) this.credential).getValue() != null;
    }
    
    public boolean isInvalid()

@@ -20,10 +20,14 @@ import org.picketlink.idm.common.exception.IdentityConfigurationException;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.configuration.IdentityConfigurationImpl;
 import org.picketlink.idm.impl.configuration.metadata.IdentityConfigurationMetaDataImpl;
+import org.picketlink.idm.impl.configuration.metadata.IdentityRepositoryConfigurationMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreConfigurationMetaDataImpl;
+import org.picketlink.idm.impl.configuration.metadata.IdentityStoreMappingMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.RealmConfigurationMetaDataImpl;
 import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
+import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
+import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
 import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
 
 /**
@@ -51,11 +55,16 @@ public class IdentitySessionProducer implements EventListener
       store.setId("jpa");
       store.setClassName("org.jboss.seam.security.management.JpaIdentityStore");      
       
-      // temporary hack
+      // temporary hack to get the example working
       Map<String,List<String>> options = new HashMap<String,List<String>>();
       options.put(JpaIdentityStore.OPTION_IDENTITY_CLASS_NAME, 
             createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObject"));
       
+      options.put(JpaIdentityStore.OPTION_CREDENTIAL_CLASS_NAME, 
+            createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential"));
+      
+      options.put(JpaIdentityStore.OPTION_RELATIONSHIP_CLASS_NAME, 
+            createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship"));
       
       store.setOptions(options);
       stores.add(store);            
@@ -64,13 +73,32 @@ public class IdentitySessionProducer implements EventListener
       // Create the default realm
       RealmConfigurationMetaDataImpl realm = new RealmConfigurationMetaDataImpl();
       realm.setId("default");      
+      realm.setOptions(new HashMap<String,List<String>>());
       List<RealmConfigurationMetaData> realms = new ArrayList<RealmConfigurationMetaData>();      
       realms.add(realm);
       metadata.setRealms(realms);
+      
+      List<IdentityRepositoryConfigurationMetaData> repositories = new ArrayList<IdentityRepositoryConfigurationMetaData>();
+      IdentityRepositoryConfigurationMetaDataImpl repository = new IdentityRepositoryConfigurationMetaDataImpl();
+      repository.setClassName("org.picketlink.idm.impl.repository.WrapperIdentityStoreRepository");
+      repository.setDefaultAttributeStoreId("jpa");
+      repository.setDefaultIdentityStoreId("jpa");
+      
+      List<IdentityStoreMappingMetaData> mappings = new ArrayList<IdentityStoreMappingMetaData>();
+      IdentityStoreMappingMetaDataImpl mapping = new IdentityStoreMappingMetaDataImpl();
+      List<String> identityObjectTypes = new ArrayList<String>();
+      identityObjectTypes.add("USER");
+      identityObjectTypes.add("GROUP");
+      mapping.setIdentityObjectTypeMappings(identityObjectTypes);
+      mapping.setIdentityStoreId("jpa");
+      mappings.add(mapping);
+      repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);      
+      
+      repositories.add(repository);
+      metadata.setRepositories(repositories);
             
       IdentityConfigurationImpl config = new IdentityConfigurationImpl();
       config.configure(metadata);
-      config.register(this, "identitySessionProducer");
       
       factory = config.buildIdentitySessionFactory();      
    }

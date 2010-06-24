@@ -42,6 +42,7 @@ import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
+import org.picketlink.idm.impl.api.PasswordCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -451,8 +452,8 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
                   if (credentials.getCredential() instanceof PasswordCredential)
                   {
                      PasswordCredential credential = (PasswordCredential) credentials.getCredential();
-                     ( (PasswordCallback) callbacks[i] ).setPassword( credential.getPassword() != null ?
-                           credential.getPassword().toCharArray() : null );                     
+                     ( (PasswordCallback) callbacks[i] ).setPassword( credential.getValue() != null ?
+                           credential.getValue().toCharArray() : null );                     
                   }
                }
                else if (callbacks[i] instanceof IdentityCallback)
