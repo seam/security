@@ -8,7 +8,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.security.util.Strings;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.IdentitySession;
@@ -16,6 +15,7 @@ import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.model.SimpleUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       
       try
       {
-         identitySession.getAttributesManager().updateCredential(new UserImpl(name), credential);
+         identitySession.getAttributesManager().updateCredential(new SimpleUser(name), credential);
          return true;
       }
       catch (IdentityException ex)
@@ -265,7 +265,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       try
       {
          return identitySession.getAttributesManager().validateCredentials(
-            new UserImpl(username), new Credential[] {credential});
+            new SimpleUser(username), new Credential[] {credential});
       }
       catch (IdentityException ex)
       {
