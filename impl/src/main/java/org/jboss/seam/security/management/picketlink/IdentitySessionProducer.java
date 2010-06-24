@@ -72,7 +72,9 @@ public class IdentitySessionProducer implements EventListener
       
       // Create the default realm
       RealmConfigurationMetaDataImpl realm = new RealmConfigurationMetaDataImpl();
-      realm.setId("default");      
+      realm.setId("default");
+      realm.setIdentityMapping("USER");
+      //realm.setGroupTypeMappings(groupTypeMappings)
       realm.setOptions(new HashMap<String,List<String>>());
       List<RealmConfigurationMetaData> realms = new ArrayList<RealmConfigurationMetaData>();      
       realms.add(realm);
@@ -92,8 +94,8 @@ public class IdentitySessionProducer implements EventListener
       mapping.setIdentityObjectTypeMappings(identityObjectTypes);
       mapping.setIdentityStoreId("jpa");
       mappings.add(mapping);
-      repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);      
-      
+      repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);
+           
       repositories.add(repository);
       metadata.setRepositories(repositories);
             
@@ -116,7 +118,8 @@ public class IdentitySessionProducer implements EventListener
       throws IdentityException
    {
       Map<String,Object> sessionOptions = new HashMap<String,Object>();
-      sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());      
+      sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());   
+      
       IdentitySession session = factory.createIdentitySession(getDefaultRealm(), sessionOptions);
       session.registerListener(this);
       return session;
