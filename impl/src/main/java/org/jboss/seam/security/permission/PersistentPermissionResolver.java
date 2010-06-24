@@ -9,7 +9,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.SimplePrincipal;
 
 /**
@@ -55,9 +54,9 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
             return true;
          }
          
-         if (permission.getRecipient() instanceof RoleImpl)
-         {
-            RoleImpl role = (RoleImpl) permission.getRecipient();
+         //if (permission.getRecipient() instanceof RoleImpl)
+         //{
+           // RoleImpl role = (RoleImpl) permission.getRecipient();
             
             // TODO fix this
             /*if (role.isConditional())
@@ -68,7 +67,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
             {
                return true;
             }*/
-         }
+         //}
       }
       
       return false;
@@ -100,9 +99,9 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
                   break;
                }
                
-               if (permission.getRecipient() instanceof RoleImpl)
-               {
-                  RoleImpl role = (RoleImpl) permission.getRecipient();
+               //if (permission.getRecipient() instanceof RoleImpl)
+               //{
+                 // RoleImpl role = (RoleImpl) permission.getRecipient();
                   
                   // TODO fix this
                   /*
@@ -119,7 +118,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
                      iter.remove();
                      break;
                   }*/
-               }
+               //}
             }
          }
       }

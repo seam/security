@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.annotations.permission.PermissionAction;
 import org.jboss.seam.security.annotations.permission.PermissionRecipient;
 import org.jboss.seam.security.annotations.permission.PermissionRecipientType;
@@ -264,7 +263,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    protected boolean updatePermissionActions(Object target, Principal recipient, String[] actions,
          boolean set)
    {
-      boolean recipientIsRole = recipient instanceof RoleImpl;
+      boolean recipientIsRole = false; //recipient instanceof RoleImpl;
       
       try
       {
@@ -532,7 +531,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
     */
    protected Object resolvePrincipalEntity(Principal recipient)
    {
-      boolean recipientIsRole = recipient instanceof RoleImpl;
+      boolean recipientIsRole = false; //recipient instanceof RoleImpl;
             
       //if (identityManager.getIdentityStore() != null //&& 
             //identityManager.getIdentityStore() instanceof JpaIdentityStore)

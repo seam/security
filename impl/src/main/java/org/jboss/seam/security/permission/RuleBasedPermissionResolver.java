@@ -23,7 +23,6 @@ import org.drools.runtime.rule.FactHandle;
 //import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.IdentityImpl;
-import org.jboss.seam.security.RoleImpl;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.slf4j.Logger;
@@ -217,8 +216,8 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                   Principal role = (Principal) e.nextElement();
    
                   boolean found = false;
-                  Iterator<?> iter = getSecurityContext().getObjects(
-                        new ClassObjectFilter(RoleImpl.class)).iterator();
+                  //Iterator<?> iter = getSecurityContext().getObjects(
+                  //      new ClassObjectFilter(RoleImpl.class)).iterator();
                   
                   // TODO fix
                   /*
@@ -242,10 +241,10 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
             }
          }
          
-         Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(RoleImpl.class)).iterator();
-         while (iter.hasNext())
-         {
-            RoleImpl r = (RoleImpl) iter.next();
+         //Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(RoleImpl.class)).iterator();
+         //while (iter.hasNext())
+         //{
+            //RoleImpl r = (RoleImpl) iter.next();
             
             // TODO fix
             /*if (!identity.hasRole(r.getName()))
@@ -253,7 +252,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                FactHandle fh = getSecurityContext().getFactHandle(r);
                getSecurityContext().retract(fh);
             }*/
-         }
+         //}
       }
    }
    
