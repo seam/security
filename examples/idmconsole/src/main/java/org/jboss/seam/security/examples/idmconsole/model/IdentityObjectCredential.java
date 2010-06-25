@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
@@ -36,7 +37,7 @@ public class IdentityObjectCredential implements Serializable
       this.id = id;
    }
    
-   @ManyToOne
+   @ManyToOne @JoinColumn(name = "IDENTITY_OBJECT_ID")
    public IdentityObject getIdentityObject()
    {
       return identityObject;
@@ -48,6 +49,7 @@ public class IdentityObjectCredential implements Serializable
    }
    
    @ManyToOne @IdentityProperty(PropertyType.TYPE)
+   @JoinColumn(name = "CREDENTIAL_TYPE_ID")
    public IdentityObjectCredentialType getType()
    {
       return type;

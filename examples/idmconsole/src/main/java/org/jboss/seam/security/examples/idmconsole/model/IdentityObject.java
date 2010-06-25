@@ -1,9 +1,11 @@
 package org.jboss.seam.security.examples.idmconsole.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
@@ -45,6 +47,7 @@ public class IdentityObject implements Serializable
    }
    
    @ManyToOne @IdentityProperty(PropertyType.TYPE)
+   @JoinColumn(name = "IDENTITY_OBJECT_TYPE_ID")
    public IdentityObjectType getType()
    {
       return type;
