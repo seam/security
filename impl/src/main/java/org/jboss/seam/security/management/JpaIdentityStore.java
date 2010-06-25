@@ -959,19 +959,21 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public IdentityObjectRelationship createRelationship(
-         IdentityStoreInvocationContext invocationCxt,
+         IdentityStoreInvocationContext invocationCtx,
          IdentityObject fromIdentity, IdentityObject toIdentity,
          IdentityObjectRelationshipType relationshipType,
          String relationshipName, boolean createNames) throws IdentityException
    {
       try
       {
+         EntityManager em = getEntityManager(invocationCtx);
+         
          Object relationship = relationshipClass.newInstance();
          
          modelProperties.get(PROPERTY_RELATIONSHIP_FROM).setValue(relationship, 
-               lookupIdentity(fromIdentity));
+               lookupIdentity(fromIdentity, em));
          modelProperties.get(PROPERTY_RELATIONSHIP_TO).setValue(relationship,
-               lookupIdentity(toIdentity));
+               lookupIdentity(toIdentity, em));
          
          Property<Object> type = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE);
          if (String.class.equals(modelProperties.get(PROPERTY_RELATIONSHIP_TYPE).getJavaClass()))
@@ -997,11 +999,24 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
    }
    
-   protected Object lookupIdentity(IdentityObject obj)
+   protected Object lookupIdentity(IdentityObject obj, EntityManager em)
    {
-      // TODO implement
-      return null;
+      Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
       
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(identityClass);
+      Root<?> root = criteria.from(identityClass);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(identityNameProp.getName()), obj.getName()));
+      
+      // TODO add criteria for identity type
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      Query q = em.createQuery(criteria);
+      
+      return q.getSingleResult();
    }
    
    protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType)
@@ -1270,7 +1285,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          Root<?> root = criteria.from(credentialClass);
          
          List<Predicate> predicates = new ArrayList<Predicate>();
-         predicates.add(builder.equal(root.get(credentialIdentity.getName()), lookupIdentity(identityObject)));
+         predicates.add(builder.equal(root.get(credentialIdentity.getName()), 
+               lookupIdentity(identityObject, em)));
          
          criteria.where(predicates.toArray(new Predicate[0]));
          

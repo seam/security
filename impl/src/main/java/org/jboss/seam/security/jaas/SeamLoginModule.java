@@ -91,11 +91,12 @@ public class SeamLoginModule implements LoginModule
             
             if (success)
             {
-               for (Role role : identityManager.getImpliedRoles(username))
-               {
-                  idCallback.getIdentity().addRole(role.getRoleType().getName(), 
-                        role.getGroup().getName(), role.getGroup().getGroupType());
-               }
+               // TODO implement role population
+               //for (Role role : identityManager.getImpliedRoles(username))
+               //{
+                 // idCallback.getIdentity().addRole(role.getRoleType().getName(), 
+                   //     role.getGroup().getName(), role.getGroup().getGroupType());
+               //}
             }
             
             return success;
