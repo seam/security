@@ -1318,10 +1318,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          
          criteria.where(predicates.toArray(new Predicate[0]));
          
-         Query q = em.createQuery(criteria);
-         List<?> results = q.getResultList();
+         List<?> results = em.createQuery(criteria).getResultList();
          
          if (results.isEmpty()) return false;
+         
+         // TODO this only supports plain text passwords
          
          for (Object result : results)
          {
@@ -1332,10 +1333,25 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       // or they're stored in the identity class
       else
       {
+         Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
          
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(credentialValue.getDeclaringClass());
+         
+         Root<?> root = criteria.from(credentialValue.getDeclaringClass());
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(identityNameProp.getName()), 
+               identityObject.getName()));
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         Object result = em.createQuery(criteria).getSingleResult();
+         
+         Object val = credentialValue.getValue(result);
+         if (val.equals(credential.getValue())) return true;
       }
-      
-      // TODO Auto-generated method stub
+
       return false;
    }
 
