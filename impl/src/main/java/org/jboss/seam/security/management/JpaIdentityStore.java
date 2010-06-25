@@ -1014,9 +1014,22 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       criteria.where(predicates.toArray(new Predicate[0]));
       
-      Query q = em.createQuery(criteria);
+      return em.createQuery(criteria).getSingleResult();
+   }
+   
+   protected Object lookupCredentialType(String name, EntityManager em)
+   {
+      Property<?> credentialTypeNameProp = modelProperties.get(PROPERTY_CREDENTIAL_TYPE_NAME);
       
-      return q.getSingleResult();
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(credentialTypeNameProp.getDeclaringClass());
+      Root<?> root = criteria.from(credentialTypeNameProp.getDeclaringClass());
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(credentialTypeNameProp.getName()), name));      
+      criteria.where(predicates.toArray(new Predicate[0]));
+
+      return em.createQuery(criteria).getSingleResult();
    }
    
    protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType)
@@ -1279,6 +1292,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       if (credentialClass != null)
       {
          Property<?> credentialIdentity = modelProperties.get(PROPERTY_CREDENTIAL_IDENTITY);
+         Property<?> credentialType = modelProperties.get(PROPERTY_CREDENTIAL_TYPE);
          
          CriteriaBuilder builder = em.getCriteriaBuilder();
          CriteriaQuery<?> criteria = builder.createQuery(credentialClass);
@@ -1287,6 +1301,20 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          List<Predicate> predicates = new ArrayList<Predicate>();
          predicates.add(builder.equal(root.get(credentialIdentity.getName()), 
                lookupIdentity(identityObject, em)));
+         
+         if (credentialType != null)
+         {
+            if (String.class.equals(credentialType.getJavaClass()))
+            {
+               predicates.add(builder.equal(root.get(credentialType.getName()),
+                     credential.getType().getName()));
+            }
+            else
+            {
+               predicates.add(builder.equal(root.get(credentialType.getName()),
+                     lookupCredentialType(credential.getType().getName(), em)));
+            }
+         }
          
          criteria.where(predicates.toArray(new Predicate[0]));
          
