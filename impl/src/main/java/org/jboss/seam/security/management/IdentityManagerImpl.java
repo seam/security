@@ -269,6 +269,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       }
       catch (IdentityException ex)
       {
+         log.error("Exception during authentication", ex);
          return false;
       }
    }

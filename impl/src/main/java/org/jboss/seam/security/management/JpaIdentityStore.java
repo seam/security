@@ -3,6 +3,7 @@ package org.jboss.seam.security.management;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,11 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
@@ -71,6 +77,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_CREDENTIAL_VALUE = "CREDENTIAL_VALUE";
    private static final String PROPERTY_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
    private static final String PROPERTY_CREDENTIAL_TYPE_NAME = "CREDENTIAL_TYPE_NAME";
+   private static final String PROPERTY_CREDENTIAL_IDENTITY = "CREDENTIAL_IDENTITY";
    private static final String PROPERTY_RELATIONSHIP_FROM = "RELATIONSHIP_FROM";
    private static final String PROPERTY_RELATIONSHIP_TO = "RELATIONSHIP_TO";
    private static final String PROPERTY_RELATIONSHIP_TYPE = "RELATIONSHIP_TYPE";
@@ -158,14 +165,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       clsName = configurationContext.getStoreConfigurationMetaData()
          .getOptionSingleValue(OPTION_CREDENTIAL_CLASS_NAME);
       
-      try
+      if (clsName != null)
       {
-         credentialClass = Class.forName(clsName);
+         try
+         {
+            credentialClass = Class.forName(clsName);
+         }
+         catch (ClassNotFoundException e)
+         {
+            throw new IdentityException("Error bootstrapping JpaIdentityStore - no credential entity class found: " + clsName);
+         }
       }
-      catch (ClassNotFoundException e)
-      {
-         throw new IdentityException("Error bootstrapping JpaIdentityStore - no credential entity class found: " + clsName);
-      }      
       
       clsName = configurationContext.getStoreConfigurationMetaData()
          .getOptionSingleValue(OPTION_RELATIONSHIP_CLASS_NAME);
@@ -392,6 +402,36 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
             }
          }  
+         
+         // Scan for the credential identity property
+         props = PropertyQueries.createQuery(credentialClass)
+            .addCriteria(new TypedPropertyCriteria(identityClass))
+            .getResultList();
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_CREDENTIAL_IDENTITY, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityException(
+                  "Ambiguous identity property in credential class " + 
+                  credentialClass.getName());
+         }
+         else
+         {
+            // Scan for a named identity property
+            props = PropertyQueries.createQuery(credentialClass)
+               .addCriteria(new NamedPropertyCriteria("identity", "identityObject"))
+               .getResultList();
+            if (!props.isEmpty())
+            {
+               modelProperties.put(PROPERTY_CREDENTIAL_IDENTITY, props.get(0));
+            }
+            else
+            {
+               throw new IdentityException("Error initializing JpaIdentityStore - no credential identity property found.");
+            }
+         }
       }
       else
       {
@@ -840,6 +880,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    {
       this.relationshipTypeRole = relationshipTypeRole;
    }  
+   
+   public IdentityStoreSession createIdentityStoreSession(
+         Map<String, Object> sessionOptions) throws IdentityException
+   {
+      EntityManager em = (EntityManager) sessionOptions.get("ENTITY_MANAGER");
+      
+      return new JpaIdentityStoreSessionImpl(em);
+   }
 
    public IdentityObject createIdentityObject(
          IdentityStoreInvocationContext invocationCtx, String name,
@@ -1208,6 +1256,41 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObject identityObject, IdentityObjectCredential credential)
          throws IdentityException
    {
+      EntityManager em = getEntityManager(ctx);
+
+      Property<?> credentialValue = modelProperties.get(PROPERTY_CREDENTIAL_VALUE);
+      
+      // Either credentials are stored in their own class...
+      if (credentialClass != null)
+      {
+         Property<?> credentialIdentity = modelProperties.get(PROPERTY_CREDENTIAL_IDENTITY);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(credentialClass);
+         Root<?> root = criteria.from(credentialClass);
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(credentialIdentity.getName()), lookupIdentity(identityObject)));
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         Query q = em.createQuery(criteria);
+         List<?> results = q.getResultList();
+         
+         if (results.isEmpty()) return false;
+         
+         for (Object result : results)
+         {
+            Object val = credentialValue.getValue(result);
+            if (val.equals(credential.getValue())) return true;
+         }
+      }
+      // or they're stored in the identity class
+      else
+      {
+         
+      }
+      
       // TODO Auto-generated method stub
       return false;
    }
@@ -1281,13 +1364,5 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException
    {
       return createIdentityStoreSession(null);
-   }
-
-   public IdentityStoreSession createIdentityStoreSession(
-         Map<String, Object> sessionOptions) throws IdentityException
-   {
-      EntityManager em = (EntityManager) sessionOptions.get("ENTITY_MANAGER");
-      
-      return new JpaIdentityStoreSessionImpl(em);
    }
 }
