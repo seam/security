@@ -6,13 +6,24 @@ body {
   font-size: 0.9em;
 }
 
+div#header {
+  height: 80px;
+  background-color: #eeeeee;
+}
+
+div#title {
+  padding-top: 22px;
+  font-size: 22px;
+  font-weight: bold;
+  margin-left: 180px;
+}
+
 div#container {
   margin: 0px auto;
-  padding: 2px 2px 2px 2px;
+  padding: 2px 2px 2px 4px;
   border: 1px solid #666666;
-  width: 865px; /* subtract 40px from banner width for padding */
-  background: #FFFFFF url(#{request.contextPath}/resources/gfx/banner.png) no-repeat;
-  padding-top: 110px;
+  width: 865px;
+  background: #FFFFFF;
 }
 
 div#sidebar {
@@ -21,20 +32,13 @@ div#sidebar {
   float: left;
   border: 1px solid #666666;
   background: #EAECEE;
-  padding: 4px 4px 4px 4px;
+  padding: 4px 4px 24px 4px;
+  margin-top: 8px;
 }
 
 div#content {
   padding: 4px 4px 4px 4px;
   margin-left: 180px;
-}
-
-#footer {
-  margin-top: 12px;
-  clear: both;
-  text-align: center;
-  color: #666666;
-  font-size: 0.85em;
 }
 
 
