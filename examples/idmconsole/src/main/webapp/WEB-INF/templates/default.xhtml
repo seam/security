@@ -3,22 +3,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
    xmlns:h="http://java.sun.com/jsf/html"
    xmlns:ui="http://java.sun.com/jsf/facelets">
-   <h:head>
-      <title>Java EE 6 Starter Application</title>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      <h:outputStylesheet name="css/screen.css"/>
-   </h:head>
-   <h:body>
-      <div id="container">
-         <div id="content">
-
-            <ui:insert name="content">
-               [Template content will be inserted here]
-            </ui:insert>
-         </div>
-         <div id="footer">
-            <h:graphicImage value="/resources/gfx/weld.png" alt="Weld logo"/>
-         </div>
+  <h:head>
+    <title>Java EE 6 Starter Application</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="style/default.css" type="text/css" media="screen" />
+  </h:head>
+  <h:body>
+    <div id="container">
+      <div id="sidebar">
+        <ui:insert name="sidebar"/>
       </div>
-   </h:body>
+      
+      <div id="content">
+        <ui:insert name="content"/>
+      </div>
+      
+      <div id="footer">
+        <h:graphicImage value="/resources/gfx/weld.png" alt="Weld logo"/>
+      </div>
+    </div>
+  </h:body>
 </html>

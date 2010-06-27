@@ -4,6 +4,11 @@
    xmlns:f="http://java.sun.com/jsf/core"
    xmlns:h="http://java.sun.com/jsf/html"
    template="/WEB-INF/templates/default.xhtml">
+  
+  <ui:define name="sidebar"> 
+    <ui:include src="menu.xhtml"/>
+  </ui:define>
+   
   <ui:define name="content">
     <h2>Identity Management Console</h2>
     <p>This example demonstrates Seam's identity management features, backed by PicketLink IDM.</p>
