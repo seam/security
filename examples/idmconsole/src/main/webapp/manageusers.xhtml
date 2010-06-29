@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:h="http://java.sun.com/jsf/html"
+   template="/WEB-INF/templates/default.xhtml">
+  
+  <ui:define name="sidebar"> 
+    <ui:include src="menu.xhtml"/>
+  </ui:define>
+   
+  <ui:define name="content">
+    <h3>Manage Users</h3>
+   
+    <h:button id="newUser" action="#{userAction.createUser}" styleClass="newuser" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
+  	    
+    <h:dataTable 
+      id="threads"
+      value="#{userSearch.users}" 
+      var="user" 
+      styleClass="security"
+      cellspacing="0"
+      headerClass="header"
+      rowClasses="odd,even"
+      columnClasses=",,enabled,action">
+      <h:column width="auto">
+        <f:facet name="header">
+          User name
+        </f:facet>
+        #{user}
+      </h:column>
+      <h:column id="enabled" width="auto">
+        <f:facet name="header">
+          Enabled
+        </f:facet>
+        <div class="#{identityManager.isUserEnabled(user) ? 'checkmark' : 'cross'}"/>
+      </h:column>
+      <h:column id="action" width="auto">
+        <f:facet name="header">
+          Action
+        </f:facet>
+      
+        <ui:fragment rendered="#{identity.hasPermission('seam.user', 'update')}">
+          <h:link id="edit" value="Edit" action="#{userAction.editUser(userSearch.selectedUser)}"/><span> | </span>
+        </ui:fragment>
+        <h:link id="delete" value="Delete" action="#{identityManager.deleteUser(userSearch.selectedUser)}" 
+                rendered="#{identity.hasPermission('seam.user', 'delete')}"
+                onclick="return confirmDelete()"/>
+      </h:column>
+    </h:dataTable>
+    
+    <br style="clear:both"/>
+     
+  </ui:define>
+</ui:composition>

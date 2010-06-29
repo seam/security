@@ -22,7 +22,7 @@ public class UserSearch implements Serializable
    
    @Inject IdentityManager identityManager;
    
-   public void loadUsers()
+   @Inject public void loadUsers()
    {
       users = identityManager.findUsers(null);
    }

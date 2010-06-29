@@ -41,4 +41,17 @@ div#content {
   margin-left: 180px;
 }
 
+div.menuitem a {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+input.newuser {
+  background: url(btn_newuser.png) top left no-repeat;
+  height: 39px;
+  width: 113px;
+  margin: 4px 4px 4px 4px;
+  border: 0px;
+  cursor: pointer;  
+}
 

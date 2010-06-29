@@ -1,6 +1,8 @@
 package org.jboss.seam.security.management;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.enterprise.inject.Model;
@@ -14,6 +16,9 @@ import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
+import org.picketlink.idm.api.query.QueryException;
+import org.picketlink.idm.api.query.UserQuery;
+import org.picketlink.idm.api.query.UserQueryBuilder;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.model.SimpleUser;
 import org.slf4j.Logger;
@@ -207,9 +212,26 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    public List<String> findUsers(String filter)
    {
       identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
-      //List<String> users = identityStore.findUsers(filter);
+      UserQueryBuilder builder = identitySession.createUserQueryBuilder();
+      UserQuery userQuery = builder.createQuery();
       
-      return null;
+      try
+      {
+         Collection<User> users = identitySession.execute(userQuery);
+         
+         List<String> userList = new ArrayList<String>();
+         
+         for (User user : users)
+         {
+            userList.add(user.getId());
+         }
+         
+         return userList;
+      }
+      catch (QueryException ex)
+      {
+         throw new RuntimeException("Error querying users", ex);
+      }
    }
    
    public List<String> listRoleTypes()

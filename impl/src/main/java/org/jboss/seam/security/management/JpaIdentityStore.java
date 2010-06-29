@@ -1117,13 +1117,51 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public Collection<IdentityObject> findIdentityObject(
-         IdentityStoreInvocationContext invocationCtx,
-         IdentityObjectType identityType, IdentityObjectSearchCriteria criteria)
+         IdentityStoreInvocationContext ctx,
+         IdentityObjectType identityType, IdentityObjectSearchCriteria searchCriteria)
          throws IdentityException
    {
+      List<IdentityObject> objs = new ArrayList<IdentityObject>();
+      
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(identityClass);
+      Root<?> root = criteria.from(identityClass);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      //predicates.add(builder.equal(root.get(credentialIdentity.getName()), 
+            //lookupIdentity(identityObject, em)));
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      List<?> results = em.createQuery(criteria).getResultList();
+      
+      Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      
+      Property<?> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
+      Property<?> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+      
+      for (Object result : results)
+      {
+         String name = (String) identityNameProp.getValue(result);
+         String typeName;
+         
+         if (typeNameProp != null)
+         {
+            typeName = (String) typeNameProp.getValue(typeProp.getValue(result));
+         }
+         else
+         {
+            typeName = (String) typeProp.getValue(result);
+         }
+         
+         IdentityObjectType type = new IdentityObjectTypeImpl(typeName);
+         objs.add(new IdentityObjectImpl(name, name, type));
+      }
       
       // TODO Auto-generated method stub
-      return null;
+      return objs;
    }
 
    public Collection<IdentityObject> findIdentityObject(
@@ -1131,8 +1169,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObjectRelationshipType relationshipType, boolean parent,
          IdentityObjectSearchCriteria criteria) throws IdentityException
    {
+      List<IdentityObject> objs = new ArrayList<IdentityObject>();
+      
       // TODO Auto-generated method stub
-      return null;
+      return objs;
    }
 
    public String getId()
