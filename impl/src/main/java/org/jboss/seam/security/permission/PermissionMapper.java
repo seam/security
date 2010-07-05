@@ -24,19 +24,30 @@ import javax.enterprise.inject.spi.BeanManager;
 @ApplicationScoped
 public class PermissionMapper implements Serializable
 {
-   public static final String DEFAULT_RESOLVER_CHAIN_CREATED = "org.jboss.seam.security.defaultResolverChainCreated";
+   private static final long serialVersionUID = 7692687882996064772L;
+  
+   private Map<Class<?>,Map<String,String>> resolverChains = new HashMap<Class<?>,Map<String,String>>();
    
-   private Map<Class,Map<String,String>> resolverChains = new HashMap<Class,Map<String,String>>();
-   
-   private String defaultResolverChain;
-   
-   private static final String DEFAULT_RESOLVER_CHAIN = "org.jboss.seam.security.defaultResolverChain";
+   private List<PermissionResolver> defaultResolverChain;
    
    @Inject BeanManager manager;
    
+   @Inject
+   public void init()
+   {
+      defaultResolverChain = new ArrayList<PermissionResolver>();
+      
+      Set<Bean<?>> beans = manager.getBeans(PermissionResolver.class);
+      for (Bean<?> resolverBean :  beans)
+      {
+         defaultResolverChain.add((PermissionResolver) manager.getReference(
+               resolverBean, PermissionResolver.class, manager.createCreationalContext(resolverBean)));
+      }     
+   }
+   
    private List<PermissionResolver> getResolvers(Object target, String action)
    {
-      Class<?> targetClass = null;
+      /*Class<?> targetClass = null;
       
       if (target instanceof Class)
       {
@@ -47,26 +58,10 @@ public class PermissionMapper implements Serializable
          // TODO target may be a component name, or an object, or a view name (or arbitrary name) -
          // we need to deal with all of these possibilities
       }
-      
-      // TODO configure resolver chains differently - scan for all beans of type ResolverChain
-      
-      /*
-      if (targetClass != null)
-      {
-         Map<String,String> chains = resolverChains.get(target);
-         if (chains != null && chains.containsKey(action))
-         {
-            return (ResolverChain) BeanManagerHelper.getInstanceByName(manager, chains.get(action));
-         }
-      }
-      
-      if (defaultResolverChain != null && !"".equals(defaultResolverChain))
-      {
-         return (ResolverChain) BeanManagerHelper.getInstanceByName(manager,defaultResolverChain);
-      }
       */
-      
-      return createDefaultResolverChain();
+      // TODO more customisation of resolver chains
+           
+      return defaultResolverChain;
    }
    
    public boolean resolvePermission(Object target, String action)
@@ -83,11 +78,11 @@ public class PermissionMapper implements Serializable
       return false;
    }
    
-   public void filterByPermission(Collection collection, String action)
+   public void filterByPermission(Collection<?> collection, String action)
    {
       boolean homogenous = true;
       
-      Class targetClass = null;
+      Class<?> targetClass = null;
       for (Object target : collection)
       {
          if (targetClass == null) targetClass = target.getClass();
@@ -114,7 +109,7 @@ public class PermissionMapper implements Serializable
       }
       else
       {
-         Map<Class,Set<Object>> deniedByClass = new HashMap<Class,Set<Object>>();
+         Map<Class<?>,Set<Object>> deniedByClass = new HashMap<Class<?>,Set<Object>>();
          for (Object obj : collection)
          {
             if (!deniedByClass.containsKey(obj.getClass()))
@@ -129,7 +124,7 @@ public class PermissionMapper implements Serializable
             }
          }
          
-         for (Class cls : deniedByClass.keySet())
+         for (Class<?> cls : deniedByClass.keySet())
          {
             Set<Object> denied = deniedByClass.get(cls);
             List<PermissionResolver> resolvers = getResolvers(cls, action);
@@ -144,18 +139,5 @@ public class PermissionMapper implements Serializable
             }
          }
       }
-   }
-   
-   @Produces public @SessionScoped List<PermissionResolver> createDefaultResolverChain()
-   {
-      List<PermissionResolver> resolvers = new ArrayList<PermissionResolver>();
-               
-      Set<Bean<?>> beans = manager.getBeans(PermissionResolver.class);
-      for (Bean<?> resolverBean :  beans)
-      {
-         resolvers.add((PermissionResolver) manager.getReference(resolverBean, PermissionResolver.class, manager.createCreationalContext(resolverBean)));
-      }
-      
-      return resolvers;
    }
 }

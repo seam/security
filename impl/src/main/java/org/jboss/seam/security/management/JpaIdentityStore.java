@@ -895,11 +895,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return createIdentityObject(invocationCtx, name, identityObjectType, null);
    }
    
-   protected Object lookupIdentityType(String identityType, EntityManager em) throws IdentityException
+   protected Object lookupIdentityType(String identityType, EntityManager em)
    {      
       try
       {
          Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+         
+         // If there is no identity type table, just return the name
+         if (typeNameProp == null) return identityType;
          
          Object val = em.createQuery(
                "select t from " + typeNameProp.getDeclaringClass().getName() + 
@@ -911,7 +914,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
       catch (NoResultException ex)
       {
-         throw new IdentityException("Could not determine identity type [" + identityType + "]");
+         return null;
       }      
    }
 
@@ -982,13 +985,13 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          }
          else
          {
-            type.setValue(relationship, lookupRelationshipType(relationshipType));
+            type.setValue(relationship, lookupRelationshipType(relationshipType, em));
          }
          
          modelProperties.get(PROPERTY_RELATIONSHIP_NAME).setValue(relationship, 
                relationshipName);
          
-         //entityManagerInstance.get().persist(relationship);
+         em.persist(relationship);
          
          return new IdentityObjectRelationshipImpl(fromIdentity, toIdentity,
                relationshipName, relationshipType);
@@ -1002,6 +1005,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    protected Object lookupIdentity(IdentityObject obj, EntityManager em)
    {
       Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      Property<?> identityTypeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       
       CriteriaBuilder builder = em.getCriteriaBuilder();
       CriteriaQuery<?> criteria = builder.createQuery(identityClass);
@@ -1009,6 +1013,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       List<Predicate> predicates = new ArrayList<Predicate>();
       predicates.add(builder.equal(root.get(identityNameProp.getName()), obj.getName()));
+      predicates.add(builder.equal(root.get(identityTypeProp.getName()), lookupIdentityType(obj.getIdentityType().getName(), em)));
       
       // TODO add criteria for identity type
       
@@ -1127,18 +1132,16 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       CriteriaBuilder builder = em.getCriteriaBuilder();
       CriteriaQuery<?> criteria = builder.createQuery(identityClass);
-      Root<?> root = criteria.from(identityClass);
+      
+      //Root<?> root = criteria.from(identityClass);
+
+      Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
       
       List<Predicate> predicates = new ArrayList<Predicate>();
-      //predicates.add(builder.equal(root.get(credentialIdentity.getName()), 
-            //lookupIdentity(identityObject, em)));
-      
       criteria.where(predicates.toArray(new Predicate[0]));
       
       List<?> results = em.createQuery(criteria).getResultList();
-      
-      Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
-      
+           
       Property<?> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       Property<?> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
       

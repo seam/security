@@ -52,6 +52,11 @@ public class UserAction implements Serializable
       enabled = identityManager.isUserEnabled(username);
       newUserFlag = false;
    }
+   
+   public void deleteUser(String username)
+   {
+      identityManager.deleteUser(username);
+   }
       
    public String save()
    {

@@ -47,7 +47,7 @@
             <h:commandLink id="edit" value="Edit" action="#{userAction.editUser(user.username)}"/>
             <span> | </span>
           </ui:fragment>
-          <h:link id="delete" value="Delete" action="#{identityManager.deleteUser(userSearch.selectedUser)}" 
+          <h:link id="delete" value="Delete" action="#{userAction.deleteUser(user.username)}" 
                   rendered="#{identity.hasPermission('seam.user', 'delete')}"
                   onclick="return confirmDelete()"/>
         </h:column>

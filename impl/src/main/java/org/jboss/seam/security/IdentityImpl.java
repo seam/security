@@ -637,14 +637,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    public boolean hasPermission(Object target, String action)
    {
-      return true;
-      /*
       if (!securityEnabled) return true;
       if (systemOp != null && Boolean.TRUE.equals(systemOp.get())) return true;
       if (permissionMapper == null) return false;
       if (target == null) return false;
       
-      return permissionMapper.resolvePermission(target, action);*/
+      return permissionMapper.resolvePermission(target, action);
    }
      
    public String getJaasConfigName()
