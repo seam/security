@@ -7,7 +7,7 @@ import javax.persistence.PersistenceContext;
 
 public class EntityManagerProducer
 {
-   @PersistenceContext EntityManager entityManager;
+   @PersistenceContext(unitName = "idmconsoleDatabase") EntityManager entityManager;
    
    public @Produces @RequestScoped EntityManager produceEntityManager()
    {

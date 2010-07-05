@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.enterprise.inject.Model;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import org.jboss.seam.transaction.Transactional;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.util.Strings;
 import org.picketlink.idm.api.Credential;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@Model
+@RequestScoped @Transactional
 public class IdentityManagerImpl implements IdentityManager, Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;

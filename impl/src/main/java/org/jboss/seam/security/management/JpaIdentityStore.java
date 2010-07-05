@@ -14,7 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -917,7 +916,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public IdentityObject createIdentityObject(
-         IdentityStoreInvocationContext invocationCtx, String name,
+         IdentityStoreInvocationContext ctx, String name,
          IdentityObjectType identityObjectType, Map<String, String[]> attributes)
          throws IdentityException
    {
@@ -935,19 +934,20 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          else
          {
             typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName(), 
-                  getEntityManager(invocationCtx)));
+                  getEntityManager(ctx)));
          }
                
          //beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
          
-         //entityManagerInstance.get().persist(identityInstance);
+         getEntityManager(ctx).persist(identityInstance);
          
          //beanManager.fireEvent(new UserCreatedEvent(identityInstance));
          
          // TODO persist attributes
 
+         Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
          IdentityObject obj = new IdentityObjectImpl(
-               modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance).toString(),
+               (id != null ? id.toString() : null),
                name, identityObjectType);
 
          return obj;

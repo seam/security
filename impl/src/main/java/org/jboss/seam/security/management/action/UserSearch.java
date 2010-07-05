@@ -1,6 +1,7 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
@@ -15,16 +16,22 @@ public class UserSearch implements Serializable
 {
    private static final long serialVersionUID = 8592034786339372510L;
 
-   List<String> users;
-   
-   //@DataModelSelection
-   //String selectedUser;
-   
+   List<UserDTO> users;
+      
    @Inject IdentityManager identityManager;
    
    @Inject public void loadUsers()
-   {
-      users = identityManager.findUsers(null);
+   {       
+      users = new ArrayList<UserDTO>();
+      
+      List<String> usernames = identityManager.findUsers(null);  
+      for (String username : usernames)
+      {
+         UserDTO dto = new UserDTO();
+         dto.setUsername(username);
+         dto.setEnabled(identityManager.isUserEnabled(username));
+         users.add(dto);
+      }      
    }
    
    public String getUserRoles(String username)
@@ -49,7 +56,7 @@ public class UserSearch implements Serializable
       //return selectedUser;
    //}
    
-   public List<String> getUsers()
+   public List<UserDTO> getUsers()
    {
       return users;
    }   
