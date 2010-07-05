@@ -1032,7 +1032,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return em.createQuery(criteria).getSingleResult();
    }
    
-   protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType)
+   protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType, EntityManager em)
    {
       // TODO implement
       return null;
@@ -1228,20 +1228,58 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public void removeIdentityObject(
-         IdentityStoreInvocationContext invocationCtx, IdentityObject identity)
+         IdentityStoreInvocationContext ctx, IdentityObject identity)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
+      Property<?> nameProperty = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      Property<?> typeProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(identityClass);
+      Root<?> root = criteria.from(identityClass);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(nameProperty.getName()), 
+            identity.getName()));
+      predicates.add(builder.equal(root.get(typeProperty.getName()),
+            lookupIdentityType(identity.getIdentityType().getName(), em)));
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      Object instance = em.createQuery(criteria).getSingleResult();
+      
+      em.remove(instance);
    }
 
-   public void removeRelationship(IdentityStoreInvocationContext invocationCxt,
+   public void removeRelationship(IdentityStoreInvocationContext ctx,
          IdentityObject fromIdentity, IdentityObject toIdentity,
          IdentityObjectRelationshipType relationshipType,
          String relationshipName) throws IdentityException
    {
-      // TODO Auto-generated method stub
+      Property<?> fromProperty = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> toProperty = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
+      Property<?> relationshipTypeProp = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE);
       
+      EntityManager em = getEntityManager(ctx);
+
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(identityClass);
+      Root<?> root = criteria.from(identityClass);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(fromProperty.getName()), 
+            lookupIdentity(fromIdentity, em)));
+      predicates.add(builder.equal(root.get(toProperty.getName()), 
+            lookupIdentity(toIdentity, em)));
+      predicates.add(builder.equal(root.get(relationshipTypeProp.getName()), 
+            lookupRelationshipType(relationshipType, em)));
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      Object relationship = em.createQuery(criteria).getSingleResult();
+      em.remove(relationship);
    }
 
    public String removeRelationshipName(IdentityStoreInvocationContext ctx,
