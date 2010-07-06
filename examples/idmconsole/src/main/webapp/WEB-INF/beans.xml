@@ -5,7 +5,15 @@
 -->
 <beans xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:seam:core" 
+   xmlns:perm="org.jboss.seam.security.permission"
    xsi:schemaLocation="
       http://java.sun.com/xml/ns/javaee 
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
+      
+   <perm:JpaPermissionStore>
+      <s:specializes/>
+      
+      <perm:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</perm:identityPermissionClass>
+   </perm:JpaPermissionStore>
 </beans>
