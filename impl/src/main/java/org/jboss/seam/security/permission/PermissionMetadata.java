@@ -19,10 +19,10 @@ import org.jboss.seam.security.annotations.permission.Permissions;
  */
 public class PermissionMetadata
 {
-   private Map<Class,Boolean> usesActionMask = new HashMap<Class,Boolean>();
-   private Map<Class,Map<String,Long>> classActions = new HashMap<Class,Map<String,Long>>();
+   private Map<Class<?>,Boolean> usesActionMask = new HashMap<Class<?>,Boolean>();
+   private Map<Class<?>,Map<String,Long>> classActions = new HashMap<Class<?>,Map<String,Long>>();
    
-   private synchronized void initClassActions(Class cls)
+   private synchronized void initClassActions(Class<?> cls)
    {
       if (!classActions.containsKey(cls))
       {
@@ -86,9 +86,9 @@ public class PermissionMetadata
    protected class ActionSet
    {
       private Set<String> members = new HashSet<String>();
-      private Class targetClass;
+      private Class<?> targetClass;
       
-      public ActionSet(Class targetClass, String members)
+      public ActionSet(Class<?> targetClass, String members)
       {
          this.targetClass = targetClass;
          addMembers(members);
@@ -179,14 +179,14 @@ public class PermissionMetadata
       }
    }
    
-   public ActionSet createActionSet(Class targetClass, String members)
+   public ActionSet createActionSet(Class<?> targetClass, String members)
    {      
       if (!classActions.containsKey(targetClass)) initClassActions(targetClass);
       
       return new ActionSet(targetClass, members);
    }
    
-   public List<String> listAllowableActions(Class targetClass)
+   public List<String> listAllowableActions(Class<?> targetClass)
    {
       if (!classActions.containsKey(targetClass)) initClassActions(targetClass);
       

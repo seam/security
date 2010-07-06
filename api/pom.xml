@@ -27,6 +27,17 @@
          <artifactId>picketlink-idm-api</artifactId>
       </dependency>
 
+      <dependency>
+         <groupId>org.picketlink.idm</groupId>
+         <artifactId>picketlink-idm-core</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>log4j</groupId>
+               <artifactId>log4j</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
    </dependencies>
 
 </project>

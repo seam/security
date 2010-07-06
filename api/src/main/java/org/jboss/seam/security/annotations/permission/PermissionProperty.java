@@ -10,13 +10,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * 
+ * Marks an entity field or method as being a property for storing permission
+ * related data.
+ *  
  * @author Shane Bryzak
  */
 @Target({METHOD,FIELD})
 @Documented
 @Retention(RUNTIME)
 @Inherited
-public @interface PermissionRecipientType {
-
+public @interface PermissionProperty {
+   PermissionPropertyType value();
 }

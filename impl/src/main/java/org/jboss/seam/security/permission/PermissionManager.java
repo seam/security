@@ -56,7 +56,7 @@ public class PermissionManager implements Serializable
    
    public boolean grantPermission(Permission permission)
    {
-      identity.checkPermission(permission.getTarget(), PERMISSION_GRANT);
+      identity.checkPermission(permission.getResource(), PERMISSION_GRANT);
       return permissionStore.grantPermission(permission);
    }
    
@@ -64,14 +64,14 @@ public class PermissionManager implements Serializable
    {
       for (Permission permission : permissions)
       {
-         identity.checkPermission(permission.getTarget(), PERMISSION_GRANT);
+         identity.checkPermission(permission.getResource(), PERMISSION_GRANT);
       }
       return permissionStore.grantPermissions(permissions);
    }
    
    public boolean revokePermission(Permission permission)
    {
-      identity.checkPermission(permission.getTarget(), PERMISSION_REVOKE);
+      identity.checkPermission(permission.getResource(), PERMISSION_REVOKE);
       return permissionStore.revokePermission(permission);
    }
    
@@ -79,7 +79,7 @@ public class PermissionManager implements Serializable
    {
       for (Permission permission : permissions)
       {
-         identity.checkPermission(permission.getTarget(), PERMISSION_REVOKE);
+         identity.checkPermission(permission.getResource(), PERMISSION_REVOKE);
       }
       return permissionStore.revokePermissions(permissions);
    }

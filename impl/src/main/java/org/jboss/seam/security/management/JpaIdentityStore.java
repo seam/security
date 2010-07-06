@@ -88,8 +88,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    
    private String id;
       
-   // Entity classes
-   
+   // Entity classes   
    private Class<?> identityClass;
    private Class<?> credentialClass;
    private Class<?> relationshipClass;   

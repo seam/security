@@ -15,6 +15,7 @@ import javax.inject.Named;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.Permission;
 import org.jboss.seam.security.permission.PermissionManager;
+import org.picketlink.idm.spi.model.IdentityObject;
 
 @Named
 @ConversationScoped
@@ -22,11 +23,11 @@ public class PermissionSearch implements Serializable
 {
    private static final long serialVersionUID = 2802038930768758665L;
 
-   private Map<Principal,List<Permission>> groupedPermissions = new HashMap<Principal,List<Permission>>();
+   private Map<IdentityObject,List<Permission>> groupedPermissions = new HashMap<IdentityObject,List<Permission>>();
  
    
    //@DataModel(scope = ConversationScoped.class)
-   List<Principal> recipients;
+   List<IdentityObject> recipients;
    
    //@DataModelSelection
    Principal selectedRecipient;
@@ -52,20 +53,20 @@ public class PermissionSearch implements Serializable
       {
          List<Permission> recipientPermissions = null;
          
-         if (!groupedPermissions.containsKey(permission.getRecipient()))
+         if (!groupedPermissions.containsKey(permission.getIdentity()))
          {
             recipientPermissions = new ArrayList<Permission>();
-            groupedPermissions.put(permission.getRecipient(), recipientPermissions);
+            groupedPermissions.put(permission.getIdentity(), recipientPermissions);
          }
          else
          {
-            recipientPermissions = groupedPermissions.get(permission.getRecipient());
+            recipientPermissions = groupedPermissions.get(permission.getIdentity());
          }
          
          recipientPermissions.add(permission);
       }
       
-      recipients = new ArrayList<Principal>(groupedPermissions.keySet());
+      recipients = new ArrayList<IdentityObject>(groupedPermissions.keySet());
    }
    
    public String getActions(Principal recipient)
@@ -75,7 +76,7 @@ public class PermissionSearch implements Serializable
       for (Permission permission : groupedPermissions.get(recipient))
       {
          if (sb.length() > 0) sb.append(", ");
-         sb.append(permission.getAction());
+         sb.append(permission.getPermission());
       }
       
       return sb.toString();

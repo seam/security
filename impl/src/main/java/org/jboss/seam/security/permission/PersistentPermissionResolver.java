@@ -48,8 +48,8 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       
       for (Permission permission : permissions)
       {
-         if (permission.getRecipient() instanceof SimplePrincipal &&
-               username.equals(permission.getRecipient().getName()))
+         if (permission.getIdentity() instanceof SimplePrincipal &&
+               username.equals(permission.getIdentity().getName()))
          {
             return true;
          }
@@ -90,10 +90,10 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
          
          for (Permission permission : permissions)
          {
-            if (permission.getTarget().equals(target))
+            if (permission.getResource().equals(target))
             {
-               if (permission.getRecipient() instanceof SimplePrincipal &&
-                     username.equals(permission.getRecipient().getName()))
+               if (permission.getIdentity() instanceof SimplePrincipal &&
+                     username.equals(permission.getIdentity().getName()))
                {
                   iter.remove();
                   break;
