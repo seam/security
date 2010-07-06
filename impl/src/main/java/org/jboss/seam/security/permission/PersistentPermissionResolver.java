@@ -46,28 +46,31 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       
       String username = identity.getPrincipal().getName();
       
-      for (Permission permission : permissions)
-      {
-         if (permission.getIdentity() instanceof SimplePrincipal &&
-               username.equals(permission.getIdentity().getName()))
+      if (permissions != null)
+      {      
+         for (Permission permission : permissions)
          {
-            return true;
-         }
-         
-         //if (permission.getRecipient() instanceof RoleImpl)
-         //{
-           // RoleImpl role = (RoleImpl) permission.getRecipient();
-            
-            // TODO fix this
-            /*if (role.isConditional())
-            {
-               if (ruleBasedPermissionResolver.checkConditionalRole(role.getRoleType(), target, action)) return true;
-            }
-            else if (identity.hasRole(role.getRoleType()))
+            if (permission.getIdentity() instanceof SimplePrincipal &&
+                  username.equals(permission.getIdentity().getName()))
             {
                return true;
-            }*/
-         //}
+            }
+            
+            //if (permission.getRecipient() instanceof RoleImpl)
+            //{
+              // RoleImpl role = (RoleImpl) permission.getRecipient();
+               
+               // TODO fix this
+               /*if (role.isConditional())
+               {
+                  if (ruleBasedPermissionResolver.checkConditionalRole(role.getRoleType(), target, action)) return true;
+               }
+               else if (identity.hasRole(role.getRoleType()))
+               {
+                  return true;
+               }*/
+            //}
+         }
       }
       
       return false;

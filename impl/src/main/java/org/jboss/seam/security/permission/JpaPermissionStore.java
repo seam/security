@@ -89,7 +89,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
       // TODO see if we can scan for this automatically
       if (identityPermissionClass == null)
       {
-         log.debug("No permissionClass set, JpaPermissionStore will be unavailable.");
+         log.debug("No identityPermissionClass set, JpaPermissionStore will be unavailable.");
          return;
       }
       

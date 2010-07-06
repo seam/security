@@ -798,7 +798,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       for (Property<Object> p : props)
       {
-         if (p.getJavaClass().isAnnotationPresent(Entity.class))
+         if (!p.isReadOnly() && p.getJavaClass().isAnnotationPresent(Entity.class))
          {
             List<Property<Object>> pp = PropertyQueries.createQuery(p.getJavaClass())
                .addCriteria(new PropertyTypeCriteria(PropertyType.ATTRIBUTE))
