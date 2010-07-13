@@ -9,6 +9,6 @@ import java.util.Set;
  */
 public interface PermissionResolver
 {
-   boolean hasPermission(Object target, String action);
-   void filterSetByAction(Set<Object> targets, String action);
+   boolean hasPermission(Object resource, String permission);
+   void filterSetByAction(Set<Object> resources, String permission);
 }

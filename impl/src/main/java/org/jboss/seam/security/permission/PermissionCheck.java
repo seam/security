@@ -12,27 +12,27 @@ import java.util.Set;
  */
 public class PermissionCheck
 {
-   private Object target;
+   private Object resource;
 
-   private String action;
+   private String permission;
    private boolean granted;
    private Set<String> requirements;
    
-   public PermissionCheck(Object target, String action)
+   public PermissionCheck(Object resource, String permission)
    {      
-      this.target = target;
-      this.action = action;
+      this.resource = resource;
+      this.permission = permission;
       granted = false;
    }
    
-   public Object getTarget()
+   public Object getResource()
    {
-      return target;
+      return resource;
    }   
 
-   public String getAction() 
+   public String getPermission() 
    {
-      return action;
+      return permission;
    }
    
    public void require(String requirement)

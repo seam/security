@@ -48,12 +48,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    @Inject Identity identity;
    
    @Inject
-   public boolean create()
-   {
-      initSecurityContext();
-      return getSecurityContext() != null;
-   }
-   
    protected void initSecurityContext()
    {
       if (getSecurityRules() != null)
@@ -70,7 +64,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
     * @param action String The action to be performed on the target
     * @return boolean True if the user has the specified permission
     */
-   public boolean hasPermission(Object target, String action)
+   public boolean hasPermission(Object resource, String permission)
    {
       StatefulKnowledgeSession securityContext = getSecurityContext();
       
@@ -82,18 +76,18 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       
       synchronized( securityContext )
       {
-         if (!(target instanceof String) && !(target instanceof Class))
+         if (!(resource instanceof String) && !(resource instanceof Class<?>))
          {
-            handles.add( securityContext.insert(target) );
+            handles.add( securityContext.insert(resource) );
          }
-         else if (target instanceof Class)
+         else if (resource instanceof Class<?>)
          {
             // TODO fix
             String componentName = null; // manager. Seam.getComponentName((Class) target);
-            target = componentName != null ? componentName : ((Class) target).getName();
+            resource = componentName != null ? componentName : ((Class) resource).getName();
          }
          
-         check = new PermissionCheck(target, action);
+         check = new PermissionCheck(resource, permission);
          
          try
          {
@@ -267,7 +261,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       this.securityContext = securityContext;
    }
    
-
    public KnowledgeBase getSecurityRules()
    {
       return securityRules;
