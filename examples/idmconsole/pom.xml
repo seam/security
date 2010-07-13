@@ -79,6 +79,13 @@
       <dependency>
          <groupId>org.jboss.seam.xml</groupId>
          <artifactId>seam-xml-config</artifactId>
+         <version>3.0.0-SNAPSHOT</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jboss.spec.javax.interceptor</groupId>
+               <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <!-- CDI (JSR-299) -->

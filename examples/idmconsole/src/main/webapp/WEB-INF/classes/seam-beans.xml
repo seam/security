@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-   The contents of this file is permitted to be empty.
-   The schema definition is provided for your convenience.
--->
 <beans xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:s="urn:java:seam:core" 
-   xmlns:perm="org.jboss.seam.security.permission"
+   xmlns:s="urn:java:ee" 
+   xmlns:drools="urn:java:org.jboss.seam.drools:org.jboss.seam.drools.config"   
+   xmlns:security="urn:java:org.jboss.seam.security.permission"
    xsi:schemaLocation="
       http://java.sun.com/xml/ns/javaee 
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
       
-   <perm:JpaPermissionStore>
-      <s:specializes/>
-      
-      <perm:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</perm:identityPermissionClass>
-   </perm:JpaPermissionStore>
+   <security:JpaPermissionStore>
+      <s:overrides/>      
+      <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
+   </security:JpaPermissionStore>
+   
+   <drools:RuleResources>
+     <s:modifies/>
+     <security:SecurityRulesConfig/>
+     <drools:resources>
+       <s:value>security-rules.drl</s:value>
+     </drools:resources>
+   </drools:RuleResources>
+   
+   <drools:DroolsConfig>
+   		<s:modifies/>
+   		<security:SecurityRulesConfig/>
+   		<drools:ruleResources>
+ 		    <s:Inject/>
+ 		    <security:SecurityRulesConfig/>
+   		</drools:ruleResources>
+   </drools:DroolsConfig>
+   
+   <security:RuleBasedPermissionResolver>
+      <s:overrides/>
+      <security:securityRules>
+        <security:SecurityRulesConfig/>
+        <s:Inject/>
+        <s:Default/>
+      </security:securityRules>
+   </security:RuleBasedPermissionResolver>   
+   
 </beans>
