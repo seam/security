@@ -17,7 +17,7 @@
      <s:modifies/>
      <security:SecurityRulesConfig/>
      <drools:resources>
-       <s:value>security-rules.drl</s:value>
+       <s:value>classpath;security-rules.drl;DRL</s:value>
      </drools:resources>
    </drools:RuleResources>
    
@@ -32,11 +32,24 @@
    
    <security:RuleBasedPermissionResolver>
       <s:overrides/>
+      
+      <security:manager>
+        <s:Inject/>
+      </security:manager>
+      
+      <security:identity>
+        <s:Inject/>
+      </security:identity>
+      
+      <security:init>
+        <s:Inject/>
+      </security:init>
+      
       <security:securityRules>
         <security:SecurityRulesConfig/>
         <s:Inject/>
         <s:Default/>
       </security:securityRules>
-   </security:RuleBasedPermissionResolver>   
+   </security:RuleBasedPermissionResolver>
    
 </beans>

@@ -30,7 +30,8 @@ public class IdentityPermission implements Serializable
    private String permission;
    
    /**
-    * Surrogate primary key value of the permission.
+    * Surrogate primary key value for the permission.
+    * 
     * @return
     */
    @Id @GeneratedValue
@@ -118,7 +119,7 @@ public class IdentityPermission implements Serializable
    
    /**
     * The permission(s) granted for the resource.  May either be a comma-separated
-    * list of permission names (such as create, delete, etc) or a bitmasked
+    * list of permission names (such as create, delete, etc) or a bit-masked
     * integer value, in which each bit represents a different permission.
     * 
     * @return
