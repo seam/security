@@ -62,6 +62,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
       }      
    }
 
+   private boolean enabled;
    
    private Class<?> identityPermissionClass;
       
@@ -90,6 +91,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
       if (identityPermissionClass == null)
       {
          log.debug("No identityPermissionClass set, JpaPermissionStore will be unavailable.");
+         enabled = false;
          return;
       }
       
@@ -152,6 +154,8 @@ public class JpaPermissionStore implements PermissionStore, Serializable
             identityPermissionClass.getName() + 
             " - required annotation @PermissionProperty(PERMISSION) not found on any field or method.");
       }
+      
+      enabled = true;
    }
    
    /**
@@ -539,5 +543,10 @@ public class JpaPermissionStore implements PermissionStore, Serializable
             resourceProperty.getName() + " = :resource")
             .setParameter("resource", identifier)
             .executeUpdate();      
+   }
+
+   public boolean isEnabled()
+   {
+      return enabled;
    }
 }

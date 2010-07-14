@@ -48,7 +48,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    @Inject Identity identity;
    
    @Inject
-   protected void initSecurityContext()
+   public void init()
    {
       if (getSecurityRules() != null)
       {
@@ -84,7 +84,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
          {
             // TODO fix
             String componentName = null; // manager. Seam.getComponentName((Class) target);
-            resource = componentName != null ? componentName : ((Class) resource).getName();
+            resource = componentName != null ? componentName : ((Class<?>) resource).getName();
          }
          
          check = new PermissionCheck(resource, permission);
@@ -111,7 +111,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    
    public void filterSetByAction(Set<Object> targets, String action)
    {
-      Iterator iter = targets.iterator();
+      Iterator<?> iter = targets.iterator();
       while (iter.hasNext())
       {
          Object target = iter.next();
@@ -131,15 +131,15 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       
       synchronized( securityContext )
       {
-         if (!(target instanceof String) && !(target instanceof Class))
+         if (!(target instanceof String) && !(target instanceof Class<?>))
          {
             handles.add( securityContext.insert(target) );
          }
-         else if (target instanceof Class)
+         else if (target instanceof Class<?>)
          {
             // TODO fix
             String componentName = null; //Seam.getComponentName((Class) target);
-            target = componentName != null ? componentName : ((Class) target).getName();
+            target = componentName != null ? componentName : ((Class<?>) target).getName();
          }
          
          try
@@ -180,7 +180,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       return roleCheck.isGranted();
    }
    
-   @SuppressWarnings("unchecked")
    public void unAuthenticate(@Observes PostLoggedOutEvent event)
    {
       if (getSecurityContext() != null)
@@ -188,7 +187,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
          getSecurityContext().dispose();
          setSecurityContext(null);
       }
-      initSecurityContext();
+      init();
    }
    
    /**
@@ -204,7 +203,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
          {
             if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
             {
-               Enumeration e = sg.members();
+               Enumeration<?> e = sg.members();
                while (e.hasMoreElements())
                {
                   Principal role = (Principal) e.nextElement();

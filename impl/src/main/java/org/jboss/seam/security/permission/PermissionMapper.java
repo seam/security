@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.inject.Inject;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Bean;
@@ -37,11 +38,11 @@ public class PermissionMapper implements Serializable
    {
       defaultResolverChain = new ArrayList<PermissionResolver>();
       
-      Set<Bean<?>> beans = manager.getBeans(PermissionResolver.class);
-      for (Bean<?> resolverBean :  beans)
-      {
-         defaultResolverChain.add((PermissionResolver) manager.getReference(
-               resolverBean, PermissionResolver.class, manager.createCreationalContext(resolverBean)));
+      Set<Bean<?>> beans = (Set<Bean<?>>) manager.getBeans(PermissionResolver.class);
+      for (Bean<?> resolverBean : beans)
+      {         
+         CreationalContext<PermissionResolver> ctx = manager.createCreationalContext((Bean<PermissionResolver>) resolverBean);
+         defaultResolverChain.add(((Bean<PermissionResolver>) resolverBean).create(ctx));
       }     
    }
    

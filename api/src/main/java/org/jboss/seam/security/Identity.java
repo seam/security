@@ -141,16 +141,16 @@ public interface Identity
    void checkRole(String role, String group, String groupType);
    
    /**
-    * Checks if the currently authenticated user can perform the specified action
-    * on the specified target object.
+    * Checks if the currently authenticated user has the specified permission 
+    * for the specified resource.
     * 
-    * @param target The target object for which the user wishes to perform a restricted action
-    * @param action The action that the user wishes to perform
+    * @param resource The resource for which the user wishes to perform a restricted action
+    * @param permission The name of the permission that the user requires to invoke the operation
     * @throws NotLoggedInException if the current user is not authenticated
     * @throws AuthorizationException if the current user does not have the necessary
-    * privileges to perform the specified action on the specified target object.   
+    * permission for the specified resource object.   
     */
-   void checkPermission(Object target, String action);
+   void checkPermission(Object resource, String permission);
    
    /**
     * Filters a collection of objects by a specified action, by removing the 
@@ -160,15 +160,13 @@ public interface Identity
     * @param collection The Collection to filter
     * @param action The name of the action to filter by
     */
-   void filterByPermission(Collection<?> collection, String action);
+   void filterByPermission(Collection<?> collection, String permission);
    
    /**
-    * Checks if the currently authenticated user has the necessary privileges to perform the
-    * specified action on the specified target object.
+    * Checks if the currently authenticated user has the necessary permission for
+    * a specific resource.
     * 
-    * @param target  
-    * @param action
-    * @return true if the user has the required privileges, otherwise false
+    * @return true if the user has the required permission, otherwise false
     */
-   boolean hasPermission(Object target, String action);      
+   boolean hasPermission(Object resource, String permission);      
 }

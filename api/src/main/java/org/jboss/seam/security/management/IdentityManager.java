@@ -80,7 +80,7 @@ public interface IdentityManager
     * @param value The value of the attribute
     * @return true if the attribute was successfully set
     */
-   boolean setUserAttribute(String username, String attribute, Object value);
+   void setUserAttribute(String username, String attribute, Object value);
    
    /**
     * Deletes the specified attribute value from the specified user
@@ -89,7 +89,7 @@ public interface IdentityManager
     * @param attribute The name of the attribute to delete
     * @return true if the attribute was successfully deleted
     */
-   boolean deleteUserAttribute(String username, String attribute);
+   void deleteUserAttribute(String username, String attribute);
 
    /**
     * Creates a new role type

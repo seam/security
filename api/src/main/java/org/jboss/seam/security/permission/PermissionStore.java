@@ -19,4 +19,5 @@ public interface PermissionStore
    boolean revokePermissions(List<Permission> permissions);
    List<String> listAvailableActions(Object target);
    void clearPermissions(Object target);
+   boolean isEnabled();
 }

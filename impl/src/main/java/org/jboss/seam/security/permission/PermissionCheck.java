@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Used to assert permission requirements into a WorkingMemory when evaluating
+ * Used to assert permission check requirements into a StatefulSession when evaluating
  * a @Restrict expression.  The consequence of the rule is responsible for
  * granting the permission.
  *

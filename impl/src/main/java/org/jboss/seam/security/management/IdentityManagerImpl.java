@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default IdentityManager implementation 
+ * Default IdentityManager implementation, backed by PicketLink IDM 
  * 
  * @author Shane Bryzak
  */
@@ -35,9 +35,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;
    
-   public static final String USER_PERMISSION_NAME = "seam.user";
-   public static final String ROLE_PERMISSION_NAME = "seam.role";
-   public static final String GROUP_PERMISSION_NAME = "seam.group";
+   public static final String RESOURCE_IDENTITY = "seam.identity";
    
    public static final String PERMISSION_CREATE = "create";
    public static final String PERMISSION_READ = "read";
@@ -53,7 +51,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public boolean createUser(String name, Credential credential)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_CREATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_CREATE);
       try
       {
          User user = identitySession.getPersistenceManager().createUser(name);
@@ -68,7 +66,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public boolean deleteUser(String name)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_DELETE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_DELETE);
       
       try
       {
@@ -83,21 +81,21 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public boolean enableUser(String name)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return identityStore.enableUser(name);
       return false;
    }
    
    public boolean disableUser(String name)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return identityStore.disableUser(name);
       return false;
    }
    
    public boolean updateCredential(String name, Credential credential)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       
       try
       {
@@ -112,49 +110,63 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public boolean isUserEnabled(String name)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_READ);
       //return identityStore.isUserEnabled(name);
       return false;
    }
    
-   public boolean setUserAttribute(String username, String attribute, Object value)
+   public void setUserAttribute(String username, String attribute, Object value)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      //return identityStore.setUserAttribute(username, attribute, value);
-      return false;
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
+      try
+      {
+         identitySession.getAttributesManager().addAttribute(username, attribute, value);
+      }
+      catch (IdentityException e)
+      {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
    
-   public boolean deleteUserAttribute(String username, String attribute)
+   public void deleteUserAttribute(String username, String attribute)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
-      //return identityStore.deleteUserAttribute(username, attribute);
-      return false;
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);      
+      try
+      {
+         identitySession.getAttributesManager().removeAttributes(username, new String[] {attribute});
+      }
+      catch (IdentityException e)
+      {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
    
    public boolean grantRole(String name, String role, String groupName, String groupType)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return roleIdentityStore.grantRole(name, role, groupName, groupType);
       return false;
    }
    
    public boolean revokeRole(String name, String role, String groupName, String groupType)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return roleIdentityStore.revokeRole(name, role, groupName, groupType);
       return false;
    }   
 
    public boolean associateUser(String groupName, String groupType, String username)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return identityStore.associateUser(groupName, groupType, username);
       return false;
    }
    
    public boolean disassociateUser(String groupName, String groupType, String username)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_UPDATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
       //return identityStore.disassociateUser(groupName, groupType, username);
       return false;
    }
@@ -171,35 +183,35 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public boolean createRoleType(String roleType)
    {
-      identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_CREATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_CREATE);
       //return roleIdentityStore.createRoleType(roleType);
       return false;
    }
    
    public boolean deleteRoleType(String roleType)
    {
-      identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_DELETE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_DELETE);
       //return roleIdentityStore.deleteRoleType(roleType);
       return false;
    }
    
    public boolean createGroup(String groupName, String groupType)
    {
-      identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_CREATE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_CREATE);
       //return groupIdentityStore.createGroup(groupName, groupType);
       return false;
    }
    
    public boolean deleteGroup(String groupName, String groupType)
    {
-      identity.checkPermission(GROUP_PERMISSION_NAME, PERMISSION_DELETE);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_DELETE);
       //return groupIdentityStore.deleteGroup(groupName, groupType);
       return false;
    }
       
    public boolean userExists(String name)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_READ);
       //return identityStore.userExists(name);
       return false;
    }
@@ -212,7 +224,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       
    public List<String> findUsers(String filter)
    {
-      identity.checkPermission(USER_PERMISSION_NAME, PERMISSION_READ);
+      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_READ);
       UserQueryBuilder builder = identitySession.createUserQueryBuilder();
       UserQuery userQuery = builder.createQuery();
       
@@ -237,7 +249,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public List<String> listRoleTypes()
    {
-      identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
+     // identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
       //List<String> roles = roleIdentityStore.listRoleTypes();
       
       return null;
@@ -276,7 +288,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    public List<IdentityType> listRoleMembers(String roleType, String groupName, String groupType)
    {
-      identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
+      //identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
       //return roleIdentityStore.listRoleMembers(roleType, groupName, groupType);
       return null;
    }

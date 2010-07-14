@@ -42,6 +42,8 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
             
       if (!identity.isLoggedIn()) return false;
       
+      if (!permissionStore.isEnabled()) return false;
+      
       List<Permission> permissions = permissionStore.listPermissions(target, action);
       
       String username = identity.getPrincipal().getName();
