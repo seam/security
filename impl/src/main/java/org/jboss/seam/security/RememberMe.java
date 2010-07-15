@@ -174,7 +174,7 @@ public class RememberMe implements Serializable
                }
    
                // Set the principal
-               identity.getSubject().getPrincipals().add(new SimplePrincipal(username));
+              // identity.getSubject().getPrincipals().add(new SimplePrincipal(username));
                identityImpl.postAuthenticate();
             
                autoLoggedIn = true;

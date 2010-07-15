@@ -20,7 +20,7 @@ public abstract class RunAsOperation
       
    public RunAsOperation()
    {
-      principal = new SimplePrincipal(null);  
+      //principal = new SimplePrincipal(null);  
       subject = new Subject();
    }
    
@@ -53,7 +53,7 @@ public abstract class RunAsOperation
       {
          if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
          {
-            sg.addMember(new SimplePrincipal(role));
+            //sg.addMember(new SimplePrincipal(role));
             break;
          }
       }

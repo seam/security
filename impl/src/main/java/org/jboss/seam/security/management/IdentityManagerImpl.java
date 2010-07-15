@@ -10,17 +10,24 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.seam.transaction.Transactional;
+import org.jboss.seam.security.GroupImpl;
 import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.security.util.Strings;
 import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.IdentitySearchCriteria;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.api.query.QueryException;
 import org.picketlink.idm.api.query.UserQuery;
 import org.picketlink.idm.api.query.UserQueryBuilder;
+import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 import org.picketlink.idm.impl.api.model.SimpleUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +43,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    private static final long serialVersionUID = 6864253169970552893L;
    
    public static final String RESOURCE_IDENTITY = "seam.identity";
+   public static final String RESOURCE_RELATIONSHIP = "seam.relationship";
    
    public static final String PERMISSION_CREATE = "create";
    public static final String PERMISSION_READ = "read";
@@ -222,7 +230,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return false;
    }
       
-   public List<String> findUsers(String filter)
+   public Collection<User> findUsers(String filter)
    {
       identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_READ);
       UserQueryBuilder builder = identitySession.createUserQueryBuilder();
@@ -230,16 +238,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       
       try
       {
-         Collection<User> users = identitySession.execute(userQuery);
-         
-         List<String> userList = new ArrayList<String>();
-         
-         for (User user : users)
-         {
-            userList.add(user.getId());
-         }
-         
-         return userList;
+         return identitySession.execute(userQuery);         
       }
       catch (QueryException ex)
       {
@@ -268,10 +267,30 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
     * @param name The user for which to return a list of roles
     * @return List containing the names of the granted roles
     */
-   public List<Role> getGrantedRoles(String username)
+   public Collection<Role> getGrantedRoles(String username)
    {
-      //return roleIdentityStore.listGrantedRoles(username);
-      return null;
+      identity.checkPermission(RESOURCE_RELATIONSHIP, PERMISSION_READ);
+      try
+      {
+         Collection<Role> roles = new ArrayList<Role>();
+         
+         Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
+                           
+         for (RoleType roleType : roleTypes)
+         {
+            roles.addAll(identitySession.getRoleManager().findRoles(username, roleType.getName()));
+         }
+         
+         return roles;
+      }
+      catch (IdentityException e)
+      {
+         throw new RuntimeException(e);
+      }
+      catch (FeatureNotSupportedException e)
+      {
+         throw new RuntimeException(e);
+      }
    }
    
    /**
@@ -286,11 +305,24 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       return null;
    }
    
-   public List<IdentityType> listRoleMembers(String roleType, String groupName, String groupType)
+   public Collection<User> listRoleMembers(String roleType, String groupName, String groupType)
    {
-      //identity.checkPermission(ROLE_PERMISSION_NAME, PERMISSION_READ);
-      //return roleIdentityStore.listRoleMembers(roleType, groupName, groupType);
-      return null;
+      identity.checkPermission(RESOURCE_RELATIONSHIP, PERMISSION_READ);
+      Group group = new GroupImpl(groupType, groupName);      
+      IdentitySearchCriteriaImpl criteria = new IdentitySearchCriteriaImpl();
+      
+      try
+      {
+         return identitySession.getRoleManager().findUsersWithRelatedRole(group, criteria);
+      }
+      catch (IdentityException e)
+      {
+         throw new RuntimeException(e);
+      }
+      catch (FeatureNotSupportedException e)
+      {
+         throw new RuntimeException(e);         
+      }
    }
      
    public boolean authenticate(String username, Credential credential)

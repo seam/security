@@ -2,6 +2,7 @@ package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.enterprise.context.Conversation;
@@ -118,7 +119,7 @@ public class UserAction implements Serializable
          }
       }
       
-      List<Role> grantedRoles = identityManager.getGrantedRoles(username);
+      Collection<Role> grantedRoles = identityManager.getGrantedRoles(username);
       
       if (grantedRoles != null)
       {

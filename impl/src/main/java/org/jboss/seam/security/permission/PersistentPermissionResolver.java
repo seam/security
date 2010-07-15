@@ -9,7 +9,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.SimplePrincipal;
 
 /**
  * Resolves dynamically-assigned permissions, mapped to a user or a role, and kept in persistent
@@ -52,7 +51,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       {      
          for (Permission permission : permissions)
          {
-            if (permission.getIdentity() instanceof SimplePrincipal &&
+            if (//permission.getIdentity() instanceof SimplePrincipal &&
                   username.equals(permission.getIdentity().getName()))
             {
                return true;
@@ -97,7 +96,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
          {
             if (permission.getResource().equals(target))
             {
-               if (permission.getIdentity() instanceof SimplePrincipal &&
+               if (//permission.getIdentity() instanceof SimplePrincipal &&
                      username.equals(permission.getIdentity().getName()))
                {
                   iter.remove();

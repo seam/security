@@ -1,10 +1,12 @@
 package org.jboss.seam.security.management;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.User;
 
 /**
  * Identity Management API, allows management of users, groups and roles.
@@ -195,9 +197,9 @@ public interface IdentityManager
     * all users.
     * 
     * @param filter The filter used to perform the search.  
-    * @return A list of users that match the specified filter.
+    * @return A collection of users that match the specified filter.
     */
-   List<String> findUsers(String filter);
+   Collection<User> findUsers(String filter);
    
    /**
     * Returns a list of all the role types.
@@ -214,7 +216,7 @@ public interface IdentityManager
     * @param name The user for which to return a list of roles
     * @return List containing the names of the granted roles
     */
-   List<Role> getGrantedRoles(String name);
+   Collection<Role> getGrantedRoles(String name);
    
    /**
     * Returns a list of roles that are either explicitly or indirectly granted to the specified user.
@@ -230,9 +232,9 @@ public interface IdentityManager
     * @param roleType The role type of the role
     * @param groupName The name of the group the role has been granted in
     * @param groupType The type of the group
-    * @return A List of IdentityType objects having membership of the specified role
+    * @return A Collection of User objects having membership of the specified role
     */
-   List<IdentityType> listRoleMembers(String roleType, String groupName, String groupType);
+   Collection<User> listRoleMembers(String roleType, String groupName, String groupType);
       
    /**
     * Performs an authentication check using the specified username and credential.

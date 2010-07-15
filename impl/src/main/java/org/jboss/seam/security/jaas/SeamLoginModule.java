@@ -12,7 +12,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.jboss.seam.security.SimplePrincipal;
 import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
@@ -46,7 +45,7 @@ public class SeamLoginModule implements LoginModule
 
    public boolean commit() throws LoginException
    {        
-      subject.getPrincipals().add(new SimplePrincipal(username));
+      //subject.getPrincipals().add(new SimplePrincipal(username));
       return true;
    }
 

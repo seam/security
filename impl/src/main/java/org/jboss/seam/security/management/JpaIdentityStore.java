@@ -1103,7 +1103,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return em.createQuery(criteria).getSingleResult();
    }
    
-   protected Object lookupCredentialType(String name, EntityManager em)
+   protected Object lookupCredentialTypeEntity(String name, EntityManager em)
    {
       Property<?> credentialTypeNameProp = modelProperties.get(PROPERTY_CREDENTIAL_TYPE_NAME);
       
@@ -1238,7 +1238,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          objs.add(new IdentityObjectImpl(name, name, type));
       }
       
-      // TODO Auto-generated method stub
       return objs;
    }
 
@@ -1248,6 +1247,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObjectSearchCriteria criteria) throws IdentityException
    {
       List<IdentityObject> objs = new ArrayList<IdentityObject>();
+      
+      System.out.println("*** Invoked unimplemented method findIdentityObject()");
       
       // TODO Auto-generated method stub
       return objs;
@@ -1262,6 +1263,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityStoreInvocationContext invocationCtx,
          IdentityObjectType identityType) throws IdentityException
    {
+      System.out.println("*** Invoked unimplemented method getIdentityObjectsCount()");
       // TODO Auto-generated method stub
       return 0;
    }
@@ -1270,6 +1272,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityStoreInvocationContext ctx, String name)
          throws IdentityException, OperationNotSupportedException
    {
+      System.out.println("*** Invoked unimplemented method getRelationshipNameProperties()");
       // TODO Auto-generated method stub
       return null;
    }
@@ -1278,6 +1281,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObjectSearchCriteria criteria) throws IdentityException,
          OperationNotSupportedException
    {
+      System.out.println("*** Invoked unimplemented method getRelationshipNames()");
       // TODO Auto-generated method stub
       return null;
    }
@@ -1286,6 +1290,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObject identity, IdentityObjectSearchCriteria criteria)
          throws IdentityException, OperationNotSupportedException
    {
+      System.out.println("*** Invoked unimplemented method getRelationshipNames()");
       // TODO Auto-generated method stub
       return null;
    }
@@ -1295,12 +1300,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObjectRelationship relationship) throws IdentityException,
          OperationNotSupportedException
    {
+      System.out.println("*** Invoked unimplemented method getRelationshipProperties()");
       // TODO Auto-generated method stub
       return null;
    }
 
    public FeaturesMetaData getSupportedFeatures()
    {
+      System.out.println("*** Invoked unimplemented method getSupportedFeatures()");
       // TODO Auto-generated method stub
       return null;
    }
@@ -1363,6 +1370,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public String removeRelationshipName(IdentityStoreInvocationContext ctx,
          String name) throws IdentityException, OperationNotSupportedException
    {
+      System.out.println("*** Invoked unimplemented method removeRelationshipName()");
       // TODO Auto-generated method stub
       return null;
    }
@@ -1372,7 +1380,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException, OperationNotSupportedException
    {
       // TODO Auto-generated method stub
-      
+      System.out.println("*** Invoked unimplemented method removeRelationshipNameProperties()");
    }
 
    public void removeRelationshipProperties(IdentityStoreInvocationContext ctx,
@@ -1380,7 +1388,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException, OperationNotSupportedException
    {
       // TODO Auto-generated method stub
-      
+      System.out.println("*** Invoked unimplemented method removeRelationshipProperties()");
    }
 
    public void removeRelationships(
@@ -1389,7 +1397,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException
    {
       // TODO Auto-generated method stub
-      
+      System.out.println("*** Invoked unimplemented method removeRelationships()");
    }
 
    public Set<IdentityObjectRelationship> resolveRelationships(
@@ -1458,6 +1466,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          boolean named, String name) throws IdentityException
    {
       // TODO Auto-generated method stub
+      System.out.println("*** Invoked unimplemented method resolveRelationships()");
       return null;
    }
 
@@ -1467,6 +1476,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          OperationNotSupportedException
    {
       // TODO Auto-generated method stub
+      System.out.println("*** Invoked unimplemented method setRelationshipNameProperties()");
       
    }
 
@@ -1475,7 +1485,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException, OperationNotSupportedException
    {
       // TODO Auto-generated method stub
-      
+      System.out.println("*** Invoked unimplemented method setRelationshipProperties()");
    }
 
    public void updateCredential(IdentityStoreInvocationContext ctx,
@@ -1483,7 +1493,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          throws IdentityException
    {
       // TODO Auto-generated method stub
-      
+      System.out.println("*** Invoked unimplemented method updateCredential()");
    }
 
    public boolean validateCredential(IdentityStoreInvocationContext ctx,
@@ -1518,7 +1528,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             else
             {
                predicates.add(builder.equal(root.get(credentialType.getName()),
-                     lookupCredentialType(credential.getType().getName(), em)));
+                     lookupCredentialTypeEntity(credential.getType().getName(), em)));
             }
          }
          

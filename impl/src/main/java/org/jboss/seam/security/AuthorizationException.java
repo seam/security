@@ -1,7 +1,7 @@
 package org.jboss.seam.security;
 
 /**
- * Thrown when an authenticated user has insufficient rights to carry out an action.
+ * Thrown when an authenticated user has insufficient rights to perform an operation.
  * 
  * @author Shane Bryzak
  */
