@@ -1,7 +1,5 @@
 package org.jboss.seam.security.events;
 
-import javax.security.auth.login.LoginException;
-
 /**
  * This event is fired when an authentication attempt fails
  *  
@@ -9,14 +7,14 @@ import javax.security.auth.login.LoginException;
  */
 public class LoginFailedEvent
 {
-   private LoginException loginException;
+   private Exception loginException;
    
-   public LoginFailedEvent(LoginException loginException)
+   public LoginFailedEvent(Exception loginException)
    {
       this.loginException = loginException;
    }
    
-   public LoginException getLoginException()
+   public Exception getLoginException()
    {
       return loginException;
    }

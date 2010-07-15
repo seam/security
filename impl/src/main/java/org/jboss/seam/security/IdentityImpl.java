@@ -1,9 +1,6 @@
 package org.jboss.seam.security;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,19 +14,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.Configuration;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 
-import org.jboss.seam.security.callbacks.AuthenticatorCallback;
-import org.jboss.seam.security.callbacks.IdentityCallback;
-import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
@@ -43,7 +28,6 @@ import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
 import org.picketlink.idm.api.User;
-import org.picketlink.idm.impl.api.PasswordCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +39,10 @@ import org.slf4j.LoggerFactory;
 public @Named("identity") @SessionScoped class IdentityImpl implements Identity, Serializable
 {
    private static final long serialVersionUID = 3751659008033189259L;
+   
+   private static final String RESPONSE_LOGIN_SUCCESS = "success";
+   private static final String RESPONSE_LOGIN_FAILED = "failed";
+   private static final String RESPONSE_LOGIN_EXCEPTION = "exception";
    
    protected static boolean securityEnabled = true;
    
@@ -71,9 +59,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    @Inject Instance<RequestSecurityState> requestSecurityState;
    
    private User user;
-   private Subject subject;
-
-   private String jaasConfigName = null;
 
    /**
     * Contains a group name to group type:role list mapping of roles assigned 
@@ -206,41 +191,39 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             if (requestSecurityState.get().isSilentLogin())
             {
                manager.fireEvent(new LoggedInEvent(user));
-               return "loggedIn";
+               return RESPONSE_LOGIN_SUCCESS;
             }
             
             manager.fireEvent(new AlreadyLoggedInEvent());
-            return "loggedIn";
+            return RESPONSE_LOGIN_SUCCESS;
          }
          
-         authenticate();
-         
-         if (!isLoggedIn())
+         boolean success = authenticate();
+                  
+         if (success)
          {
-            throw new LoginException();
+            if (log.isDebugEnabled())
+            {
+               log.debug("Login successful for: " + credentials);
+            }
+            manager.fireEvent(new LoggedInEvent(user));
+            return RESPONSE_LOGIN_SUCCESS;
          }
          
-         if ( log.isDebugEnabled() )
-         {
-            log.debug("Login successful for: " + credentials);
-         }
-
-         manager.fireEvent(new LoggedInEvent(user));
-         return "loggedIn";
+         credentials.invalidate();         
+         return RESPONSE_LOGIN_FAILED;
       }
-      catch (LoginException ex)
+      catch (Exception ex)
       {
-         credentials.invalidate();
-         
          if ( log.isDebugEnabled() )
          {
              log.debug("Login failed for: " + credentials, ex);
          }
          
          manager.fireEvent(new LoginFailedEvent(ex));
+         
+         return RESPONSE_LOGIN_EXCEPTION;
       }
-      
-      return null;
    }
    
    public void quietLogin()
@@ -263,38 +246,74 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             }
          }
       }
-      catch (LoginException ex)
+      catch (Exception ex)
       {
          credentials.invalidate();
       }
    }
-
-   /**
-    * 
-    * @throws LoginException
-    */
-   public synchronized void authenticate()
-      throws LoginException
-   {
-      // If we're already authenticated, then don't authenticate again
-      if (!isLoggedIn() && !credentials.isInvalid())
-      {
-         user = null;
-         subject = new Subject();
-         authenticate( getLoginContext() );
-      }
-   }
-
     
-   protected void authenticate(LoginContext loginContext)
-      throws LoginException
+   protected boolean authenticate()
    {
       try
       {
          authenticating = true;
+         
+         user = null;
+         
          preAuthenticate();
-         loginContext.login();
-         postAuthenticate();
+         
+         Authenticator authenticator;
+         
+         Set<Bean<?>> authenticators = manager.getBeans(Authenticator.class);
+         if (authenticators.size() == 1)
+         {
+            @SuppressWarnings("unchecked")
+            Bean<Authenticator> authenticatorBean = (Bean<Authenticator>) authenticators.iterator().next();
+            authenticator = (Authenticator) manager.getReference(authenticatorBean, Authenticator.class, manager.createCreationalContext(authenticatorBean));
+         }
+         else if (authenticators.size() > 1)
+         {
+            throw new IllegalStateException("More than one Authenticator bean found - please ensure " +
+                  "only one Authenticator implementation is provided");
+         }
+         else
+         {
+            authenticator = null;
+         }         
+         
+         boolean success = false;
+         
+         if (authenticator != null)
+         {
+            success = authenticator.authenticate();
+         }
+         else
+         {
+            // Otherwise if identity management is enabled, use it.
+            if (identityManager != null)
+            {            
+               success = identityManager.authenticate(credentials.getUsername(),
+                     credentials.getCredential());
+               
+               if (success)
+               {
+                  // TODO implement role population
+                  //for (Role role : identityManager.getImpliedRoles(username))
+                  //{
+                    // idCallback.getIdentity().addRole(role.getRoleType().getName(), 
+                      //     role.getGroup().getName(), role.getGroup().getGroupType());
+                  //}
+               }
+            }
+         }
+         
+         if (success)
+         {
+            user = new UserImpl(credentials.getUsername());
+            postAuthenticate();
+         }
+         
+         return success;
       }
       finally
       {
@@ -321,20 +340,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     * different post-authentication logic should occur.
     */
    protected void postAuthenticate()
-   {
-      // Populate the working memory with the user's principals
-      for ( Principal p : subject.getPrincipals() )
-      {
-         if ( !(p instanceof Group))
-         {
-            if (user == null)
-            {
-               user = new UserImpl(p.getName());
-               break;
-            }
-         }
-      }
-      
+   {  
       if (isLoggedIn())
       {
          if (!preAuthenticationRoles.isEmpty())
@@ -362,8 +368,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             preAuthenticationGroups.clear();
          }         
       }
-
-      credentials.setCredential(null);
       
       manager.fireEvent(new PostAuthenticateEvent());
    }
@@ -373,93 +377,8 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     */
    public void unAuthenticate()
    {
-      user = null;
-      
+      user = null;      
       credentials.clear();
-   }
-
-   protected LoginContext getLoginContext() throws LoginException
-   {      
-      if (getJaasConfigName() != null)
-      {
-         return new LoginContext(getJaasConfigName(), subject,
-                  createCallbackHandler());
-      }
-      
-      @SuppressWarnings("unchecked")
-      Bean<Configuration> configBean = (Bean<Configuration>) manager.getBeans(Configuration.class).iterator().next();
-      Configuration config = (Configuration) manager.getReference(configBean, Configuration.class, manager.createCreationalContext(configBean));
-      
-      return new LoginContext(JaasConfiguration.DEFAULT_JAAS_CONFIG_NAME, subject,
-            createCallbackHandler(), config);
-   }
-   
-   
-   /**
-    * Creates a callback handler that can handle a standard username/password
-    * callback, using the credentials username and password properties
-    */
-   public CallbackHandler createCallbackHandler()
-   {
-      final Identity identity = this;
-      final Authenticator authenticator;
-      
-      Set<Bean<?>> authenticators = manager.getBeans(Authenticator.class);
-      if (authenticators.size() == 1)
-      {
-         @SuppressWarnings("unchecked")
-         Bean<Authenticator> authenticatorBean = (Bean<Authenticator>) authenticators.iterator().next();
-         authenticator = (Authenticator) manager.getReference(authenticatorBean, Authenticator.class, manager.createCreationalContext(authenticatorBean));
-      }
-      else if (authenticators.size() > 1)
-      {
-         throw new IllegalStateException("More than one Authenticator bean found - please ensure " +
-               "only one Authenticator implementation is provided");
-      }
-      else
-      {
-         authenticator = null;
-      }
-      
-      return new CallbackHandler()
-      {
-         public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException
-         {
-            for (int i=0; i < callbacks.length; i++)
-            {
-               if (callbacks[i] instanceof NameCallback)
-               {
-                  ( (NameCallback) callbacks[i] ).setName(credentials.getUsername());
-               }
-               else if (callbacks[i] instanceof PasswordCallback)
-               {
-                  if (credentials.getCredential() instanceof PasswordCredential)
-                  {
-                     PasswordCredential credential = (PasswordCredential) credentials.getCredential();
-                     ( (PasswordCallback) callbacks[i] ).setPassword( credential.getValue() != null ?
-                           credential.getValue().toCharArray() : null );                     
-                  }
-               }
-               else if (callbacks[i] instanceof IdentityCallback)
-               {
-                  ((IdentityCallback ) callbacks[i]).setIdentity(identity);
-               }
-               else if (callbacks[i] instanceof AuthenticatorCallback)
-               {
-                  ((AuthenticatorCallback) callbacks[i]).setAuthenticator(authenticator);
-               }
-               else if (callbacks[i] instanceof IdentityManagerCallback)
-               {
-                  ((IdentityManagerCallback) callbacks[i]).setIdentityManager(identityManager);
-               }
-               else
-               {
-                  log.warn("Unsupported callback " + callbacks[i]);
-               }
-            }
-         }
-      };
    }
    
    public void logout()
@@ -628,16 +547,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       if (target == null) return false;
       
       return permissionMapper.resolvePermission(target, action);
-   }
-     
-   public String getJaasConfigName()
-   {
-      return jaasConfigName;
-   }
-   
-   public void setJaasConfigName(String jaasConfigName)
-   {
-      this.jaasConfigName = jaasConfigName;
    }
    
    public synchronized void runAs(RunAsOperation operation)
