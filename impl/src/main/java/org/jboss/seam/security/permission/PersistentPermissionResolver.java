@@ -45,7 +45,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       
       List<Permission> permissions = permissionStore.listPermissions(target, action);
       
-      String username = identity.getPrincipal().getName();
+      String username = identity.getUser().getId();
       
       if (permissions != null)
       {      
@@ -85,7 +85,7 @@ public class PersistentPermissionResolver implements PermissionResolver, Seriali
       
       List<Permission> permissions = permissionStore.listPermissions(targets, action);
       
-      String username = identity.getPrincipal().getName();
+      String username = identity.getUser().getId();
       
       Iterator<?> iter = targets.iterator();
       while (iter.hasNext())

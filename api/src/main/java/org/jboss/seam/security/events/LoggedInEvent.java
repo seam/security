@@ -1,6 +1,6 @@
 package org.jboss.seam.security.events;
 
-import java.security.Principal;
+import org.picketlink.idm.api.User;
 
 /**
  * This event is raised when user successfully logs in.
@@ -9,15 +9,15 @@ import java.security.Principal;
  */
 public class LoggedInEvent
 {
-   private Principal principal;
+   private User user;
    
-   public LoggedInEvent(Principal principal)
+   public LoggedInEvent(User user)
    {
-      this.principal = principal;
+      this.user = user;
    }
    
-   public Principal getPrincipal()
+   public User getUser()
    {
-      return principal;
+      return user;
    }
 }

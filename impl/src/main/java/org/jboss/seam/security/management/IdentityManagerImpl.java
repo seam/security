@@ -9,16 +9,14 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
-import org.jboss.seam.transaction.Transactional;
 import org.jboss.seam.security.GroupImpl;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.security.util.Strings;
+import org.jboss.seam.transaction.Transactional;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
-import org.picketlink.idm.api.IdentitySearchCriteria;
 import org.picketlink.idm.api.IdentitySession;
-import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;

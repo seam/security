@@ -1,7 +1,6 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.Conversation;
@@ -75,7 +74,7 @@ public class RoleAction implements Serializable
    
    private String saveExistingRole()
    {
-      // TODO rewrite
+      // FIXME rewrite
       /*List<String> grantedRoles = identityManager.getRoleGroups(role);
       
       if (grantedRoles != null)

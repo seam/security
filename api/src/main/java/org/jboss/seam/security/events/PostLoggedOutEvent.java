@@ -1,6 +1,6 @@
 package org.jboss.seam.security.events;
 
-import java.security.Principal;
+import org.picketlink.idm.api.User;
 
 /**
  * This event is raised just after the user unauthenticates
@@ -9,15 +9,15 @@ import java.security.Principal;
  */
 public class PostLoggedOutEvent
 {
-   private Principal principal;
+   private User user;
    
-   public PostLoggedOutEvent(Principal principal)
+   public PostLoggedOutEvent(User user)
    {
-      this.principal = principal;
+      this.user = user;
    }
    
-   public Principal getPrincipal()
+   public User getUser()
    {
-      return principal;
+      return user;
    }
 }

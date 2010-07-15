@@ -41,6 +41,7 @@ public class SecurityInterceptor implements Serializable
    
    private class Restriction
    {
+      @SuppressWarnings("unused")
       private String expression;
       
       private String permissionTarget;

@@ -42,8 +42,8 @@ import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
 import org.picketlink.idm.spi.store.FeaturesMetaData;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+/*import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;*/
 
 /**
  * IdentityStore implementation that allows identity related data to be 
@@ -55,7 +55,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 {
    private static final long serialVersionUID = 7729139146633529501L;
    
-   private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);   
+   //private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);   
    
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
@@ -1208,7 +1208,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       CriteriaBuilder builder = em.getCriteriaBuilder();
       CriteriaQuery<?> criteria = builder.createQuery(identityClass);
       
-      Root<?> root = criteria.from(identityClass);
+      criteria.from(identityClass);
 
       Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
       

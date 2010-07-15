@@ -10,8 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.jboss.seam.security.annotations.TokenUsername;
-import org.jboss.seam.security.annotations.TokenValue;
+//import org.jboss.seam.security.annotations.TokenUsername;
+//import org.jboss.seam.security.annotations.TokenValue;
 import org.jboss.weld.extensions.util.properties.Property;
 
 /**

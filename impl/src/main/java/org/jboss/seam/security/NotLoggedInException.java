@@ -1,11 +1,11 @@
 package org.jboss.seam.security;
 
-//import javax.ejb.ApplicationException;
-
 /**
  * Thrown when an unauthenticated user attempts to execute a restricted action. 
  * 
  * @author Shane Bryzak
  */
-//@ApplicationException(rollback=true)
-public class NotLoggedInException extends SecurityException {}
+public class NotLoggedInException extends SecurityException 
+{
+   private static final long serialVersionUID = -2708471484839030465L;
+}

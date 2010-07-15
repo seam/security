@@ -1,5 +1,5 @@
 package org.jboss.seam.security;
-
+/*
 import static org.jboss.seam.security.EntityAction.DELETE;
 import static org.jboss.seam.security.EntityAction.INSERT;
 import static org.jboss.seam.security.EntityAction.READ;
@@ -9,7 +9,7 @@ import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
-
+*/
 
 /**
  * Facilitates security checks for entity beans.

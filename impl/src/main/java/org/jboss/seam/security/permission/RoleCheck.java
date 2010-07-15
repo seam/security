@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public class RoleCheck implements Serializable
 {
+   private static final long serialVersionUID = -9129682144406056768L;
+   
    private String name;
    private boolean granted;
    

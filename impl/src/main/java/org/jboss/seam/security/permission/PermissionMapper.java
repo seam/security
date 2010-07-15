@@ -10,12 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.inject.Inject;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 
 /**
  * Maps permission checks to resolver chains
@@ -27,12 +25,13 @@ public class PermissionMapper implements Serializable
 {
    private static final long serialVersionUID = 7692687882996064772L;
   
-   private Map<Class<?>,Map<String,String>> resolverChains = new HashMap<Class<?>,Map<String,String>>();
+   //private Map<Class<?>,Map<String,String>> resolverChains = new HashMap<Class<?>,Map<String,String>>();
    
    private List<PermissionResolver> defaultResolverChain;
    
    @Inject BeanManager manager;
    
+   @SuppressWarnings("unchecked")
    @Inject
    public void init()
    {

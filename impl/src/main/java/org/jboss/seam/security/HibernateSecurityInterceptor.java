@@ -1,5 +1,7 @@
 package org.jboss.seam.security;
 
+import org.hibernate.EmptyInterceptor;
+/*
 import static org.jboss.seam.security.EntityAction.DELETE;
 import static org.jboss.seam.security.EntityAction.INSERT;
 import static org.jboss.seam.security.EntityAction.READ;
@@ -7,9 +9,8 @@ import static org.jboss.seam.security.EntityAction.UPDATE;
 
 import java.io.Serializable;
 
-import org.hibernate.EmptyInterceptor;
 import org.hibernate.Interceptor;
-import org.hibernate.type.Type;
+import org.hibernate.type.Type;*/
 //import org.jboss.seam.Entity.NotEntityException;
 
 /**
@@ -20,6 +21,8 @@ import org.hibernate.type.Type;
  */
 public class HibernateSecurityInterceptor extends EmptyInterceptor
 {
+   private static final long serialVersionUID = 4418010755107869488L;
+   
    /*
    private Interceptor wrappedInterceptor;
    

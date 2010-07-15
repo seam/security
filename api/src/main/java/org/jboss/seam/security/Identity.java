@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import javax.security.auth.Subject;
 
+import org.picketlink.idm.api.User;
+
 /**
  * API for authorization and authentication via Seam security.
  * 
@@ -29,19 +31,12 @@ public interface Identity
    boolean tryLogin();
 
    /**
-    * Return the currently authenticated Principal
+    * Returns the currently authenticated user
     * 
     * @return
     */
-   Principal getPrincipal();
+   User getUser();
    
-   /**
-    * Return the Subject for the current session.
-    * 
-    * @return
-    */
-   Subject getSubject();
-      
    /**
     * Performs an authorization check, based on the specified security expression string.
     * 

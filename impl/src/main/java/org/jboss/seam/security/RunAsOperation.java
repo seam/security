@@ -5,6 +5,8 @@ import java.security.acl.Group;
 
 import javax.security.auth.Subject;
 
+import org.picketlink.idm.api.User;
+
 /**
  * Defines a security operation that can be executed within a particular 
  * security context.
@@ -13,15 +15,12 @@ import javax.security.auth.Subject;
  */
 public abstract class RunAsOperation
 {
-   private Principal principal;
-   private Subject subject;
+   private User user;
    
    private boolean systemOp = false;
       
    public RunAsOperation()
    {
-      //principal = new SimplePrincipal(null);  
-      subject = new Subject();
    }
    
    /**
@@ -37,26 +36,23 @@ public abstract class RunAsOperation
    
    public abstract void execute();
    
-   public Principal getPrincipal()
+   public User getUser()
    {
-      return principal;
-   }
-   
-   public Subject getSubject()
-   {
-      return subject;
+      return user;
    }
    
    public RunAsOperation addRole(String role)
    {
-      for ( Group sg : getSubject().getPrincipals(Group.class) )      
+      // FIXME this all has to change
+      
+      /*for ( Group sg : getSubject().getPrincipals(Group.class) )      
       {
          if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
          {
             //sg.addMember(new SimplePrincipal(role));
             break;
          }
-      }
+      }*/
         
       // TODO fix this
       //SimpleGroup roleGroup = new SimpleGroup(IdentityImpl.ROLES_GROUP);

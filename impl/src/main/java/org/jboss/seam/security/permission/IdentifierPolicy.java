@@ -20,7 +20,7 @@ import org.jboss.seam.security.annotations.permission.Identifier;
 @ApplicationScoped
 public class IdentifierPolicy
 {
-   private Map<Class,IdentifierStrategy> strategies = new ConcurrentHashMap<Class,IdentifierStrategy>();
+   private Map<Class<?>,IdentifierStrategy> strategies = new ConcurrentHashMap<Class<?>,IdentifierStrategy>();
    
    private Set<IdentifierStrategy> registeredStrategies = new HashSet<IdentifierStrategy>();
    

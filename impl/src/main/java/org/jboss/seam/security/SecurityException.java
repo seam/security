@@ -9,6 +9,8 @@ package org.jboss.seam.security;
  */
 public abstract class SecurityException extends RuntimeException
 {
+   private static final long serialVersionUID = 789326682407249952L;
+
    public SecurityException()
    {
       super();

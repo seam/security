@@ -13,4 +13,4 @@ insert into IdentityObjectCredential (id, identity_object_id, credential_type_id
 insert into IdentityObjectRelationshipType (id, name) values (1, 'MEMBER_OF');
 insert into IdentityObjectRelationshipType (id, name) values (2, 'ROLE');
 
-insert into IdentityObjectRelationship (id, name, relationship_type_id, identity_from_id, identity_to_id) values (1, 'admin', 2, 1, 3);
+insert into IdentityObjectRelationship (id, name, relationship_type_id, from_identity_id, to_identity_id) values (1, 'admin', 2, 1, 3);

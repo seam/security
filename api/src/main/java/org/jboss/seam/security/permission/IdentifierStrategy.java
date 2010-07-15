@@ -7,6 +7,6 @@ package org.jboss.seam.security.permission;
  */
 public interface IdentifierStrategy
 {
-   boolean canIdentify(Class targetClass);
+   boolean canIdentify(Class<?> targetClass);
    String getIdentifier(Object target);
 }

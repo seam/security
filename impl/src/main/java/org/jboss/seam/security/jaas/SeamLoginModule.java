@@ -16,7 +16,6 @@ import org.jboss.seam.security.callbacks.AuthenticatorCallback;
 import org.jboss.seam.security.callbacks.IdentityCallback;
 import org.jboss.seam.security.callbacks.IdentityManagerCallback;
 import org.jboss.seam.security.management.IdentityManager;
-import org.picketlink.idm.api.Role;
 import org.picketlink.idm.impl.api.PasswordCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

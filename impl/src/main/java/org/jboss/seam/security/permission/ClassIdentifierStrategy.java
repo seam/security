@@ -15,24 +15,24 @@ import org.jboss.seam.security.annotations.permission.Identifier;
 @Dependent
 public class ClassIdentifierStrategy implements IdentifierStrategy
 {
-   private Map<Class,String> identifierNames = new ConcurrentHashMap<Class,String>();
+   private Map<Class<?>,String> identifierNames = new ConcurrentHashMap<Class<?>,String>();
    
-   public boolean canIdentify(Class targetClass)
+   public boolean canIdentify(Class<?> targetClass)
    {
       return Class.class.equals(targetClass);
    }
 
    public String getIdentifier(Object target)
    {
-      if (!(target instanceof Class))
+      if (!(target instanceof Class<?>))
       {
          throw new IllegalArgumentException("Target [" + target + "] must be instance of Class");
       }
       
-      return getIdentifierName((Class) target);
+      return getIdentifierName((Class<?>) target);
    }
    
-   private String getIdentifierName(Class cls)
+   private String getIdentifierName(Class<?> cls)
    {
       if (!identifierNames.containsKey(cls))
       {

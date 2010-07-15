@@ -19,7 +19,7 @@ import org.jboss.seam.security.util.Strings;
  */
 public class EntityIdentifierStrategy implements IdentifierStrategy
 {
-   private Map<Class,String> identifierNames = new ConcurrentHashMap<Class,String>();
+   private Map<Class<?>,String> identifierNames = new ConcurrentHashMap<Class<?>,String>();
    
    //@Inject PersistenceProvider persistenceProvider;
    //@Inject Expressions expressions;
@@ -27,22 +27,20 @@ public class EntityIdentifierStrategy implements IdentifierStrategy
    @Inject BeanManager manager;
    @Inject Instance<EntityManager> entityManagerInstance;
 
-   public boolean canIdentify(Class targetClass)
+   public boolean canIdentify(Class<?> targetClass)
    {
       return targetClass.isAnnotationPresent(Entity.class);
    }
 
    public String getIdentifier(Object target)
-   {
-      /**
-        return String.format("%s:%s", getIdentifierName(target.getClass()),
-       
-        persistenceProvider.getId(target, lookupEntityManager()).toString());
-        */
-      return null;
+   {      
+      return String.format("%s:%s", getIdentifierName(target.getClass()),
+            // FIXME
+            null);
+        //persistenceProvider.getId(target, lookupEntityManager()).toString());        
    }
    
-   private String getIdentifierName(Class cls)
+   private String getIdentifierName(Class<?> cls)
    {
       if (!identifierNames.containsKey(cls))
       {
@@ -67,12 +65,5 @@ public class EntityIdentifierStrategy implements IdentifierStrategy
       }
       
       return identifierNames.get(cls);
-   }
-
-   private EntityManager lookupEntityManager()
-   {
-      //return entityManager.getValue();
-      //return BeanManagerHelper.getInstanceByType(manager, EntityManager.class);
-      return entityManagerInstance.get();
    }
 }

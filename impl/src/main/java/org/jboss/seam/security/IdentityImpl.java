@@ -42,6 +42,7 @@ import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
+import org.picketlink.idm.api.User;
 import org.picketlink.idm.impl.api.PasswordCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +70,9 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    @Inject Instance<RequestSecurityState> requestSecurityState;
    
-   private Principal principal;
+   private User user;
    private Subject subject;
+
    private String jaasConfigName = null;
 
    /**
@@ -103,12 +105,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     * Flag that indicates we are in the process of authenticating
     */
    private boolean authenticating = false;
-         
-   @Inject
-   public void create()
-   {
-      subject = new Subject();
-   }
    
    public static boolean isSecurityEnabled()
    {
@@ -122,13 +118,13 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    public boolean isLoggedIn()
    {
-      // If there is a principal set, then the user is logged in.
-      return getPrincipal() != null;
+      // If there is a user set, then the user is logged in.
+      return user != null;
    }
    
    public boolean tryLogin()
    {      
-      if (!authenticating && getPrincipal() == null && credentials.isSet() && 
+      if (!authenticating && getUser() == null && credentials.isSet() && 
             !requestSecurityState.get().isLoginTried())
       {
          requestSecurityState.get().setLoginTried(true);
@@ -136,16 +132,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
       
       return isLoggedIn();
-   }
-
-   public Principal getPrincipal()
-   {
-      return principal;
-   }
-   
-   public Subject getSubject()
-   {
-      return subject;
    }
    
    /**
@@ -219,7 +205,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             // and then return.
             if (requestSecurityState.get().isSilentLogin())
             {
-               manager.fireEvent(new LoggedInEvent(principal));
+               manager.fireEvent(new LoggedInEvent(user));
                return "loggedIn";
             }
             
@@ -239,7 +225,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             log.debug("Login successful for: " + credentials);
          }
 
-         manager.fireEvent(new LoggedInEvent(principal));
+         manager.fireEvent(new LoggedInEvent(user));
          return "loggedIn";
       }
       catch (LoginException ex)
@@ -293,7 +279,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       // If we're already authenticated, then don't authenticate again
       if (!isLoggedIn() && !credentials.isInvalid())
       {
-         principal = null;
+         user = null;
          subject = new Subject();
          authenticate( getLoginContext() );
       }
@@ -330,20 +316,20 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    }
    
    /**
-    * Extracts the principal from the subject, and populates the roles of the
-    * authenticated user.  This method may be overridden by a subclass if
+    * Extracts the principal from the subject, and uses it to create the User object.  
+    * This method may be overridden by a subclass if
     * different post-authentication logic should occur.
     */
    protected void postAuthenticate()
    {
       // Populate the working memory with the user's principals
-      for ( Principal p : getSubject().getPrincipals() )
+      for ( Principal p : subject.getPrincipals() )
       {
          if ( !(p instanceof Group))
          {
-            if (principal == null)
+            if (user == null)
             {
-               principal = p;
+               user = new UserImpl(p.getName());
                break;
             }
          }
@@ -387,17 +373,16 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     */
    public void unAuthenticate()
    {
-      principal = null;
-      subject = new Subject();
+      user = null;
       
       credentials.clear();
    }
 
    protected LoginContext getLoginContext() throws LoginException
-   {
+   {      
       if (getJaasConfigName() != null)
       {
-         return new LoginContext(getJaasConfigName(), getSubject(),
+         return new LoginContext(getJaasConfigName(), subject,
                   createCallbackHandler());
       }
       
@@ -405,7 +390,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       Bean<Configuration> configBean = (Bean<Configuration>) manager.getBeans(Configuration.class).iterator().next();
       Configuration config = (Configuration) manager.getReference(configBean, Configuration.class, manager.createCreationalContext(configBean));
       
-      return new LoginContext(JaasConfiguration.DEFAULT_JAAS_CONFIG_NAME, getSubject(),
+      return new LoginContext(JaasConfiguration.DEFAULT_JAAS_CONFIG_NAME, subject,
             createCallbackHandler(), config);
    }
    
@@ -481,7 +466,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       if (isLoggedIn())
       {
-         PostLoggedOutEvent loggedOutEvent = new PostLoggedOutEvent(principal);
+         PostLoggedOutEvent loggedOutEvent = new PostLoggedOutEvent(user);
          
          manager.fireEvent(new PreLoggedOutEvent());
          unAuthenticate();
@@ -657,18 +642,18 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    public synchronized void runAs(RunAsOperation operation)
    {
-      Principal savedPrincipal = getPrincipal();
-      Subject savedSubject = getSubject();
+      User savedUser = getUser();
+      
+      if (systemOp == null)
+      {
+         systemOp = new ThreadLocal<Boolean>();
+      }
+      
+      boolean savedSystemOp = systemOp.get();
       
       try
       {
-         principal = operation.getPrincipal();
-         subject = operation.getSubject();
-         
-         if (systemOp == null)
-         {
-            systemOp = new ThreadLocal<Boolean>();
-         }
+         user = operation.getUser();         
          
          systemOp.set(operation.isSystemOperation());
          
@@ -676,9 +661,8 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
       finally
       {
-         systemOp.set(false);
-         principal = savedPrincipal;
-         subject = savedSubject;
+         systemOp.set(savedSystemOp);
+         user = savedUser;
       }
    }
 
@@ -686,5 +670,10 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       // TODO Auto-generated method stub
       
+   }
+
+   public User getUser()
+   {
+      return user;
    }
 }

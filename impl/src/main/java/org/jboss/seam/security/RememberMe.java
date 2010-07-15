@@ -325,6 +325,7 @@ public class RememberMe implements Serializable
       boolean value;
    }
    
+   /*
    private class DecodedToken
    {
       private String username;
@@ -356,5 +357,5 @@ public class RememberMe implements Serializable
       {
          return value;
       }
-   }
+   }*/
 }

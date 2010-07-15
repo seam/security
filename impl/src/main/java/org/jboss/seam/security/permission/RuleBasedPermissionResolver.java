@@ -1,7 +1,6 @@
 package org.jboss.seam.security.permission;
 
 import java.io.Serializable;
-import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -15,9 +14,8 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.event.Observes;
 
 import org.drools.KnowledgeBase;
-import org.drools.RuleBase;
-import org.drools.StatefulSession;
-import org.drools.ClassObjectFilter;
+/*import org.drools.StatefulSession;
+import org.drools.ClassObjectFilter;*/
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 //import org.jboss.seam.drools.SeamGlobalResolver;
@@ -25,8 +23,8 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.IdentityImpl;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+/*import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;*/
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
@@ -38,7 +36,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
 {
    private static final long serialVersionUID = -7572627522601793024L;
 
-   private Logger log = LoggerFactory.getLogger(RuleBasedPermissionResolver.class);
+   //private Logger log = LoggerFactory.getLogger(RuleBasedPermissionResolver.class);
    
    private StatefulKnowledgeSession securityContext;
    
@@ -148,6 +146,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
             
             // Check if there are any additional requirements
             securityContext.fireAllRules();
+            /*
             if (check.hasRequirements())
             {
                for (String requirement : check.getRequirements())
@@ -159,7 +158,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                      handles.add (securityContext.insert(value));
                   }
                }
-            }
+            }*/
             
             synchronizeContext();
 
@@ -197,18 +196,18 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    {
       if (getSecurityContext() != null)
       {
-         getSecurityContext().insert(identity.getPrincipal());
+         getSecurityContext().insert(identity.getUser());
          
-         for ( Group sg : identity.getSubject().getPrincipals(Group.class) )
+/*         for ( Group sg : identity.getSubject().getPrincipals(Group.class) )
          {
             if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
             {
                Enumeration<?> e = sg.members();
                while (e.hasMoreElements())
-               {
-                  Principal role = (Principal) e.nextElement();
+               {*/
+                  //Principal role = (Principal) e.nextElement();
    
-                  boolean found = false;
+                  //boolean found = false;
                   //Iterator<?> iter = getSecurityContext().getObjects(
                   //      new ClassObjectFilter(RoleImpl.class)).iterator();
                   
@@ -230,9 +229,9 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
                      getSecurityContext().insert(new RoleImpl(role.getName()));
                   }*/
                   
-               }
-            }
-         }
+ //              }
+ //           }
+ //        }
          
          //Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(RoleImpl.class)).iterator();
          //while (iter.hasNext())
@@ -277,7 +276,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    {
       if (getSecurityContext() != null)
       {
-         getSecurityContext().insert(identity.getPrincipal());
+         getSecurityContext().insert(identity.getUser());
 
          // If we were authenticated with the JpaIdentityStore, then insert the authenticated
          // UserAccount into the security context.
