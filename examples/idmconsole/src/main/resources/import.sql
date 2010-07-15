@@ -1,3 +1,6 @@
+insert into RelationshipName(id, name) values (1, 'admin');
+insert into RelationshipName(id, name) values (2, 'manager');
+
 insert into IdentityObjectType(id, name) values (1, 'USER');
 insert into IdentityObjectType(id, name) values (2, 'GROUP');
 
@@ -10,7 +13,7 @@ insert into IdentityObjectCredentialType (id, name) values (1, 'PASSWORD');
 insert into IdentityObjectCredential (id, identity_object_id, credential_type_id, value) values (1, 1, 1, 'password');
 insert into IdentityObjectCredential (id, identity_object_id, credential_type_id, value) values (2, 2, 1, 'demo');
 
-insert into IdentityObjectRelationshipType (id, name) values (1, 'MEMBER_OF');
-insert into IdentityObjectRelationshipType (id, name) values (2, 'ROLE');
+insert into IdentityObjectRelationshipType (id, name) values (1, 'JBOSS_IDENTITY_MEMBERSHIP');
+insert into IdentityObjectRelationshipType (id, name) values (2, 'JBOSS_IDENTITY_ROLE');
 
 insert into IdentityObjectRelationship (id, name, relationship_type_id, from_identity_id, to_identity_id) values (1, 'admin', 2, 1, 3);

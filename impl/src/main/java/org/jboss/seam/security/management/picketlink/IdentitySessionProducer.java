@@ -66,6 +66,9 @@ public class IdentitySessionProducer implements EventListener
       options.put(JpaIdentityStore.OPTION_RELATIONSHIP_CLASS_NAME, 
             createOptionList("org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship"));
       
+      options.put(JpaIdentityStore.OPTION_RELATIONSHIP_NAME_CLASS_NAME, 
+            createOptionList("org.jboss.seam.security.examples.idmconsole.model.RelationshipName"));
+      
       store.setOptions(options);
       stores.add(store);            
       metadata.setIdentityStores(stores);

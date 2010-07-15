@@ -43,3 +43,11 @@ then
   check.grant();
 end
 
+rule ManageRelationships
+  no-loop
+  activation-group "permissions"
+when
+  check: PermissionCheck(resource == "seam.relationship", granted == false)
+then
+  check.grant();
+end

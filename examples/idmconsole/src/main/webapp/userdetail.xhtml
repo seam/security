@@ -49,13 +49,11 @@
           </div>                        
               
           <div class="formRow">            
-            <h:outputLabel for="roles" value="Member of" styleClass="formLabel"/>
-            <div class="selectMany">
-              <h:selectManyCheckbox id="roles" value="#{userAction.roles}" layout="pageDirection" styleClass="roles">
-                <!--s:selectItems value="#{identityManager.listGrantableRoles}" var="role" label="#{role}"/-->
-              </h:selectManyCheckbox>
-            </div>
-            <div class="validationError"><h:message for="roles"/></div>            
+            <h:outputLabel value="Member of" styleClass="formLabel"/>
+            <ui:repeat value="#{userAction.roles}" var="role">
+              #{role.roleType.name}<span> in group </span>#{role.group.name}<br/>
+            </ui:repeat>            
+
           </div>
           
           <div class="formRow">

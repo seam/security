@@ -30,7 +30,7 @@ public class UserAction implements Serializable
    private String username;
    private String password;
    private String confirm;
-   private List<Role> roles;
+   private Collection<Role> roles;
    private boolean enabled;
    
    private boolean newUserFlag;
@@ -49,7 +49,7 @@ public class UserAction implements Serializable
    {
       conversation.begin();
       this.username = username;
-      //roles = identityManager.getGrantedRoles(username);
+      roles = identityManager.getGrantedRoles(username);
       enabled = identityManager.isUserEnabled(username);
       newUserFlag = false;
    }
@@ -203,7 +203,7 @@ public class UserAction implements Serializable
       this.confirm = confirm;
    }
    
-   public List<Role> getRoles()
+   public Collection<Role> getRoles()
    {
       return roles;
    }

@@ -29,6 +29,7 @@ import org.jboss.weld.extensions.util.properties.query.PropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyQueries;
 import org.jboss.weld.extensions.util.properties.query.TypedPropertyCriteria;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
 import org.picketlink.idm.spi.exception.OperationNotSupportedException;
@@ -40,6 +41,7 @@ import org.picketlink.idm.spi.model.IdentityObjectRelationshipType;
 import org.picketlink.idm.spi.model.IdentityObjectType;
 import org.picketlink.idm.spi.search.IdentityObjectSearchCriteria;
 import org.picketlink.idm.spi.store.FeaturesMetaData;
+import org.picketlink.idm.spi.store.IdentityObjectSearchCriteriaType;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 /*import org.slf4j.Logger;
@@ -60,6 +62,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
    public static final String OPTION_RELATIONSHIP_CLASS_NAME = "relationshipEntityClassName";
+   public static final String OPTION_RELATIONSHIP_NAME_CLASS_NAME = "relationshipNameEntityClassName";
    
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
@@ -83,10 +86,12 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_RELATIONSHIP_TYPE = "RELATIONSHIP_TYPE";
    private static final String PROPERTY_RELATIONSHIP_TYPE_NAME = "RELATIONSHIP_TYPE_NAME";
    private static final String PROPERTY_RELATIONSHIP_NAME = "RELATIONSHIP_NAME";
+
+   // Distinct from PROPERTY_RELATIONSHIP NAME - this property refers to the name field in the RELATIONSHIP_NAME entity 
+   private static final String PROPERTY_RELATIONSHIP_NAME_NAME = "RELATIONSHIP_NAME_NAME";
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
-   private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
-   
+   private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";   
    
    private class EntityToSpiConverter
    {
@@ -115,8 +120,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          else
          {         
             IdentityObject obj = new IdentityObjectImpl(
-               (String) identityIdProperty.getValue(entity),
-               (String) identityNameProperty.getValue(entity),
+               identityIdProperty.getValue(entity).toString(),
+               identityNameProperty.getValue(entity).toString(),
                convertToIdentityObjectType(identityTypeProperty.getValue(entity)));
             cache.put(entity, obj);
             
@@ -176,6 +181,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private Class<?> relationshipClass;   
    private Class<?> attributeClass;
    private Class<?> roleTypeClass;
+   private Class<?> relationshipNameClass;
    
    private String userIdentityType = DEFAULT_USER_IDENTITY_TYPE;
    private String roleIdentityType = DEFAULT_ROLE_IDENTITY_TYPE;
@@ -193,6 +199,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
     * Attribute properties
     */
    private Map<String,Property<Object>> attributeProperties = new HashMap<String,Property<Object>>();
+   
+   private FeaturesMetaData featuresMetaData;
    
    private class PropertyTypeCriteria implements PropertyCriteria
    {
@@ -223,7 +231,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    
    public void bootstrap(IdentityStoreConfigurationContext configurationContext)
       throws IdentityException
-   {      
+   {           
       String clsName = configurationContext.getStoreConfigurationMetaData()
          .getOptionSingleValue(OPTION_IDENTITY_CLASS_NAME);
 
@@ -233,7 +241,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
       catch (ClassNotFoundException e)
       {
-         throw new IdentityException("Error bootstrapping JpaIdentityStore - no identity entity class found: " + clsName);
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid identity entity class: " + clsName);
       }
       
       if (identityClass == null)
@@ -253,7 +261,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          }
          catch (ClassNotFoundException e)
          {
-            throw new IdentityException("Error bootstrapping JpaIdentityStore - no credential entity class found: " + clsName);
+            throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid credential entity class: " + clsName);
          }
       }
       
@@ -266,8 +274,26 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
       catch (ClassNotFoundException e)
       {
-         throw new IdentityException("Error bootstrapping JpaIdentityStore - no relationship entity class found: " + clsName);
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid relationship entity class: " + clsName);
       }      
+      
+      boolean namedRelationshipsSupported = false;
+      
+      clsName = configurationContext.getStoreConfigurationMetaData()
+         .getOptionSingleValue(OPTION_RELATIONSHIP_NAME_CLASS_NAME);
+      
+      if (clsName != null)
+      {
+         try
+         {
+            relationshipNameClass = Class.forName(clsName);
+            namedRelationshipsSupported = true;
+         }
+         catch (ClassNotFoundException e)
+         {
+            throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid relationship name entity class: " + clsName);
+         }
+      }
       
       configureIdentityId();
       configureIdentityName();
@@ -277,6 +303,19 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       configureRelationships();
       configureAttributes();   
       configureRoleTypeNames();
+      
+      if (namedRelationshipsSupported)
+      {
+         configureRelationshipNames();
+      }
+      
+      featuresMetaData = new FeaturesMetaDataImpl(
+            configurationContext.getStoreConfigurationMetaData(),
+            new HashSet<IdentityObjectSearchCriteriaType>(),
+            false,
+            namedRelationshipsSupported,
+            new HashSet<String>()
+            );            
    }   
    
    protected void configureIdentityId() throws IdentityException
@@ -911,6 +950,15 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
    }
    
+   protected void configureRelationshipNames()
+   {
+      Property<Object> relationshipNameProp = findNamedProperty(relationshipNameClass, "name");
+      if (relationshipNameProp != null)
+      {         
+         modelProperties.put(PROPERTY_RELATIONSHIP_NAME_NAME, relationshipNameProp);
+      }
+   }
+   
    public String getUserIdentityType()
    {
       return userIdentityType;
@@ -1120,8 +1168,24 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    
    protected Object lookupRelationshipType(IdentityObjectRelationshipType relationshipType, EntityManager em)
    {
-      // TODO implement
-      return null;
+      Property<?> relationshipTypeNameProp = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE_NAME);      
+      
+      if (relationshipTypeNameProp != null)
+      {
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(relationshipTypeNameProp.getDeclaringClass());
+         Root<?> root = criteria.from(relationshipTypeNameProp.getDeclaringClass());
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(relationshipTypeNameProp.getName()), relationshipType.getName()));      
+         criteria.where(predicates.toArray(new Predicate[0]));
+
+         return em.createQuery(criteria).getSingleResult();
+      }
+      else
+      {
+         return relationshipType.getName();
+      }
    }
 
    public String createRelationshipName(IdentityStoreInvocationContext ctx,
@@ -1287,12 +1351,35 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
-         IdentityObject identity, IdentityObjectSearchCriteria criteria)
+         IdentityObject identity, IdentityObjectSearchCriteria searchCriteria)
          throws IdentityException, OperationNotSupportedException
    {
-      System.out.println("*** Invoked unimplemented method getRelationshipNames()");
-      // TODO Auto-generated method stub
-      return null;
+      Set<String> names = new HashSet<String>();
+      
+      if (!featuresMetaData.isNamedRelationshipsSupported()) return names;
+      
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
+      Root<?> root = criteria.from(relationshipClass);
+      
+      Property<?> identityFromProperty = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> relationshipNameProperty = modelProperties.get(PROPERTY_RELATIONSHIP_NAME);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(identityFromProperty.getName()), 
+            lookupIdentity(identity, em)));
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      List<?> results = em.createQuery(criteria).getResultList();
+      for (Object result : results)
+      {
+         names.add((String) relationshipNameProperty.getValue(result));
+      }
+      
+      return names;
    }
 
    public Map<String, String> getRelationshipProperties(
@@ -1306,10 +1393,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public FeaturesMetaData getSupportedFeatures()
-   {
-      System.out.println("*** Invoked unimplemented method getSupportedFeatures()");
-      // TODO Auto-generated method stub
-      return null;
+   {      
+      return featuresMetaData;
    }
 
    public void removeIdentityObject(
@@ -1461,13 +1546,74 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public Set<IdentityObjectRelationship> resolveRelationships(
-         IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
+         IdentityStoreInvocationContext ctx, IdentityObject identity,
          IdentityObjectRelationshipType relationshipType, boolean parent,
          boolean named, String name) throws IdentityException
    {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method resolveRelationships()");
-      return null;
+      Set<IdentityObjectRelationship> relationships = new HashSet<IdentityObjectRelationship>();
+      
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
+      Root<?> root = criteria.from(relationshipClass);
+      
+      Property<?> relationshipFromProp = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> relationshipToProp = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
+      Property<?> relationshipTypeProp = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE);
+      Property<?> relationshipNameProp = modelProperties.get(PROPERTY_RELATIONSHIP_NAME);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      
+      if (parent)
+      {
+         predicates.add(builder.equal(root.get(relationshipToProp.getName()),
+               lookupIdentity(identity, em)));
+      }
+      else
+      {
+         predicates.add(builder.equal(root.get(relationshipFromProp.getName()), 
+               lookupIdentity(identity, em)));
+      }
+            
+      if (relationshipType != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipTypeProp.getName()),
+               lookupRelationshipType(relationshipType, em)));
+      }
+      
+      if (named)
+      {
+         if (name != null)
+         {
+            predicates.add(builder.equal(root.get(relationshipNameProp.getName()),
+               name));
+         }
+         else
+         {
+            predicates.add(builder.isNotNull(root.get(relationshipNameProp.getName())));
+         }
+      }
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      List<?> results = em.createQuery(criteria).getResultList();
+      
+      EntityToSpiConverter converter = new EntityToSpiConverter();
+      
+      for (Object result : results)
+      {
+         IdentityObjectRelationship relationship = new IdentityObjectRelationshipImpl(
+               converter.convertToIdentityObject(relationshipFromProp.getValue(result)),
+               converter.convertToIdentityObject(relationshipToProp.getValue(result)),
+               (String) relationshipNameProp.getValue(result),
+               converter.convertToRelationshipType(relationshipTypeProp.getValue(result))         
+         );
+         
+         relationships.add(relationship);
+      }
+      
+      return relationships;
    }
 
    public void setRelationshipNameProperties(
