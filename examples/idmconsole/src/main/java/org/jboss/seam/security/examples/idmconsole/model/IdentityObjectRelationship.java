@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
@@ -22,7 +23,7 @@ public class IdentityObjectRelationship implements Serializable
    
    private Long id;
    private String name;
-   private IdentityObjectRelationshipType type;
+   private IdentityObjectRelationshipType relationshipType;
    private IdentityObject from;
    private IdentityObject to;
    
@@ -47,18 +48,18 @@ public class IdentityObjectRelationship implements Serializable
       this.name = name;
    }
    
-   @ManyToOne @IdentityProperty(PropertyType.TYPE)
-   public IdentityObjectRelationshipType getType()
+   @ManyToOne @IdentityProperty(PropertyType.TYPE) @JoinColumn(name = "RELATIONSHIP_TYPE_ID")
+   public IdentityObjectRelationshipType getRelationshipType()
    {
-      return type;
+      return relationshipType;
    }
    
-   public void setType(IdentityObjectRelationshipType type)
+   public void setRelationshipType(IdentityObjectRelationshipType relationshipType)
    {
-      this.type = type;
+      this.relationshipType = relationshipType;
    }
 
-   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_FROM)
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_FROM) @JoinColumn(name = "FROM_IDENTITY_ID")
    public IdentityObject getFrom()
    {
       return from;
@@ -69,7 +70,7 @@ public class IdentityObjectRelationship implements Serializable
       this.from = from;
    }
 
-   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_TO)
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_TO) @JoinColumn(name = "TO_IDENTITY_ID")
    public IdentityObject getTo()
    {
       return to;

@@ -14,7 +14,7 @@
    </security:JpaPermissionStore>
    
    <drools:RuleResources>
-     <s:modifies/>
+     <s:overrides/>
      <security:SecurityRulesConfig/>
      <drools:resources>
        <s:value>classpath;security-rules.drl;DRL</s:value>
@@ -31,20 +31,7 @@
    </drools:DroolsConfig>
    
    <security:RuleBasedPermissionResolver>
-      <s:overrides/>
-      
-      <security:manager>
-        <s:Inject/>
-      </security:manager>
-      
-      <security:identity>
-        <s:Inject/>
-      </security:identity>
-      
-      <security:init>
-        <s:Inject/>
-      </security:init>
-      
+      <s:modifies/>     
       <security:securityRules>
         <security:SecurityRulesConfig/>
         <s:Inject/>
