@@ -1,5 +1,6 @@
 package org.jboss.seam.security.jaas;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,21 @@ public class SeamLoginModule implements LoginModule
    
    protected String username;
    
+   public class SimplePrincipal implements Principal
+   {
+      private String name;
+      
+      public SimplePrincipal(String name)
+      {
+         this.name = name;
+      }
+      
+      public String getName()
+      {
+         return name;
+      }      
+   }
+   
    public boolean abort() throws LoginException
    {
       return true;
@@ -44,7 +60,7 @@ public class SeamLoginModule implements LoginModule
 
    public boolean commit() throws LoginException
    {        
-      //subject.getPrincipals().add(new SimplePrincipal(username));
+      subject.getPrincipals().add(new SimplePrincipal(username));
       return true;
    }
 
