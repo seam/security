@@ -21,6 +21,9 @@ public class IdentityObjectImpl implements IdentityObject, Serializable
    
    public IdentityObjectImpl(String id, String name, IdentityObjectType type)
    {
+      if (name == null) throw new IllegalArgumentException("IdentityObject.name cannot be null");
+      if (type == null) throw new IllegalArgumentException("IdentityObject.identityType cannot be null");
+      
       this.id = id;
       this.name = name;
       this.type = type;
@@ -44,5 +47,25 @@ public class IdentityObjectImpl implements IdentityObject, Serializable
    public void validatePolicy() throws PolicyValidationException
    {
 
+   }
+   
+   @Override
+   public boolean equals(Object value)
+   {
+      if (!(value instanceof IdentityObject)) return false;
+      IdentityObject other = (IdentityObject) value;
+      
+      return (id != null ? id.equals(other.getId()) : other.getId() == null) && 
+             name.equals(other.getName()) &&
+             type.equals(other.getIdentityType());
+   }
+   
+   @Override
+   public int hashCode()
+   {
+      int hash = 0;
+      if (id != null) hash ^= (id.hashCode() * 17);
+      hash ^= (name.hashCode() * 29) ^ (type.hashCode() * 37);      
+      return hash;
    }
 }

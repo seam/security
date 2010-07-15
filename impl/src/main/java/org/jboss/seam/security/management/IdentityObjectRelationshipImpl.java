@@ -23,6 +23,10 @@ public class IdentityObjectRelationshipImpl implements IdentityObjectRelationshi
          IdentityObject toIdentityObject, String name, 
          IdentityObjectRelationshipType type)
    {
+      if (fromIdentityObject == null) throw new IllegalArgumentException("IdentityObjectRelationship.fromIdentityObject cannot be null.");
+      if (toIdentityObject == null) throw new IllegalArgumentException("IdentityObjectRelationship.toIdentityObject cannot be null.");
+      if (type == null) throw new IllegalArgumentException("IdentityObjectRelationship.type cannot be null.");
+      
       this.fromIdentityObject = fromIdentityObject;
       this.toIdentityObject = toIdentityObject;
       this.name = name;
@@ -47,5 +51,38 @@ public class IdentityObjectRelationshipImpl implements IdentityObjectRelationshi
    public IdentityObjectRelationshipType getType()
    {
       return type;
+   }
+   
+   @Override
+   public boolean equals(Object value)
+   {
+      if (!(value instanceof IdentityObjectRelationship)) return false;
+      IdentityObjectRelationship other = (IdentityObjectRelationship) value;
+      
+      if (!fromIdentityObject.equals(other.getFromIdentityObject())) return false;
+      if (!toIdentityObject.equals(other.getToIdentityObject())) return false;
+      if (!type.equals(other.getType())) return false;
+      if (name == null)
+      {
+         if (other.getName() != null) return false;
+      }
+      else
+      {
+         if (!name.equals(other.getName())) return false;
+      }
+      
+      return true;
+   }
+   
+   @Override
+   public int hashCode()
+   {
+      int hash = (fromIdentityObject.hashCode() * 11) ^
+             (toIdentityObject.hashCode() * 17) ^
+             (type.hashCode() * 23);
+      
+      if (name != null) hash ^= (name.hashCode() * 29);
+      
+      return hash;
    }
 }

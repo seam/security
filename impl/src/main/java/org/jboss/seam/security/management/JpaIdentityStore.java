@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +86,87 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
    private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";
+   
+   
+   private class EntityToSpiConverter
+   {
+      private static final String IDENTITY_TYPE_CACHE_PREFIX = "identity_type:";
+      private static final String RELATIONSHIP_TYPE_CACHE_PREFIX = "relationship_type:";
+      
+      private Map<Object,Object> cache = new HashMap<Object,Object>();
+      
+      private Property<?> identityIdProperty = modelProperties.get(PROPERTY_IDENTITY_ID);
+      private Property<?> identityNameProperty = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      private Property<?> identityTypeProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE);
+      private Property<?> identityTypeNameProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+      private Property<?> relationshipTypeNameProperty = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE_NAME);
+      
+      public IdentityObject convertToIdentityObject(Object entity)
+      {
+         if (!identityClass.isAssignableFrom(entity.getClass())) 
+         {
+            throw new IllegalArgumentException("Invalid identity entity");
+         }
+         
+         if (cache.containsKey(entity))
+         {
+            return (IdentityObject) cache.get(entity);
+         }
+         else
+         {         
+            IdentityObject obj = new IdentityObjectImpl(
+               (String) identityIdProperty.getValue(entity),
+               (String) identityNameProperty.getValue(entity),
+               convertToIdentityObjectType(identityTypeProperty.getValue(entity)));
+            cache.put(entity, obj);
+            
+            return obj;            
+         }
+      }
+      
+      public IdentityObjectType convertToIdentityObjectType(Object value)
+      {
+         if (value instanceof String)
+         {
+            String key = IDENTITY_TYPE_CACHE_PREFIX + (String) value; 
+            if (cache.containsKey(key)) return (IdentityObjectType) cache.get(key);
+            
+            IdentityObjectType type = new IdentityObjectTypeImpl((String) value);
+            cache.put(key, type);
+            return type;
+         }
+         else
+         {
+            if (cache.containsKey(value)) return (IdentityObjectType) cache.get(value);
+            IdentityObjectType type = new IdentityObjectTypeImpl(
+                  (String) identityTypeNameProperty.getValue(value));
+            cache.put(value, type);
+            return type;
+         }
+      }
+      
+      public IdentityObjectRelationshipType convertToRelationshipType(Object value)
+      {
+         if (value instanceof String)
+         {
+            String key = RELATIONSHIP_TYPE_CACHE_PREFIX + (String) value;
+            if (cache.containsKey(key)) return (IdentityObjectRelationshipType) cache.get(key);
+            
+            IdentityObjectRelationshipType type = new IdentityObjectRelationshipTypeImpl((String) value);
+            cache.put(key, type);
+            return type;
+         }
+         else
+         {
+            if (cache.containsKey(value)) return (IdentityObjectRelationshipType) cache.get(value);
+            IdentityObjectRelationshipType type = new IdentityObjectRelationshipTypeImpl(
+                  (String) relationshipTypeNameProperty.getValue(value));
+            cache.put(value, type);
+            return type;
+         }
+      }
+   }
+   
    
    private String id;
       
@@ -1083,12 +1165,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          return null;
       }
    }
-   
-   protected IdentityObjectType convertType(Object obj)
-   {
-      // TODO implement
-      return null;
-   }
 
    public IdentityObject findIdentityObject(
          IdentityStoreInvocationContext invocationContext, String name,
@@ -1317,13 +1393,63 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public Set<IdentityObjectRelationship> resolveRelationships(
-         IdentityStoreInvocationContext invocationCxt,
+         IdentityStoreInvocationContext ctx,
          IdentityObject fromIdentity, IdentityObject toIdentity,
          IdentityObjectRelationshipType relationshipType)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
+      Set<IdentityObjectRelationship> relationships = new HashSet<IdentityObjectRelationship>();
+      
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
+      Root<?> root = criteria.from(relationshipClass);
+      
+      Property<?> relationshipFromProp = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> relationshipToProp = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
+      Property<?> relationshipTypeProp = modelProperties.get(PROPERTY_RELATIONSHIP_TYPE);
+      Property<?> relationshipNameProp = modelProperties.get(PROPERTY_RELATIONSHIP_NAME);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      
+      if (fromIdentity != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipFromProp.getName()), 
+            lookupIdentity(fromIdentity, em)));
+      }
+      
+      if (toIdentity != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipToProp.getName()),
+            lookupIdentity(toIdentity, em)));
+      }
+      
+      if (relationshipType != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipTypeProp.getName()),
+               lookupRelationshipType(relationshipType, em)));
+      }
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      List<?> results = em.createQuery(criteria).getResultList();
+      
+      EntityToSpiConverter converter = new EntityToSpiConverter();
+      
+      for (Object result : results)
+      {
+         IdentityObjectRelationship relationship = new IdentityObjectRelationshipImpl(
+               converter.convertToIdentityObject(relationshipFromProp.getValue(result)),
+               converter.convertToIdentityObject(relationshipToProp.getValue(result)),
+               (String) relationshipNameProp.getValue(result),
+               converter.convertToRelationshipType(relationshipTypeProp.getValue(result))         
+         );
+         
+         relationships.add(relationship);
+      }
+      
+      return relationships;
    }
 
    public Set<IdentityObjectRelationship> resolveRelationships(
