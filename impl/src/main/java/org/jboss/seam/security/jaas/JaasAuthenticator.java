@@ -23,13 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An authenticator for authenticating with JAAS
+ * An authenticator for authenticating with JAAS.  The jaasConfigName property
+ * _must_ be configured to point to a valid JAAS configuration name, typically
+ * defined in a file called login-config.xml in the application server.
  * 
  * @author Shane Bryzak
  *
  */
-@Alternative @RequestScoped
-public class JaasAuthenticator implements Authenticator
+public @RequestScoped @Alternative class JaasAuthenticator implements Authenticator
 {  
    Logger log = LoggerFactory.getLogger(JaasAuthenticator.class);
    
