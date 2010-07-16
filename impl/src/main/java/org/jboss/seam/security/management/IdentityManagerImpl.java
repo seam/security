@@ -71,7 +71,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       }
    }
    
-   public boolean deleteUser(String name)
+   public @Transactional boolean deleteUser(String name)
    {
       identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_DELETE);
       
@@ -263,7 +263,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
     * @param name The user for which to return a list of roles
     * @return List containing the names of the granted roles
     */
-   public Collection<Role> getGrantedRoles(String username)
+   public Collection<Role> getUserRoles(String username)
    {
       identity.checkPermission(RESOURCE_RELATIONSHIP, PERMISSION_READ);
       try
@@ -287,18 +287,6 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       {
          throw new RuntimeException(e);
       }
-   }
-   
-   /**
-    * Returns a list of roles that are either explicitly or indirectly granted to the specified user.
-    * 
-    * @param name The user for which to return the list of roles
-    * @return List containing the names of the implied roles
-    */
-   public List<Role> getImpliedRoles(String username)
-   {
-      //return roleIdentityStore.listImpliedRoles(username);
-      return null;
    }
    
    public Collection<User> listRoleMembers(String roleType, String groupName, String groupType)

@@ -7,6 +7,7 @@ insert into IdentityObjectType(id, name) values (2, 'GROUP');
 insert into IdentityObject (id, name, identity_object_type_id) values (1, 'shane', 1);
 insert into IdentityObject (id, name, identity_object_type_id) values (2, 'demo', 1);
 insert into IdentityObject (id, name, identity_object_type_id) values (3, 'Head Office', 2);
+insert into IdentityObject (id, name, identity_object_type_id) values (4, 'foo', 1);
 
 insert into IdentityObjectCredentialType (id, name) values (1, 'PASSWORD');
 

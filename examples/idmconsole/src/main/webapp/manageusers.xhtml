@@ -10,6 +10,12 @@
   </ui:define>
    
   <ui:define name="content">
+    <script type="text/javascript">
+      function confirmDelete() {
+        return confirm("Are you sure you wish to delete this user? This action cannot be undone.");
+      }
+    </script>  
+  
     <h3>Manage Users</h3>
    
     <h:form>
@@ -47,9 +53,9 @@
             <h:commandLink id="edit" value="Edit" action="#{userAction.editUser(user.username)}"/>
             <span> | </span>
           </ui:fragment>
-          <h:link id="delete" value="Delete" action="#{userAction.deleteUser(user.username)}" 
-                  rendered="#{identity.hasPermission('seam.identity', 'delete')}"
-                  onclick="return confirmDelete()"/>
+          <ui:fragment rendered="#{identity.hasPermission('seam.identity', 'delete')}">
+            <h:commandLink id="delete" value="Delete" action="#{userAction.deleteUser(user.username)}" onclick="return confirmDelete()"/>
+          </ui:fragment>
         </h:column>
       </h:dataTable>
     </h:form>

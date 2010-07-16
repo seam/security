@@ -5,17 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Model;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jboss.seam.security.management.IdentityManager;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
 
-@Named
-@SessionScoped
-public class UserSearch implements Serializable
+public @Model class UserSearch implements Serializable
 {
    private static final long serialVersionUID = 8592034786339372510L;
 
@@ -39,10 +36,8 @@ public class UserSearch implements Serializable
    
    public String getUserRoles(String username)
    {
-      Collection<Role> roles = identityManager.getGrantedRoles(username);
-      
-      //if (roles == null) return "";
-      
+      Collection<Role> roles = identityManager.getUserRoles(username);
+            
       StringBuilder sb = new StringBuilder();
       
       for (Role role : roles)

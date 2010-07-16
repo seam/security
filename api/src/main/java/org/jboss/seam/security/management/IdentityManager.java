@@ -216,15 +216,7 @@ public interface IdentityManager
     * @param name The user for which to return a list of roles
     * @return List containing the names of the granted roles
     */
-   Collection<Role> getGrantedRoles(String name);
-   
-   /**
-    * Returns a list of roles that are either explicitly or indirectly granted to the specified user.
-    * 
-    * @param name The user for which to return the list of roles
-    * @return List containing the names of the implied roles
-    */
-   List<Role> getImpliedRoles(String name);
+   Collection<Role> getUserRoles(String name);
    
    /**
     * Returns a list of all members that have been granted the specified role

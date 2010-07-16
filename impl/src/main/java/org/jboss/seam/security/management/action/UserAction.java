@@ -49,7 +49,7 @@ public class UserAction implements Serializable
    {
       conversation.begin();
       this.username = username;
-      roles = identityManager.getGrantedRoles(username);
+      roles = identityManager.getUserRoles(username);
       enabled = identityManager.isUserEnabled(username);
       newUserFlag = false;
    }
@@ -119,7 +119,7 @@ public class UserAction implements Serializable
          }
       }
       
-      Collection<Role> grantedRoles = identityManager.getGrantedRoles(username);
+      Collection<Role> grantedRoles = identityManager.getUserRoles(username);
       
       if (grantedRoles != null)
       {

@@ -153,7 +153,7 @@ public class RememberMe implements Serializable
                   {
                      userEnabled.value = true;
 
-                     for (Role role : identityManager.getImpliedRoles(username))
+                     for (Role role : identityManager.getUserRoles(username))
                      {
                         roles.add(role);
                      }
