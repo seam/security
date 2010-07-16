@@ -1272,11 +1272,19 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       CriteriaBuilder builder = em.getCriteriaBuilder();
       CriteriaQuery<?> criteria = builder.createQuery(identityClass);
       
-      criteria.from(identityClass);
+      Root<?> root = criteria.from(identityClass);
 
       Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      Property<?> identityTypeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       
       List<Predicate> predicates = new ArrayList<Predicate>();
+      
+      if (identityType != null)
+      {
+         predicates.add(builder.equal(root.get(identityTypeProp.getName()), 
+               lookupIdentityType(identityType.getName(), em)));
+      }
+      
       criteria.where(predicates.toArray(new Predicate[0]));
       
       List<?> results = em.createQuery(criteria).getResultList();

@@ -16,6 +16,7 @@ import org.jboss.seam.security.util.Strings;
 import org.jboss.seam.transaction.Transactional;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.IdentitySearchCriteria;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
@@ -230,17 +231,14 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
       
    public Collection<User> findUsers(String filter)
    {
-      identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_READ);
-      UserQueryBuilder builder = identitySession.createUserQueryBuilder();
-      UserQuery userQuery = builder.createQuery();
-      
+      IdentitySearchCriteria criteria = new IdentitySearchCriteriaImpl();
       try
       {
-         return identitySession.execute(userQuery);         
+         return identitySession.getPersistenceManager().findUser(criteria);
       }
-      catch (QueryException ex)
+      catch (IdentityException e)
       {
-         throw new RuntimeException("Error querying users", ex);
+         throw new RuntimeException(e);
       }
    }
    
