@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Shane Bryzak
  */
-@RequestScoped @Transactional
+@RequestScoped
 public class IdentityManagerImpl implements IdentityManager, Serializable
 {
    private static final long serialVersionUID = 6864253169970552893L;
@@ -55,7 +55,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    
    @Inject IdentitySession identitySession;
    
-   public boolean createUser(String name, Credential credential)
+   public @Transactional boolean createUser(String name, Credential credential)
    {
       identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_CREATE);
       try

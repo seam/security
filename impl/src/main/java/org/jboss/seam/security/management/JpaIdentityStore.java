@@ -1364,11 +1364,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
       Root<?> root = criteria.from(relationshipClass);
       
-      Property<?> identityFromProperty = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> identityToProperty = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
       Property<?> relationshipNameProperty = modelProperties.get(PROPERTY_RELATIONSHIP_NAME);
       
       List<Predicate> predicates = new ArrayList<Predicate>();
-      predicates.add(builder.equal(root.get(identityFromProperty.getName()), 
+      predicates.add(builder.equal(root.get(identityToProperty.getName()), 
             lookupIdentity(identity, em)));
       
       criteria.where(predicates.toArray(new Predicate[0]));
@@ -1567,12 +1567,12 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       if (parent)
       {
-         predicates.add(builder.equal(root.get(relationshipToProp.getName()),
+         predicates.add(builder.equal(root.get(relationshipFromProp.getName()),
                lookupIdentity(identity, em)));
       }
       else
       {
-         predicates.add(builder.equal(root.get(relationshipFromProp.getName()), 
+         predicates.add(builder.equal(root.get(relationshipToProp.getName()), 
                lookupIdentity(identity, em)));
       }
             
