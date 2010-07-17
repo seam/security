@@ -20,6 +20,12 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
    private Class<?> roleNameClass;
    private Class<?> attributeClass;
    
+   @Override
+   public String getId()
+   {
+      return (super.getId() == null) ? "jpa" : super.getId();
+   }   
+   
    /**
     * If the identityStoreClass hasn't been set, then return JpaIdentityStore
     * by default.

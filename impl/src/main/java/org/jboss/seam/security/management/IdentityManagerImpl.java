@@ -89,6 +89,7 @@ public class IdentityManagerImpl implements IdentityManager, Serializable
    public boolean enableUser(String name)
    {
       identity.checkPermission(RESOURCE_IDENTITY, PERMISSION_UPDATE);
+      
       //return identityStore.enableUser(name);
       return false;
    }

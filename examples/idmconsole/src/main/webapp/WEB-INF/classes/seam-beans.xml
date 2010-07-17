@@ -42,7 +42,6 @@
    
    <plidm:JpaIdentityStoreConfiguration>
       <s:overrides/>
-      <plidm:id>jpa</plidm:id>
       <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
       <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
       <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
