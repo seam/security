@@ -25,9 +25,11 @@ import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
-import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMapper;
+import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.User;
+import org.picketlink.idm.common.exception.IdentityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
    
-   @Inject private IdentityManager identityManager;
+   @Inject private IdentitySession identitySession;
    
    @Inject Instance<RequestSecurityState> requestSecurityState;
    
@@ -226,7 +228,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
    }
    
-   public void quietLogin()
+   public void quietLogin() 
    {
       try
       {
@@ -248,11 +250,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
       catch (Exception ex)
       {
+         log.error("Error authenticating", ex);
          credentials.invalidate();
       }
    }
     
-   protected boolean authenticate()
+   protected boolean authenticate() throws IdentityException
    {
       try
       {
@@ -290,10 +293,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          else
          {
             // Otherwise if identity management is enabled, use it.
-            if (identityManager != null)
+            if (identitySession != null)
             {            
-               success = identityManager.authenticate(credentials.getUsername(),
-                     credentials.getCredential());
+               success = identitySession.getAttributesManager().validateCredentials(
+                     new UserImpl(credentials.getUsername()), 
+                     new Credential[] {credentials.getCredential()});
                
                if (success)
                {

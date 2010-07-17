@@ -49,11 +49,6 @@ public @Model class UserSearch implements Serializable
       return sb.toString();
    }
    
-   //public String getSelectedUser()
-   //{
-      //return selectedUser;
-   //}
-   
    public List<UserDTO> getUsers()
    {
       return users;

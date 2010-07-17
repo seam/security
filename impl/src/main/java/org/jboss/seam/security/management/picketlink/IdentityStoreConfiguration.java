@@ -34,7 +34,7 @@ public abstract class IdentityStoreConfiguration
    
    public void configure(IdentityStoreConfigurationMetaDataImpl store)
    {
-      store.setId(id);
+      store.setId(getId());
       
       if (getIdentityStoreClass() != null)
       {
