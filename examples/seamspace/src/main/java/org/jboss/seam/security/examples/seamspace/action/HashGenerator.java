@@ -4,8 +4,8 @@ import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.crypto.BinTools;
-import org.jboss.seam.security.management.JpaIdentityStore;
 import org.jboss.seam.security.management.PasswordHash;
+import org.jboss.seam.security.management.picketlink.JpaIdentityStore;
 
 @Model
 public class HashGenerator

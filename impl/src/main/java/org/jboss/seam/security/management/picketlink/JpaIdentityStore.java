@@ -1,4 +1,4 @@
-package org.jboss.seam.security.management;
+package org.jboss.seam.security.management.picketlink;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -22,6 +22,10 @@ import javax.persistence.criteria.Root;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
+import org.jboss.seam.security.management.IdentityObjectImpl;
+import org.jboss.seam.security.management.IdentityObjectRelationshipImpl;
+import org.jboss.seam.security.management.IdentityObjectRelationshipTypeImpl;
+import org.jboss.seam.security.management.IdentityObjectTypeImpl;
 import org.jboss.weld.extensions.util.properties.Property;
 import org.jboss.weld.extensions.util.properties.query.AnnotatedPropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.NamedPropertyCriteria;
@@ -62,7 +66,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
    public static final String OPTION_RELATIONSHIP_CLASS_NAME = "relationshipEntityClassName";
-   public static final String OPTION_RELATIONSHIP_NAME_CLASS_NAME = "relationshipNameEntityClassName";
+   public static final String OPTION_ROLE_NAME_CLASS_NAME = "roleNameEntityClassName";
    
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
@@ -280,7 +284,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       boolean namedRelationshipsSupported = false;
       
       clsName = configurationContext.getStoreConfigurationMetaData()
-         .getOptionSingleValue(OPTION_RELATIONSHIP_NAME_CLASS_NAME);
+         .getOptionSingleValue(OPTION_ROLE_NAME_CLASS_NAME);
       
       if (clsName != null)
       {

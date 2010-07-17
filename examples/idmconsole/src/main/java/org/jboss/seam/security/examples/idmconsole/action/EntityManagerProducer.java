@@ -11,5 +11,6 @@ import org.jboss.seam.drools.qualifiers.Stateless;
 @Stateless
 public class EntityManagerProducer
 {
-   @Produces @RequestScoped @PersistenceContext(unitName = "idmconsoleDatabase") EntityManager entityManager;
+   @Produces /*@ManagedPersistenceContext @ConversationScoped*/ @RequestScoped 
+   @PersistenceContext(unitName = "idmconsoleDatabase") EntityManager entityManager;
 }

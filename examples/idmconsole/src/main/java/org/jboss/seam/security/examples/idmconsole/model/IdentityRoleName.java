@@ -7,12 +7,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * This is a simple lookup table containing relationship (i.e. role) names.
+ * This is a simple lookup table containing role names
  * 
  * @author Shane Bryzak
  */
 @Entity
-public class RelationshipName implements Serializable
+public class IdentityRoleName implements Serializable
 {
    private static final long serialVersionUID = 8775236263787825703L;
    

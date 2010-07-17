@@ -1,5 +1,5 @@
-insert into RelationshipName(id, name) values (1, 'admin');
-insert into RelationshipName(id, name) values (2, 'manager');
+insert into IdentityRoleName(id, name) values (1, 'admin');
+insert into IdentityRoleName(id, name) values (2, 'manager');
 
 insert into IdentityObjectType(id, name) values (1, 'USER');
 insert into IdentityObjectType(id, name) values (2, 'GROUP');
