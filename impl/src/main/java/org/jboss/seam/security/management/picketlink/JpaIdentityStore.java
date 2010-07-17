@@ -1278,7 +1278,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       Root<?> root = criteria.from(identityClass);
 
-      Property<?> identityNameProp = modelProperties.get(PROPERTY_IDENTITY_NAME);
       Property<?> identityTypeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       
       List<Predicate> predicates = new ArrayList<Predicate>();
@@ -1292,26 +1291,12 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       criteria.where(predicates.toArray(new Predicate[0]));
       
       List<?> results = em.createQuery(criteria).getResultList();
-           
-      Property<?> typeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
-      Property<?> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+      
+      EntityToSpiConverter converter = new EntityToSpiConverter();
       
       for (Object result : results)
-      {
-         String name = (String) identityNameProp.getValue(result);
-         String typeName;
-         
-         if (typeNameProp != null)
-         {
-            typeName = (String) typeNameProp.getValue(typeProp.getValue(result));
-         }
-         else
-         {
-            typeName = (String) typeProp.getValue(result);
-         }
-         
-         IdentityObjectType type = new IdentityObjectTypeImpl(typeName);
-         objs.add(new IdentityObjectImpl(name, name, type));
+      {               
+         objs.add(converter.convertToIdentityObject(result));
       }
       
       return objs;

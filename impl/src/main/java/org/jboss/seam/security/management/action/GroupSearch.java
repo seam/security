@@ -30,10 +30,8 @@ public @Model class GroupSearch implements Serializable
    @Inject public void loadUsers() throws IdentityException, QueryException
    {       
       groups = new ArrayList<GroupDTO>();
-            
-      GroupQueryBuilder builder = identitySession.createGroupQueryBuilder();            
       
-      Collection<Group> results = identitySession.list(builder.createQuery());
+      Collection<Group> results = identitySession.getPersistenceManager().findGroup("GROUP");
 
       for (Group group : results)
       {

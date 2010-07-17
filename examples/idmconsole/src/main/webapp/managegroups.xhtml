@@ -16,7 +16,7 @@
       }
     </script>  
   
-    <h3>Manage Users</h3>
+    <h3>Manage Groups</h3>
    
     <h:form>
       <h:commandButton action="#{groupAction.createGroup}" styleClass="newuser" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
@@ -34,10 +34,16 @@
         columnClasses=",,action">
         <h:column width="auto">
           <f:facet name="header">
-            User name
+            Group name
           </f:facet>
-          #{user.username}
+          #{group.name}
         </h:column>
+        <h:column width="auto">
+          <f:facet name="header">
+            Group type
+          </f:facet>
+          #{group.groupType}
+        </h:column>        
         <h:column id="action" width="auto">
           <f:facet name="header">
             Action
