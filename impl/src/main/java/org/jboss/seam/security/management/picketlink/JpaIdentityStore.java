@@ -1075,7 +1075,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                
          //beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
          
-         getEntityManager(ctx).persist(identityInstance);
+         EntityManager em = getEntityManager(ctx);
+         
+         em.persist(identityInstance);
          
          //beanManager.fireEvent(new UserCreatedEvent(identityInstance));
          
