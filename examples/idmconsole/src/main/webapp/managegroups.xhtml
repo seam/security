@@ -49,12 +49,8 @@
             Action
           </f:facet>
         
-          <ui:fragment rendered="#{identity.hasPermission('seam.identity', 'update')}">
-            <h:commandLink id="edit" value="Edit" action="#{groupAction.editGroup(group.name)}"/>
-            <span> | </span>
-          </ui:fragment>
           <ui:fragment rendered="#{identity.hasPermission('seam.identity', 'delete')}">
-            <h:commandLink id="delete" value="Delete" action="#{groupAction.deleteGroup(group.name)}" onclick="return confirmDelete()"/>
+            <h:commandLink id="delete" value="Delete" action="#{groupAction.deleteGroup(group.name, group.groupType)}" onclick="return confirmDelete()"/>
           </ui:fragment>
         </h:column>
       </h:dataTable>

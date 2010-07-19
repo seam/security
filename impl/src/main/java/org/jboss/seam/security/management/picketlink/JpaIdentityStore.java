@@ -1415,9 +1415,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       criteria.where(predicates.toArray(new Predicate[0]));
       
-      Object instance = em.createQuery(criteria).getSingleResult();
-      
-      em.remove(instance);
+      try
+      {
+         Object instance = em.createQuery(criteria).getSingleResult();
+         em.remove(instance);
+      }
+      catch (NoResultException ex)
+      {
+         throw new IdentityException(String.format(
+               "Exception removing identity object - [%s] not found.", 
+               identity), ex);
+      }
    }
 
    public void removeRelationship(IdentityStoreInvocationContext ctx,

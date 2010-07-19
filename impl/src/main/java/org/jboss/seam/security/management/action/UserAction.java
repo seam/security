@@ -19,9 +19,7 @@ import org.picketlink.idm.impl.api.PasswordCredential;
  * 
  * @author Shane Bryzak
  */
-@Named
-@ConversationScoped
-public class UserAction implements Serializable
+public @Named @ConversationScoped class UserAction implements Serializable
 {
    private static final long serialVersionUID = 5820385095080724087L;
    

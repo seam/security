@@ -61,19 +61,15 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam</groupId>
-         <artifactId>seam-persistence</artifactId>
+         <groupId>org.jboss.seam.persistence</groupId>
+         <artifactId>seam-persistence-api</artifactId>
          <version>3.0.0-SNAPSHOT</version>
-         <exclusions>
-           <exclusion>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-api</artifactId>
-           </exclusion>
-           <exclusion>
-             <groupId>org.hibernate</groupId>
-             <artifactId>hibernate-core</artifactId>
-           </exclusion>
-         </exclusions>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.persistence</groupId>
+         <artifactId>seam-persistence-impl</artifactId>
+         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>

@@ -13,7 +13,7 @@ import org.jboss.seam.security.GroupImpl;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.security.util.Strings;
-import org.jboss.seam.transaction.Transactional;
+import org.jboss.seam.persistence.transaction.Transactional;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySearchCriteria;

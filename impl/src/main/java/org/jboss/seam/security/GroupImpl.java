@@ -10,7 +10,7 @@ public class GroupImpl implements org.picketlink.idm.api.Group
    private String groupType;
    private String name;
    
-   public GroupImpl(String groupType, String name)
+   public GroupImpl(String name, String groupType)
    {
       this.groupType = groupType;
       this.name = name;
