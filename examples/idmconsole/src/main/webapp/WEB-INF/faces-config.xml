@@ -10,6 +10,7 @@
    
    <navigation-rule>
       <from-view-id>/manageusers.xhtml</from-view-id>
+      
       <navigation-case>
          <from-action>#{userAction.createUser}</from-action>
          <if>#{true}</if>
@@ -33,23 +34,53 @@
    </navigation-rule>
    
    <navigation-rule>
-      <from-view-id>/managegroups.xhtml</from-view-id>
-      <navigation-case>
-         <from-action>#{groupAction.deleteGroup(group.name, group.groupType)}</from-action>
-         <if>#{true}</if>
-         <to-view-id>/managegroups.xhtml</to-view-id>
-         <redirect />
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
       <from-view-id>/userdetail.xhtml</from-view-id>
+      
       <navigation-case>
          <from-action>#{userAction.save}</from-action>
          <if>#{true}</if>
          <to-view-id>/manageusers.xhtml</to-view-id>
          <redirect />
       </navigation-case>
+      
+      <navigation-case>
+         <from-action>#{userAction.cancel}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/manageusers.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>      
+   </navigation-rule>   
+   
+   <navigation-rule>
+      <from-view-id>/managegroups.xhtml</from-view-id>
+      
+      <navigation-case>
+         <from-action>#{groupAction.createGroup}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/groupdetail.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>
+      
+      <navigation-case>
+         <from-action>#{groupAction.deleteGroup(group.name, group.groupType)}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/managegroups.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>
+      
    </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/groupdetail.xhtml</from-view-id>
+      
+      <navigation-case>
+         <from-action>#{groupAction.cancel}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/managegroups.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>
+      
+   </navigation-rule>
+
 
 </faces-config>

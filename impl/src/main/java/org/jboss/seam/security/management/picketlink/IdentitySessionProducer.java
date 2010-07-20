@@ -26,6 +26,7 @@ import org.picketlink.idm.impl.configuration.metadata.IdentityRepositoryConfigur
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreConfigurationMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreMappingMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.RealmConfigurationMetaDataImpl;
+import org.picketlink.idm.impl.repository.WrapperIdentityStoreRepository;
 import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
@@ -90,7 +91,7 @@ public class IdentitySessionProducer implements EventListener
       List<IdentityRepositoryConfigurationMetaData> repositories = new ArrayList<IdentityRepositoryConfigurationMetaData>();
       
       IdentityRepositoryConfigurationMetaDataImpl repository = new IdentityRepositoryConfigurationMetaDataImpl();
-      repository.setClassName("org.picketlink.idm.impl.repository.WrapperIdentityStoreRepository");
+      repository.setClassName(WrapperIdentityStoreRepository.class.getName());
       repository.setDefaultAttributeStoreId(defaultAttributeStoreId != null ? defaultAttributeStoreId : defaultStoreId);
       repository.setDefaultIdentityStoreId(defaultIdentityStoreId != null ? defaultIdentityStoreId : defaultStoreId);
       

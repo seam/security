@@ -69,6 +69,11 @@ public @Named @ConversationScoped class UserAction implements Serializable
       }
    }
    
+   public void cancel()
+   {
+      conversation.end();
+   }
+   
    private String saveNewUser()
    {
       if (password == null || !password.equals(confirm))

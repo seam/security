@@ -1,6 +1,7 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -45,5 +46,35 @@ public @Transactional @Named @ConversationScoped class GroupAction implements Se
       identitySession.getPersistenceManager().createGroup(groupName, groupType);
       conversation.end();      
       return "success";
+   }
+   
+   public void cancel()
+   {
+      conversation.end();
+   }
+   
+   public String getGroupName()
+   {
+      return groupName;
+   }
+   
+   public void setGroupName(String groupName)
+   {
+      this.groupName = groupName;
+   }
+   
+   public String getGroupType()
+   {
+      return groupType;
+   }
+   
+   public void setGroupType(String groupType)
+   {
+      this.groupType = groupType;
+   }
+   
+   public List<String> getSupportedGroupTypes()
+   {
+      return null;
    }
 }
