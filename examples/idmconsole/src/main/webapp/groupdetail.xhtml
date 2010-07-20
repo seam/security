@@ -22,7 +22,13 @@
           <div class="formRow">
             <h:outputLabel for="groupname" value="Group name" styleClass="formLabel"/>
             <h:inputText id="groupname" value="#{groupAction.groupName}"/>
-            <div class="validationError"><h:message for="firstname"/></div>
+            <div class="validationError"><h:message for="groupname"/></div>
+          </div>  
+
+          <div class="formRow">
+            <h:outputLabel for="grouptype" value="Group type" styleClass="formLabel"/>
+            <h:inputText id="grouptype" value="#{groupAction.groupType}"/>
+            <div class="validationError"><h:message for="grouptype"/></div>
           </div>  
           
           <div class="formButtons">

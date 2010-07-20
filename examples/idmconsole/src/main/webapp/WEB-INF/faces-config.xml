@@ -74,6 +74,13 @@
       <from-view-id>/groupdetail.xhtml</from-view-id>
       
       <navigation-case>
+         <from-action>#{groupAction.save}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/managegroups.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>      
+      
+      <navigation-case>
          <from-action>#{groupAction.cancel}</from-action>
          <if>#{true}</if>
          <to-view-id>/managegroups.xhtml</to-view-id>
