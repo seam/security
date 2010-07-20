@@ -1408,6 +1408,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       EntityManager em = getEntityManager(ctx);
       
       CriteriaBuilder builder = em.getCriteriaBuilder();
+      
       CriteriaQuery<?> criteria = builder.createQuery(identityClass);
       Root<?> root = criteria.from(identityClass);
       
@@ -1422,6 +1423,27 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       try
       {
          Object instance = em.createQuery(criteria).getSingleResult();
+                  
+         // If there is a credential class, delete any credentials
+         if (credentialClass != null)
+         {
+            Property<?> credentialIdentityProp = modelProperties.get(PROPERTY_CREDENTIAL_IDENTITY);
+            
+            criteria = builder.createQuery(credentialClass);
+            root = criteria.from(credentialClass);
+            
+            predicates = new ArrayList<Predicate>();
+            predicates.add(builder.equal(root.get(credentialIdentityProp.getName()),
+                  lookupIdentity(identity, em)));
+            criteria.where(predicates.toArray(new Predicate[0]));
+            
+            List<?> results = em.createQuery(criteria).getResultList();
+            for (Object result : results)
+            {
+               em.remove(result);
+            }
+         }
+         
          em.remove(instance);
       }
       catch (NoResultException ex)
@@ -1700,8 +1722,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObject identityObject, IdentityObjectCredential credential)
          throws IdentityException
    {
+
+      
       // TODO Auto-generated method stub
       System.out.println("*** Invoked unimplemented method updateCredential()");
+
    }
 
    public boolean validateCredential(IdentityStoreInvocationContext ctx,
