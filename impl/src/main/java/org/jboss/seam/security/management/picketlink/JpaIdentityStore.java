@@ -1400,6 +1400,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityStoreInvocationContext ctx, IdentityObject identity)
          throws IdentityException
    {
+      removeRelationships(ctx, identity, null, false);
+      
       Property<?> nameProperty = modelProperties.get(PROPERTY_IDENTITY_NAME);
       Property<?> typeProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE);
       
@@ -1484,12 +1486,65 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public void removeRelationships(
-         IdentityStoreInvocationContext invocationCtx,
+         IdentityStoreInvocationContext ctx,
          IdentityObject identity1, IdentityObject identity2, boolean named)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method removeRelationships()");
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
+      Root<?> root = criteria.from(relationshipClass);
+      
+      Property<?> relationshipFromProp = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
+      Property<?> relationshipToProp = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      
+      if (identity1 != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipFromProp.getName()),
+               lookupIdentity(identity1, em)));
+      }
+      
+      if (identity2 != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipToProp.getName()),
+               lookupIdentity(identity2, em)));
+      }
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      List<?> results = em.createQuery(criteria).getResultList();
+      for (Object result : results)
+      {
+         em.remove(result);
+      }
+      
+      criteria = builder.createQuery(relationshipClass);
+      criteria.from(relationshipClass);
+      
+      predicates = new ArrayList<Predicate>();
+      
+      if (identity2 != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipFromProp.getName()),
+               lookupIdentity(identity2, em)));
+      }
+      
+      if (identity1 != null)
+      {
+         predicates.add(builder.equal(root.get(relationshipToProp.getName()),
+               lookupIdentity(identity1, em)));
+      }
+      
+      criteria.where(predicates.toArray(new Predicate[0]));
+      
+      results = em.createQuery(criteria).getResultList();
+      for (Object result : results)
+      {
+         em.remove(result);
+      }
    }
 
    public Set<IdentityObjectRelationship> resolveRelationships(

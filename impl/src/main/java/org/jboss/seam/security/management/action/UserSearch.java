@@ -20,8 +20,11 @@ public @Model class UserSearch implements Serializable
       
    @Inject IdentityManager identityManager;
    
-   @Inject public void loadUsers()
-   {       
+   private boolean loaded;
+   
+   public void loadUsers()
+   {
+      loaded = true;
       users = new ArrayList<UserDTO>();
       
       Collection<User> results = identityManager.findUsers(null);  
@@ -51,6 +54,7 @@ public @Model class UserSearch implements Serializable
    
    public List<UserDTO> getUsers()
    {
+      if (!loaded) loadUsers();
       return users;
    }   
    

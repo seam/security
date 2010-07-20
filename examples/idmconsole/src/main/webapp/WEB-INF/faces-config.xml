@@ -23,6 +23,23 @@
          <to-view-id>/userdetail.xhtml</to-view-id>
          <redirect/>
       </navigation-case>
+      
+      <navigation-case>
+        <from-action>#{userAction.deleteUser(user.username)}</from-action>
+        <if>#{true}</if>
+        <to-view-id>/manageusers.xhtml</to-view-id>
+        <redirect/>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/managegroups.xhtml</from-view-id>
+      <navigation-case>
+         <from-action>#{groupAction.deleteGroup(group.name, group.groupType)}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/managegroups.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
