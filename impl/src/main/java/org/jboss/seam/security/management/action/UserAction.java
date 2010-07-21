@@ -10,18 +10,26 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.management.IdentityManager;
+import org.jboss.seam.persistence.transaction.Transactional;
+import org.jboss.seam.security.UserImpl;
+import org.picketlink.idm.api.Attribute;
+import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
-import org.picketlink.idm.impl.api.PasswordCredential;
+import org.picketlink.idm.api.RoleType;
+import org.picketlink.idm.api.User;
+import org.picketlink.idm.common.exception.FeatureNotSupportedException;
+import org.picketlink.idm.common.exception.IdentityException;
 
 /**
  * A conversation-scoped component for creating and managing user accounts
  * 
  * @author Shane Bryzak
  */
-public @Named @ConversationScoped class UserAction implements Serializable
+public @Transactional @Named @ConversationScoped class UserAction implements Serializable
 {
    private static final long serialVersionUID = 5820385095080724087L;
+   
+   private static final String ATTRIBUTE_NAME_USER_ENABLED = "USER_ENABLED";
    
    private String firstname;
    private String lastname;
@@ -33,7 +41,7 @@ public @Named @ConversationScoped class UserAction implements Serializable
    
    private boolean newUserFlag;
    
-   @Inject IdentityManager identityManager;
+   @Inject IdentitySession identitySession;
    @Inject Conversation conversation;
       
    public void createUser()
@@ -43,21 +51,31 @@ public @Named @ConversationScoped class UserAction implements Serializable
       newUserFlag = true;
    }
    
-   public void editUser(String username)
+   public void editUser(String username) throws IdentityException, FeatureNotSupportedException
    {
       conversation.begin();
       this.username = username;
-      roles = identityManager.getUserRoles(username);
-      enabled = identityManager.isUserEnabled(username);
+      
+      Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
+      
+      for (RoleType roleType : roleTypes)
+      {
+         roles.addAll(identitySession.getRoleManager().findRoles(username, roleType.getName()));
+      }          
+      
+      Attribute enabledAttr = identitySession.getAttributesManager().getAttribute(username, 
+            ATTRIBUTE_NAME_USER_ENABLED); 
+      enabled = enabledAttr != null ? (Boolean) enabledAttr.getValue() : true;
+      
       newUserFlag = false;
    }
    
-   public void deleteUser(String username)
+   public void deleteUser(String username) throws IdentityException
    {
-      identityManager.deleteUser(username);
+      identitySession.getPersistenceManager().removeUser(new UserImpl(username), true);
    }
       
-   public String save()
+   public String save() throws IdentityException, FeatureNotSupportedException
    {
       if (newUserFlag)
       {
@@ -74,7 +92,7 @@ public @Named @ConversationScoped class UserAction implements Serializable
       conversation.end();
    }
    
-   private String saveNewUser()
+   private String saveNewUser() throws IdentityException
    {
       if (password == null || !password.equals(confirm))
       {
@@ -83,29 +101,15 @@ public @Named @ConversationScoped class UserAction implements Serializable
          return "failure";
       }
       
-      boolean success = identityManager.createUser(username, new PasswordCredential(password));
-      
-      if (success)
-      {
-         /*for (String role : roles)
-         {
-            identityManager.grantRole(username, role);
-         }*/
+      User user = identitySession.getPersistenceManager().createUser(username);
+      identitySession.getAttributesManager().updatePassword(user, password);
+            
+      conversation.end();
          
-         if (!enabled)
-         {
-            identityManager.disableUser(username);
-         }
-         
-         conversation.end();
-         
-         return "success";
-      }
-      
-      return "failure";
+      return "success";
    }
    
-   private String saveExistingUser()
+   private String saveExistingUser() throws IdentityException, FeatureNotSupportedException
    {
       // Check if a new password has been entered
       if (password != null && !"".equals(password))
@@ -118,19 +122,27 @@ public @Named @ConversationScoped class UserAction implements Serializable
          }
          else
          {
-            identityManager.updateCredential(username, new PasswordCredential(password));
+            identitySession.getAttributesManager().updatePassword(new UserImpl(username), password);
          }
       }
       
-      Collection<Role> grantedRoles = identityManager.getUserRoles(username);
+      Collection<Role> grantedRoles = new ArrayList<Role>();
+      
+      Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
+      
+      for (RoleType roleType : roleTypes)
+      {
+         grantedRoles.addAll(identitySession.getRoleManager().findRoles(username, roleType.getName()));
+      }                      
       
       if (grantedRoles != null)
       {
          for (Role role : grantedRoles)
          {
-            if (!roles.contains(role)) identityManager.revokeRole(username, 
-                  role.getRoleType().getName(), role.getGroup().getName(),
-                  role.getGroup().getGroupType());
+            if (!roles.contains(role)) 
+            {
+               identitySession.getRoleManager().removeRole(role);
+            }                  
          }
       }
       
@@ -138,18 +150,17 @@ public @Named @ConversationScoped class UserAction implements Serializable
       {
          if (grantedRoles == null || !grantedRoles.contains(role))
          {
-            identityManager.grantRole(username, role.getRoleType().getName(), 
-                  role.getGroup().getName(), role.getGroup().getGroupType());
+            identitySession.getRoleManager().createRole(role.getRoleType(), role.getUser(), role.getGroup());
          }
       }
       
       if (enabled)
       {
-         identityManager.enableUser(username);
+         //identityManager.enableUser(username);
       }
       else
       {
-         identityManager.disableUser(username);
+         //identityManager.disableUser(username);
       }
          
       conversation.end();
