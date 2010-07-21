@@ -56,6 +56,8 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       conversation.begin();
       this.username = username;
       
+      roles = new ArrayList<Role>();
+      
       Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
       
       for (RoleType roleType : roleTypes)

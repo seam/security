@@ -33,6 +33,7 @@ import org.jboss.weld.extensions.util.properties.query.PropertyCriteria;
 import org.jboss.weld.extensions.util.properties.query.PropertyQueries;
 import org.jboss.weld.extensions.util.properties.query.TypedPropertyCriteria;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
@@ -95,6 +96,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_RELATIONSHIP_NAME_NAME = "RELATIONSHIP_NAME_NAME";
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
+   private static final String PROPERTY_ATTRIBUTE_IDENTITY = "ATTRIBUTE_IDENTITY";
    private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";   
    
    private class EntityToSpiConverter
@@ -902,6 +904,26 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             Property<Object> prop = findNamedProperty(attributeClass, 
                   "attributeValue", "value");
             if (prop != null) modelProperties.put(PROPERTY_ATTRIBUTE_VALUE, prop);
+         }
+         
+         props = PropertyQueries.createQuery(attributeClass)
+            .addCriteria(new TypedPropertyCriteria(identityClass))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_ATTRIBUTE_IDENTITY, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityException(
+                  "Ambiguous identity property in attribute class " +
+                  attributeClass.getName());
+         }
+         else
+         {
+            throw new IdentityException("Error initializing JpaIdentityStore - " +
+                  "no attribute identity property found.");
          }
       }
 
@@ -1821,22 +1843,114 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return null;
    }
 
-   public IdentityObjectAttribute getAttribute(
-         IdentityStoreInvocationContext invocationContext,
+   public IdentityObjectAttribute getAttribute(IdentityStoreInvocationContext ctx,
          IdentityObject identity, String name) throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
+      EntityManager em = getEntityManager(ctx);
+      
+      Property<?> attributeProperty = attributeProperties.get(name);
+      if (attributeProperty != null)
+      {
+         // TODO implement attribute search for attributes scattered across the model
+         
+         
+         return new SimpleAttribute(name);
+      }
+      else
+      {
+         // If there is no attributeClass set, we have nowhere else to look - return an empty attribute
+         if (attributeClass == null) return new SimpleAttribute(name);
+         
+         Property<?> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+         Property<?> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
+         Property<?> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
+         Root<?> root = criteria.from(attributeClass);
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
+               lookupIdentity(identity, em)));
+         predicates.add(builder.equal(root.get(attributeNameProp.getName()),
+               name));
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         List<?> results = em.createQuery(criteria).getResultList();
+         
+         if (results.size() == 0)
+         {
+            // No results found, return an empty attribute value
+            return new SimpleAttribute(name);            
+         }
+         else if (results.size() == 1)
+         {
+            return new SimpleAttribute(name, attributeValueProp.getValue(results.get(0)));
+         }
+         else
+         {
+            Collection<Object> values = new ArrayList<Object>();
+            for (Object result : results)
+            {
+               values.add(attributeValueProp.getValue(result));               
+            }
+            
+            return new SimpleAttribute(name, values.toArray());
+         }
+      }
    }
 
    public Map<String, IdentityObjectAttribute> getAttributes(
-         IdentityStoreInvocationContext invocationContext,
-         IdentityObject identity) throws IdentityException
+         IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject) throws IdentityException
    {
-      // TODO Auto-generated method stub
-      return null;
-   }
+      Map<String, IdentityObjectAttribute> attributes = new HashMap<String,IdentityObjectAttribute>();
+      
+      EntityManager em = getEntityManager(ctx);
+      
+      Object identity = lookupIdentity(identityObject, em);
+      
+      // TODO iterate through attributeProperties
+      
+      if (attributeClass != null)
+      {
+         Property<?> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+         Property<?> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
+         Property<?> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
+         Root<?> root = criteria.from(attributeClass);
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
+               identity));
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         List<?> results = em.createQuery(criteria).getResultList();
 
+         for (Object result : results)
+         {
+            String name = attributeNameProp.getValue(result).toString();
+            Object value = attributeValueProp.getValue(result);
+            
+            if (attributes.containsKey(name))
+            {
+               IdentityObjectAttribute attr = attributes.get(name);
+               attr.addValue(value);
+            }
+            else
+            {
+               attributes.put(name, new SimpleAttribute(name, value));
+            }
+         }
+      }
+      
+      return attributes;
+   }
+   
    public Map<String, IdentityObjectAttributeMetaData> getAttributesMetaData(
          IdentityStoreInvocationContext invocationContext,
          IdentityObjectType identityType)
