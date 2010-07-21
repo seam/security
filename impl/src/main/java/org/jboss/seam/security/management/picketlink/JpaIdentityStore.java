@@ -1744,10 +1744,88 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObject identityObject, IdentityObjectCredential credential)
          throws IdentityException
    {
-
+      EntityManager em = getEntityManager(ctx);
       
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method updateCredential()");
+      Property<Object> credentialValue = modelProperties.get(PROPERTY_CREDENTIAL_VALUE);
+      
+      if (credentialClass != null)
+      {
+         Property<Object> credentialIdentity = modelProperties.get(PROPERTY_CREDENTIAL_IDENTITY);
+         Property<Object> credentialType = modelProperties.get(PROPERTY_CREDENTIAL_TYPE);
+         Object identity = lookupIdentity(identityObject, em);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(credentialClass);
+         Root<?> root = criteria.from(credentialClass);
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(credentialIdentity.getName()),
+               identity));
+         
+         if (credentialType != null)
+         {
+            if (String.class.equals(credentialType.getJavaClass()))
+            {
+               predicates.add(builder.equal(root.get(credentialType.getName()),
+                     credential.getType().getName()));
+            }
+            else
+            {
+               predicates.add(builder.equal(root.get(credentialType.getName()),
+                     lookupCredentialTypeEntity(credential.getType().getName(), em)));
+            }
+         }
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         List<?> results = em.createQuery(criteria).getResultList();
+         
+         if (results.isEmpty())
+         {
+            // The credential doesn't exist, let's create it
+            try
+            {
+               Object newCredential = credentialClass.newInstance();
+               credentialIdentity.setValue(newCredential, identity);
+               credentialValue.setValue(newCredential, credential.getValue());
+               credentialType.setValue(newCredential, 
+                     lookupCredentialTypeEntity(credential.getType().getName(), em));
+               
+               em.persist(newCredential);
+            }
+            catch (IllegalAccessException ex)
+            {
+               throw new IdentityException("Error updating credential - could " +
+                     "not create credential instance", ex);
+            }
+            catch (InstantiationException ex)
+            {
+               throw new IdentityException("Error updating credential - could " +
+                     "not create credential instance", ex);
+            }
+         }
+         else
+         {
+            // TODO there shouldn't be multiple credentials with the same type,
+            // but if there are, we need to deal with it somehow.. for now just use the first one
+            
+            Object result = results.get(0);
+            credentialValue.setValue(result, credential.getValue());
+            
+            em.merge(result);
+         }
+      }
+      else
+      {
+         // The credential is stored in the identity class, update it there
+         
+         Property<Object> credentialProp = modelProperties.get(PROPERTY_CREDENTIAL_VALUE);
+         Object identity = lookupIdentity(identityObject, em);
+         
+         credentialProp.setValue(identity, credential.getValue());
+         
+         em.merge(identity);         
+      }
 
    }
 
