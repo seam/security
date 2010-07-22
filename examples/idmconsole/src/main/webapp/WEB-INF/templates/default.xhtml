@@ -14,6 +14,16 @@
         <div id="title">
           Identity Management Console
         </div>
+        
+        <div id="headerMenu">
+          <h:form>
+            <ui:fragment rendered="#{identity.loggedIn}">
+              Welcome, #{identity.user.id}!<br/>
+              <a href="changepassword.jsf">Change password</a><span> | </span>
+              <h:commandLink value="Log out" action="#{identity.logout}"/>
+            </ui:fragment>
+          </h:form>
+        </div>
       </div>
     
       <div id="sidebar">

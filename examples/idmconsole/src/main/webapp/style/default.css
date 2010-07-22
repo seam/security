@@ -11,6 +11,10 @@ div#header {
   background-color: #eeeeee;
 }
 
+div#headerMenu {
+  float: right;
+}
+
 div#title {
   padding-top: 22px;
   font-size: 22px;

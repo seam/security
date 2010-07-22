@@ -88,6 +88,25 @@
       </navigation-case>
       
    </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/changepassword.xhtml</from-view-id>
+      
+      <navigation-case>
+         <from-action>#{changePasswordAction.changePassword}</from-action>
+         <from-outcome>success</from-outcome>
+         <if>#{true}</if>
+         <to-view-id>/home.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>      
+      
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/home.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>
+      
+   </navigation-rule>   
 
 
 </faces-config>
