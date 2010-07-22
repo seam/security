@@ -45,7 +45,7 @@
       <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
       <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
       <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
-      <plidm:roleNameClass>org.jboss.seam.security.examples.idmconsole.model.IdentityRoleName</plidm:roleNameClass>      
+      <plidm:roleTypeClass>org.jboss.seam.security.examples.idmconsole.model.IdentityRoleName</plidm:roleTypeClass>
    </plidm:JpaIdentityStoreConfiguration>
    
 </beans>

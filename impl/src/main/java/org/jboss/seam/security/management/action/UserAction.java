@@ -3,7 +3,9 @@ package org.jboss.seam.security.management.action;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -13,12 +15,14 @@ import javax.inject.Named;
 import org.jboss.seam.persistence.transaction.Transactional;
 import org.jboss.seam.security.UserImpl;
 import org.picketlink.idm.api.Attribute;
+import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.model.SimpleRole;
 
 /**
  * A conversation-scoped component for creating and managing user accounts
@@ -43,6 +47,13 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
    
    @Inject IdentitySession identitySession;
    @Inject Conversation conversation;
+   
+   Map<RoleType, Group> newRoles = new HashMap<RoleType, Group>();
+   
+   Collection<RoleType> roleTypes; 
+   
+   private RoleType roleType;
+   private String roleGroupName;
       
    public void createUser()
    {
@@ -70,6 +81,21 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       enabled = enabledAttr != null ? (Boolean) enabledAttr.getValue() : true;
       
       newUserFlag = false;
+   }
+   
+   public void addRole() throws IdentityException, FeatureNotSupportedException
+   {
+      roleTypes = identitySession.getRoleManager().findRoleTypes();
+      
+      roleType = null;
+      roleGroupName = null;
+   }
+   
+   public String roleSave()
+   {
+      //Role role = new SimpleRole();
+      //roles.add(role);
+      return "success";
    }
    
    public void deleteUser(String username) throws IdentityException
@@ -237,5 +263,35 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
    public void setEnabled(boolean enabled)
    {
       this.enabled = enabled;
+   }
+   
+   public RoleType getRoleType()
+   {
+      return roleType;
+   }
+   
+   public void setRoleType(RoleType roleType)
+   {
+      this.roleType = roleType;
+   }
+   
+   public String getRoleGroupName()
+   {
+      return roleGroupName;
+   }
+   
+   public void setRoleGroupName(String roleGroupName)
+   {
+      this.roleGroupName = roleGroupName;
+   }
+   
+   public Collection<RoleType> getRoleTypes()
+   {
+      return roleTypes;
+   }
+   
+   public void setRoleTypes(Collection<RoleType> roleTypes)
+   {
+      this.roleTypes = roleTypes;
    }
 }

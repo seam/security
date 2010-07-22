@@ -46,21 +46,26 @@
           <div class="formRow">
             <h:outputLabel for="confirm" value="Confirm password" styleClass="formLabel"/>
             <h:inputSecret id="confirm" value="#{userAction.confirm}"/>
-          </div>                        
-              
-          <div class="formRow">            
-            <h:outputLabel value="Member of" styleClass="formLabel"/>
-            <ui:repeat value="#{userAction.roles}" var="role">
-              #{role.roleType.name}<span> in group </span>#{role.group.name}<br/>
-            </ui:repeat>            
-
           </div>
           
           <div class="formRow">
             <h:outputLabel for="enabled" value="Account enabled" styleClass="formLabel"/>
             <h:selectBooleanCheckbox id="enabled" value="#{userAction.enabled}"/>
-          </div>   
-                                      
+          </div>                                  
+              
+          <h4>Role Memberships</h4>
+          
+          <div class="formRow">            
+            <h:outputLabel value="Member of" styleClass="formLabel"/>
+            <ui:repeat value="#{userAction.roles}" var="role">
+              #{role.roleType.name}<span> in group </span>#{role.group.name}<br/>
+            </ui:repeat>            
+          </div>
+          
+          <div>
+            <h:commandButton id="addRole" value="Add new role" action="#{userAction.addRole}" styleClass="formButton"/>
+          </div>
+                                                
           <div class="formButtons">
             <h:commandButton id="save" value="Save" action="#{userAction.save}" styleClass="formButton"/>
             <h:commandButton id="cancel" value="Cancel" action="#{userAction.cancel}" styleClass="formButton"/>

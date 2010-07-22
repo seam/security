@@ -17,7 +17,7 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
    private Class<?> identityClass;
    private Class<?> credentialClass;
    private Class<?> relationshipClass;
-   private Class<?> roleNameClass;
+   private Class<?> roleTypeClass;
    private Class<?> attributeClass;
    
    @Override
@@ -67,14 +67,14 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
       this.relationshipClass = relationshipClass;
    }
 
-   public Class<?> getRoleNameClass()
+   public Class<?> getRoleTypeClass()
    {
-      return roleNameClass;
+      return roleTypeClass;
    }
    
-   public void setRoleNameClass(Class<?> roleNameClass)
+   public void setRoleTypeClass(Class<?> roleTypeClass)
    {
-      this.roleNameClass = roleNameClass;
+      this.roleTypeClass = roleTypeClass;
    }
 
    public Class<?> getAttributeClass()
@@ -109,10 +109,10 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
             createOptionList(relationshipClass.getName()));
       }
       
-      if (roleNameClass != null)
+      if (roleTypeClass != null)
       {
-         options.put(JpaIdentityStore.OPTION_ROLE_NAME_CLASS_NAME, 
-            createOptionList(roleNameClass.getName()));
+         options.put(JpaIdentityStore.OPTION_ROLE_TYPE_CLASS_NAME, 
+            createOptionList(roleTypeClass.getName()));
       }
       
       store.setOptions(options);      

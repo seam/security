@@ -67,7 +67,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
    public static final String OPTION_RELATIONSHIP_CLASS_NAME = "relationshipEntityClassName";
-   public static final String OPTION_ROLE_NAME_CLASS_NAME = "roleNameEntityClassName";
+   public static final String OPTION_ROLE_TYPE_CLASS_NAME = "roleTypeEntityClassName";
    
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
@@ -92,12 +92,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_RELATIONSHIP_TYPE_NAME = "RELATIONSHIP_TYPE_NAME";
    private static final String PROPERTY_RELATIONSHIP_NAME = "RELATIONSHIP_NAME";
 
-   // Distinct from PROPERTY_RELATIONSHIP NAME - this property refers to the name field in the RELATIONSHIP_NAME entity 
-   private static final String PROPERTY_RELATIONSHIP_NAME_NAME = "RELATIONSHIP_NAME_NAME";
+   private static final String PROPERTY_ROLE_TYPE_NAME = "RELATIONSHIP_NAME_NAME";
+   
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
-   private static final String PROPERTY_ATTRIBUTE_IDENTITY = "ATTRIBUTE_IDENTITY";
-   private static final String PROPERTY_ROLE_TYPE_NAME = "ROLE_TYPE_NAME";   
+   private static final String PROPERTY_ATTRIBUTE_IDENTITY = "ATTRIBUTE_IDENTITY";  
    
    private class EntityToSpiConverter
    {
@@ -187,7 +186,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private Class<?> relationshipClass;   
    private Class<?> attributeClass;
    private Class<?> roleTypeClass;
-   private Class<?> relationshipNameClass;
    
    private String userIdentityType = DEFAULT_USER_IDENTITY_TYPE;
    private String roleIdentityType = DEFAULT_ROLE_IDENTITY_TYPE;
@@ -286,18 +284,18 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       boolean namedRelationshipsSupported = false;
       
       clsName = configurationContext.getStoreConfigurationMetaData()
-         .getOptionSingleValue(OPTION_ROLE_NAME_CLASS_NAME);
+         .getOptionSingleValue(OPTION_ROLE_TYPE_CLASS_NAME);
       
       if (clsName != null)
       {
          try
          {
-            relationshipNameClass = Class.forName(clsName);
+            roleTypeClass = Class.forName(clsName);
             namedRelationshipsSupported = true;
          }
          catch (ClassNotFoundException e)
          {
-            throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid relationship name entity class: " + clsName);
+            throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid role type entity class: " + clsName);
          }
       }
       
@@ -308,11 +306,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       configureCredentials();
       configureRelationships();
       configureAttributes();   
-      configureRoleTypeNames();
       
       if (namedRelationshipsSupported)
       {
-         configureRelationshipNames();
+         configureRoleTypeName();
       }
       
       featuresMetaData = new FeaturesMetaDataImpl(
@@ -961,27 +958,12 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
    }
    
-   protected void configureRoleTypeNames()
+   protected void configureRoleTypeName()
    {
-      if (roleTypeClass != null)
-      {
-         List<Property<Object>> props = PropertyQueries.createQuery(roleTypeClass)
-            .addCriteria(new PropertyTypeCriteria(PropertyType.NAME))
-            .getResultList();
-         
-         if (props.size() == 1)
-         {
-            modelProperties.put(PROPERTY_ROLE_TYPE_NAME, props.get(0));
-         }
-      }
-   }
-   
-   protected void configureRelationshipNames()
-   {
-      Property<Object> relationshipNameProp = findNamedProperty(relationshipNameClass, "name");
+      Property<Object> relationshipNameProp = findNamedProperty(roleTypeClass, "name");
       if (relationshipNameProp != null)
       {         
-         modelProperties.put(PROPERTY_RELATIONSHIP_NAME_NAME, relationshipNameProp);
+         modelProperties.put(PROPERTY_ROLE_TYPE_NAME, relationshipNameProp);
       }
    }
    
@@ -1363,12 +1345,29 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    }
 
    public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
-         IdentityObjectSearchCriteria criteria) throws IdentityException,
+         IdentityObjectSearchCriteria searchCriteria) throws IdentityException,
          OperationNotSupportedException
    {
-      System.out.println("*** Invoked unimplemented method getRelationshipNames()");
-      // TODO Auto-generated method stub
-      return null;
+      Set<String> names = new HashSet<String>();
+      
+      Property<Object> roleTypeNameProp = modelProperties.get(PROPERTY_ROLE_TYPE_NAME);
+      
+      if (roleTypeClass != null)
+      {
+         EntityManager em = getEntityManager(ctx);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(roleTypeClass);
+         criteria.from(roleTypeClass);
+         
+         List<?> results = em.createQuery(criteria).getResultList();
+         for (Object result : results)
+         {
+            names.add(roleTypeNameProp.getValue(result).toString());
+         }
+      }      
+
+      return names;
    }
 
    public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
