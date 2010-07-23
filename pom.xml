@@ -81,7 +81,8 @@
          <modules>
             <module>dist</module>
             <module>docs</module>
-            <module>examples/seamspace</module>
+            <!--module>examples/seamspace</module-->
+            <module>examples/idmconsole</module>
          </modules>
       </profile>
    </profiles>

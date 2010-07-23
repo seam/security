@@ -57,7 +57,8 @@
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
-            <include>org.jboss.seam.security:seam-security-seamspace-example</include>
+            <!--include>org.jboss.seam.security:seam-security-seamspace-example</include-->
+            <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
          </includes>
       </dependencySet>
       <!-- Pull in docbook artifacts -->
