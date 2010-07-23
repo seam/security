@@ -10,7 +10,6 @@
 
    <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security-reference-guide</artifactId>
-   <version>3.0.0-SNAPSHOT</version>
    <packaging>jdocbook</packaging>
    <name>Seam Security Reference Guide</name>
 
