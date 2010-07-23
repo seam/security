@@ -6,7 +6,6 @@
    <artifactId>seam-security-idmconsole-example</artifactId>
    <packaging>war</packaging>
    <name>Seam Security Identity Management Console Example</name>
-   <version>3.0.0-SNAPSHOT</version>
   
    <parent>
       <groupId>org.jboss.seam.security</groupId>
@@ -151,7 +150,7 @@
 
    </dependencies>
    <build>
-      <finalName>${artifactId}</finalName>
+      <finalName>${project.artifactId}</finalName>
       <plugins>
          <!-- Compiler plugin enforces Java 1.6 compatibility -->
          <plugin>
@@ -184,7 +183,7 @@
                <jbossHome>${jboss.home}</jbossHome>
                <serverName>${jboss.domain}</serverName>
                <fileNames>
-                  <fileName>${project.build.directory}/${build.finalName}.war</fileName>
+                  <fileName>${project.build.directory}/${project.build.finalName}.war</fileName>
                </fileNames> 
             </configuration>
          </plugin>
@@ -194,7 +193,7 @@
             <artifactId>maven-embedded-glassfish-plugin</artifactId>
             <version>3.0</version>
             <configuration>
-               <app>${project.build.directory}/${build.finalName}.war</app>
+               <app>${project.build.directory}/${project.build.finalName}.war</app>
                <port>7070</port>
                <containerType>web</containerType>
             </configuration>
