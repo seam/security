@@ -21,15 +21,19 @@
   	    
           <div class="formRow">
             <h:outputLabel for="roleType" value="Role type" styleClass="formLabel"/>
-            <h:selectOneMenu value="#{userAction.roleType}">
+            <h:selectOneMenu id="roleType" value="#{userAction.roleType}">
               <f:selectItems value="#{userAction.roleTypes}" var="roleType" itemLabel="#{roleType.name}"/>
+              <f:converter converterId="roleTypeConverter"/>
             </h:selectOneMenu>
             <div class="validationError"><h:message for="roleType"/></div>
           </div>  
           
           <div class="formRow">
-            <h:outputLabel for="roleGroup" value="Role group" styleClass="formLabel"/>
-            <h:inputText id="roleGroup" value="#{userAction.roleGroupName}"/>
+            <h:outputLabel for="roleGroup" value="Role group" styleClass="formLabel"/>            
+            <h:selectOneMenu id="roleGroup" value="#{userAction.roleGroup}">
+              <f:selectItems value="#{userAction.roleGroups}" var="group" itemLabel="#{group.name}"/>
+              <f:converter converterId="groupConverter"/>
+            </h:selectOneMenu>                        
             <div class="validationError"><h:message for="roleGroup"/></div>
           </div>            
               

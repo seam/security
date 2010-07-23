@@ -56,7 +56,6 @@
           <h4>Role Memberships</h4>
           
           <div class="formRow">            
-            <h:outputLabel value="Member of" styleClass="formLabel"/>
             <ui:repeat value="#{userAction.roles}" var="role">
               #{role.roleType.name}<span> in group </span>#{role.group.name}<br/>
             </ui:repeat>            

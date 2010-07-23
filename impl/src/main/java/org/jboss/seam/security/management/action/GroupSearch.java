@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
-import org.picketlink.idm.api.query.GroupQueryBuilder;
 import org.picketlink.idm.api.query.QueryException;
 import org.picketlink.idm.common.exception.IdentityException;
 

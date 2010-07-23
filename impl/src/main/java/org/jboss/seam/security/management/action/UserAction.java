@@ -3,9 +3,7 @@ package org.jboss.seam.security.management.action;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -48,12 +46,11 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
    @Inject IdentitySession identitySession;
    @Inject Conversation conversation;
    
-   Map<RoleType, Group> newRoles = new HashMap<RoleType, Group>();
-   
    Collection<RoleType> roleTypes; 
+   Collection<Group> roleGroups;
    
    private RoleType roleType;
-   private String roleGroupName;
+   private Group roleGroup;
       
    public void createUser()
    {
@@ -86,15 +83,15 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
    public void addRole() throws IdentityException, FeatureNotSupportedException
    {
       roleTypes = identitySession.getRoleManager().findRoleTypes();
+      roleGroups = identitySession.getPersistenceManager().findGroup("GROUP");
       
       roleType = null;
-      roleGroupName = null;
+      roleGroup = null;
    }
    
    public String roleSave()
-   {
-      //Role role = new SimpleRole();
-      //roles.add(role);
+   {      
+      roles.add(new SimpleRole(roleType, null, roleGroup));
       return "success";
    }
    
@@ -275,14 +272,14 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       this.roleType = roleType;
    }
    
-   public String getRoleGroupName()
+   public Group getRoleGroup()
    {
-      return roleGroupName;
+      return roleGroup;
    }
    
-   public void setRoleGroupName(String roleGroupName)
+   public void setRoleGroup(Group roleGroup)
    {
-      this.roleGroupName = roleGroupName;
+      this.roleGroup = roleGroup;
    }
    
    public Collection<RoleType> getRoleTypes()
@@ -290,8 +287,10 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       return roleTypes;
    }
    
-   public void setRoleTypes(Collection<RoleType> roleTypes)
+   public Collection<Group> getRoleGroups()
    {
-      this.roleTypes = roleTypes;
+      return roleGroups;
    }
+   
+   
 }
