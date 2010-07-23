@@ -27,7 +27,7 @@ import org.picketlink.idm.impl.api.model.SimpleRole;
  * 
  * @author Shane Bryzak
  */
-public @Transactional @Named @ConversationScoped class UserAction implements Serializable
+public @Named @ConversationScoped class UserAction implements Serializable
 {
    private static final long serialVersionUID = 5820385095080724087L;
    
@@ -59,7 +59,7 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       newUserFlag = true;
    }
    
-   public void editUser(String username) throws IdentityException, FeatureNotSupportedException
+   public @Transactional void editUser(String username) throws IdentityException, FeatureNotSupportedException
    {
       conversation.begin();
       this.username = username;
@@ -100,7 +100,7 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       identitySession.getPersistenceManager().removeUser(new UserImpl(username), true);
    }
       
-   public String save() throws IdentityException, FeatureNotSupportedException
+   public @Transactional String save() throws IdentityException, FeatureNotSupportedException
    {
       if (newUserFlag)
       {
@@ -117,7 +117,7 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       conversation.end();
    }
    
-   private String saveNewUser() throws IdentityException
+   private String saveNewUser() throws IdentityException, FeatureNotSupportedException
    {
       if (password == null || !password.equals(confirm))
       {
@@ -128,6 +128,11 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
       
       User user = identitySession.getPersistenceManager().createUser(username);
       identitySession.getAttributesManager().updatePassword(user, password);
+      
+      for (Role role : roles)
+      {
+         identitySession.getRoleManager().createRole(role.getRoleType(), user, role.getGroup());
+      }
             
       conversation.end();
          
@@ -171,11 +176,13 @@ public @Transactional @Named @ConversationScoped class UserAction implements Ser
          }
       }
       
+      User user = identitySession.getPersistenceManager().findUser(username);
+      
       for (Role role : roles)
       {
          if (grantedRoles == null || !grantedRoles.contains(role))
          {
-            identitySession.getRoleManager().createRole(role.getRoleType(), role.getUser(), role.getGroup());
+            identitySession.getRoleManager().createRole(role.getRoleType(), user, role.getGroup());
          }
       }
       
