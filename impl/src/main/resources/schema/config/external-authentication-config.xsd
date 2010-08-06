@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:seam:security:external_authentication:config"
+  xmlns:tns="urn:seam:security:external_authentication:config" elementFormDefault="qualified">
+  <complexType name="ExternalAuthenticationConfigType">
+    <annotation>
+      <documentation>
+        Configuration for the external authentication of users
+        (using for example SAMLv2 or OpenID).
+			</documentation>
+    </annotation>
+    <sequence minOccurs="0" maxOccurs="unbounded">
+      <element name="ServiceProvider" type="tns:ServiceProviderType" />
+    </sequence>
+  </complexType>
+  <complexType name="ServiceProviderType">
+    <annotation>
+      <documentation>
+        Configuration for one service provider (relying
+        party).
+			</documentation>
+    </annotation>
+    <sequence>
+      <element name="SamlConfig" type="tns:SamlConfigType" minOccurs="0" />
+      <element name="OpenIdConfig" type="tns:OpenIdConfigType" minOccurs="0" />
+    </sequence>
+    <attribute name="protocol" type="tns:ProtocolTypes" use="optional" default="https">
+      <annotation>
+        <documentation>Protocol that is used for the service provider (http
+          or https). Default: https.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="hostname" type="string" use="required">
+      <annotation>
+        <documentation>Name of the system that hosts the application.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="port" type="integer" use="optional">
+      <annotation>
+        <documentation>Port that is used for the service provider. Default:
+          8080 if the protocol is http, 8443 if the protocol is https.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="unsolicitedAuthenticationUrl" type="string" use="required">
+      <annotation>
+        <documentation>URL to which the browser should be redirected by
+          default after succesful unsolicited authentication (IDP initiated
+          login).</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="loggedOutUrl" type="string" use="required">
+      <annotation>
+        <documentation>URL where the browser is redirected to after a
+          succesful logout.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="failedAuthenticationUrl" type="string" use="required">
+      <annotation>
+        <documentation>URL where the browser is redirected to after
+          failed
+          authentication.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="internalAuthenticationMethod" type="string" use="required">
+      <annotation>
+        <documentation>After succesful external authentication, this method
+          is called, to determine whether the authenticated principal is
+          allowed to login. The principal is passed to this method.
+				</documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+  <complexType name="SamlConfigType">
+    <annotation>
+      <documentation>
+        Configuration for SAMLv2.
+			</documentation>
+    </annotation>
+    <sequence minOccurs="0" maxOccurs="unbounded">
+      <element name="SamlIdentityProvider" type="tns:SamlIdentityProviderType" />
+    </sequence>
+    <attribute name="authnRequestsSigned" type="boolean" use="optional" default="false">
+      <annotation>
+        <documentation>Indicates whether the service provider signs outgoing
+          authentication requests.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="wantAssertionsSigned" type="boolean" use="optional" default="true">
+      <annotation>
+        <documentation>Specifies whether assertions received from the IDP
+          are required to have a valid signature.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="serviceProviderEntityId" type="string" use="required">
+      <annotation>
+        <documentation>SAML entity id for this service provider.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="defaultIdentityProvider" type="string" use="optional">
+      <annotation>
+        <documentation>Name of the default identity provider.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="keyStoreUrl" type="string" use="required">
+      <annotation>
+        <documentation>URL of the keystore.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="keyStorePass" type="string" use="required">
+      <annotation>
+        <documentation>Password of the keystore.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="signingKeyAlias" type="string" use="required">
+      <annotation>
+        <documentation>Alias of the key that is used for signing outgoing
+          messages.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="signingKeyPass" type="string" use="optional">
+      <annotation>
+        <documentation>Password of the key that is used for signing outgoing
+          messages. Defaults to the keyStorePass.s</documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+  <complexType name="OpenIdConfigType">
+    <annotation>
+      <documentation>
+        Configuration for OpenID.
+			</documentation>
+    </annotation>
+    <sequence minOccurs="0" maxOccurs="unbounded">
+      <element name="Attribute" type="tns:OpenIdAttributeType" />
+    </sequence>
+    <attribute name="defaultOpenIdProvider" type="string" use="optional">
+      <annotation>
+        <documentation>URL of the default OpenID provider.
+				</documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+  <complexType name="OpenIdAttributeType">
+    <annotation>
+      <documentation>
+        OpenId attribute.
+			</documentation>
+    </annotation>
+    <attribute name="Alias" type="string" use="required">
+      <annotation>
+        <documentation>Alias.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="TypeUri" type="string" use="required">
+      <annotation>
+        <documentation>The URI identifying the attribute type.
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Required" type="boolean" use="required">
+      <annotation>
+        <documentation>Indicates whether the attribute is required.
+				</documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+  <simpleType name="ProtocolTypes">
+    <restriction base="string">
+      <enumeration value="http" />
+      <enumeration value="https" />
+    </restriction>
+  </simpleType>
+  <complexType name="SamlIdentityProviderType">
+    <attribute name="entityId" type="string" use="required">
+      <annotation>
+        <documentation>entity id of the SAML identity provider
+				</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="singleLogoutMessagesSigned" type="boolean" use="optional" default="false">
+      <annotation>
+        <documentation>Indicates whether outgoing logout requests and
+          responses are signed by the identity provider.
+						</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="wantSingleLogoutMessagesSigned" type="boolean" use="optional" default="false">
+      <annotation>
+        <documentation>Indicates whether the identity provider wants
+          incoming single logout requests and responses to be signed.
+				</documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+  <element name="ExternalAuthenticationConfig" type="tns:ExternalAuthenticationConfigType" />
+</schema>
