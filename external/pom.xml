@@ -12,7 +12,7 @@
    <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security-external</artifactId>
    <packaging>jar</packaging>
-   <name>Seam Security External Authentication</name>
+   <name>Seam Security External Authentication Services</name>
 
    <build>
       <plugins>
@@ -38,7 +38,7 @@
                   <id>jaxb-xrds</id>
                   <configuration>
                      <schemaDirectory>${basedir}/src/main/resources/schema/xrds</schemaDirectory>
-                     <packageName>org.jboss.seam.security.external_authentication.jaxb.xrds</packageName>
+                     <packageName>org.jboss.seam.security.external.jaxb.xrds</packageName>
                      <outputDirectory>${basedir}/src/main/generated-source</outputDirectory>
                      <clearOutputDir>false</clearOutputDir>
                      <staleFile>${project.build.directory}/.staleFlag_xrds</staleFile>
@@ -52,7 +52,7 @@
                   <id>jaxb-config</id>
                   <configuration>
                      <schemaDirectory>${basedir}/src/main/resources/schema/config</schemaDirectory>
-                     <packageName>org.jboss.seam.security.external_authentication.jaxb.config</packageName>
+                     <packageName>org.jboss.seam.security.external.jaxb.config</packageName>
                      <outputDirectory>${basedir}/src/main/generated-source</outputDirectory>
                      <clearOutputDir>false</clearOutputDir>
                      <staleFile>${project.build.directory}/.staleFlag_config</staleFile>
@@ -103,6 +103,11 @@
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
          <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-impl</artifactId>
       </dependency>
 
       <dependency>

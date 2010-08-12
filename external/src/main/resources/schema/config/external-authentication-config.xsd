@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:seam:security:external_authentication:config"
-  xmlns:tns="urn:seam:security:external_authentication:config" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:seam:security:external:config"
+  xmlns:tns="urn:seam:security:external:config" elementFormDefault="qualified">
   <complexType name="ExternalAuthenticationConfigType">
     <annotation>
       <documentation>
