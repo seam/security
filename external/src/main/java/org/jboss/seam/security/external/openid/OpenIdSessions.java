@@ -19,44 +19,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.openid;
+
+import java.io.Serializable;
+import java.util.Set;
+
+import javax.enterprise.context.SessionScoped;
+
+import org.jboss.seam.security.external.api.OpenIdPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@SessionScoped
+public class OpenIdSessions implements Serializable
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private static final long serialVersionUID = -6167224737841053169L;
 
-   private String description;
+   private Set<OpenIdPrincipal> loggedInPrincipals;
 
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public boolean isLoggedIn(OpenIdPrincipal principal)
    {
-      this(description, null);
+      return loggedInPrincipals.contains(principal);
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void login(OpenIdPrincipal principal)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      loggedInPrincipals.add(principal);
    }
 
-   public String getDescription()
+   public void logout(OpenIdPrincipal principal)
    {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      loggedInPrincipals.remove(principal);
    }
 }

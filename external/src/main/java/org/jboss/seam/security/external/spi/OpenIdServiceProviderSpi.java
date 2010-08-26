@@ -19,44 +19,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.spi;
+
+import org.jboss.seam.security.external.api.OpenIdPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public interface OpenIdServiceProviderSpi
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   public void loginSucceeded(OpenIdPrincipal principal);
 
-   private String description;
+   public void loginFailed();
 
-   private Exception cause;
+   public void logoutSucceeded(OpenIdPrincipal principal);
 
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
+   public void logoutFailed(OpenIdPrincipal principal, String statusCode);
 }

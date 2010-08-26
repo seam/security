@@ -19,44 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.externaltest.integration.sp;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import javax.enterprise.event.Observes;
+
+import org.jboss.seam.security.external.api.SamlBinding;
+import org.jboss.seam.security.external.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
+import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
+
+public class SpCustomizer
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderApi sp, VirtualApplication virtualApplication)
    {
-      this(description, null);
+      if (virtualApplication.equals("www.sp2.com"))
+      {
+         sp.setPreferredBinding(SamlBinding.HTTP_Redirect);
+      }
+      sp.setWantSingleLogoutMessagesSigned(true);
+      sp.setProtocol("http");
+      sp.setPort(8080);
    }
 
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

@@ -1,0 +1,274 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2010, Red Hat, Inc., and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.jboss.seam.security.external.saml;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import org.jboss.seam.security.external.EntityBean;
+import org.jboss.seam.security.external.JaxbContext;
+import org.jboss.seam.security.external.api.SamlBinding;
+import org.jboss.seam.security.external.api.SamlEntityApi;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntitiesDescriptorType;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.IndexedEndpointType;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.KeyDescriptorType;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.KeyTypes;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.ObjectFactory;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.RoleDescriptorType;
+import org.jboss.seam.security.external.jaxb.samlv2.metadata.SSODescriptorType;
+import org.jboss.seam.security.external.jaxb.xmldsig.KeyInfoType;
+import org.jboss.seam.security.external.jaxb.xmldsig.X509DataType;
+
+/**
+ * @author Marcel Kolsteren
+ * 
+ */
+public abstract class SamlEntityBean extends EntityBean implements SamlEntityApi
+{
+   private Map<String, SSODescriptorType> metaInfo = new HashMap<String, SSODescriptorType>();
+
+   private String entityId;
+
+   private SamlSigningKey samlSigningKey;
+
+   private SamlBinding preferredBinding = SamlBinding.HTTP_Post;
+
+   @Inject
+   private ServletContext servletContext;
+
+   @Inject
+   @JaxbContext(ObjectFactory.class)
+   protected JAXBContext metaDataJaxbContext;
+
+   private boolean singleLogoutMessagesSigned = false;
+
+   private boolean wantSingleLogoutMessagesSigned = false;
+
+   public String getServiceURL(SamlServiceType service)
+   {
+      String portString;
+      if (protocol.equals("http") && port != 80 || protocol.equals("https") && port != 443)
+      {
+         portString = ":" + port;
+      }
+      else
+      {
+         portString = "";
+      }
+      return protocol + "://" + hostName + portString + servletContext.getContextPath() + SamlFilterInstaller.FILTER_PATH + "/" + getIdpOrSp() + "/" + service.getName();
+   }
+
+   public void setEntityId(String entityId)
+   {
+      this.entityId = entityId;
+   }
+
+   public String getEntityId()
+   {
+      return entityId;
+   }
+
+   protected SamlSigningKey getSigningKey()
+   {
+      return samlSigningKey;
+   }
+
+   public void setSigningKey(String keyStoreUrl, String keyStorePass, String signingKeyAlias, String signingKeyPass)
+   {
+      if (signingKeyPass == null)
+      {
+         signingKeyPass = keyStorePass;
+      }
+      samlSigningKey = new SamlSigningKey(keyStoreUrl, keyStorePass, signingKeyAlias, signingKeyPass);
+   }
+
+   public boolean isSingleLogoutMessagesSigned()
+   {
+      return singleLogoutMessagesSigned;
+   }
+
+   public void setSingleLogoutMessagesSigned(boolean singleLogoutMessagesSigned)
+   {
+      this.singleLogoutMessagesSigned = singleLogoutMessagesSigned;
+   }
+
+   public boolean isWantSingleLogoutMessagesSigned()
+   {
+      return wantSingleLogoutMessagesSigned;
+   }
+
+   public void setWantSingleLogoutMessagesSigned(boolean wantSingleLogoutMessagesSigned)
+   {
+      this.wantSingleLogoutMessagesSigned = wantSingleLogoutMessagesSigned;
+   }
+
+   public abstract SamlIdpOrSp getIdpOrSp();
+
+   public abstract SamlExternalEntity getExternalSamlEntityByEntityId(String entityId);
+
+   public abstract SamlExternalEntity addExternalSamlEntity(Reader reader);
+
+   public abstract List<SamlExternalEntity> getExternalSamlEntities();
+
+   protected void readEntitiesDescriptor(Reader reader)
+   {
+      try
+      {
+         Unmarshaller unmarshaller = metaDataJaxbContext.createUnmarshaller();
+         JAXBElement<?> o = (JAXBElement<?>) unmarshaller.unmarshal(reader);
+         EntitiesDescriptorType entitiesDescriptor = (EntitiesDescriptorType) o.getValue();
+         readEntitiesDescriptor(entitiesDescriptor);
+      }
+      catch (JAXBException e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
+
+   private void readEntitiesDescriptor(EntitiesDescriptorType entitiesDescriptor)
+   {
+      for (Object object : entitiesDescriptor.getEntityDescriptorOrEntitiesDescriptor())
+      {
+         if (object instanceof EntityDescriptorType)
+         {
+            EntityDescriptorType entityDescriptor = (EntityDescriptorType) object;
+            readEntityDescriptor(entityDescriptor);
+         }
+         else
+         {
+            EntitiesDescriptorType descriptor = (EntitiesDescriptorType) object;
+            readEntitiesDescriptor(descriptor);
+         }
+      }
+   }
+
+   private void readEntityDescriptor(EntityDescriptorType entityDescriptor)
+   {
+      String entityId = entityDescriptor.getEntityID();
+
+      for (RoleDescriptorType roleDescriptor : entityDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor())
+      {
+         metaInfo.put(entityId, (SSODescriptorType) roleDescriptor);
+      }
+   }
+
+   public Map<String, SSODescriptorType> getMetaInfo()
+   {
+      return metaInfo;
+   }
+
+   protected EntityDescriptorType readEntityDescriptor(Reader metaInfoReader)
+   {
+      try
+      {
+         Unmarshaller unmarshaller = metaDataJaxbContext.createUnmarshaller();
+         JAXBElement<?> o = (JAXBElement<?>) unmarshaller.unmarshal(metaInfoReader);
+         EntityDescriptorType entityDescriptor = (EntityDescriptorType) o.getValue();
+         return entityDescriptor;
+      }
+      catch (JAXBException e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
+
+   public abstract void writeMetaData(Writer writer);
+
+   protected void addKeyDescriptorToMetaData(SSODescriptorType ssoDescriptor)
+   {
+      ObjectFactory metaDataFactory = new ObjectFactory();
+      org.jboss.seam.security.external.jaxb.xmldsig.ObjectFactory signatureFactory = new org.jboss.seam.security.external.jaxb.xmldsig.ObjectFactory();
+
+      X509Certificate certificate = getSigningKey().getCertificate();
+      if (certificate == null)
+         throw new RuntimeException("Certificate obtained from configuration is null");
+
+      JAXBElement<byte[]> X509Certificate;
+      try
+      {
+         X509Certificate = signatureFactory.createX509DataTypeX509Certificate(certificate.getEncoded());
+      }
+      catch (CertificateEncodingException e)
+      {
+         throw new RuntimeException(e);
+      }
+
+      X509DataType X509Data = signatureFactory.createX509DataType();
+      X509Data.getX509IssuerSerialOrX509SKIOrX509SubjectName().add(X509Certificate);
+
+      KeyInfoType keyInfo = signatureFactory.createKeyInfoType();
+      keyInfo.getContent().add(signatureFactory.createX509Data(X509Data));
+
+      KeyDescriptorType keyDescriptor = metaDataFactory.createKeyDescriptorType();
+      keyDescriptor.setUse(KeyTypes.SIGNING);
+      keyDescriptor.setKeyInfo(keyInfo);
+
+      ssoDescriptor.getKeyDescriptor().add(keyDescriptor);
+   }
+
+   protected void addSloEndpointsToMetaData(SSODescriptorType ssoDescriptor)
+   {
+      ObjectFactory metaDataFactory = new ObjectFactory();
+
+      IndexedEndpointType sloRedirectEndpoint = metaDataFactory.createIndexedEndpointType();
+      sloRedirectEndpoint.setBinding(SamlConstants.HTTP_REDIRECT_BINDING);
+      sloRedirectEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_SINGLE_LOGOUT_SERVICE));
+
+      IndexedEndpointType sloPostEndpoint = metaDataFactory.createIndexedEndpointType();
+      sloPostEndpoint.setBinding(SamlConstants.HTTP_POST_BINDING);
+      sloPostEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_SINGLE_LOGOUT_SERVICE));
+
+      ssoDescriptor.getSingleLogoutService().add(sloRedirectEndpoint);
+      ssoDescriptor.getSingleLogoutService().add(sloPostEndpoint);
+   }
+
+   protected void addNameIDFormatsToMetaData(SSODescriptorType idpSsoDescriptor)
+   {
+      idpSsoDescriptor.getNameIDFormat().add("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+      idpSsoDescriptor.getNameIDFormat().add("urn:oasis:names:tc:SAML:2.0:nameid-format:transient");
+      idpSsoDescriptor.getNameIDFormat().add("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified");
+      idpSsoDescriptor.getNameIDFormat().add("urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress");
+   }
+
+   public SamlBinding getPreferredBinding()
+   {
+      return preferredBinding;
+   }
+
+   public void setPreferredBinding(SamlBinding preferredBinding)
+   {
+      this.preferredBinding = preferredBinding;
+   }
+}

@@ -19,44 +19,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.externaltest.integration.sp;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+
+import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationManagerCreation;
+
+@ApplicationScoped
+public class SpVirtualApplicationCreator
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void virtualApplicationManagerCreated(@Observes final AfterVirtualApplicationManagerCreation event)
    {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      event.addVirtualApplication("www.sp1.com");
+      event.addVirtualApplication("www.sp2.com");
    }
 }

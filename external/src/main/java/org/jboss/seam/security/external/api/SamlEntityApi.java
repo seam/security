@@ -19,44 +19,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.api;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.util.List;
+
+import org.jboss.seam.security.external.saml.SamlExternalEntity;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public interface SamlEntityApi
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   String getProtocol();
 
-   private String description;
+   void setProtocol(String protocol);
 
-   private Exception cause;
+   void setEntityId(String entityId);
 
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
+   String getEntityId();
 
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
+   String getHostName();
 
-   public String getDescription()
-   {
-      return description;
-   }
+   void setHostName(String hostName);
 
-   public Exception getCause()
-   {
-      return cause;
-   }
+   int getPort();
 
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
+   void setPort(int port);
+
+   SamlBinding getPreferredBinding();
+
+   void setPreferredBinding(SamlBinding preferredBinding);
+
+   void setSigningKey(String keyStoreUrl, String keyStorePass, String signingKeyAlias, String signingKeyPass);
+
+   SamlExternalEntity getExternalSamlEntityByEntityId(String entityId);
+
+   SamlExternalEntity addExternalSamlEntity(Reader reader);
+
+   List<SamlExternalEntity> getExternalSamlEntities();
+
+   void writeMetaData(Writer writer);
 }

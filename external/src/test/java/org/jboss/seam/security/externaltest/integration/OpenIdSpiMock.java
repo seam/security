@@ -19,44 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.externaltest.integration;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import org.jboss.seam.security.external.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.spi.OpenIdServiceProviderSpi;
+
+public class OpenIdSpiMock implements OpenIdServiceProviderSpi
 {
-   private static final long serialVersionUID = -9127592026257210986L;
 
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void loginFailed()
    {
-      this(description, null);
+      // TODO Auto-generated method stub
+
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void loginSucceeded(OpenIdPrincipal principal)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      // TODO Auto-generated method stub
+
    }
 
-   public String getDescription()
+   public void logoutFailed(OpenIdPrincipal principal, String statusCode)
    {
-      return description;
+      // TODO Auto-generated method stub
+
    }
 
-   public Exception getCause()
+   public void logoutSucceeded(OpenIdPrincipal principal)
    {
-      return cause;
+      // TODO Auto-generated method stub
+
    }
 
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

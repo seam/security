@@ -19,44 +19,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml;
+
+import org.jboss.seam.security.external.api.SamlBinding;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class SamlEndpoint
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private SamlBinding samlBinding;
 
-   private String description;
+   private String location;
 
-   private Exception cause;
+   private String responseLocation;
 
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
+   private SamlService service;
 
-   public InvalidRequestException(String description, Exception cause)
+   public SamlEndpoint(SamlService service, SamlBinding samlBinding, String location, String responseLocation)
    {
       super();
-      this.description = description;
-      this.cause = cause;
+      this.service = service;
+      this.samlBinding = samlBinding;
+      this.location = location;
+      this.responseLocation = responseLocation;
    }
 
-   public String getDescription()
+   public SamlService getService()
    {
-      return description;
+      return service;
    }
 
-   public Exception getCause()
+   public SamlBinding getBinding()
    {
-      return cause;
+      return samlBinding;
    }
 
-   public void setCause(Exception cause)
+   public String getLocation()
    {
-      this.cause = cause;
+      return location;
+   }
+
+   public String getResponseLocation()
+   {
+      return responseLocation != null ? responseLocation : location;
    }
 }

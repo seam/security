@@ -19,44 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.dialogues.api;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.enterprise.util.Nonbinding;
+import javax.interceptor.InterceptorBinding;
+
+@InterceptorBinding
+@Target( { METHOD, TYPE })
+@Retention(RUNTIME)
+public @interface Dialogued
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
+   @Nonbinding
+   boolean join() default false;
 }

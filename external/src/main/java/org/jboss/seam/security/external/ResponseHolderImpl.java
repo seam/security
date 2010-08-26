@@ -21,42 +21,27 @@
  */
 package org.jboss.seam.security.external;
 
+import javax.enterprise.context.RequestScoped;
+import javax.servlet.http.HttpServletResponse;
+
+import org.jboss.seam.security.external.api.ResponseHolder;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@RequestScoped
+public class ResponseHolderImpl implements ResponseHolder
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private HttpServletResponse httpServletResponse;
 
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public HttpServletResponse getResponse()
    {
-      this(description, null);
+      return httpServletResponse;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setResponse(HttpServletResponse response)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      httpServletResponse = response;
    }
 }

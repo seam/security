@@ -19,44 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.dialogues.api;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@DialogueScoped
+public class Dialogue
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private String dialogueId;
 
-   private String description;
+   private boolean finished;
 
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public String getDialogueId()
    {
-      this(description, null);
+      return dialogueId;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setDialogueId(String requestId)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      this.dialogueId = requestId;
    }
 
-   public String getDescription()
+   public boolean isFinished()
    {
-      return description;
+      return finished;
    }
 
-   public Exception getCause()
+   public void setFinished(boolean finished)
    {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      this.finished = finished;
    }
 }

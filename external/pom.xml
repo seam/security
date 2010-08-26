@@ -14,6 +14,12 @@
    <packaging>jar</packaging>
    <name>Seam Security External Authentication Services</name>
 
+   <properties>
+      <arquillian.version>1.0.0.Alpha3</arquillian.version>
+      <jbossas.server.manager.version>1.0.3.GA</jbossas.server.manager.version>
+      <jbossas.client.version>6.0.0.20100721-M4</jbossas.client.version>
+   </properties>
+
    <build>
       <plugins>
          <plugin>
@@ -27,7 +33,7 @@
                      <schemaDirectory>${basedir}/src/main/resources/schema/samlv2</schemaDirectory>
                      <outputDirectory>${basedir}/src/main/generated-source</outputDirectory>
                      <clearOutputDir>true</clearOutputDir>
-                     <staleFile>${project.build.directory}/.staleFlag_saml</staleFile>
+                     <staleFile>${project.build.directory}/classes/.staleFlag_saml</staleFile>
                      <bindingFiles>samlv2-bindings.xjb</bindingFiles>
                   </configuration>
                   <goals>
@@ -41,22 +47,8 @@
                      <packageName>org.jboss.seam.security.external.jaxb.xrds</packageName>
                      <outputDirectory>${basedir}/src/main/generated-source</outputDirectory>
                      <clearOutputDir>false</clearOutputDir>
-                     <staleFile>${project.build.directory}/.staleFlag_xrds</staleFile>
+                     <staleFile>${project.build.directory}/classes/.staleFlag_xrds</staleFile>
                      <bindingFiles>xrds-bindings.xjb</bindingFiles>
-                  </configuration>
-                  <goals>
-                     <goal>xjc</goal>
-                  </goals>
-               </execution>
-               <execution>
-                  <id>jaxb-config</id>
-                  <configuration>
-                     <schemaDirectory>${basedir}/src/main/resources/schema/config</schemaDirectory>
-                     <packageName>org.jboss.seam.security.external.jaxb.config</packageName>
-                     <outputDirectory>${basedir}/src/main/generated-source</outputDirectory>
-                     <clearOutputDir>false</clearOutputDir>
-                     <staleFile>${project.build.directory}/.staleFlag_config</staleFile>
-                     <bindingFiles>config-bindings.xjb</bindingFiles>
                   </configuration>
                   <goals>
                      <goal>xjc</goal>
@@ -68,6 +60,29 @@
    </build>
 
    <dependencies>
+
+      <dependency>
+         <groupId>org.jboss.weld</groupId>
+         <artifactId>weld-core</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.weld</groupId>
+         <artifactId>weld-extensions</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.servlet</groupId>
+         <artifactId>seam-servlet-api</artifactId>
+         <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.servlet</groupId>
+         <artifactId>seam-servlet</artifactId>
+         <version>3.0.0-SNAPSHOT</version>
+      </dependency>
 
       <dependency>
          <groupId>javax.el</groupId>
@@ -96,38 +111,6 @@
       <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-api</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-impl</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.picketlink.idm</groupId>
-         <artifactId>picketlink-idm-core</artifactId>
-         <exclusions>
-            <exclusion>
-               <groupId>com.sun.xml.bind</groupId>
-               <artifactId>jaxb-impl</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>log4j</groupId>
-               <artifactId>log4j</artifactId>
-            </exclusion>
-         </exclusions>
-      </dependency>
-
-      <dependency>
-         <groupId>org.hibernate</groupId>
-         <artifactId>hibernate-core</artifactId>
          <scope>provided</scope>
       </dependency>
 
@@ -163,6 +146,103 @@
          <optional>true</optional>
       </dependency>
 
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-log4j12</artifactId>
+         <version>${slf4j.version}</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.14</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>com.sun.xml.bind</groupId>
+         <artifactId>jaxb-impl</artifactId>
+         <version>2.1.9</version>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- Needed by openid4java -->
+      <dependency>
+         <groupId>commons-httpclient</groupId>
+         <artifactId>commons-httpclient</artifactId>
+         <version>3.1</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.httpcomponents</groupId>
+         <artifactId>httpclient</artifactId>
+         <version>4.0</version>
+         <scope>test</scope>
+      </dependency>
+
    </dependencies>
+
+   <profiles>
+      <profile>
+         <id>jbossas-managed-6</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jbossas-managed-6</artifactId>
+               <version>${arquillian.version}</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-server-manager</artifactId>
+               <version>${jbossas.server.manager.version}</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-as-client</artifactId>
+               <type>pom</type>
+               <version>${jbossas.client.version}</version>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+      </profile>
+
+      <profile>
+         <id>jbossas-remote-6</id>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jbossas-remote-6</artifactId>
+               <version>${arquillian.version}</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-as-client</artifactId>
+               <type>pom</type>
+               <version>${jbossas.client.version}</version>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+      </profile>
+
+   </profiles>
 
 </project>

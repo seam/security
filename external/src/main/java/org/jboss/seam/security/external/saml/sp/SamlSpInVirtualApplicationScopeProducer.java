@@ -19,44 +19,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml.sp;
+
+import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.New;
+import javax.enterprise.inject.Produces;
+
+import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
+import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@Alternative
+public class SamlSpInVirtualApplicationScopeProducer
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   @Produces
+   @VirtualApplicationScoped
+   public SamlSpBean produceSp(@New SamlSpBean sp, VirtualApplication virtualApplication)
    {
-      this(description, null);
-   }
+      String hostName = virtualApplication.getHostName();
+      sp.setHostName(hostName);
+      sp.setEntityId("https://" + hostName);
 
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      return sp;
    }
 }

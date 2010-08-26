@@ -19,44 +19,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.externaltest.integration.client;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.DeployableContainer;
+import org.jboss.arquillian.spi.event.container.AfterDeploy;
+import org.jboss.arquillian.spi.event.suite.EventHandler;
+
+public class AfterDeployEventHandler implements EventHandler<AfterDeploy>
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void callback(Context context, AfterDeploy event) throws Exception
    {
-      this(description, null);
+      DeployableContainer container = context.get(DeployableContainer.class);
+      container.deploy(context, ArchiveBuilder.createTestArchive("idp"));
    }
 
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

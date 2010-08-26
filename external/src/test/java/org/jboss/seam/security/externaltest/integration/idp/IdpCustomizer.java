@@ -19,44 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.externaltest.integration.idp;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class InvalidRequestException extends Exception
+import javax.enterprise.event.Observes;
+import javax.servlet.ServletContextEvent;
+
+import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
+import org.jboss.seam.servlet.event.qualifier.Initialized;
+
+public class IdpCustomizer
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderApi idp)
    {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      idp.setEntityId("https://www.idp.com");
+      idp.setHostName("www.idp.com");
+      idp.setProtocol("http");
+      idp.setPort(8080);
+      idp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
+      idp.setSingleLogoutMessagesSigned(true);
    }
 }

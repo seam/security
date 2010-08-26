@@ -19,44 +19,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public enum SamlServiceType
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   SAML_SINGLE_SIGN_ON_SERVICE("SingleSignOnService", SamlProfile.SINGLE_SIGN_ON),
 
-   private String description;
+   SAML_ASSERTION_CONSUMER_SERVICE("AssertionConsumerService", SamlProfile.SINGLE_SIGN_ON),
 
-   private Exception cause;
+   SAML_SINGLE_LOGOUT_SERVICE("SingleLogoutService", SamlProfile.SINGLE_LOGOUT),
 
-   public InvalidRequestException(String description)
+   SAML_META_DATA_SERVICE("MetaDataService", null);
+
+   private String name;
+
+   private SamlProfile profile;
+
+   private SamlServiceType(String name, SamlProfile profile)
    {
-      this(description, null);
+      this.name = name;
+      this.profile = profile;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public String getName()
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      return name;
    }
 
-   public String getDescription()
+   public SamlProfile getProfile()
    {
-      return description;
+      return profile;
    }
 
-   public Exception getCause()
+   public static SamlServiceType getByName(String name)
    {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      for (SamlServiceType service : values())
+      {
+         if (service.getName().equals(name))
+         {
+            return service;
+         }
+      }
+      return null;
    }
 }

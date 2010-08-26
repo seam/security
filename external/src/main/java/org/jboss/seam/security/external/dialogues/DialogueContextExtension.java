@@ -19,44 +19,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.dialogues;
+
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class DialogueContextExtension implements Extension
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private DialogueContext dialogueContext;
 
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager)
    {
-      this(description, null);
+      dialogueContext = new DialogueContext();
+      event.addContext(dialogueContext);
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public DialogueContext getDialogueContext()
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      return dialogueContext;
    }
 
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

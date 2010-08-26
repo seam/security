@@ -19,44 +19,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.openid;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public enum OpenIdService
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   OPEN_ID_SERVICE("OpenIdService"),
 
-   private String description;
+   OPEN_ID_XRDS_SERVICE("OpenIdXrdsService");
 
-   private Exception cause;
+   private String name;
 
-   public InvalidRequestException(String description)
+   private OpenIdService(String name)
    {
-      this(description, null);
+      this.name = name;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public String getName()
    {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      return name;
    }
 }

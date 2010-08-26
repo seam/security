@@ -32,7 +32,7 @@
 	<jaxb:bindings schemaLocation="../resources/schema/samlv2/xenc-schema.xsd">
 		<jaxb:bindings node="/xs:schema">
 			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.external.jaxb.xenc" />
+				<jaxb:package name="org.jboss.seam.security.external.jaxb.xenc" />
 			</jaxb:schemaBindings>
 		</jaxb:bindings>
 	</jaxb:bindings>

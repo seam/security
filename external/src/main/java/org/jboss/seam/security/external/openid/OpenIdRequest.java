@@ -19,44 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.openid;
+
+import java.io.Serializable;
+
+import javax.enterprise.context.SessionScoped;
+
+import org.openid4java.discovery.DiscoveryInformation;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@SessionScoped
+public class OpenIdRequest implements Serializable
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private static final long serialVersionUID = -6701058408595984106L;
 
-   private String description;
+   private DiscoveryInformation discoveryInformation;
 
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public DiscoveryInformation getDiscoveryInformation()
    {
-      this(description, null);
+      return discoveryInformation;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setDiscoveryInformation(DiscoveryInformation discoveryInformation)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      this.discoveryInformation = discoveryInformation;
    }
 }

@@ -19,44 +19,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.api;
+
+import java.net.URL;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+// TODO: create hash code and equals method
+public class OpenIdPrincipal implements Principal
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private String identifier;
 
-   private String description;
+   private URL openIdProvider;
 
-   private Exception cause;
+   private Map<String, List<String>> attributes;
 
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
+   public OpenIdPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributes)
    {
       super();
-      this.description = description;
-      this.cause = cause;
+      this.identifier = identifier;
+      this.openIdProvider = openIdProvider;
+      this.attributes = attributes;
    }
 
-   public String getDescription()
+   public String getName()
    {
-      return description;
+      return identifier;
    }
 
-   public Exception getCause()
+   public String getIdentifier()
    {
-      return cause;
+      return identifier;
    }
 
-   public void setCause(Exception cause)
+   public URL getOpenIdProvider()
    {
-      this.cause = cause;
+      return openIdProvider;
    }
+
+   public Map<String, List<String>> getAttributes()
+   {
+      return attributes;
+   }
+
 }

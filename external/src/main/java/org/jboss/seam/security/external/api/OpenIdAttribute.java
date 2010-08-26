@@ -19,44 +19,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.api;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class OpenIdAttribute
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private String alias;
+   private String typeUri;
+   private boolean required;
 
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public String getAlias()
    {
-      this(description, null);
+      return alias;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setAlias(String alias)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      this.alias = alias;
    }
 
-   public String getDescription()
+   public String getTypeUri()
    {
-      return description;
+      return typeUri;
    }
 
-   public Exception getCause()
+   public void setTypeUri(String typeUri)
    {
-      return cause;
+      this.typeUri = typeUri;
    }
 
-   public void setCause(Exception cause)
+   public boolean isRequired()
    {
-      this.cause = cause;
+      return required;
+   }
+
+   public void setRequired(boolean required)
+   {
+      this.required = required;
    }
 }

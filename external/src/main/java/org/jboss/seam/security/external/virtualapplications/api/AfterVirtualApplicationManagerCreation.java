@@ -19,44 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.virtualapplications.api;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class AfterVirtualApplicationManagerCreation
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private Set<String> hostNames = new HashSet<String>();
 
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void addVirtualApplication(String hostName)
    {
-      this(description, null);
+      hostNames.add(hostName);
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public Set<String> getHostNames()
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      return hostNames;
    }
 
-   public String getDescription()
+   public void setHostNames(Set<String> hostNames)
    {
-      return description;
+      this.hostNames = hostNames;
    }
 
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

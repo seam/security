@@ -25,38 +25,40 @@ package org.jboss.seam.security.external;
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public abstract class EntityBean
 {
-   private static final long serialVersionUID = -9127592026257210986L;
 
-   private String description;
+   protected String hostName;
+   protected String protocol = "https";
+   protected int port = 443;
 
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public String getProtocol()
    {
-      this(description, null);
+      return protocol;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setProtocol(String protocol)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      this.protocol = protocol;
    }
 
-   public String getDescription()
+   public String getHostName()
    {
-      return description;
+      return hostName;
    }
 
-   public Exception getCause()
+   public void setHostName(String hostName)
    {
-      return cause;
+      this.hostName = hostName;
    }
 
-   public void setCause(Exception cause)
+   public int getPort()
    {
-      this.cause = cause;
+      return port;
+   }
+
+   public void setPort(int port)
+   {
+      this.port = port;
    }
 }

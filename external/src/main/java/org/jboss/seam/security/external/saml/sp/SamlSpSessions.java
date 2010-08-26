@@ -19,44 +19,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml.sp;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.enterprise.context.SessionScoped;
+
+import org.jboss.seam.security.external.api.SamlPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+@SessionScoped
+public class SamlSpSessions implements Serializable
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private static final long serialVersionUID = 6297278286428111620L;
 
-   private String description;
+   private Set<SamlSpSession> sessions = new HashSet<SamlSpSession>();
 
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   public void addSession(SamlSpSession session)
    {
-      this(description, null);
+      sessions.add(session);
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void removeSession(SamlSpSession session)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      sessions.remove(session);
    }
 
-   public String getDescription()
+   public Set<SamlSpSession> getSessions()
    {
-      return description;
+      return sessions;
    }
 
-   public Exception getCause()
+   public SamlSpSession getSession(SamlPrincipal samlPrincipal, String idpEntityId, String sessionIndex)
    {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      for (SamlSpSession session : sessions)
+      {
+         if (session.getPrincipal().equals(samlPrincipal) && session.getIdentityProvider().getEntityId().equals(idpEntityId) && session.getSessionIndex().equals(sessionIndex))
+         {
+            return session;
+         }
+      }
+      return null;
    }
 }

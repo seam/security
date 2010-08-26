@@ -21,42 +21,31 @@
  */
 package org.jboss.seam.security.external;
 
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class JaxbContextProducer
 {
-   private static final long serialVersionUID = -9127592026257210986L;
-
-   private String description;
-
-   private Exception cause;
-
-   public InvalidRequestException(String description)
+   @Produces
+   @JaxbContext(Object.class)
+   public JAXBContext getContext(InjectionPoint ip)
    {
-      this(description, null);
-   }
-
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
-
-   public String getDescription()
-   {
-      return description;
-   }
-
-   public Exception getCause()
-   {
-      return cause;
-   }
-
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
+      JAXBContext jaxbContext;
+      try
+      {
+         Class<?>[] classes = ip.getAnnotated().getAnnotation(JaxbContext.class).value();
+         jaxbContext = JAXBContext.newInstance(classes);
+      }
+      catch (JAXBException e)
+      {
+         throw new RuntimeException(e);
+      }
+      return jaxbContext;
    }
 }

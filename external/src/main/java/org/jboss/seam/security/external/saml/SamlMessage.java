@@ -19,44 +19,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class SamlMessage
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   public static final String QSP_SAML_REQUEST = "SAMLRequest";
+   public static final String QSP_SAML_RESPONSE = "SAMLResponse";
 
-   private String description;
+   protected SamlRequestOrResponse samlRequestOrResponse;
 
-   private Exception cause;
+   protected String samlMessage;
 
-   public InvalidRequestException(String description)
+   public SamlRequestOrResponse getRequestOrResponse()
    {
-      this(description, null);
+      return samlRequestOrResponse;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setRequestOrResponse(SamlRequestOrResponse samlRequestOrResponse)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      this.samlRequestOrResponse = samlRequestOrResponse;
    }
 
-   public String getDescription()
+   public String getSamlMessage()
    {
-      return description;
+      return samlMessage;
    }
 
-   public Exception getCause()
+   public void setSamlMessage(String samlMessage)
    {
-      return cause;
+      this.samlMessage = samlMessage;
    }
 
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
 }

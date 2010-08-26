@@ -19,44 +19,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.api;
+
+import java.util.List;
+import java.util.Set;
+
+import org.jboss.seam.security.external.saml.sp.SamlExternalIdentityProvider;
+import org.jboss.seam.security.external.saml.sp.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public interface SamlServiceProviderApi extends SamlEntityApi
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   public void signOn(String idpEntityId);
 
-   private String description;
+   public void logout(SamlSpSession session);
 
-   private Exception cause;
+   public void singleLogout(SamlSpSession session);
 
-   public InvalidRequestException(String description)
-   {
-      this(description, null);
-   }
+   public Set<SamlSpSession> getSessions();
 
-   public InvalidRequestException(String description, Exception cause)
-   {
-      super();
-      this.description = description;
-      this.cause = cause;
-   }
+   List<SamlExternalIdentityProvider> getIdentityProviders();
 
-   public String getDescription()
-   {
-      return description;
-   }
+   boolean isAuthnRequestsSigned();
 
-   public Exception getCause()
-   {
-      return cause;
-   }
+   void setAuthnRequestsSigned(boolean authnRequestsSigned);
 
-   public void setCause(Exception cause)
-   {
-      this.cause = cause;
-   }
+   boolean isWantAssertionsSigned();
+
+   void setWantAssertionsSigned(boolean wantAssertionsSigned);
+
+   boolean isSingleLogoutMessagesSigned();
+
+   void setSingleLogoutMessagesSigned(boolean singleLogoutMessagesSigned);
+
+   boolean isWantSingleLogoutMessagesSigned();
+
+   void setWantSingleLogoutMessagesSigned(boolean wantSingleLogoutMessagesSigned);
 }

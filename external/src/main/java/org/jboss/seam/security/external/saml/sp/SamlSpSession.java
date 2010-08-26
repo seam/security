@@ -19,44 +19,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.saml.sp;
+
+import org.jboss.seam.security.external.api.SamlPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class InvalidRequestException extends Exception
+public class SamlSpSession
 {
-   private static final long serialVersionUID = -9127592026257210986L;
+   private SamlPrincipal principal;
 
-   private String description;
+   private String sessionIndex;
 
-   private Exception cause;
+   private SamlExternalIdentityProvider identityProvider;
 
-   public InvalidRequestException(String description)
+   public SamlPrincipal getPrincipal()
    {
-      this(description, null);
+      return principal;
    }
 
-   public InvalidRequestException(String description, Exception cause)
+   public void setPrincipal(SamlPrincipal samlPrincipal)
    {
-      super();
-      this.description = description;
-      this.cause = cause;
+      this.principal = samlPrincipal;
    }
 
-   public String getDescription()
+   public String getSessionIndex()
    {
-      return description;
+      return sessionIndex;
    }
 
-   public Exception getCause()
+   public void setSessionIndex(String sessionIndex)
    {
-      return cause;
+      this.sessionIndex = sessionIndex;
    }
 
-   public void setCause(Exception cause)
+   public SamlExternalIdentityProvider getIdentityProvider()
    {
-      this.cause = cause;
+      return identityProvider;
    }
+
+   public void setIdentityProvider(SamlExternalIdentityProvider identityProvider)
+   {
+      this.identityProvider = identityProvider;
+   }
+
 }
