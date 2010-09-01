@@ -31,13 +31,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlEntityApi;
+import org.jboss.seam.security.external.api.SamlEntityConfigurationApi;
 
 @ApplicationScoped
 public class MetaDataLoader
 {
    @Inject
-   private Instance<SamlEntityApi> samlEntityBean;
+   private Instance<SamlEntityConfigurationApi> samlEntityBean;
 
    public void loadMetaDataOfOtherSamlEntity(String hostName, String idpOrSp)
    {

@@ -1,0 +1,2 @@
+org.jboss.seam.security.external.virtualapplications.VirtualApplicationContextExtension
+org.jboss.seam.security.external.dialogues.DialogueContextExtension

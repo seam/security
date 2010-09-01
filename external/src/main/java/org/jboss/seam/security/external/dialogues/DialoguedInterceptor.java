@@ -21,13 +21,11 @@
  */
 package org.jboss.seam.security.external.dialogues;
 
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 
 /**
@@ -41,19 +39,20 @@ public class DialoguedInterceptor
    @Inject
    private DialogueManager manager;
 
-   @Inject
-   private Instance<Dialogue> dialogue;
-
    @AroundInvoke
    public Object intercept(InvocationContext ctx) throws Exception
    {
-      boolean joined = false;
+      boolean joined;
       Object result;
       boolean join = ctx.getMethod().getAnnotation(Dialogued.class).join();
 
       if (!join || !manager.isAttached())
       {
          manager.beginDialogue();
+         joined = false;
+      }
+      else
+      {
          joined = true;
       }
 
@@ -65,28 +64,16 @@ public class DialoguedInterceptor
       {
          if (!joined)
          {
-            endOrDetachDialogue();
+            manager.detachDialogue();
          }
          throw (e);
       }
 
       if (!joined)
       {
-         endOrDetachDialogue();
+         manager.detachDialogue();
       }
 
       return result;
-   }
-
-   private void endOrDetachDialogue()
-   {
-      if (dialogue.get().isFinished())
-      {
-         manager.endDialogue();
-      }
-      else
-      {
-         manager.detachDialogue();
-      }
    }
 }

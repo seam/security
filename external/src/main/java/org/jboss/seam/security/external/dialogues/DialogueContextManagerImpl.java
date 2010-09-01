@@ -23,9 +23,11 @@ package org.jboss.seam.security.external.dialogues;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 
+import org.jboss.seam.security.external.dialogues.api.AfterDialogueActivation;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.servlet.event.qualifier.Destroyed;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
@@ -42,6 +44,9 @@ public class DialogueContextManagerImpl implements DialogueManager
    @Inject
    private Instance<Dialogue> dialogue;
 
+   @Inject
+   private BeanManager beanManager;
+
    protected void servletInitialized(@Observes @Initialized final ServletContextEvent e)
    {
       dialogueContextExtension.getDialogueContext().initialize(e.getServletContext());
@@ -56,6 +61,7 @@ public class DialogueContextManagerImpl implements DialogueManager
    {
       String dialogueId = dialogueContextExtension.getDialogueContext().create();
       dialogue.get().setDialogueId(dialogueId);
+      beanManager.fireEvent(new AfterDialogueActivation());
    }
 
    public void endDialogue()
@@ -66,11 +72,19 @@ public class DialogueContextManagerImpl implements DialogueManager
    public void attachDialogue(String requestId)
    {
       dialogueContextExtension.getDialogueContext().attach(requestId);
+      beanManager.fireEvent(new AfterDialogueActivation());
    }
 
    public void detachDialogue()
    {
-      dialogueContextExtension.getDialogueContext().detach();
+      if (dialogue.get().isFinished())
+      {
+         endDialogue();
+      }
+      else
+      {
+         dialogueContextExtension.getDialogueContext().detach();
+      }
    }
 
    public boolean isExistingDialogue(String dialogueId)

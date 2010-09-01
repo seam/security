@@ -19,51 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.saml;
+package org.jboss.seam.security.external.spi;
+
+import org.jboss.seam.security.external.api.OpenIdPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class SamlMessage
+public interface OpenIdRelyingPartySpi
 {
-   public static final String QSP_SAML_REQUEST = "SAMLRequest";
-   public static final String QSP_SAML_RESPONSE = "SAMLResponse";
-   public static final String QSP_RELAY_STATE = "RelayState";
+   public void loginSucceeded(OpenIdPrincipal principal);
 
-   protected SamlRequestOrResponse samlRequestOrResponse;
-
-   protected String samlMessage;
-
-   protected String relayState;
-
-   public SamlRequestOrResponse getRequestOrResponse()
-   {
-      return samlRequestOrResponse;
-   }
-
-   public void setRequestOrResponse(SamlRequestOrResponse samlRequestOrResponse)
-   {
-      this.samlRequestOrResponse = samlRequestOrResponse;
-   }
-
-   public String getSamlMessage()
-   {
-      return samlMessage;
-   }
-
-   public void setSamlMessage(String samlMessage)
-   {
-      this.samlMessage = samlMessage;
-   }
-
-   public String getRelayState()
-   {
-      return relayState;
-   }
-
-   public void setRelayState(String relayState)
-   {
-      this.relayState = relayState;
-   }
+   public void loginFailed();
 }

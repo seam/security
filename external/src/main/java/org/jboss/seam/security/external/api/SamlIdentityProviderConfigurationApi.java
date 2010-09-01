@@ -19,51 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.saml;
+package org.jboss.seam.security.external.api;
+
+import java.util.List;
+
+import org.jboss.seam.security.external.saml.idp.SamlExternalServiceProvider;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class SamlMessage
+public interface SamlIdentityProviderConfigurationApi extends SamlEntityConfigurationApi
 {
-   public static final String QSP_SAML_REQUEST = "SAMLRequest";
-   public static final String QSP_SAML_RESPONSE = "SAMLResponse";
-   public static final String QSP_RELAY_STATE = "RelayState";
+   boolean isWantAuthnRequestsSigned();
 
-   protected SamlRequestOrResponse samlRequestOrResponse;
+   void setWantAuthnRequestsSigned(boolean wantAuthnRequestsSigned);
 
-   protected String samlMessage;
+   boolean isSingleLogoutMessagesSigned();
 
-   protected String relayState;
+   void setSingleLogoutMessagesSigned(boolean singleLogoutMessagesSigned);
 
-   public SamlRequestOrResponse getRequestOrResponse()
-   {
-      return samlRequestOrResponse;
-   }
+   boolean isWantSingleLogoutMessagesSigned();
 
-   public void setRequestOrResponse(SamlRequestOrResponse samlRequestOrResponse)
-   {
-      this.samlRequestOrResponse = samlRequestOrResponse;
-   }
+   void setWantSingleLogoutMessagesSigned(boolean wantSingleLogoutMessagesSigned);
 
-   public String getSamlMessage()
-   {
-      return samlMessage;
-   }
-
-   public void setSamlMessage(String samlMessage)
-   {
-      this.samlMessage = samlMessage;
-   }
-
-   public String getRelayState()
-   {
-      return relayState;
-   }
-
-   public void setRelayState(String relayState)
-   {
-      this.relayState = relayState;
-   }
+   List<SamlExternalServiceProvider> getServiceProviders();
 }

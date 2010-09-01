@@ -122,10 +122,9 @@ public class IntegrationTest
       checkNrOfSessions("www.sp1.com", "sp", 1);
       checkNrOfSessions("www.sp2.com", "sp", 1);
 
-      // So an IDP-initiated single logout of the user at SP1.
+      // Do an IDP-initiated single logout of the user at SP1.
       params.clear();
       params.put("command", "singleLogout");
-      params.put("userName", "John Doe");
       sendMessageToApplication("www.idp.com", "idp", params);
 
       checkApplicationMessage("Single logout succeeded");
@@ -134,10 +133,9 @@ public class IntegrationTest
       checkNrOfSessions("www.sp1.com", "sp", 0);
       checkNrOfSessions("www.sp2.com", "sp", 1);
 
-      // So an SP-initiated single logout of the user at SP2.
+      // Do an SP-initiated single logout of the user at SP2.
       params.clear();
       params.put("command", "singleLogout");
-      params.put("userName", "Jane Doe");
       sendMessageToApplication("www.sp2.com", "sp", params);
 
       checkApplicationMessage("Single logout succeeded");

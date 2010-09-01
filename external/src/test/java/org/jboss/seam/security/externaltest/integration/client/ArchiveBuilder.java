@@ -99,6 +99,7 @@ class ArchiveBuilder
       jar.addPackages(true, ResponseHandler.class.getPackage());
 
       jar.addResource("META-INF/beans.xml", "META-INF/beans.xml");
+      jar.addResource("META-INF/web-fragment.xml", "META-INF/web-fragment.xml");
       jar.addServiceProvider(Extension.class, VirtualApplicationContextExtension.class, DialogueContextExtension.class);
 
       return jar;

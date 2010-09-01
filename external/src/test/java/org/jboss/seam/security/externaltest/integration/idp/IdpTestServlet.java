@@ -27,6 +27,7 @@ public class IdpTestServlet extends HttpServlet
    @Inject
    private MetaDataLoader metaDataLoader;
 
+   @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
       responseHolder.setResponse(response);
@@ -37,7 +38,7 @@ public class IdpTestServlet extends HttpServlet
       }
       else if (command.equals("singleLogout"))
       {
-         samlIdpApplicationMock.handleSingleLogout(request.getParameter("userName"));
+         samlIdpApplicationMock.handleSingleLogout();
       }
       else if (command.equals("getNrOfSessions"))
       {

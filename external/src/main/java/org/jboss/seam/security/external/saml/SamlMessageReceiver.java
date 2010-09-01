@@ -107,9 +107,6 @@ public class SamlMessageReceiver
    @JaxbContext( { RequestAbstractType.class, StatusResponseType.class })
    private JAXBContext jaxbContext;
 
-   @Inject
-   private Instance<SamlEntityBean> configuredSamlEntity;
-
    public void handleIncomingSamlMessage(SamlServiceType service, HttpServletRequest httpRequest, SamlIdpOrSp idpOrSp) throws InvalidRequestException
    {
       String samlRequestParam = httpRequest.getParameter(SamlRedirectMessage.QSP_SAML_REQUEST);
@@ -165,103 +162,92 @@ public class SamlMessageReceiver
          log.debug("Received: " + SamlUtils.getDocumentAsString(document));
       }
 
-      if (samlRequestOrResponse.isRequest() || samlResponseMessage.getInResponseTo() == null)
+      try
       {
-         // Request or unsolicited response
-
-         boolean serviceFound = false;
-         String destination = samlRequestMessage.getDestination();
-         for (SamlEntityBean samlEntityBean : configuredSamlEntity)
+         if (samlRequestOrResponse.isRequest() || samlResponseMessage.getInResponseTo() == null)
          {
-            for (SamlServiceType samlServiceType : SamlServiceType.values())
+            // Request or unsolicited response
+
+            String destination = samlRequestOrResponse.isRequest() ? samlRequestMessage.getDestination() : samlResponseMessage.getDestination();
+            if (!samlEntityBean.get().getServiceURL(service).equals(destination))
             {
-               if (samlEntityBean.getServiceURL(samlServiceType).equals(destination))
+               throw new InvalidRequestException("Destination (" + destination + ") is not valid.");
+            }
+
+            dialogueManager.beginDialogue();
+            samlDialogue.get().setExternalProviderMessageId(samlRequestOrResponse.isRequest() ? samlRequestMessage.getID() : samlResponseMessage.getID());
+            SamlExternalEntity externalProvider = samlEntityBean.get().getExternalSamlEntityByEntityId(issuerEntityId);
+            if (externalProvider == null)
+            {
+               throw new InvalidRequestException("Received message from unknown entity id " + issuerEntityId);
+            }
+            samlDialogue.get().setExternalProvider(externalProvider);
+         }
+         else
+         {
+            String dialogueId = samlResponseMessage.getInResponseTo();
+            if (!dialogueManager.isExistingDialogue(dialogueId))
+            {
+               throw new InvalidRequestException("No request that corresponds with the received response");
+            }
+
+            dialogueManager.attachDialogue(dialogueId);
+            if (!(samlDialogue.get().getExternalProvider().getEntityId().equals(issuerEntityId)))
+            {
+               throw new InvalidRequestException("Identity samlEntityBean of request and response do not match");
+            }
+         }
+
+         SamlExternalEntity externalProvider = samlEntityBean.get().getExternalSamlEntityByEntityId(issuerEntityId);
+
+         boolean validate;
+         if (samlRequestOrResponse.isRequest())
+         {
+            if (service.getProfile() == SamlProfile.SINGLE_SIGN_ON)
+            {
+               if (idpOrSp == SamlIdpOrSp.IDP)
                {
-                  serviceFound = true;
+                  validate = samlIdpBean.get().isWantAuthnRequestsSigned();
+               }
+               else
+               {
+                  validate = samlSpBean.get().isWantAssertionsSigned();
+               }
+            }
+            else
+            {
+               if (idpOrSp == SamlIdpOrSp.IDP)
+               {
+                  validate = samlIdpBean.get().isWantSingleLogoutMessagesSigned();
+               }
+               else
+               {
+                  validate = samlSpBean.get().isWantSingleLogoutMessagesSigned();
                }
             }
          }
-         if (!serviceFound)
+         else
          {
-            throw new InvalidRequestException("No service found at destination " + destination);
+            validate = samlResponseMessage instanceof ResponseType;
          }
 
-         dialogueManager.beginDialogue();
-         samlDialogue.get().setExternalProviderMessageId(samlRequestMessage.getID());
-         SamlExternalEntity externalProvider = samlEntityBean.get().getExternalSamlEntityByEntityId(issuerEntityId);
-         if (externalProvider == null)
+         if (validate)
          {
-            throw new InvalidRequestException("Received message from unknown entity id " + issuerEntityId);
-         }
-         samlDialogue.get().setExternalProvider(externalProvider);
-      }
-      else
-      {
-         String dialogueId = samlResponseMessage.getInResponseTo();
-         if (!dialogueManager.isExistingDialogue(dialogueId))
-         {
-            throw new InvalidRequestException("No request that corresponds with the received response");
-         }
-
-         dialogueManager.attachDialogue(dialogueId);
-         if (!(samlDialogue.get().getExternalProvider().getEntityId().equals(issuerEntityId)))
-         {
-            throw new InvalidRequestException("Identity samlEntityBean of request and response do not match");
-         }
-      }
-
-      SamlExternalEntity externalProvider = samlEntityBean.get().getExternalSamlEntityByEntityId(issuerEntityId);
-
-      boolean validate;
-      if (samlRequestOrResponse.isRequest())
-      {
-         if (service.getProfile() == SamlProfile.SINGLE_SIGN_ON)
-         {
-            if (idpOrSp == SamlIdpOrSp.IDP)
+            if (log.isDebugEnabled())
             {
-               validate = samlIdpBean.get().isWantAuthnRequestsSigned();
+               log.debug("Validating the signature");
+            }
+            if (httpRequest.getMethod().equals("POST"))
+            {
+               signatureUtilForPostBinding.validateSignature(externalProvider.getPublicKey(), document);
             }
             else
             {
-               validate = samlSpBean.get().isWantAssertionsSigned();
+               SamlRedirectMessage redirectMessage = new SamlRedirectMessage(samlRequestOrResponse, httpRequest);
+               signatureUtilForRedirectBinding.validateSignature(redirectMessage, externalProvider.getPublicKey());
             }
          }
-         else
-         {
-            if (idpOrSp == SamlIdpOrSp.IDP)
-            {
-               validate = samlIdpBean.get().isWantSingleLogoutMessagesSigned();
-            }
-            else
-            {
-               validate = samlSpBean.get().isWantSingleLogoutMessagesSigned();
-            }
-         }
-      }
-      else
-      {
-         validate = samlResponseMessage instanceof ResponseType;
-      }
 
-      if (validate)
-      {
-         if (log.isDebugEnabled())
-         {
-            log.debug("Validating the signature");
-         }
-         if (httpRequest.getMethod().equals("POST"))
-         {
-            signatureUtilForPostBinding.validateSignature(externalProvider.getPublicKey(), document);
-         }
-         else
-         {
-            SamlRedirectMessage redirectMessage = new SamlRedirectMessage(samlRequestOrResponse, httpRequest);
-            signatureUtilForRedirectBinding.validateSignature(redirectMessage, externalProvider.getPublicKey());
-         }
-      }
-
-      try
-      {
          if (service.getProfile() == SamlProfile.SINGLE_SIGN_ON)
          {
             if (samlRequestOrResponse.isRequest())
@@ -301,7 +287,10 @@ public class SamlMessageReceiver
       }
       catch (Exception e)
       {
-         dialogueManager.endDialogue();
+         if (dialogueManager.isAttached())
+         {
+            dialogueManager.endDialogue();
+         }
          throw new RuntimeException(e);
       }
 

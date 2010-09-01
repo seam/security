@@ -31,6 +31,14 @@ public class OpenIdAttribute
    private String typeUri;
    private boolean required;
 
+   public OpenIdAttribute(String alias, String typeUri, boolean required)
+   {
+      super();
+      this.alias = alias;
+      this.typeUri = typeUri;
+      this.required = required;
+   }
+
    public String getAlias()
    {
       return alias;

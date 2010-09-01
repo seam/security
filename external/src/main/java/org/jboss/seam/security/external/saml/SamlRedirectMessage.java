@@ -36,13 +36,10 @@ public class SamlRedirectMessage extends SamlMessage
    // Query string parameters used by the HTTP_Redirect binding
    public static final String QSP_SIGNATURE = "Signature";
    public static final String QSP_SIG_ALG = "SigAlg";
-   public static final String QSP_RELAY_STATE = "RelayState";
 
    private String signature;
 
    private String signatureAlgorithm;
-
-   private String relayState;
 
    // If this is true, the samlMessage, signature, signatureAlgorithm and
    // relayState values are in url encoded form
@@ -84,7 +81,7 @@ public class SamlRedirectMessage extends SamlMessage
       {
          addParamToQueryString(queryString, SamlRedirectMessage.QSP_SAML_RESPONSE, samlMessage);
       }
-      addParamToQueryString(queryString, SamlRedirectMessage.QSP_RELAY_STATE, relayState);
+      addParamToQueryString(queryString, SamlMessage.QSP_RELAY_STATE, relayState);
       addParamToQueryString(queryString, SamlRedirectMessage.QSP_SIG_ALG, signatureAlgorithm);
       addParamToQueryString(queryString, SamlRedirectMessage.QSP_SIGNATURE, signature);
 
@@ -123,16 +120,6 @@ public class SamlRedirectMessage extends SamlMessage
    public void setSignatureAlgorithm(String signatureAlgorithm)
    {
       this.signatureAlgorithm = signatureAlgorithm;
-   }
-
-   public String getRelayState()
-   {
-      return relayState;
-   }
-
-   public void setRelayState(String relayState)
-   {
-      this.relayState = relayState;
    }
 
    public boolean isUrlEncoded()

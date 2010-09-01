@@ -108,12 +108,12 @@ public class SamlSpSingleLogoutService
    {
       if (response.getStatus() != null && response.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
       {
-         samlServiceProviderSpi.get().singleLogoutSucceeded();
+         samlServiceProviderSpi.get().globalLogoutSucceeded();
       }
       else
       {
          String statusCode = response.getStatus() == null ? "null" : response.getStatus().getStatusCode().getValue();
-         samlServiceProviderSpi.get().singleLogoutFailed(statusCode);
+         samlServiceProviderSpi.get().globalLogoutFailed(statusCode);
       }
       dialogue.setFinished(true);
    }

@@ -33,7 +33,8 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
+import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
 import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.api.SamlPrincipal;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
@@ -50,12 +51,14 @@ import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlIdpOrSp;
 import org.jboss.seam.security.external.saml.SamlServiceType;
 
+import com.google.common.collect.Lists;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
 @Typed(SamlIdpBean.class)
-public class SamlIdpBean extends SamlEntityBean implements SamlIdentityProviderApi
+public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentityProviderApi, SamlIdentityProviderConfigurationApi
 {
    @Inject
    private SamlIdpSingleSignOnService samlIdpSingleSignOnService;
@@ -173,28 +176,10 @@ public class SamlIdpBean extends SamlEntityBean implements SamlIdentityProviderA
    }
 
    @Dialogued(join = true)
-   public void authenticationSucceeded(SamlNameId nameId, List<AttributeType> attributes)
+   public void authenticationSucceeded(SamlIdpSession session)
    {
-      SamlPrincipal samlPrincipal = new SamlPrincipal();
-      samlPrincipal.setNameId(nameId);
-      if (attributes != null)
-      {
-         samlPrincipal.setAttributes(attributes);
-      }
-      else
-      {
-         samlPrincipal.setAttributes(new LinkedList<AttributeType>());
-      }
-      SamlIdpSession session = samlIdpSessions.addSession(samlPrincipal, (SamlExternalServiceProvider) samlDialogue.get().getExternalProvider());
-
+      session.getServiceProviders().add((SamlExternalServiceProvider) samlDialogue.get().getExternalProvider());
       samlIdpSingleSignOnService.handleSucceededAuthentication(session);
-   }
-
-   public void authenticationSucceeded(SamlIdpSession sessionToJoin)
-   {
-      sessionToJoin.getServiceProviders().add((SamlExternalServiceProvider) samlDialogue.get().getExternalProvider());
-
-      samlIdpSingleSignOnService.handleSucceededAuthentication(sessionToJoin);
    }
 
    @Dialogued(join = true)
@@ -208,10 +193,50 @@ public class SamlIdpBean extends SamlEntityBean implements SamlIdentityProviderA
       return samlIdpSessions.getSessions();
    }
 
-   @Dialogued(join = true)
-   public void logout(SamlPrincipal principal, List<String> indexes)
+   public SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes)
    {
-      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, indexes);
+      return createSession(nameId, attributes);
+   }
+
+   private SamlIdpSession createSession(SamlNameId nameId, List<AttributeType> attributes)
+   {
+      SamlPrincipal samlPrincipal = new SamlPrincipal();
+      samlPrincipal.setNameId(nameId);
+      if (attributes != null)
+      {
+         samlPrincipal.setAttributes(attributes);
+      }
+      else
+      {
+         samlPrincipal.setAttributes(new LinkedList<AttributeType>());
+      }
+      return samlIdpSessions.addSession(samlPrincipal);
+   }
+
+   @Dialogued(join = true)
+   public void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl)
+   {
+      for (SamlExternalServiceProvider sp : session.getServiceProviders())
+      {
+         if (sp.getEntityId().equals(spEntityId))
+         {
+            throw new RuntimeException("Service provider " + spEntityId + " is already a session participant.");
+         }
+      }
+      session.getServiceProviders().add(getExternalSamlEntityByEntityId(spEntityId));
+      samlIdpSingleSignOnService.remoteLogin(spEntityId, session, remoteUrl);
+   }
+
+   public void localLogout(SamlIdpSession session)
+   {
+      samlIdpSessions.removeSession(session);
+   }
+
+   @Dialogued(join = true)
+   public void globalLogout(SamlIdpSession session)
+   {
+      SamlPrincipal principal = session.getPrincipal();
+      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, Lists.newArrayList(session.getSessionIndex()));
    }
 
    @Override

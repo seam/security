@@ -27,6 +27,7 @@ public class SpTestServlet extends HttpServlet
    @Inject
    private ResponseHolder responseHolder;
 
+   @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
       responseHolder.setResponse(response);
@@ -38,8 +39,7 @@ public class SpTestServlet extends HttpServlet
       }
       else if (command.equals("singleLogout"))
       {
-         String userName = request.getParameter("userName");
-         samlSpApplicationMock.handleSingleLogout(userName);
+         samlSpApplicationMock.handleGlobalLogout();
       }
       else if (command.equals("getNrOfSessions"))
       {

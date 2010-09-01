@@ -19,21 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.spi;
+package org.jboss.seam.security.external.api;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
+import java.util.Set;
+
+import org.jboss.seam.security.external.saml.sp.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public interface OpenIdServiceProviderSpi
+public interface SamlMultiUserServiceProviderApi
 {
-   public void loginSucceeded(OpenIdPrincipal principal);
+   public void login(String idpEntityId);
 
-   public void loginFailed();
+   public void localLogout(SamlSpSession session);
 
-   public void logoutSucceeded(OpenIdPrincipal principal);
+   public void globalLogout(SamlSpSession session);
 
-   public void logoutFailed(OpenIdPrincipal principal, String statusCode);
+   public Set<SamlSpSession> getSessions();
 }

@@ -21,6 +21,8 @@
  */
 package org.jboss.seam.security.external.openid;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,53 +30,55 @@ import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.api.OpenIdAttribute;
-import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
+import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
+import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
+import org.jboss.seam.security.external.dialogues.api.Dialogued;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-@VirtualApplicationScoped
-public class OpenIdServiceProvider extends EntityBean
+public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi
 {
-   private List<OpenIdAttribute> attributes;
-
-   private String realm;
+   @Inject
+   private OpenIdSingleLoginService openIdSingleLoginSender;
 
    @Inject
    private ServletContext servletContext;
 
+   @Dialogued
+   public void login(String openId, List<OpenIdAttribute> attributes)
+   {
+      openIdSingleLoginSender.sendAuthRequest(openId, attributes);
+   }
+
    public String getServiceURL(OpenIdService service)
    {
-      String portString;
-      if (protocol.equals("http") && port != 80 || protocol.equals("https") && port != 443)
-      {
-         portString = ":" + port;
-      }
-      else
-      {
-         portString = "";
-      }
-      return protocol + "://" + hostName + portString + servletContext.getContextPath() + OpenIdFilterInstaller.FILTER_PATH + "/" + service.getName();
-   }
-
-   public List<OpenIdAttribute> getAttributes()
-   {
-      return attributes;
-   }
-
-   public void setAttributes(List<OpenIdAttribute> attributes)
-   {
-      this.attributes = attributes;
+      String path = servletContext.getContextPath() + "/openid/" + service.getName();
+      return createURL(path);
    }
 
    public String getRealm()
    {
-      return realm;
+      return createURL("");
    }
 
-   public void setRealm(String realm)
+   private String createURL(String path)
    {
-      this.realm = realm;
+      try
+      {
+         if (protocol.equals("http") && port == 80 || protocol.equals("https") && port == 443)
+         {
+            return new URL(protocol, hostName, path).toExternalForm();
+         }
+         else
+         {
+            return new URL(protocol, hostName, port, path).toExternalForm();
+         }
+      }
+      catch (MalformedURLException e)
+      {
+         throw new RuntimeException(e);
+      }
    }
 }

@@ -44,7 +44,7 @@ import org.openid4java.discovery.DiscoveryInformation;
 public class OpenIdXrdsProvider
 {
    @Inject
-   private OpenIdServiceProvider serviceProvider;
+   private OpenIdRpBean serviceProvider;
 
    @Inject
    @JaxbContext(ObjectFactory.class)

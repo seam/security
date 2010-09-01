@@ -256,6 +256,7 @@ public class SamlMessageSender
             SamlPostMessage samlPostMessage = new SamlPostMessage();
             samlPostMessage.setRequestOrResponse(samlRequestOrResponse);
             samlPostMessage.setSamlMessage(base64EncodedMessage);
+            samlPostMessage.setRelayState(samlDialogue.get().getExternalProviderRelayState());
             responseHandler.sendFormToUserAgent(endpoint.getLocation(), samlPostMessage);
          }
       }
@@ -275,6 +276,7 @@ public class SamlMessageSender
          {
             redirectMessage.setRequestOrResponse(samlRequestOrResponse);
             redirectMessage.setSamlMessage(base64EncodedSamlMessage);
+            redirectMessage.setRelayState(samlDialogue.get().getExternalProviderRelayState());
 
             samlSignatureUtilForRedirectBinding.sign(redirectMessage, signingKey);
          }

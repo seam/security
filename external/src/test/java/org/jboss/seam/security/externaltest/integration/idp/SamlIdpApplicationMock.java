@@ -28,9 +28,8 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
 import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.api.SamlPrincipal;
 import org.jboss.seam.security.external.dialogues.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
@@ -51,7 +50,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
    private Dialogue dialogue;
 
    @Inject
-   private Instance<SamlIdentityProviderApi> idpApi;
+   private Instance<SamlMultiUserIdentityProviderApi> idpApi;
 
    private String dialogueId;
 
@@ -73,8 +72,9 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
 
    public void handleLogin(String userName)
    {
+      SamlIdpSession session = idpApi.get().localLogin(new SamlNameId(userName, null, null), null);
       dialogueManager.attachDialogue(dialogueId);
-      idpApi.get().authenticationSucceeded(new SamlNameId(userName, null, null), null);
+      idpApi.get().authenticationSucceeded(session);
       dialogueManager.detachDialogue();
    }
 
@@ -108,15 +108,13 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
    }
 
    @Dialogued
-   public void handleSingleLogout(String nameId)
+   public void handleSingleLogout()
    {
-      SamlPrincipal principal = new SamlPrincipal();
-      principal.setNameId(new SamlNameId(nameId, null, null));
-      idpApi.get().logout(principal, null);
+      idpApi.get().globalLogout(idpApi.get().getSessions().iterator().next());
    }
 
    public void loggedOut(SamlIdpSession session)
    {
-      log.info("User " + session.getPrincipal().getNameId() + " has been logged out.");
+      log.info("User " + session.getPrincipal().getNameId().getValue() + " has been logged out.");
    }
 }

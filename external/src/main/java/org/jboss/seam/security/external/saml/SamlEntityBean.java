@@ -39,7 +39,7 @@ import javax.xml.bind.Unmarshaller;
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.api.SamlBinding;
-import org.jboss.seam.security.external.api.SamlEntityApi;
+import org.jboss.seam.security.external.api.SamlEntityConfigurationApi;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntitiesDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.IndexedEndpointType;
@@ -55,7 +55,7 @@ import org.jboss.seam.security.external.jaxb.xmldsig.X509DataType;
  * @author Marcel Kolsteren
  * 
  */
-public abstract class SamlEntityBean extends EntityBean implements SamlEntityApi
+public abstract class SamlEntityBean extends EntityBean implements SamlEntityConfigurationApi
 {
    private Map<String, SSODescriptorType> metaInfo = new HashMap<String, SSODescriptorType>();
 
@@ -72,9 +72,9 @@ public abstract class SamlEntityBean extends EntityBean implements SamlEntityApi
    @JaxbContext(ObjectFactory.class)
    protected JAXBContext metaDataJaxbContext;
 
-   private boolean singleLogoutMessagesSigned = false;
+   private boolean singleLogoutMessagesSigned = true;
 
-   private boolean wantSingleLogoutMessagesSigned = false;
+   private boolean wantSingleLogoutMessagesSigned = true;
 
    public String getServiceURL(SamlServiceType service)
    {
@@ -87,7 +87,12 @@ public abstract class SamlEntityBean extends EntityBean implements SamlEntityApi
       {
          portString = "";
       }
-      return protocol + "://" + hostName + portString + servletContext.getContextPath() + SamlFilterInstaller.FILTER_PATH + "/" + getIdpOrSp() + "/" + service.getName();
+      return protocol + "://" + hostName + portString + servletContext.getContextPath() + "/saml/" + getIdpOrSp() + "/" + service.getName();
+   }
+
+   public String getMetaDataURL()
+   {
+      return getServiceURL(SamlServiceType.SAML_META_DATA_SERVICE);
    }
 
    public void setEntityId(String entityId)

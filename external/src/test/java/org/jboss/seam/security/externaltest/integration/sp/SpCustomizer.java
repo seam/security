@@ -24,19 +24,19 @@ package org.jboss.seam.security.externaltest.integration.sp;
 import javax.enterprise.event.Observes;
 
 import org.jboss.seam.security.external.api.SamlBinding;
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
 
 public class SpCustomizer
 {
-   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderApi sp, VirtualApplication virtualApplication)
+   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication)
    {
       if (virtualApplication.equals("www.sp2.com"))
       {
          sp.setPreferredBinding(SamlBinding.HTTP_Redirect);
       }
-      sp.setWantSingleLogoutMessagesSigned(true);
+      sp.setSingleLogoutMessagesSigned(false);
       sp.setProtocol("http");
       sp.setPort(8080);
    }

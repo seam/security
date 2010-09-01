@@ -19,47 +19,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.spi;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
-
-import org.jboss.seam.security.external.saml.SamlExternalEntity;
-
-/**
- * @author Marcel Kolsteren
- * 
- */
-public interface SamlEntityApi
+public class SamlSingleUserServiceProviderSpi
 {
-   String getProtocol();
 
-   void setProtocol(String protocol);
-
-   void setEntityId(String entityId);
-
-   String getEntityId();
-
-   String getHostName();
-
-   void setHostName(String hostName);
-
-   int getPort();
-
-   void setPort(int port);
-
-   SamlBinding getPreferredBinding();
-
-   void setPreferredBinding(SamlBinding preferredBinding);
-
-   void setSigningKey(String keyStoreUrl, String keyStorePass, String signingKeyAlias, String signingKeyPass);
-
-   SamlExternalEntity getExternalSamlEntityByEntityId(String entityId);
-
-   SamlExternalEntity addExternalSamlEntity(Reader reader);
-
-   List<SamlExternalEntity> getExternalSamlEntities();
-
-   void writeMetaData(Writer writer);
 }

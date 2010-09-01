@@ -33,6 +33,7 @@ import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
 import org.jboss.seam.security.external.saml.SamlConstants;
 import org.jboss.seam.security.external.saml.SamlDialogue;
+import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlMessageFactory;
 import org.jboss.seam.security.external.saml.SamlMessageSender;
@@ -62,6 +63,9 @@ public class SamlIdpSingleSignOnService
    @Inject
    private SamlDialogue samlDialogue;
 
+   @Inject
+   private Instance<SamlEntityBean> samlEntityBean;
+
    public void processSPRequest(HttpServletRequest httpRequest, RequestAbstractType request) throws InvalidRequestException
    {
       if (!(request instanceof AuthnRequestType))
@@ -74,13 +78,11 @@ public class SamlIdpSingleSignOnService
 
    public void handleSucceededAuthentication(SamlIdpSession session)
    {
-      sendAuthenticationResponse(session, false);
+      sendAuthenticationResponse(samlDialogue.getExternalProvider(), session, false);
    }
 
-   private void sendAuthenticationResponse(SamlIdpSession session, boolean failed)
+   private void sendAuthenticationResponse(SamlExternalEntity serviceProvider, SamlIdpSession session, boolean failed)
    {
-      SamlExternalEntity samlServiceProvider = samlDialogue.getExternalProvider();
-
       StatusResponseType response;
 
       if (failed)
@@ -89,18 +91,18 @@ public class SamlIdpSingleSignOnService
       }
       else
       {
-         SamlService service = samlServiceProvider.getService(SamlProfile.SINGLE_SIGN_ON);
+         SamlService service = serviceProvider.getService(SamlProfile.SINGLE_SIGN_ON);
          response = samlMessageFactory.createResponse(session, samlMessageSender.getEndpoint(service));
       }
 
-      samlMessageSender.sendResponse(samlServiceProvider, response, SamlProfile.SINGLE_SIGN_ON);
+      samlMessageSender.sendResponse(serviceProvider, response, SamlProfile.SINGLE_SIGN_ON);
 
       dialogue.setFinished(true);
    }
 
    public void handleFailedAuthentication()
    {
-      sendAuthenticationResponse(null, true);
+      sendAuthenticationResponse(samlDialogue.getExternalProvider(), null, true);
    }
 
    @Dialogued
@@ -111,5 +113,15 @@ public class SamlIdpSingleSignOnService
       samlDialogue.setExternalProvider(idp);
 
       samlMessageSender.sendRequest(idp, SamlProfile.SINGLE_SIGN_ON, authnRequest);
+   }
+
+   public void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl)
+   {
+      SamlExternalEntity serviceProvider = samlEntityBean.get().getExternalSamlEntityByEntityId(spEntityId);
+      samlDialogue.setExternalProvider(serviceProvider);
+      samlDialogue.setExternalProviderRelayState(remoteUrl);
+
+      // Send an unsolicited authentication response to the service provider
+      sendAuthenticationResponse(serviceProvider, session, false);
    }
 }

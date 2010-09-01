@@ -128,33 +128,38 @@ public class SamlIdpSingleLogoutService
 
          if (sessionToRemove != null)
          {
-            // For the session that is about to be removed, get the first
-            // service provider that participates in the session. Remove it from
-            // the session.
-            SamlExternalServiceProvider sp = sessionToRemove.getServiceProviders().iterator().next();
-            sessionToRemove.getServiceProviders().remove(sp);
-            if (sessionToRemove.getServiceProviders().size() == 0)
+            if (sessionToRemove.getServiceProviders().size() != 0)
             {
+               // For the session that is about to be removed, get the first
+               // service provider that participates in the session. Remove it
+               // from the session.
+               SamlExternalServiceProvider sp = sessionToRemove.getServiceProviders().iterator().next();
+               sessionToRemove.getServiceProviders().remove(sp);
+
+               // If the session participant is not the party that initiated the
+               // single logout, and it has a single logout service, send a
+               // single logout request. Otherwise, move on to the next session
+               // participant (if available) or to the next session.
+               if (sp != null && !sp.equals(samlDialogue.get().getExternalProvider()) && sp.getService(SamlProfile.SINGLE_LOGOUT) != null)
+               {
+                  String incomingDialogueId = dialogue.get().getDialogueId();
+                  dialogueManager.detachDialogue();
+                  dialogueManager.beginDialogue();
+                  samlIdpOutgoingLogoutDialogue.get().setIncomingDialogueId(incomingDialogueId);
+
+                  sendSingleLogoutRequestToSP(sessionToRemove, sp);
+                  readyForNow = true;
+               }
+            }
+            else
+            {
+               // Session has no participating service providers (any more).
+               // Remove the session.
                samlIdpSessions.removeSession(sessionToRemove);
                if (samlDialogue.get().getExternalProvider() != null)
                {
                   samlIdentityProviderSpi.get().loggedOut(sessionToRemove);
                }
-            }
-
-            // If the session participant is not the party that initiated the
-            // single logout, and it has a single logout service, send a
-            // single logout request. Otherwise, move on to the next session
-            // participant (if available) or to the next session.
-            if (!sp.equals(samlDialogue.get().getExternalProvider()) && sp.getService(SamlProfile.SINGLE_LOGOUT) != null)
-            {
-               String incomingDialogueId = dialogue.get().getDialogueId();
-               dialogueManager.detachDialogue();
-               dialogueManager.beginDialogue();
-               samlIdpOutgoingLogoutDialogue.get().setIncomingDialogueId(incomingDialogueId);
-
-               sendSingleLogoutRequestToSP(sessionToRemove, sp);
-               readyForNow = true;
             }
          }
          else

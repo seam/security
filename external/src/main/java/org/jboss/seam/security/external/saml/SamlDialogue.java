@@ -34,6 +34,8 @@ public class SamlDialogue
 
    private String externalProviderMessageId;
 
+   private String externalProviderRelayState;
+
    public void setExternalProvider(SamlExternalEntity externalProvider)
    {
       this.externalProvider = externalProvider;
@@ -52,6 +54,16 @@ public class SamlDialogue
    public void setExternalProviderMessageId(String externalProviderRequestId)
    {
       this.externalProviderMessageId = externalProviderRequestId;
+   }
+
+   public String getExternalProviderRelayState()
+   {
+      return externalProviderRelayState;
+   }
+
+   public void setExternalProviderRelayState(String externalProviderRelayState)
+   {
+      this.externalProviderRelayState = externalProviderRelayState;
    }
 
 }

@@ -19,40 +19,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.external.api;
 
-import javax.inject.Inject;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.List;
 
-import org.jboss.seam.security.external.EntityBean;
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.dialogues.api.Dialogued;
+import org.jboss.seam.security.external.saml.SamlExternalEntity;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class OpenIdBean extends EntityBean implements OpenIdRelyingPartyApi
+public interface SamlEntityConfigurationApi
 {
-   @Inject
-   private OpenIdSingleLoginSender openIdSingleLoginSender;
+   String getProtocol();
 
-   @Inject
-   private OpenIdSessions openIdSessions;
+   void setProtocol(String protocol);
 
-   @Dialogued
-   public void signOn(String openId)
-   {
-      openIdSingleLoginSender.sendAuthRequest(openId);
-   }
+   void setEntityId(String entityId);
 
-   @Dialogued
-   public void logout(OpenIdPrincipal openIdPrincipal)
-   {
-      if (!openIdSessions.isLoggedIn(openIdPrincipal))
-      {
-         throw new RuntimeException("Not logged in");
-      }
-      openIdSessions.logout(openIdPrincipal);
-   }
+   String getEntityId();
+
+   String getHostName();
+
+   void setHostName(String hostName);
+
+   int getPort();
+
+   void setPort(int port);
+
+   SamlBinding getPreferredBinding();
+
+   void setPreferredBinding(SamlBinding preferredBinding);
+
+   void setSigningKey(String keyStoreUrl, String keyStorePass, String signingKeyAlias, String signingKeyPass);
+
+   SamlExternalEntity getExternalSamlEntityByEntityId(String entityId);
+
+   SamlExternalEntity addExternalSamlEntity(Reader reader);
+
+   List<SamlExternalEntity> getExternalSamlEntities();
+
+   void writeMetaData(Writer writer);
+
+   String getMetaDataURL();
 }

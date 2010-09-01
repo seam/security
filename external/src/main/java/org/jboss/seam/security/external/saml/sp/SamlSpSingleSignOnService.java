@@ -52,6 +52,7 @@ import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlMessageFactory;
 import org.jboss.seam.security.external.saml.SamlMessageSender;
 import org.jboss.seam.security.external.saml.SamlProfile;
+import org.jboss.seam.security.external.saml.SamlRedirectMessage;
 import org.jboss.seam.security.external.saml.SamlServiceType;
 import org.jboss.seam.security.external.saml.SamlUtils;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
@@ -100,7 +101,7 @@ public class SamlSpSingleSignOnService
       String statusValue = status.getStatusCode().getValue();
       if (SamlConstants.STATUS_SUCCESS.equals(statusValue) == false)
       {
-         throw new RuntimeException("IDP returned status " + statusValue);
+         samlServiceProviderSpi.get().loginFailed();
       }
 
       if (!(statusResponse instanceof ResponseType))
@@ -119,12 +120,12 @@ public class SamlSpSingleSignOnService
       SamlSpSession session = createSession(response, idp);
       if (session == null)
       {
-         samlServiceProviderSpi.get().loginFailed();
+         throw new InvalidRequestException("Not possible to login based on the supplied assertions");
       }
       else
       {
          session.setIdentityProvider(idp);
-         loginUser(httpRequest, session, statusResponse.getInResponseTo() == null);
+         loginUser(httpRequest, session, statusResponse.getInResponseTo() == null, httpRequest.getParameter(SamlRedirectMessage.QSP_RELAY_STATE));
       }
 
       dialogue.setFinished(true);
@@ -271,13 +272,13 @@ public class SamlSpSingleSignOnService
       }
    }
 
-   private void loginUser(HttpServletRequest httpRequest, SamlSpSession session, boolean unsolicited)
+   private void loginUser(HttpServletRequest httpRequest, SamlSpSession session, boolean unsolicited, String relayState)
    {
       samlSpSessions.addSession(session);
 
       if (unsolicited)
       {
-         samlServiceProviderSpi.get().unsolicitedLogin(session);
+         samlServiceProviderSpi.get().loggedIn(session, relayState);
       }
       else
       {

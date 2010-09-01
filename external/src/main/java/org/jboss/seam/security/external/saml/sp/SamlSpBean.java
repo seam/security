@@ -32,7 +32,8 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
+import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.IDPSSODescriptorType;
@@ -50,7 +51,7 @@ import org.jboss.seam.security.external.saml.SamlServiceType;
  * 
  */
 @Typed(SamlSpBean.class)
-public class SamlSpBean extends SamlEntityBean implements SamlServiceProviderApi
+public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi
 {
    private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();
 
@@ -179,7 +180,7 @@ public class SamlSpBean extends SamlEntityBean implements SamlServiceProviderApi
    }
 
    @Dialogued(join = true)
-   public void signOn(String idpEntityId)
+   public void login(String idpEntityId)
    {
       SamlExternalIdentityProvider idp = getExternalSamlEntityByEntityId(idpEntityId);
       if (idp == null)
@@ -191,15 +192,15 @@ public class SamlSpBean extends SamlEntityBean implements SamlServiceProviderApi
    }
 
    @Dialogued(join = true)
-   public void logout(SamlSpSession session)
+   public void localLogout(SamlSpSession session)
    {
       samlSpSessions.removeSession(session);
    }
 
    @Dialogued(join = true)
-   public void singleLogout(SamlSpSession session)
+   public void globalLogout(SamlSpSession session)
    {
-      logout(session);
+      localLogout(session);
       samlSpSingleLogoutService.sendSingleLogoutRequestToIDP(session);
    }
 

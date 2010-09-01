@@ -22,9 +22,9 @@
 package org.jboss.seam.security.externaltest.integration;
 
 import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.spi.OpenIdServiceProviderSpi;
+import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 
-public class OpenIdSpiMock implements OpenIdServiceProviderSpi
+public class OpenIdSpiMock implements OpenIdRelyingPartySpi
 {
 
    public void loginFailed()

@@ -22,7 +22,6 @@
 package org.jboss.seam.security.external.api;
 
 import java.net.URL;
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ import java.util.Map;
  * 
  */
 // TODO: create hash code and equals method
-public class OpenIdPrincipal implements Principal
+public class OpenIdPrincipal
 {
    private String identifier;
 
@@ -45,11 +44,6 @@ public class OpenIdPrincipal implements Principal
       this.identifier = identifier;
       this.openIdProvider = openIdProvider;
       this.attributes = attributes;
-   }
-
-   public String getName()
-   {
-      return identifier;
    }
 
    public String getIdentifier()

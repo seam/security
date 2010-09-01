@@ -24,18 +24,18 @@ package org.jboss.seam.security.externaltest.integration.idp;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 
 public class IdpCustomizer
 {
-   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderApi idp)
+   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderConfigurationApi idp)
    {
       idp.setEntityId("https://www.idp.com");
       idp.setHostName("www.idp.com");
       idp.setProtocol("http");
       idp.setPort(8080);
       idp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
-      idp.setSingleLogoutMessagesSigned(true);
+      idp.setWantSingleLogoutMessagesSigned(false);
    }
 }

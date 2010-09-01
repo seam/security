@@ -27,12 +27,8 @@ import java.util.regex.Pattern;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,8 +41,10 @@ import org.slf4j.Logger;
  * @author Marcel Kolsteren
  * 
  */
-public class SamlServletFilter implements Filter
+public class SamlServlet extends HttpServlet
 {
+   private static final long serialVersionUID = -6125510783395424719L;
+
    @Inject
    private Logger log;
 
@@ -62,20 +60,28 @@ public class SamlServletFilter implements Filter
    @Inject
    private Instance<SamlEntityBean> samlEntityBean;
 
-   public void init(FilterConfig filterConfig) throws ServletException
+   @Override
+   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
+      doGetOrPost(request, response);
    }
 
-   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+   @Override
+   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+   {
+      doGetOrPost(request, response);
+   }
+
+   private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) throws IOException
    {
       try
       {
-         responseHolder.setResponse((HttpServletResponse) response);
-         handleMessage((HttpServletRequest) request);
+         responseHolder.setResponse(response);
+         handleMessage(request);
       }
       catch (InvalidRequestException e)
       {
-         ((HttpServletResponse) response).sendError(HttpServletResponse.SC_BAD_REQUEST, e.getDescription());
+         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getDescription());
          if (log.isInfoEnabled())
          {
             log.info("Bad request received from {}: {}", request.getRemoteHost(), e.getDescription());
@@ -107,9 +113,5 @@ public class SamlServletFilter implements Filter
       default:
          throw new RuntimeException("Unsupported service " + service);
       }
-   }
-
-   public void destroy()
-   {
    }
 }

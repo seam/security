@@ -40,7 +40,7 @@ public class SamlIdpSessions implements Serializable
 
    private Set<SamlIdpSession> sessions = new HashSet<SamlIdpSession>();
 
-   public SamlIdpSession addSession(SamlPrincipal principal, SamlExternalServiceProvider serviceProvider)
+   public SamlIdpSession addSession(SamlPrincipal principal)
    {
       String sessionIndex;
       int i = 0;
@@ -52,7 +52,6 @@ public class SamlIdpSessions implements Serializable
 
       SamlIdpSession session = new SamlIdpSession();
       session.setPrincipal(principal);
-      session.getServiceProviders().add(serviceProvider);
       session.setSessionIndex(sessionIndex);
       sessions.add(session);
 

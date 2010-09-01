@@ -19,38 +19,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.external.api;
 
-import java.io.Serializable;
-import java.util.Set;
-
-import javax.enterprise.context.SessionScoped;
-
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-@SessionScoped
-public class OpenIdSessions implements Serializable
+public interface EntityConfigurationApi
 {
-   private static final long serialVersionUID = -6167224737841053169L;
+   String getProtocol();
 
-   private Set<OpenIdPrincipal> loggedInPrincipals;
+   void setProtocol(String protocol);
 
-   public boolean isLoggedIn(OpenIdPrincipal principal)
-   {
-      return loggedInPrincipals.contains(principal);
-   }
+   String getHostName();
 
-   public void login(OpenIdPrincipal principal)
-   {
-      loggedInPrincipals.add(principal);
-   }
+   void setHostName(String hostName);
 
-   public void logout(OpenIdPrincipal principal)
-   {
-      loggedInPrincipals.remove(principal);
-   }
+   int getPort();
+
+   void setPort(int port);
 }

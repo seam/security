@@ -21,13 +21,13 @@
  */
 package org.jboss.seam.security.external.api;
 
+import java.util.List;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
 public interface OpenIdRelyingPartyApi
 {
-   public void signOn(String openId);
-
-   public void logout(OpenIdPrincipal principal);
+   public void login(String openId, List<OpenIdAttribute> attributes);
 }

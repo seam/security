@@ -19,21 +19,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.spi;
+package org.jboss.seam.security.external.api;
 
-import java.io.PrintWriter;
+import java.util.List;
+import java.util.Set;
+
+import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
+import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public interface ResponseSpi
+public interface SamlMultiUserIdentityProviderApi
 {
-   void setContentType(String type);
+   void authenticationSucceeded(SamlIdpSession session);
 
-   PrintWriter getWriter();
+   void authenticationFailed();
 
-   void sendRedirect(String url);
+   Set<SamlIdpSession> getSessions();
 
-   void sendError(int statusCode, String message);
+   SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes);
+
+   void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl);
+
+   void localLogout(SamlIdpSession session);
+
+   void globalLogout(SamlIdpSession session);
 }

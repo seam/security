@@ -19,40 +19,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.external.api;
 
-
-/**
- * @author Marcel Kolsteren
- * 
- */
-public enum OpenIdService
+public interface OpenIdRelyingPartyConfigurationApi extends EntityConfigurationApi
 {
-   OPEN_ID_SERVICE("OpenIdService"),
 
-   OPEN_ID_XRDS_SERVICE("OpenIdXrdsService");
-
-   private String name;
-
-   private OpenIdService(String name)
-   {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
-      {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
-      }
-      return null;
-   }
 }

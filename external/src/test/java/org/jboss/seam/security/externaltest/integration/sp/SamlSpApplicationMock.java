@@ -27,7 +27,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.saml.sp.SamlSpSession;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 public class SamlSpApplicationMock implements SamlServiceProviderSpi
 {
    @Inject
-   private Instance<SamlServiceProviderApi> samlServiceProviderApi;
+   private Instance<SamlMultiUserServiceProviderApi> spApi;
 
    @Inject
    private ResponseHolder responseHolder;
@@ -49,7 +49,7 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
    @Dialogued
    public void login(String idpEntityId)
    {
-      samlServiceProviderApi.get().signOn(idpEntityId);
+      spApi.get().login(idpEntityId);
    }
 
    public void loginFailed()
@@ -62,17 +62,17 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
       writeMessageToResponse("Login succeeded (" + session.getPrincipal().getNameId().getValue() + ")");
    }
 
-   public void singleLogoutFailed(String statusCode)
+   public void globalLogoutFailed(String statusCode)
    {
       writeMessageToResponse("Single logout failed");
    }
 
-   public void singleLogoutSucceeded()
+   public void globalLogoutSucceeded()
    {
       writeMessageToResponse("Single logout succeeded");
    }
 
-   public void unsolicitedLogin(SamlSpSession session)
+   public void loggedIn(SamlSpSession session, String url)
    {
       writeMessageToResponse("Logged in unsolicited");
    }
@@ -91,28 +91,14 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
 
    public int getNumberOfSessions()
    {
-      return samlServiceProviderApi.get().getSessions().size();
+      return spApi.get().getSessions().size();
    }
 
    @Dialogued
-   public void handleSingleLogout(String userName)
+   public void handleGlobalLogout()
    {
-      SamlSpSession session = null;
-      for (SamlSpSession s : samlServiceProviderApi.get().getSessions())
-      {
-         if (s.getPrincipal().getNameId().getValue().equals(userName))
-         {
-            session = s;
-         }
-      }
-      if (session != null)
-      {
-         samlServiceProviderApi.get().singleLogout(session);
-      }
-      else
-      {
-         throw new RuntimeException("No session found for user " + userName);
-      }
+      SamlSpSession session = spApi.get().getSessions().iterator().next();
+      spApi.get().globalLogout(session);
    }
 
    public void loggedOut(SamlSpSession session)
