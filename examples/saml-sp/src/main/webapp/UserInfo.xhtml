@@ -1,0 +1,43 @@
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<f:metadata>
+		<f:event type="preRenderView"
+			listener="#{identity.redirectToLoginIfNotLoggedIn}" />
+	</f:metadata>
+	<ui:composition template="/PageTemplate.xhtml">
+
+		<h1>User info</h1>
+
+		<h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
+			<h:outputText value="NameID" />
+			<h:outputText
+				value="#{identity.samlSpSession.principal.nameId.value}" />
+			<h:outputText value="NameID format" />
+			<h:outputText
+				value="#{identity.samlSpSession.principal.nameId.format}" />
+			<h:outputText value="Identity provider" />
+			<h:outputText
+				value="#{identity.samlSpSession.identityProvider.entityId}" />
+			<h:outputText value="Attributes" />
+			<h:dataTable value="#{identity.samlSpSession.principal.attributes}"
+				var="attribute">
+				<h:column>
+					<f:facet name="header">Name</f:facet>
+					<h:outputText value="#{attribute.name}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">Friendly name</f:facet>
+					<h:outputText value="#{attribute.friendlyName}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">Value(s)</f:facet>
+					<h:outputText value="#{attribute.attributeValue}" />
+				</h:column>
+			</h:dataTable>
+		</h:panelGrid>
+		
+	</ui:composition>
+</f:view>

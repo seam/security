@@ -1,0 +1,19 @@
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<f:metadata>
+		<f:viewParam name="samlDialogueId" value="#{login.samlDialogueId}" />
+	</f:metadata>
+	<ui:composition template="/PageTemplate.xhtml">
+		<h:messages />
+		<h1>Login</h1>
+		<h:form>
+			<h:outputText value="Username:" />
+			<h:inputText value="#{login.userName}" />
+			<h:commandButton action="#{login.login}" value="Login" />
+			<h:commandButton action="#{login.cancel}" value="Cancel"
+				rendered="#{login.samlDialogueId != null}" />
+		</h:form>
+	</ui:composition>
+</f:view>

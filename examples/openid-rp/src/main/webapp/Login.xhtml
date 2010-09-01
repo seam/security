@@ -1,0 +1,24 @@
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<ui:composition template="/PageTemplate.xhtml">
+
+		<h1>Login</h1>
+
+		<h:form>
+			<h:commandLink
+				action="#{identity.startLogin('https://www.google.com/accounts/o8/id')}"
+				value="Login with Google" />
+			<br />
+			<h:commandLink
+				action="#{identity.startLogin('https://me.yahoo.com')}"
+				value="Login with Yahoo" />
+			<br />
+			<h:commandLink
+				action="#{identity.startLogin('https://myopenid.com')}"
+				value="Login with myOpenID" />
+		</h:form>
+
+	</ui:composition>
+</f:view>

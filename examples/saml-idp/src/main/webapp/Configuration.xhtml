@@ -1,0 +1,24 @@
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<ui:composition template="/PageTemplate.xhtml">
+		<h1>Configuration</h1>
+		<h:outputText value="Meta Data URL for this SAML entity: #{configuration.metaDataUrl}" />
+		<h2>Trusted SAML Service Providers</h2>
+		<p><h:dataTable value="#{saml.spEntityIds}" var="spEntityId" columnClasses="dataTableColumn">
+			<h:column>
+				<h:outputText value="#{spEntityId}" />
+			</h:column>
+		</h:dataTable></p>
+		<h2>Add SAML Service Provider</h2>
+		<h:form>
+			<p><h:outputText
+				value="Here you can add a new trusted Service Provider by uploading the corresponding meta data." /></p>
+			<p><h:outputText value="Meta Data URL:" /> <h:inputText
+				value="#{configuration.spMetaDataUrl}" /> <h:commandButton
+				action="#{configuration.addSamlServiceProvider}"
+				value="Add SAML Service Provider" /></p>
+		</h:form>
+	</ui:composition>
+</f:view>
