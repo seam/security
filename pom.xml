@@ -5,7 +5,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>3-SNAPSHOT</version>
+      <version>3</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
