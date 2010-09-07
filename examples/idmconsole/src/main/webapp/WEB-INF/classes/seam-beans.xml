@@ -6,8 +6,7 @@
    xmlns:security="urn:java:org.jboss.seam.security.permission"
    xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"
    xsi:schemaLocation="
-      http://java.sun.com/xml/ns/javaee 
-      http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
+      http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
       
    <security:JpaPermissionStore>
       <s:overrides/>      
