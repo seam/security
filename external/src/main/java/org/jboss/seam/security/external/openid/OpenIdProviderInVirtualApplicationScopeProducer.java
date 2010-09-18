@@ -19,23 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.externaltest.integration.idp;
+package org.jboss.seam.security.external.openid;
 
-import javax.enterprise.event.Observes;
-import javax.servlet.ServletContextEvent;
+import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.New;
+import javax.enterprise.inject.Produces;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.servlet.event.qualifier.Initialized;
+import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
 
-public class IdpCustomizer
+/**
+ * @author Marcel Kolsteren
+ * 
+ */
+@Alternative
+public class OpenIdProviderInVirtualApplicationScopeProducer
 {
-   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderConfigurationApi idp)
+   @Produces
+   @VirtualApplicationScoped
+   public OpenIdProviderBean produce(@New OpenIdProviderBean op)
    {
-      idp.setEntityId("https://www.idp.com");
-      idp.setHostName("www.idp.com");
-      idp.setProtocol("http");
-      idp.setPort(8080);
-      idp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
-      idp.setWantSingleLogoutMessagesSigned(false);
+      return op;
    }
 }

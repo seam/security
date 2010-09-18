@@ -78,16 +78,7 @@ public abstract class SamlEntityBean extends EntityBean implements SamlEntityCon
 
    public String getServiceURL(SamlServiceType service)
    {
-      String portString;
-      if (protocol.equals("http") && port != 80 || protocol.equals("https") && port != 443)
-      {
-         portString = ":" + port;
-      }
-      else
-      {
-         portString = "";
-      }
-      return protocol + "://" + hostName + portString + servletContext.getContextPath() + "/saml/" + getIdpOrSp() + "/" + service.getName();
+      return createURL(servletContext.getContextPath() + "/saml/" + getIdpOrSp() + "/" + service.getName());
    }
 
    public String getMetaDataURL()

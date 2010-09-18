@@ -23,5 +23,7 @@ package org.jboss.seam.security.external.api;
 
 public interface OpenIdRelyingPartyConfigurationApi extends EntityConfigurationApi
 {
+   String getXrdsURL();
 
+   String getRealm();
 }

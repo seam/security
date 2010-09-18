@@ -19,39 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.external.api;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public enum OpenIdService
+public interface OpenIdProviderApi
 {
-   OPEN_ID_SERVICE("OpenIdService"),
+   void authenticationSucceeded(String userName);
 
-   XRDS_SERVICE("XrdsService");
+   void authenticationFailed();
 
-   private String name;
+   void setAttributes(Map<String, List<String>> attributeValues);
 
-   private OpenIdService(String name)
-   {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
-      {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
-      }
-      return null;
-   }
+   String getOpLocalIdentifierForUserName(String userName);
 }

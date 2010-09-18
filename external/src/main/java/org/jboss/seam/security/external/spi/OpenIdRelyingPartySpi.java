@@ -31,5 +31,5 @@ public interface OpenIdRelyingPartySpi
 {
    public void loginSucceeded(OpenIdPrincipal principal);
 
-   public void loginFailed();
+   public void loginFailed(String message);
 }

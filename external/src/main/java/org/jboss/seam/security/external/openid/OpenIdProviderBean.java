@@ -1,0 +1,237 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2010, Red Hat, Inc., and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.jboss.seam.security.external.openid;
+
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
+
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import org.jboss.seam.security.external.EntityBean;
+import org.jboss.seam.security.external.JaxbContext;
+import org.jboss.seam.security.external.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.api.OpenIdProviderConfigurationApi;
+import org.jboss.seam.security.external.dialogues.api.Dialogued;
+import org.jboss.seam.security.external.jaxb.xrds.LocalID;
+import org.jboss.seam.security.external.jaxb.xrds.ObjectFactory;
+import org.jboss.seam.security.external.jaxb.xrds.Service;
+import org.jboss.seam.security.external.jaxb.xrds.Type;
+import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
+import org.jboss.seam.security.external.jaxb.xrds.XRD;
+import org.jboss.seam.security.external.jaxb.xrds.XRDS;
+import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
+import org.openid4java.discovery.DiscoveryInformation;
+
+/**
+ * @author Marcel Kolsteren
+ * 
+ */
+public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi, OpenIdProviderConfigurationApi
+{
+   @Inject
+   private Instance<OpenIdProviderRequest> openIdProviderRequest;
+
+   @Inject
+   private OpenIdProviderAuthenticationService openIdSingleLoginSender;
+
+   @Inject
+   private ServletContext servletContext;
+
+   @Inject
+   private Instance<OpenIdProviderSpi> openIdProviderSpi;
+
+   @Inject
+   @JaxbContext(ObjectFactory.class)
+   private JAXBContext jaxbContext;
+
+   public String getServiceURL(OpenIdService service)
+   {
+      String path = servletContext.getContextPath() + "/openid/OP/" + service.getName();
+      return createURL(path);
+   }
+
+   public String getRealm()
+   {
+      return createURL("");
+   }
+
+   public String getXrdsURL()
+   {
+      return getServiceURL(OpenIdService.XRDS_SERVICE);
+   }
+
+   /**
+    * Write XRDS with OP identifier (see OpenId 2.0 Authentication spec, section
+    * 7.3.2.1.1.)
+    * 
+    * @param writer writer to use
+    */
+   public void writeOpIdentifierXrds(Writer writer)
+   {
+      try
+      {
+         ObjectFactory objectFactory = new ObjectFactory();
+
+         XRDS xrds = objectFactory.createXRDS();
+
+         XRD xrd = objectFactory.createXRD();
+
+         Type type = objectFactory.createType();
+         type.setValue(DiscoveryInformation.OPENID2_OP);
+         URIPriorityAppendPattern uri = objectFactory.createURIPriorityAppendPattern();
+         uri.setValue(getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+
+         Service service = objectFactory.createService();
+         service.getType().add(type);
+         service.getURI().add(uri);
+
+         xrd.getService().add(service);
+
+         xrds.getOtherelement().add(xrd);
+
+         Marshaller marshaller = jaxbContext.createMarshaller();
+         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+         marshaller.marshal(xrds, writer);
+      }
+      catch (JAXBException e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
+
+   public void writeClaimedIdentifierXrds(Writer writer, String opLocalIdentifier)
+   {
+      try
+      {
+         ObjectFactory objectFactory = new ObjectFactory();
+
+         XRDS xrds = objectFactory.createXRDS();
+
+         XRD xrd = objectFactory.createXRD();
+
+         Type type = objectFactory.createType();
+         type.setValue(DiscoveryInformation.OPENID2);
+         URIPriorityAppendPattern uri = objectFactory.createURIPriorityAppendPattern();
+         uri.setValue(getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+
+         Service service = objectFactory.createService();
+         service.getType().add(type);
+         service.getURI().add(uri);
+
+         LocalID localId = new LocalID();
+         localId.setValue(opLocalIdentifier);
+         service.getLocalID().add(localId);
+
+         xrd.getService().add(service);
+
+         xrds.getOtherelement().add(xrd);
+
+         Marshaller marshaller = jaxbContext.createMarshaller();
+         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+         marshaller.marshal(xrds, writer);
+      }
+      catch (JAXBException e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
+
+   public String getOpLocalIdentifierForUserName(String userName)
+   {
+      try
+      {
+         return createURL(getUsersPath() + URLEncoder.encode(userName, "UTF-8"));
+      }
+      catch (UnsupportedEncodingException e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
+
+   public String getUserNameFromOpLocalIdentifier(String opLocalIdentifier)
+   {
+      String prefix = createURL(getUsersPath());
+      if (opLocalIdentifier.startsWith(prefix))
+      {
+         String urlEncodedUserName = opLocalIdentifier.replace(prefix, "");
+         try
+         {
+            return URLDecoder.decode(urlEncodedUserName, "UTF-8");
+         }
+         catch (UnsupportedEncodingException e)
+         {
+            throw new RuntimeException(e);
+         }
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   public String getUsersPath()
+   {
+      return servletContext.getContextPath() + "/users/";
+   }
+
+   public String getUsersUrlPrefix()
+   {
+      return createURL(getUsersPath());
+   }
+
+   @Dialogued(join = true)
+   public void authenticationFailed()
+   {
+      openIdSingleLoginSender.sendAuthenticationResponse(false, null);
+   }
+
+   @Dialogued(join = true)
+   public void authenticationSucceeded(String userName)
+   {
+      openIdProviderRequest.get().setUserName(userName);
+      if (openIdProviderRequest.get().getRequestedAttributes() == null)
+      {
+         openIdSingleLoginSender.sendAuthenticationResponse(true, null);
+      }
+      else
+      {
+         openIdProviderSpi.get().fetchParameters(openIdProviderRequest.get().getRequestedAttributes());
+      }
+   }
+
+   @Dialogued(join = true)
+   public void setAttributes(Map<String, List<String>> attributeValues)
+   {
+      openIdSingleLoginSender.sendAuthenticationResponse(true, attributeValues);
+   }
+}

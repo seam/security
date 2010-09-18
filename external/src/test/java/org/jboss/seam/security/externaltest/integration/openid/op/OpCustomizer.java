@@ -19,26 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.externaltest.integration.sp;
+package org.jboss.seam.security.externaltest.integration.openid.op;
 
 import javax.enterprise.event.Observes;
+import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.api.SamlBinding;
-import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
-import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
-import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
+import org.jboss.seam.security.external.api.OpenIdProviderConfigurationApi;
+import org.jboss.seam.servlet.event.qualifier.Initialized;
 
-public class SpCustomizer
+public class OpCustomizer
 {
-   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication)
+   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, OpenIdProviderConfigurationApi op)
    {
-      if (virtualApplication.equals("www.sp2.com"))
-      {
-         sp.setPreferredBinding(SamlBinding.HTTP_Redirect);
-      }
-      sp.setSingleLogoutMessagesSigned(false);
-      sp.setProtocol("http");
-      sp.setPort(8080);
+      op.setHostName("localhost");
+      op.setProtocol("http");
+      op.setPort(8080);
    }
-
 }

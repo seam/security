@@ -21,14 +21,19 @@
  */
 package org.jboss.seam.security.externaltest.integration.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.enterprise.inject.spi.Extension;
 
 import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.dialogues.DialogueContextExtension;
 import org.jboss.seam.security.external.virtualapplications.VirtualApplicationContextExtension;
 import org.jboss.seam.security.externaltest.integration.MetaDataLoader;
-import org.jboss.seam.security.externaltest.integration.idp.IdpCustomizer;
-import org.jboss.seam.security.externaltest.integration.sp.SpCustomizer;
+import org.jboss.seam.security.externaltest.integration.openid.op.OpCustomizer;
+import org.jboss.seam.security.externaltest.integration.openid.rp.RpCustomizer;
+import org.jboss.seam.security.externaltest.integration.saml.idp.IdpCustomizer;
+import org.jboss.seam.security.externaltest.integration.saml.sp.SpCustomizer;
 import org.jboss.seam.security.externaltest.util.MavenArtifactResolver;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -40,52 +45,54 @@ class ArchiveBuilder
 
    static WebArchive spArchive;
 
-   static WebArchive getArchive(String idpOrSp)
+   static Map<String, WebArchive> webArchives = new HashMap<String, WebArchive>();
+
+   static WebArchive getArchive(String entity)
    {
-      if (idpOrSp.equals("sp"))
+      WebArchive webArchive = webArchives.get(entity);
+      if (webArchive == null)
       {
-         return spArchive;
+         webArchive = createTestArchive(entity);
+         webArchives.put(entity, webArchive);
       }
-      else
-      {
-         return idpArchive;
-      }
+      return webArchive;
    }
 
-   static WebArchive createTestArchive(String idpOrSp)
+   static private WebArchive createTestArchive(String entity)
    {
-      WebArchive war = ShrinkWrap.create(WebArchive.class, idpOrSp + ".war");
+      WebArchive war = ShrinkWrap.create(WebArchive.class, entity + ".war");
 
       war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet"));
       war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet-api"));
       war.addLibraries(MavenArtifactResolver.resolve("org.openid4java", "openid4java"));
+      war.addLibraries(MavenArtifactResolver.resolve("nekohtml", "nekohtml"));
       war.addLibraries(MavenArtifactResolver.resolve("org.jboss.weld:weld-extensions"));
       war.addLibraries(MavenArtifactResolver.resolve("commons-httpclient:commons-httpclient"));
 
-      war.addWebResource("test_keystore.jks");
-      war.addWebResource("WEB-INF/" + idpOrSp + "-beans.xml", "beans.xml");
+      war.addWebResource("WEB-INF/" + entity + "-beans.xml", "beans.xml");
       war.addWebResource("WEB-INF/context.xml", "context.xml");
 
       war.addPackage(MetaDataLoader.class.getPackage());
-      if (idpOrSp.equals("sp"))
+      if (entity.equals("sp"))
       {
          war.addPackage(SpCustomizer.class.getPackage());
+         war.addWebResource("test_keystore.jks");
       }
-      else
+      else if (entity.equals("idp"))
       {
          war.addPackage(IdpCustomizer.class.getPackage());
+         war.addWebResource("test_keystore.jks");
+      }
+      else if (entity.equals("op"))
+      {
+         war.addPackage(OpCustomizer.class.getPackage());
+      }
+      else if (entity.equals("rp"))
+      {
+         war.addPackage(RpCustomizer.class.getPackage());
       }
 
       war.addLibrary(createJarModule());
-
-      if (idpOrSp.equals("sp"))
-      {
-         spArchive = war;
-      }
-      else
-      {
-         idpArchive = war;
-      }
 
       return war;
    }

@@ -50,7 +50,6 @@ import org.jboss.seam.security.external.saml.SamlServiceType;
  * @author Marcel Kolsteren
  * 
  */
-@Typed(SamlSpBean.class)
 public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi
 {
    private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();

@@ -19,39 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.externaltest.integration.saml.sp;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public enum OpenIdService
+import javax.enterprise.event.Observes;
+
+import org.jboss.seam.security.external.api.SamlBinding;
+import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
+import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
+import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
+
+public class SpCustomizer
 {
-   OPEN_ID_SERVICE("OpenIdService"),
-
-   XRDS_SERVICE("XrdsService");
-
-   private String name;
-
-   private OpenIdService(String name)
+   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
+      if (virtualApplication.equals("www.sp2.com"))
       {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
+         sp.setPreferredBinding(SamlBinding.HTTP_Redirect);
       }
-      return null;
+      sp.setSingleLogoutMessagesSigned(false);
+      sp.setProtocol("http");
+      sp.setPort(8080);
    }
+
 }

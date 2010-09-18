@@ -32,5 +32,7 @@ public class BeforeUnDeployEventHandler implements EventHandler<BeforeUnDeploy>
    {
       DeployableContainer container = context.get(DeployableContainer.class);
       container.undeploy(context, ArchiveBuilder.getArchive("idp"));
+      container.undeploy(context, ArchiveBuilder.getArchive("op"));
+      container.undeploy(context, ArchiveBuilder.getArchive("rp"));
    }
 }

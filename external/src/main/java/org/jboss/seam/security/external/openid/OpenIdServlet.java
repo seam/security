@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,10 +55,16 @@ public class OpenIdServlet extends HttpServlet
    private ResponseHandler responseHandler;
 
    @Inject
-   private OpenIdSingleLoginService openIdSingleLoginService;
+   private OpenIdProviderAuthenticationService openIdProviderAuthenticationService;
 
    @Inject
-   private OpenIdXrdsProvider openIdXrdsProvider;
+   private OpenIdRpAuthenticationService openIdRpAuthenticationService;
+
+   @Inject
+   private Instance<OpenIdRpBean> rpBean;
+
+   @Inject
+   private Instance<OpenIdProviderBean> opBean;
 
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -90,14 +97,15 @@ public class OpenIdServlet extends HttpServlet
 
    private void handleMessage(HttpServletRequest httpRequest) throws InvalidRequestException
    {
-      Matcher matcher = Pattern.compile("/([^/]*?)$").matcher(httpRequest.getRequestURI());
+      Matcher matcher = Pattern.compile("/(OP|RP)/([^/]*?)$").matcher(httpRequest.getRequestURI());
       boolean found = matcher.find();
       if (!found)
       {
          responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.");
          return;
       }
-      OpenIdService service = OpenIdService.getByName(matcher.group(1));
+      OpenIdProviderOrRelyingParty opOrRp = OpenIdProviderOrRelyingParty.valueOf(matcher.group(1));
+      OpenIdService service = OpenIdService.getByName(matcher.group(2));
 
       if (service == null)
       {
@@ -108,10 +116,24 @@ public class OpenIdServlet extends HttpServlet
       switch (service)
       {
       case OPEN_ID_SERVICE:
-         openIdSingleLoginService.handleIncomingMessage(httpRequest);
+         if (opOrRp == OpenIdProviderOrRelyingParty.OP)
+         {
+            openIdProviderAuthenticationService.handleIncomingMessage(httpRequest);
+         }
+         else
+         {
+            openIdRpAuthenticationService.handleIncomingMessage(httpRequest);
+         }
          break;
-      case OPEN_ID_XRDS_SERVICE:
-         openIdXrdsProvider.writeMetaData(responseHandler.getWriter("application/xrds+xml"));
+      case XRDS_SERVICE:
+         if (opOrRp == OpenIdProviderOrRelyingParty.OP)
+         {
+            opBean.get().writeOpIdentifierXrds(responseHandler.getWriter("application/xrds+xml"));
+         }
+         else
+         {
+            rpBean.get().writeRpXrds(responseHandler.getWriter("application/xrds+xml"));
+         }
          break;
       default:
          throw new RuntimeException("Unsupported service " + service);

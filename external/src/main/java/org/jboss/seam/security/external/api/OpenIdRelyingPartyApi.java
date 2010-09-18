@@ -29,5 +29,13 @@ import java.util.List;
  */
 public interface OpenIdRelyingPartyApi
 {
-   public void login(String openId, List<OpenIdAttribute> attributes);
+   /**
+    * Start an OpenID login dialogue.
+    * 
+    * @param identifier either a Claimed Identifier (identifying the user) or an
+    *           OP Identifier (identifying the OpenID Provider where the user
+    *           has an account)
+    * @param attributes attributes that are requested
+    */
+   void login(String identifier, List<OpenIdRequestedAttribute> attributes);
 }

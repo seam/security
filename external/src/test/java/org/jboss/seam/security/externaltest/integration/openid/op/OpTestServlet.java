@@ -1,4 +1,4 @@
-package org.jboss.seam.security.externaltest.integration.sp;
+package org.jboss.seam.security.externaltest.integration.openid.op;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -11,18 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.externaltest.integration.MetaDataLoader;
 
-@WebServlet(name = "SpTestServlet", urlPatterns = { "/testservlet" })
-public class SpTestServlet extends HttpServlet
+@WebServlet(name = "OpTestServlet", urlPatterns = { "/testservlet" })
+public class OpTestServlet extends HttpServlet
 {
    private static final long serialVersionUID = -4551548646707243449L;
 
    @Inject
-   private SamlSpApplicationMock samlSpApplicationMock;
-
-   @Inject
-   private MetaDataLoader metaDataLoader;
+   private OpenIdProviderApplicationMock openIdProviderApplicationMock;
 
    @Inject
    private ResponseHolder responseHolder;
@@ -32,18 +28,15 @@ public class SpTestServlet extends HttpServlet
    {
       responseHolder.setResponse(response);
       String command = request.getParameter("command");
-      if (command.equals("login"))
+      if (command.equals("authenticate"))
       {
-         String idpEntityId = request.getParameter("idpEntityId");
-         samlSpApplicationMock.login(idpEntityId);
+         String userName = request.getParameter("userName");
+         openIdProviderApplicationMock.handleLogin(userName);
       }
-      else if (command.equals("singleLogout"))
+      else if (command.equals("setAttribute"))
       {
-         samlSpApplicationMock.handleGlobalLogout();
-      }
-      else if (command.equals("getNrOfSessions"))
-      {
-         response.getWriter().print(samlSpApplicationMock.getNumberOfSessions());
+         String email = request.getParameter("email");
+         openIdProviderApplicationMock.setAttribute("email", email);
       }
       else if (command.equals("getNrOfDialogues"))
       {
@@ -58,10 +51,6 @@ public class SpTestServlet extends HttpServlet
             }
          }
          response.getWriter().print(count);
-      }
-      else if (command.equals("loadMetaData"))
-      {
-         metaDataLoader.loadMetaDataOfOtherSamlEntity("www.idp.com", "idp");
       }
       else
       {

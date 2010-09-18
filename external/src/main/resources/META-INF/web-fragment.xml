@@ -13,6 +13,11 @@
       <servlet-class>org.jboss.seam.security.external.openid.OpenIdServlet</servlet-class>
    </servlet>
 
+   <servlet>
+      <servlet-name>OpenIdUsersServlet</servlet-name>
+      <servlet-class>org.jboss.seam.security.external.openid.OpenIdUsersServlet</servlet-class>
+   </servlet>
+
    <servlet-mapping>
       <servlet-name>SamlServlet</servlet-name>
       <url-pattern>/saml/*</url-pattern>
@@ -21,6 +26,11 @@
    <servlet-mapping>
       <servlet-name>OpenIdServlet</servlet-name>
       <url-pattern>/openid/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>OpenIdUsersServlet</servlet-name>
+      <url-pattern>/users/*</url-pattern>
    </servlet-mapping>
 
 </web-fragment>

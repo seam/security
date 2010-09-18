@@ -21,51 +21,9 @@
  */
 package org.jboss.seam.security.external.api;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class OpenIdAttribute
+public interface OpenIdProviderConfigurationApi extends EntityConfigurationApi
 {
-   private String alias;
-   private String typeUri;
-   private boolean required;
+   String getXrdsURL();
 
-   public OpenIdAttribute(String alias, String typeUri, boolean required)
-   {
-      super();
-      this.alias = alias;
-      this.typeUri = typeUri;
-      this.required = required;
-   }
-
-   public String getAlias()
-   {
-      return alias;
-   }
-
-   public void setAlias(String alias)
-   {
-      this.alias = alias;
-   }
-
-   public String getTypeUri()
-   {
-      return typeUri;
-   }
-
-   public void setTypeUri(String typeUri)
-   {
-      this.typeUri = typeUri;
-   }
-
-   public boolean isRequired()
-   {
-      return required;
-   }
-
-   public void setRequired(boolean required)
-   {
-      this.required = required;
-   }
+   String getRealm();
 }

@@ -21,37 +21,22 @@
  */
 package org.jboss.seam.security.external.openid;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.New;
+import javax.enterprise.inject.Produces;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
-public enum OpenIdService
+@Alternative
+public class OpenIdProviderInApplicationScopeProducer
 {
-   OPEN_ID_SERVICE("OpenIdService"),
-
-   XRDS_SERVICE("XrdsService");
-
-   private String name;
-
-   private OpenIdService(String name)
+   @Produces
+   @ApplicationScoped
+   public OpenIdProviderBean produce(@New OpenIdProviderBean op)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
-      {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
-      }
-      return null;
+      return op;
    }
 }

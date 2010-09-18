@@ -43,7 +43,6 @@ import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.dialogues.DialogueManager;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
@@ -69,9 +68,6 @@ public class SamlMessageReceiver
 
    @Inject
    private DialogueManager dialogueManager;
-
-   @Inject
-   private Instance<Dialogue> dialogue;
 
    @Inject
    private Instance<SamlDialogue> samlDialogue;
@@ -294,14 +290,7 @@ public class SamlMessageReceiver
          throw new RuntimeException(e);
       }
 
-      if (dialogue.get().isFinished())
-      {
-         dialogueManager.endDialogue();
-      }
-      else
-      {
-         dialogueManager.detachDialogue();
-      }
+      dialogueManager.detachDialogue();
    }
 
    private RequestAbstractType getSamlRequest(Document document) throws InvalidRequestException

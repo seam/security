@@ -19,36 +19,71 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.externaltest.integration;
+package org.jboss.seam.security.external.api;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
-
-public class OpenIdSpiMock implements OpenIdRelyingPartySpi
+/**
+ * @author Marcel Kolsteren
+ * 
+ */
+public class OpenIdRequestedAttribute
 {
+   private String alias;
+   private String typeUri;
+   private boolean required;
+   private Integer count;
 
-   public void loginFailed()
+   public OpenIdRequestedAttribute()
    {
-      // TODO Auto-generated method stub
 
    }
 
-   public void loginSucceeded(OpenIdPrincipal principal)
+   public OpenIdRequestedAttribute(String alias, String typeUri, boolean required, Integer count)
    {
-      // TODO Auto-generated method stub
-
+      super();
+      this.alias = alias;
+      this.typeUri = typeUri;
+      this.required = required;
+      this.count = count;
    }
 
-   public void logoutFailed(OpenIdPrincipal principal, String statusCode)
+   public String getAlias()
    {
-      // TODO Auto-generated method stub
-
+      return alias;
    }
 
-   public void logoutSucceeded(OpenIdPrincipal principal)
+   public void setAlias(String alias)
    {
-      // TODO Auto-generated method stub
+      this.alias = alias;
+   }
 
+   public String getTypeUri()
+   {
+      return typeUri;
+   }
+
+   public void setTypeUri(String typeUri)
+   {
+      this.typeUri = typeUri;
+   }
+
+   public boolean isRequired()
+   {
+      return required;
+   }
+
+   public void setRequired(boolean required)
+   {
+      this.required = required;
+   }
+
+   public Integer getCount()
+   {
+      return count;
+   }
+
+   public void setCount(Integer count)
+   {
+      this.count = count;
    }
 
 }

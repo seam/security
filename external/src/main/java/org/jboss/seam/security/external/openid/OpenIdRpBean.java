@@ -21,18 +21,28 @@
  */
 package org.jboss.seam.security.external.openid;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.Writer;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.jboss.seam.security.external.EntityBean;
-import org.jboss.seam.security.external.api.OpenIdAttribute;
+import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
 import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
+import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
+import org.jboss.seam.security.external.jaxb.xrds.ObjectFactory;
+import org.jboss.seam.security.external.jaxb.xrds.Service;
+import org.jboss.seam.security.external.jaxb.xrds.Type;
+import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
+import org.jboss.seam.security.external.jaxb.xrds.XRD;
+import org.jboss.seam.security.external.jaxb.xrds.XRDS;
+import org.openid4java.discovery.DiscoveryInformation;
 
 /**
  * @author Marcel Kolsteren
@@ -41,20 +51,24 @@ import org.jboss.seam.security.external.dialogues.api.Dialogued;
 public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi
 {
    @Inject
-   private OpenIdSingleLoginService openIdSingleLoginSender;
+   private OpenIdRpAuthenticationService openIdSingleLoginSender;
 
    @Inject
    private ServletContext servletContext;
 
-   @Dialogued
-   public void login(String openId, List<OpenIdAttribute> attributes)
+   @Inject
+   @JaxbContext(ObjectFactory.class)
+   private JAXBContext jaxbContext;
+
+   @Dialogued(join = true)
+   public void login(String identifier, List<OpenIdRequestedAttribute> attributes)
    {
-      openIdSingleLoginSender.sendAuthRequest(openId, attributes);
+      openIdSingleLoginSender.sendAuthRequest(identifier, attributes);
    }
 
    public String getServiceURL(OpenIdService service)
    {
-      String path = servletContext.getContextPath() + "/openid/" + service.getName();
+      String path = servletContext.getContextPath() + "/openid/RP/" + service.getName();
       return createURL(path);
    }
 
@@ -63,20 +77,40 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, O
       return createURL("");
    }
 
-   private String createURL(String path)
+   public String getXrdsURL()
+   {
+      return getServiceURL(OpenIdService.XRDS_SERVICE);
+   }
+
+   public void writeRpXrds(Writer writer)
    {
       try
       {
-         if (protocol.equals("http") && port == 80 || protocol.equals("https") && port == 443)
-         {
-            return new URL(protocol, hostName, path).toExternalForm();
-         }
-         else
-         {
-            return new URL(protocol, hostName, port, path).toExternalForm();
-         }
+         ObjectFactory objectFactory = new ObjectFactory();
+
+         XRDS xrds = objectFactory.createXRDS();
+
+         XRD xrd = objectFactory.createXRD();
+
+         Type type = objectFactory.createType();
+         type.setValue(DiscoveryInformation.OPENID2_RP);
+         URIPriorityAppendPattern uri = objectFactory.createURIPriorityAppendPattern();
+         uri.setValue(getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+
+         Service service = objectFactory.createService();
+         service.getType().add(type);
+         service.getURI().add(uri);
+
+         xrd.getService().add(service);
+
+         xrds.getOtherelement().add(xrd);
+
+         Marshaller marshaller = jaxbContext.createMarshaller();
+         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+         marshaller.marshal(xrds, writer);
       }
-      catch (MalformedURLException e)
+      catch (JAXBException e)
       {
          throw new RuntimeException(e);
       }

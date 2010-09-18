@@ -21,37 +21,34 @@
  */
 package org.jboss.seam.security.external.openid;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+
+import org.openid4java.server.ServerManager;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
-public enum OpenIdService
+@ApplicationScoped
+public class OpenIdServerManagerFactory
 {
-   OPEN_ID_SERVICE("OpenIdService"),
+   private ServerManager serverManager;
 
-   XRDS_SERVICE("XrdsService");
+   @Inject
+   private OpenIdProviderBean providerBean;
 
-   private String name;
-
-   private OpenIdService(String name)
+   @Produces
+   public ServerManager getServerManager()
    {
-      this.name = name;
+      return serverManager;
    }
 
-   public String getName()
+   @Inject
+   public void startup() throws Exception
    {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
-      {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
-      }
-      return null;
+      serverManager = new ServerManager();
+      serverManager.setOPEndpointUrl(providerBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE));
    }
 }

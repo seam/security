@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -57,7 +56,6 @@ import com.google.common.collect.Lists;
  * @author Marcel Kolsteren
  * 
  */
-@Typed(SamlIdpBean.class)
 public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentityProviderApi, SamlIdentityProviderConfigurationApi
 {
    @Inject

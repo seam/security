@@ -36,14 +36,14 @@ public class OpenIdPrincipal
 
    private URL openIdProvider;
 
-   private Map<String, List<String>> attributes;
+   private Map<String, List<String>> attributeValues;
 
-   public OpenIdPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributes)
+   public OpenIdPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributeValues)
    {
       super();
       this.identifier = identifier;
       this.openIdProvider = openIdProvider;
-      this.attributes = attributes;
+      this.attributeValues = attributeValues;
    }
 
    public String getIdentifier()
@@ -56,9 +56,26 @@ public class OpenIdPrincipal
       return openIdProvider;
    }
 
-   public Map<String, List<String>> getAttributes()
+   public Map<String, List<String>> getAttributeValues()
    {
-      return attributes;
+      return attributeValues;
+   }
+
+   public String getAttribute(String alias)
+   {
+      List<String> values = attributeValues.get(alias);
+      if (values.size() == 0)
+      {
+         return null;
+      }
+      else if (values.size() == 1)
+      {
+         return (String) attributeValues.get(alias).get(0);
+      }
+      else
+      {
+         throw new RuntimeException("Attribute has multiple values");
+      }
    }
 
 }

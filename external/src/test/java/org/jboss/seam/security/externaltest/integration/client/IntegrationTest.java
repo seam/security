@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -61,6 +60,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
+
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
 public class IntegrationTest
@@ -86,14 +87,13 @@ public class IntegrationTest
    public static Archive<?> createTestArchive()
    {
       /*
-       * We need to deploy two war files: one for the service provider and one
-       * for the identity provider. Current version of Arquillian (1.0.0.Alpha3)
-       * doesn't support multiple archives. See ARQ-67. For the time being, we
-       * add the first war here, and we add the second war using a listener that
-       * is registered by using the Arquillian SPI (see {@Link
-       * AfterDeployEventHandler}).
+       * We need to deploy 4 war files. Current version of Arquillian
+       * (1.0.0.Alpha3) doesn't support multiple archives. See ARQ-67. For the
+       * time being, we add the first war here, and we add the other war files
+       * using a listener that is registered through the Arquillian SPI (see
+       * {@Link AfterDeployEventHandler}).
        */
-      return ArchiveBuilder.createTestArchive("sp");
+      return ArchiveBuilder.getArchive("sp");
    }
 
    @Before
@@ -106,15 +106,15 @@ public class IntegrationTest
    @Test
    public void samlTest()
    {
-      Map<String, String> params = new HashMap<String, String>();
+      Map<String, String> params = Maps.newHashMap();
       params.put("command", "loadMetaData");
       sendMessageToApplication("www.sp1.com", "sp", params);
       sendMessageToApplication("www.sp2.com", "sp", params);
       sendMessageToApplication("www.idp.com", "idp", params);
 
       // Login one user at each service provider application
-      signOn("www.sp1.com", "https://www.idp.com", "John Doe");
-      signOn("www.sp2.com", "https://www.idp.com", "Jane Doe");
+      samlSignOn("www.sp1.com", "https://www.idp.com", "John Doe");
+      samlSignOn("www.sp2.com", "https://www.idp.com", "Jane Doe");
 
       // Check that the IDP has two sessions (one for each user) and that each
       // SP has one
@@ -151,24 +151,84 @@ public class IntegrationTest
       checkDialogueTermination("www.sp2.com", "sp");
    }
 
+   @Test
+   public void openIdLoginWithOpIdentifierTest()
+   {
+      String opIdentifier = "http://localhost:8080/op/openid/OP/XrdsService";
+      String userName = "john_doe";
+
+      Map<String, String> params = Maps.newHashMap();
+      params.put("command", "login");
+      params.put("identifier", opIdentifier);
+      params.put("fetchEmail", "false");
+      sendMessageToApplication("localhost", "rp", params);
+
+      checkApplicationMessage("Please login.");
+
+      params = Maps.newHashMap();
+      params.put("command", "authenticate");
+      params.put("userName", userName);
+      sendMessageToApplication("localhost", "op", params);
+
+      checkApplicationMessage("Login succeeded (http://localhost:8080/op/users/" + userName + ")");
+
+      // All dialogues should be terminated by now.
+      checkDialogueTermination("www.op.com", "op");
+      checkDialogueTermination("www.rp.com", "rp");
+   }
+
+   @Test
+   public void openIdLoginWithClaimedIdentifierAndAttributeExchangeTest()
+   {
+      String userName = "jane_doe";
+      String claimedId = "http://localhost:8080/op/users/" + userName;
+
+      Map<String, String> params = Maps.newHashMap();
+      params.put("command", "login");
+      params.put("identifier", claimedId);
+      params.put("fetchEmail", "true");
+      sendMessageToApplication("localhost", "rp", params);
+
+      checkApplicationMessage("Please provide the password for " + userName + ".");
+
+      params = Maps.newHashMap();
+      params.put("command", "authenticate");
+      params.put("userName", userName);
+      sendMessageToApplication("localhost", "op", params);
+
+      checkApplicationMessage("Please provide your email.");
+
+      params = Maps.newHashMap();
+      params.put("command", "setAttribute");
+      String email = "jane_doe@op.com";
+      params.put("email", email);
+      sendMessageToApplication("localhost", "op", params);
+
+      checkApplicationMessage("Login succeeded (" + claimedId + ", email " + email + ")");
+
+      // All dialogues should be terminated by now.
+      checkDialogueTermination("www.op.com", "op");
+      checkDialogueTermination("www.rp.com", "rp");
+   }
+
    private void checkNrOfSessions(String serverName, String spOrIdp, int expectedNumber)
    {
-      Map<String, String> params = new HashMap<String, String>();
+      Map<String, String> params = Maps.newHashMap();
       params.put("command", "getNrOfSessions");
       sendMessageToApplication(serverName, spOrIdp, params);
       checkApplicationMessage(Integer.toString(expectedNumber));
    }
 
-   private void signOn(String spHostName, String idpEntityId, String userName)
+   private void samlSignOn(String spHostName, String idpEntityId, String userName)
    {
-      Map<String, String> params = new HashMap<String, String>();
+      Map<String, String> params = Maps.newHashMap();
       params.put("command", "login");
       params.put("idpEntityId", idpEntityId);
       sendMessageToApplication(spHostName, "sp", params);
 
       checkApplicationMessage("Please login");
 
-      params = new HashMap<String, String>();
+      params = Maps.newHashMap();
       params.put("command", "authenticate");
       params.put("userName", userName);
       sendMessageToApplication("www.idp.com", "idp", params);
@@ -176,7 +236,7 @@ public class IntegrationTest
       checkApplicationMessage("Login succeeded (" + userName + ")");
    }
 
-   private void sendMessageToApplication(String hostName, String spOrIdp, Map<String, String> params)
+   private void sendMessageToApplication(String hostName, String contextRoot, Map<String, String> params)
    {
       List<NameValuePair> qParams = new ArrayList<NameValuePair>();
       for (Map.Entry<String, String> mapEntry : params.entrySet())
@@ -186,21 +246,24 @@ public class IntegrationTest
       URI uri;
       try
       {
-         uri = URIUtils.createURI("http", "localhost", 8080, "/" + spOrIdp + "/testservlet", URLEncodedUtils.format(qParams, "UTF-8"), null);
+         uri = URIUtils.createURI("http", "localhost", 8080, "/" + contextRoot + "/testservlet", URLEncodedUtils.format(qParams, "UTF-8"), null);
       }
       catch (URISyntaxException e)
       {
          throw new RuntimeException(e);
       }
       request = new HttpGet(uri);
-      request.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(hostName));
+      if (!hostName.equals("localhost"))
+      {
+         request.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(hostName, 8080));
+      }
 
       executeHttpRequestAndRelay();
    }
 
    private void checkDialogueTermination(String serverName, String spOrIdp)
    {
-      Map<String, String> params = new HashMap<String, String>();
+      Map<String, String> params = Maps.newHashMap();
       params.put("command", "getNrOfDialogues");
       sendMessageToApplication(serverName, spOrIdp, params);
       checkApplicationMessage("0");
@@ -229,7 +292,10 @@ public class IntegrationTest
          String serverName = extractServerNameFromUri(uri);
          uri = uri.replace(serverName, "localhost");
          HttpPost httpPost = new HttpPost(uri);
-         httpPost.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(serverName));
+         if (!serverName.equals("localhost"))
+         {
+            httpPost.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(serverName, 8080));
+         }
          List<NameValuePair> formparams = new ArrayList<NameValuePair>();
          formparams.add(new BasicNameValuePair(name, value));
          UrlEncodedFormEntity entity;
@@ -250,7 +316,7 @@ public class IntegrationTest
          log.info("Received redirect to " + location);
          String serverName = extractServerNameFromUri(location);
          HttpGet httpGet = new HttpGet(location.replace(serverName, "localhost"));
-         httpGet.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(serverName));
+         httpGet.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(serverName, 8080));
          request = httpGet;
       }
       else if (responseType == ResponseType.ERROR)

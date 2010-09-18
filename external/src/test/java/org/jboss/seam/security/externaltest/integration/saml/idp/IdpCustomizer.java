@@ -19,39 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.openid;
+package org.jboss.seam.security.externaltest.integration.saml.idp;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public enum OpenIdService
+import javax.enterprise.event.Observes;
+import javax.servlet.ServletContextEvent;
+
+import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
+import org.jboss.seam.servlet.event.qualifier.Initialized;
+
+public class IdpCustomizer
 {
-   OPEN_ID_SERVICE("OpenIdService"),
-
-   XRDS_SERVICE("XrdsService");
-
-   private String name;
-
-   private OpenIdService(String name)
+   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderConfigurationApi idp)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public static OpenIdService getByName(String name)
-   {
-      for (OpenIdService service : values())
-      {
-         if (service.getName().equals(name))
-         {
-            return service;
-         }
-      }
-      return null;
+      idp.setEntityId("https://www.idp.com");
+      idp.setHostName("www.idp.com");
+      idp.setProtocol("http");
+      idp.setPort(8080);
+      idp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
+      idp.setWantSingleLogoutMessagesSigned(false);
    }
 }

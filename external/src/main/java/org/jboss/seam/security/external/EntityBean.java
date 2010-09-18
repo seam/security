@@ -21,6 +21,9 @@
  */
 package org.jboss.seam.security.external;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * @author Marcel Kolsteren
  * 
@@ -60,5 +63,24 @@ public abstract class EntityBean
    public void setPort(int port)
    {
       this.port = port;
+   }
+
+   protected String createURL(String path)
+   {
+      try
+      {
+         if (protocol.equals("http") && port == 80 || protocol.equals("https") && port == 443)
+         {
+            return new URL(protocol, hostName, path).toExternalForm();
+         }
+         else
+         {
+            return new URL(protocol, hostName, port, path).toExternalForm();
+         }
+      }
+      catch (MalformedURLException e)
+      {
+         throw new RuntimeException(e);
+      }
    }
 }

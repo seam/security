@@ -28,11 +28,15 @@ import java.util.Map;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.OpenIdAttribute;
 import org.jboss.seam.security.external.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.dialogues.DialogueManager;
+import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerManager;
@@ -45,12 +49,13 @@ import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
+import org.slf4j.Logger;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class OpenIdSingleLoginService
+public class OpenIdRpAuthenticationService
 {
    @Inject
    private OpenIdRequest openIdRequest;
@@ -67,7 +72,15 @@ public class OpenIdSingleLoginService
    @Inject
    private ResponseHandler responseHandler;
 
-   @SuppressWarnings("unchecked")
+   @Inject
+   private Logger log;
+
+   @Inject
+   private Instance<Dialogue> dialogue;
+
+   @Inject
+   private DialogueManager dialogueManager;
+
    public void handleIncomingMessage(HttpServletRequest httpRequest) throws InvalidRequestException
    {
       try
@@ -96,35 +109,35 @@ public class OpenIdSingleLoginService
          {
             AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
 
-            Map<String, List<String>> attributes = null;
+            Map<String, List<String>> attributeValues = null;
             if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
             {
                FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-
-               attributes = fetchResp.getAttributes();
+               @SuppressWarnings("unchecked")
+               Map<String, List<String>> attrValues = fetchResp.getAttributes();
+               attributeValues = attrValues;
             }
 
-            OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), discovered.getOPEndpoint(), attributes);
+            OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), discovered.getOPEndpoint(), attributeValues);
 
             openIdRelyingPartySpi.get().loginSucceeded(principal);
          }
          else
          {
-            openIdRelyingPartySpi.get().loginFailed();
+            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg());
          }
       }
       catch (OpenIDException e)
       {
-         throw new RuntimeException(e);
+         responseHandler.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+         return;
       }
+
+      dialogue.get().setFinished(true);
    }
 
-   private OpenIdPrincipal createPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributes)
-   {
-      return new OpenIdPrincipal(identifier, openIdProvider, attributes);
-   }
-
-   public void sendAuthRequest(String openId, List<OpenIdAttribute> attributes)
+   @Dialogued(join = true)
+   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes)
    {
       try
       {
@@ -137,12 +150,13 @@ public class OpenIdSingleLoginService
 
          String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
          String realm = relyingPartyBean.getRealm();
-         AuthRequest authReq = openIdConsumerManager.authenticate(discovered, openIdServiceUrl, realm);
+         String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getDialogueId();
+         AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
 
          if (attributes != null && attributes.size() > 0)
          {
             FetchRequest fetch = FetchRequest.createFetchRequest();
-            for (OpenIdAttribute attribute : attributes)
+            for (OpenIdRequestedAttribute attribute : attributes)
             {
                fetch.addAttribute(attribute.getAlias(), attribute.getTypeUri(), attribute.isRequired());
             }
@@ -156,7 +170,13 @@ public class OpenIdSingleLoginService
       }
       catch (OpenIDException e)
       {
-         openIdRelyingPartySpi.get().loginFailed();
+         log.warn("Authentication failed", e);
+         openIdRelyingPartySpi.get().loginFailed(e.getMessage());
       }
+   }
+
+   private OpenIdPrincipal createPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributeValues)
+   {
+      return new OpenIdPrincipal(identifier, openIdProvider, attributeValues);
    }
 }
