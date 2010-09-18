@@ -21,48 +21,29 @@
  */
 package org.jboss.seam.security.examples.id_consumer;
 
-import java.io.IOException;
-
+import javax.enterprise.inject.Model;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
-
-public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi
+@Model
+public class Login
 {
-   @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
-   private ServletContext servletContext;
+   private String openId;
 
    @Inject
    private Identity identity;
 
-   public void loginSucceeded(OpenIdPrincipal principal)
+   public String getOpenId()
    {
-      try
-      {
-         identity.finishLogin(principal);
-         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/UserInfo.jsf");
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
+      return openId;
    }
 
-   public void loginFailed(String message)
+   public void setOpenId(String openId)
    {
-      try
-      {
-         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/AuthenticationFailed.jsf");
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
+      this.openId = openId;
+   }
+
+   public void login()
+   {
+      identity.startLogin(openId);
    }
 }

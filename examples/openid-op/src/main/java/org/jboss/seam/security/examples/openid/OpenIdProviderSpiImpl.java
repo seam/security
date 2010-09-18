@@ -19,25 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.id_provider;
+package org.jboss.seam.security.examples.openid;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.jboss.seam.security.external.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
-import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
-import org.slf4j.Logger;
+import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 
-public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
+public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
 {
-   @Inject
-   private Logger log;
-
    @Inject
    private ResponseHolder responseHolder;
 
@@ -45,25 +43,36 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
    private ServletContext servletContext;
 
    @Inject
-   private Dialogue dialogue;
-
-   @Inject
    private Identity identity;
 
    @Inject
-   private SamlIdentityProviderApi idpApi;
+   private OpenIdProviderApi opApi;
 
-   public void authenticate()
+   @Inject
+   private Dialogue dialogue;
+
+   @Inject
+   private Attributes attributes;
+
+   public void authenticate(String realm, String userName, boolean immediate)
    {
-      if (identity.isLoggedIn())
+      if (identity.isLoggedIn() && userName != null && !userName.equals(identity.getUserName()))
       {
-         idpApi.authenticationSucceeded();
+         opApi.authenticationFailed();
       }
       else
       {
          try
          {
-            responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/Login.jsf?dialogueId=" + dialogue.getDialogueId());
+            StringBuilder url = new StringBuilder();
+            url.append(servletContext.getContextPath());
+            url.append("/Login.jsf?dialogueId=").append((dialogue.getDialogueId()));
+            url.append("&realm=").append(URLEncoder.encode(realm, "UTF-8"));
+            if (userName != null)
+            {
+               url.append("&userName=").append(URLEncoder.encode(userName, "UTF-8"));
+            }
+            responseHolder.getResponse().sendRedirect(url.toString());
          }
          catch (IOException e)
          {
@@ -72,11 +81,12 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutFailed()
+   public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes)
    {
+      attributes.setRequestedAttributes(requestedAttributes);
       try
       {
-         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/SingleLogoutFailed.jsf");
+         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/Attributes.jsf?dialogueId=" + dialogue.getDialogueId());
       }
       catch (IOException e)
       {
@@ -84,20 +94,8 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutSucceeded()
+   public boolean userExists(String userName)
    {
-      try
-      {
-         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/Login.jsf");
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
-   }
-
-   public void loggedOut(SamlIdpSession session)
-   {
-      log.info("Unsolicited logout for user " + session.getPrincipal().getNameId().getValue() + ".");
+      return true;
    }
 }

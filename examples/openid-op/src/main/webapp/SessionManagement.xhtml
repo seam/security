@@ -9,15 +9,15 @@
 	</f:metadata>
 	<ui:composition template="/PageTemplate.xhtml">
 
-		<h1>User info</h1>
+		<h1>Session Info</h1>
+
+		<h2>Logged in user</h2>
 
 		<h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
-			<h:outputText value="Verified User Identifier" />
-			<h:outputText value="#{identity.openIdPrincipal.identifier}" />
-			<h:outputText value="OpenID Provider" />
-			<h:outputText value="#{identity.openIdPrincipal.openIdProvider}" />
-			<h:outputText value="Email" />
-			<h:outputText value="#{identity.openIdPrincipal.attributeValues['email']}" />
+			<h:outputText value="User name" />
+			<h:outputText value="#{identity.userName}" />
+			<h:outputText value="User's OpenID" />
+			<h:outputText value="#{identity.opLocalIdentifier}" />
 		</h:panelGrid>
 
 	</ui:composition>

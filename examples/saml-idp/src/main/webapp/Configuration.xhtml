@@ -6,7 +6,7 @@
 		<h1>Configuration</h1>
 		<h:outputText value="Meta Data URL for this SAML entity: #{configuration.metaDataUrl}" />
 		<h2>Trusted SAML Service Providers</h2>
-		<p><h:dataTable value="#{saml.spEntityIds}" var="spEntityId" columnClasses="dataTableColumn">
+		<p><h:dataTable value="#{configuration.spEntityIds}" var="spEntityId" columnClasses="dataTableColumn">
 			<h:column>
 				<h:outputText value="#{spEntityId}" />
 			</h:column>

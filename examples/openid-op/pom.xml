@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.jboss.seam.security</groupId>
+   <artifactId>openid-op</artifactId>
+   <packaging>war</packaging>
+   <name>OpenID Relying Party</name>
+
+   <parent>
+      <groupId>org.jboss.seam.security</groupId>
+      <artifactId>seam-security-parent</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+      <relativePath>../../pom.xml</relativePath>
+   </parent>
+
+   <properties>
+      <seam.faces.version>3.0.0-SNAPSHOT</seam.faces.version>
+      <seam.international.version>3.0.0-SNAPSHOT</seam.international.version>
+      <weld.extensions.version>1.0.0.Alpha2</weld.extensions.version>
+   </properties>
+
+   <build>
+      <finalName>openid-rp</finalName>
+   </build>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-external</artifactId>
+         <version>${project.version}</version>
+         <exclusions>
+            <exclusion>
+               <artifactId>validation-api</artifactId>
+               <groupId>javax.validation</groupId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.weld</groupId>
+         <artifactId>weld-extensions</artifactId>
+         <version>${weld.extensions.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.servlet</groupId>
+         <artifactId>seam-servlet</artifactId>
+         <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.faces</groupId>
+         <artifactId>seam-faces-api</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.faces</groupId>
+         <artifactId>seam-faces</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.international</groupId>
+         <artifactId>seam-international-api</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.international</groupId>
+         <artifactId>seam-international</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.enterprise</groupId>
+         <artifactId>cdi-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <!-- This is necessary until a new JSF-API is published to central -->
+         <groupId>javax.faces</groupId>
+         <artifactId>jsf-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!--
+         <dependency> <groupId>org.jboss.seam.faces</groupId>
+         <artifactId>seam-faces</artifactId>
+         <version>${project.version}</version> </dependency>
+      -->
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <!-- Required until the Servlet 3.0 API can be resolved in Central -->
+         <groupId>org.jboss.spec.javax.servlet</groupId>
+         <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+   </dependencies>
+
+</project>

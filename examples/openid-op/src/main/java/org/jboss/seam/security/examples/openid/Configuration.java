@@ -19,40 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.id_provider;
-
-import java.util.LinkedList;
-import java.util.List;
+package org.jboss.seam.security.examples.openid;
 
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.security.external.saml.SamlExternalEntity;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
 
 @Model
-public class Saml
+public class Configuration
 {
    @Inject
-   private SamlIdentityProviderApi samlIdp;
+   private OpenIdRelyingPartyConfigurationApi confApi;
 
-   @Inject
-   private SamlIdentityProviderConfigurationApi samlIdpConfig;
-
-   public List<String> getSpEntityIds()
+   public String getRealm()
    {
-      List<String> entityIds = new LinkedList<String>();
-      for (SamlExternalEntity entity : samlIdpConfig.getExternalSamlEntities())
-      {
-         entityIds.add(entity.getEntityId());
-      }
-      return entityIds;
+      return confApi.getRealm();
    }
 
-   public SamlIdpSession getSession()
+   public String getXrdsURL()
    {
-      return samlIdp.getSession();
+      return confApi.getXrdsURL();
    }
 }

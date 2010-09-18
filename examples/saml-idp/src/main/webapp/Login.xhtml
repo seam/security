@@ -3,7 +3,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core">
 	<f:metadata>
-		<f:viewParam name="samlDialogueId" value="#{login.samlDialogueId}" />
+		<f:viewParam name="dialogueId" value="#{login.dialogueId}" />
 	</f:metadata>
 	<ui:composition template="/PageTemplate.xhtml">
 		<h:messages />
@@ -13,7 +13,7 @@
 			<h:inputText value="#{login.userName}" />
 			<h:commandButton action="#{login.login}" value="Login" />
 			<h:commandButton action="#{login.cancel}" value="Cancel"
-				rendered="#{login.samlDialogueId != null}" />
+				rendered="#{login.dialogueId != null}" />
 		</h:form>
 	</ui:composition>
 </f:view>

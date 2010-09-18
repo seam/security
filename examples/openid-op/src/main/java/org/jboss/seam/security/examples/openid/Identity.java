@@ -19,11 +19,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.id_consumer;
+package org.jboss.seam.security.examples.openid;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
@@ -31,9 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.api.OpenIdProviderApi;
 
 @SessionScoped
 @Named
@@ -41,41 +37,21 @@ public class Identity implements Serializable
 {
    private static final long serialVersionUID = -7096110154986991513L;
 
-   private OpenIdPrincipal openIdPrincipal;
+   private String userName;
 
    @Inject
-   private OpenIdRelyingPartyApi openIdApi;
+   private OpenIdProviderApi providerApi;
 
-   public OpenIdPrincipal getOpenIdPrincipal()
+   public void localLogin(String userName)
    {
-      return openIdPrincipal;
-   }
-
-   public void startLogin(String openId)
-   {
-      if (!isLoggedIn())
-      {
-         List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-         attributes.add(new OpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
-         openIdApi.login(openId, attributes);
-      }
-      else
-      {
-         FacesMessage facesMessage = new FacesMessage("Already logged in.");
-         FacesContext.getCurrentInstance().addMessage(null, facesMessage);
-      }
-   }
-
-   public void finishLogin(OpenIdPrincipal openIdPrincipal)
-   {
-      this.openIdPrincipal = openIdPrincipal;
+      this.userName = userName;
    }
 
    public void logout()
    {
       if (isLoggedIn())
       {
-         openIdPrincipal = null;
+         userName = null;
          redirectToViewId("/Index.xhtml");
       }
       else
@@ -87,7 +63,17 @@ public class Identity implements Serializable
 
    public boolean isLoggedIn()
    {
-      return openIdPrincipal != null;
+      return userName != null;
+   }
+
+   public String getUserName()
+   {
+      return userName;
+   }
+
+   public String getOpLocalIdentifier()
+   {
+      return providerApi.getOpLocalIdentifierForUserName(userName);
    }
 
    public void redirectToLoginIfNotLoggedIn()

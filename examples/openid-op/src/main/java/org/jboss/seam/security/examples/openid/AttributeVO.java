@@ -19,29 +19,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.id_consumer;
+package org.jboss.seam.security.examples.openid;
 
-import javax.enterprise.event.Observes;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
+import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.dialogues.api.AfterDialogueActivation;
-
-public class RequestObserver
+public class AttributeVO
 {
-   @Inject
-   private ResponseHolder responseHolder;
+   private OpenIdRequestedAttribute requestedAttribute;
 
-   public void dialogueCreated(@Observes AfterDialogueActivation event)
+   private String attributeValue;
+
+   public OpenIdRequestedAttribute getRequestedAttribute()
    {
-      if (FacesContext.getCurrentInstance() != null)
-      {
-         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-         responseHolder.setResponse((HttpServletResponse) externalContext.getResponse());
-      }
+      return requestedAttribute;
    }
 
+   public void setRequestedAttribute(OpenIdRequestedAttribute requestedAttribute)
+   {
+      this.requestedAttribute = requestedAttribute;
+   }
+
+   public String getAttributeValue()
+   {
+      return attributeValue;
+   }
+
+   public void setAttributeValue(String attributeValue)
+   {
+      this.attributeValue = attributeValue;
+   }
 }

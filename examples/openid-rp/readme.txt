@@ -26,11 +26,11 @@ On Unix based systems, you do this by putting the following lines in
 Some background info
 ====================
 
-The Identity Provider is preconfigured to run at port 8080, to use a test key
-store which is included in the war file, and to use the http protocol for
-communicating with IDPs. These settings are ok for a test setup, but please be
-aware that in production, you'd use http on port 443. In the test application
-these settings are done programmatically (by the OpenIdRelyingPartyCustomizer).
+The Relying Party is preconfigured to run at port 8080, and to use the
+http protocol for communicating with OPs. These settings are ok for a test setup,
+but please be aware that in production, you'd use http on port 443. In the test 
+application these settings are done programmatically (by the
+OpenIdRelyingPartyCustomizer).
 
 
 How to use the application

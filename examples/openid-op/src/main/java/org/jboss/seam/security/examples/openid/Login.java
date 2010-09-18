@@ -19,23 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.id_provider;
+package org.jboss.seam.security.examples.openid;
 
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.dialogues.DialogueManager;
 
 @Model
 public class Login
 {
    @Inject
-   private SamlIdentityProviderApi samlIdentityProviderApi;
+   private OpenIdProviderApi opApi;
+
+   private String userNameReceivedFromRp;
+
+   private String realm;
 
    private String userName;
-
-   private String dialogueId;
 
    @Inject
    private DialogueManager dialogueManager;
@@ -53,25 +55,39 @@ public class Login
       this.userName = userName;
    }
 
-   public String getDialogueId()
+   public String getUserNameReceivedFromRp()
    {
-      return dialogueId;
+      return userNameReceivedFromRp;
    }
 
-   public void setDialogueId(String dialogueId)
+   public void setUserNameReceivedFromRp(String userNameReceivedFromRp)
    {
-      this.dialogueId = dialogueId;
+      this.userNameReceivedFromRp = userNameReceivedFromRp;
+   }
+
+   public String getRealm()
+   {
+      return realm;
+   }
+
+   public void setRealm(String realm)
+   {
+      this.realm = realm;
+   }
+
+   public boolean isDialogueActive()
+   {
+      return dialogueManager.isAttached();
    }
 
    public String login()
    {
+      String userName = userNameReceivedFromRp != null ? userNameReceivedFromRp : this.userName;
       identity.localLogin(userName);
-      if (dialogueId != null)
+      if (dialogueManager.isAttached())
       {
-         dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationSucceeded();
-         dialogueManager.detachDialogue();
-         return "SAML_LOGIN";
+         opApi.authenticationSucceeded(userName);
+         return null;
       }
       else
       {
@@ -81,15 +97,13 @@ public class Login
 
    public void cancel()
    {
-      if (dialogueId != null)
+      if (dialogueManager.isAttached())
       {
-         dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationFailed();
-         dialogueManager.detachDialogue();
+         opApi.authenticationFailed();
       }
       else
       {
-         throw new IllegalStateException("cancel method can only be called during a SAML login");
+         throw new IllegalStateException("cancel method can only be called during an OpenID login");
       }
    }
 }

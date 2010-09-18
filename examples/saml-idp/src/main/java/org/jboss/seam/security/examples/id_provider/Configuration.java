@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.enterprise.inject.Model;
 import javax.faces.application.FacesMessage;
@@ -83,5 +85,15 @@ public class Configuration
    public String getMetaDataUrl()
    {
       return samlEntityConfig.getMetaDataURL();
+   }
+
+   public List<String> getSpEntityIds()
+   {
+      List<String> entityIds = new LinkedList<String>();
+      for (SamlExternalEntity entity : samlEntityConfig.getExternalSamlEntities())
+      {
+         entityIds.add(entity.getEntityId());
+      }
+      return entityIds;
    }
 }

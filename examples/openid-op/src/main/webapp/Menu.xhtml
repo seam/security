@@ -7,9 +7,9 @@
 	<h:form>
 		<h:commandLink value="Login" action="/Login.xhtml"
 			disabled="#{identity.loggedIn}" /> |
-		<h:commandLink value="User Info" action="/UserInfo.xhtml"
-			disabled="#{!identity.loggedIn}" /> | 
 		<h:commandLink value="Configuration" action="/Configuration.xhtml" /> |
+		<h:commandLink value="Session Management"
+			action="/SessionManagement.xhtml" disabled="#{!identity.loggedIn}" /> | 
 		<h:commandLink value="Logout" action="#{identity.logout}"
 			disabled="#{!identity.loggedIn}" />
 	</h:form>
