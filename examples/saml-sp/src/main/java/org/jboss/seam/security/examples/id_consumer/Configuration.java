@@ -35,7 +35,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlEntityConfigurationApi;
+import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 
 @Model
@@ -44,7 +44,7 @@ public class Configuration
    private String idpMetaDataUrl;
 
    @Inject
-   private SamlEntityConfigurationApi samlEntityConfig;
+   private SamlServiceProviderConfigurationApi spConfigApi;
 
    public String getIdpMetaDataUrl()
    {
@@ -65,7 +65,7 @@ public class Configuration
          urlConnection.setConnectTimeout(3000);
          urlConnection.setReadTimeout(3000);
          Reader reader = new InputStreamReader(urlConnection.getInputStream());
-         SamlExternalEntity samlEntity = samlEntityConfig.addExternalSamlEntity(reader);
+         SamlExternalEntity samlEntity = spConfigApi.addExternalSamlEntity(reader);
 
          FacesMessage facesMessage = new FacesMessage("SAML entity " + samlEntity.getEntityId() + " has been added.");
          FacesContext.getCurrentInstance().addMessage(null, facesMessage);
@@ -84,13 +84,13 @@ public class Configuration
 
    public String getMetaDataUrl()
    {
-      return samlEntityConfig.getMetaDataURL();
+      return spConfigApi.getMetaDataURL();
    }
 
    public List<String> getIdpEntityIds()
    {
       List<String> entityIds = new LinkedList<String>();
-      for (SamlExternalEntity entity : samlEntityConfig.getExternalSamlEntities())
+      for (SamlExternalEntity entity : spConfigApi.getExternalSamlEntities())
       {
          entityIds.add(entity.getEntityId());
       }

@@ -23,9 +23,11 @@ package org.jboss.seam.security.examples.id_provider;
 
 import java.io.Serializable;
 
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
 import org.jboss.seam.security.external.api.SamlNameId;
@@ -39,6 +41,9 @@ public class Identity implements Serializable
    @Inject
    private SamlIdentityProviderApi samlIdp;
 
+   @Inject
+   private ExternalContext externalContext;
+
    public void localLogin(String userName)
    {
       samlIdp.localLogin(new SamlNameId(userName, null, null), null);
@@ -46,7 +51,7 @@ public class Identity implements Serializable
 
    public void remoteLogin(String spEntityId)
    {
-      samlIdp.remoteLogin(spEntityId, null);
+      samlIdp.remoteLogin(spEntityId, null, (HttpServletResponse) externalContext.getResponse());
    }
 
    public void localLogout()
@@ -56,7 +61,7 @@ public class Identity implements Serializable
 
    public void globalLogout()
    {
-      samlIdp.globalLogout();
+      samlIdp.globalLogout((HttpServletResponse) externalContext.getResponse());
    }
 
    public boolean isLoggedIn()

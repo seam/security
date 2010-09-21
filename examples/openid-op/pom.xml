@@ -15,8 +15,6 @@
    </parent>
 
    <properties>
-      <seam.faces.version>3.0.0-SNAPSHOT</seam.faces.version>
-      <seam.international.version>3.0.0-SNAPSHOT</seam.international.version>
       <weld.extensions.version>1.0.0.Alpha2</weld.extensions.version>
    </properties>
 

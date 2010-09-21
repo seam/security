@@ -25,10 +25,11 @@ import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.DialogueFilter;
+import org.jboss.seam.security.external.ResponseHolderImpl;
+import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.dialogues.DialogueBeanProvider;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
 
 /**
  * @author Marcel Kolsteren
@@ -36,10 +37,6 @@ import org.jboss.seam.security.external.dialogues.api.Dialogue;
  */
 public class DialogueAwareViewHandler extends ViewHandlerWrapper
 {
-   private static final String QUERY_STRING_DELIMITER = "?";
-   private static final String PARAMETER_PAIR_DELIMITER = "&";
-   private static final String PARAMETER_ASSIGNMENT_OPERATOR = "=";
-
    private ViewHandler delegate;
 
    public DialogueAwareViewHandler(ViewHandler delegate)
@@ -54,25 +51,14 @@ public class DialogueAwareViewHandler extends ViewHandlerWrapper
       ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
       if (DialogueBeanProvider.dialogueManager(servletContext).isAttached())
       {
-         Dialogue dialogue = DialogueBeanProvider.dialogue(servletContext);
-         return appendDialogueIdIfNecessary(actionUrl, facesContext, dialogue.getDialogueId());
+         String dialogueId = DialogueBeanProvider.dialogue(servletContext).getDialogueId();
+         ResponseHolder responseHolder = new ResponseHolderImpl((HttpServletResponse) facesContext.getExternalContext().getResponse(), dialogueId);
+         return responseHolder.addDialogueIdToUrl(actionUrl);
       }
       else
       {
          return actionUrl;
       }
-   }
-
-   public String appendDialogueIdIfNecessary(String url, FacesContext facesContext, String cid)
-   {
-      String paramName = DialogueFilter.DIALOGUE_ID_PARAM;
-      int queryStringIndex = url.indexOf(QUERY_STRING_DELIMITER);
-      if (queryStringIndex < 0 || url.indexOf(paramName + PARAMETER_ASSIGNMENT_OPERATOR, queryStringIndex) < 0)
-      {
-         url = new StringBuilder(url).append(queryStringIndex < 0 ? QUERY_STRING_DELIMITER : PARAMETER_PAIR_DELIMITER).append(paramName).append(PARAMETER_ASSIGNMENT_OPERATOR).append(cid).toString();
-      }
-      return url;
-
    }
 
    /**

@@ -23,8 +23,10 @@ package org.jboss.seam.security.examples.id_consumer;
 
 import javax.enterprise.inject.Model;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.SamlServiceProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
@@ -36,12 +38,15 @@ public class Identity
    @Inject
    private SamlServiceProviderApi samlSpApi;
 
+   @Inject
+   private ExternalContext externalContext;
+
    @Dialogued
    public void login(String idpEntityId)
    {
       if (!isLoggedIn())
       {
-         samlSpApi.login(idpEntityId);
+         samlSpApi.login(idpEntityId, (HttpServletResponse) externalContext.getResponse());
       }
       else
       {
@@ -72,7 +77,7 @@ public class Identity
       {
          if (samlSpApi.getSession() != null)
          {
-            samlSpApi.globalLogout();
+            samlSpApi.globalLogout((HttpServletResponse) externalContext.getResponse());
          }
       }
       else

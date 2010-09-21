@@ -31,14 +31,10 @@ import javax.servlet.ServletContext;
 import org.jboss.seam.security.external.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 
 public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
 {
-   @Inject
-   private ResponseHolder responseHolder;
-
    @Inject
    private ServletContext servletContext;
 
@@ -49,16 +45,13 @@ public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
    private OpenIdProviderApi opApi;
 
    @Inject
-   private Dialogue dialogue;
-
-   @Inject
    private Attributes attributes;
 
-   public void authenticate(String realm, String userName, boolean immediate)
+   public void authenticate(String realm, String userName, boolean immediate, ResponseHolder responseHolder)
    {
       if (identity.isLoggedIn() && userName != null && !userName.equals(identity.getUserName()))
       {
-         opApi.authenticationFailed();
+         opApi.authenticationFailed(responseHolder.getResponse());
       }
       else
       {
@@ -66,13 +59,13 @@ public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
          {
             StringBuilder url = new StringBuilder();
             url.append(servletContext.getContextPath());
-            url.append("/Login.jsf?dialogueId=").append((dialogue.getDialogueId()));
-            url.append("&realm=").append(URLEncoder.encode(realm, "UTF-8"));
+            url.append("/Login.jsf");
+            url.append("?realm=").append(URLEncoder.encode(realm, "UTF-8"));
             if (userName != null)
             {
                url.append("&userName=").append(URLEncoder.encode(userName, "UTF-8"));
             }
-            responseHolder.getResponse().sendRedirect(url.toString());
+            responseHolder.redirectWithDialoguePropagation(url.toString());
          }
          catch (IOException e)
          {
@@ -81,17 +74,10 @@ public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
       }
    }
 
-   public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes)
+   public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes, ResponseHolder responseHolder)
    {
       attributes.setRequestedAttributes(requestedAttributes);
-      try
-      {
-         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/Attributes.jsf?dialogueId=" + dialogue.getDialogueId());
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
+      responseHolder.redirectWithDialoguePropagation(servletContext.getContextPath() + "/Attributes.jsf");
    }
 
    public boolean userExists(String userName)

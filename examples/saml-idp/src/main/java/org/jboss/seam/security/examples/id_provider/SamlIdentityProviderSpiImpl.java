@@ -28,7 +28,6 @@ import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
 import org.slf4j.Logger;
@@ -39,13 +38,7 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
    private Logger log;
 
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private ServletContext servletContext;
-
-   @Inject
-   private Dialogue dialogue;
 
    @Inject
    private Identity identity;
@@ -53,26 +46,19 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
    @Inject
    private SamlIdentityProviderApi idpApi;
 
-   public void authenticate()
+   public void authenticate(ResponseHolder responseHolder)
    {
       if (identity.isLoggedIn())
       {
-         idpApi.authenticationSucceeded();
+         idpApi.authenticationSucceeded(responseHolder.getResponse());
       }
       else
       {
-         try
-         {
-            responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/Login.jsf?dialogueId=" + dialogue.getDialogueId());
-         }
-         catch (IOException e)
-         {
-            throw new RuntimeException(e);
-         }
+         responseHolder.redirectWithDialoguePropagation(servletContext.getContextPath() + "/Login.jsf");
       }
    }
 
-   public void singleLogoutFailed()
+   public void singleLogoutFailed(ResponseHolder responseHolder)
    {
       try
       {
@@ -84,7 +70,7 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutSucceeded()
+   public void singleLogoutSucceeded(ResponseHolder responseHolder)
    {
       try
       {

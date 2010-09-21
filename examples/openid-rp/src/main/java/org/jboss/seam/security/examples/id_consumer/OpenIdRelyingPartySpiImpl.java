@@ -33,15 +33,12 @@ import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi
 {
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private ServletContext servletContext;
 
    @Inject
    private Identity identity;
 
-   public void loginSucceeded(OpenIdPrincipal principal)
+   public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder)
    {
       try
       {
@@ -54,7 +51,7 @@ public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi
       }
    }
 
-   public void loginFailed(String message)
+   public void loginFailed(String message, ResponseHolder responseHolder)
    {
       try
       {

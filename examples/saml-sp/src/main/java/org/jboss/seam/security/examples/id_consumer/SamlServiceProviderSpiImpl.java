@@ -38,15 +38,12 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
    SamlServiceProviderApi samlServiceProviderApi;
 
    @Inject
-   ResponseHolder responseHolder;
-
-   @Inject
    private Logger log;
 
    @Inject
    private ServletContext servletContext;
 
-   public void loginSucceeded(SamlSpSession session)
+   public void loginSucceeded(SamlSpSession session, ResponseHolder responseHolder)
    {
       try
       {
@@ -58,7 +55,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void loginFailed()
+   public void loginFailed(ResponseHolder responseHolder)
    {
       try
       {
@@ -70,7 +67,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void globalLogoutFailed(String statusCode)
+   public void globalLogoutFailed(String statusCode, ResponseHolder responseHolder)
    {
       try
       {
@@ -82,7 +79,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void globalLogoutSucceeded()
+   public void globalLogoutSucceeded(ResponseHolder responseHolder)
    {
       try
       {
@@ -94,7 +91,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void loggedIn(SamlSpSession session, String url)
+   public void loggedIn(SamlSpSession session, String url, ResponseHolder responseHolder)
    {
       try
       {
