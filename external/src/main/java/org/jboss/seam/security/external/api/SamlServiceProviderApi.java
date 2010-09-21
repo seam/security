@@ -21,6 +21,8 @@
  */
 package org.jboss.seam.security.external.api;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.saml.sp.SamlSpInApplicationScopeProducer;
 import org.jboss.seam.security.external.saml.sp.SamlSpInVirtualApplicationScopeProducer;
@@ -76,7 +78,7 @@ public interface SamlServiceProviderApi
     * 
     * @param idpEntityId
     */
-   public void login(String idpEntityId);
+   public void login(String idpEntityId, HttpServletResponse response);
 
    /**
     * <p>
@@ -105,7 +107,7 @@ public interface SamlServiceProviderApi
     * active when the SPI method is called. This allows the API client to store
     * state information in the dialogue.
     */
-   public void globalLogout();
+   public void globalLogout(HttpServletResponse response);
 
    /**
     * Gets the current session (login). If there is no active session, null is

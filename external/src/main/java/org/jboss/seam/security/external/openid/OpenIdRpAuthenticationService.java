@@ -34,7 +34,6 @@ import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
@@ -78,16 +77,13 @@ public class OpenIdRpAuthenticationService
    @Inject
    private Instance<Dialogue> dialogue;
 
-   @Inject
-   private DialogueManager dialogueManager;
-
-   public void handleIncomingMessage(HttpServletRequest httpRequest) throws InvalidRequestException
+   public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException
    {
       try
       {
          // extract the parameters from the authentication response
          // (which comes in as a HTTP request from the OpenID provider)
-         ParameterList response = new ParameterList(httpRequest.getParameterMap());
+         ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
 
          // retrieve the previously stored discovery information
          DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
@@ -100,7 +96,7 @@ public class OpenIdRpAuthenticationService
 
          // verify the response; ConsumerManager needs to be the same
          // (static) instance used to place the authentication request
-         VerificationResult verification = openIdConsumerManager.verify(receivingURL.toString(), response, discovered);
+         VerificationResult verification = openIdConsumerManager.verify(receivingURL.toString(), parameterList, discovered);
 
          // examine the verification result and extract the verified identifier
          Identifier identifier = verification.getVerifiedId();
@@ -120,16 +116,16 @@ public class OpenIdRpAuthenticationService
 
             OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), discovered.getOPEndpoint(), attributeValues);
 
-            openIdRelyingPartySpi.get().loginSucceeded(principal);
+            openIdRelyingPartySpi.get().loginSucceeded(principal, responseHandler.createResponseHolder(httpResponse));
          }
          else
          {
-            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg());
+            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg(), responseHandler.createResponseHolder(httpResponse));
          }
       }
       catch (OpenIDException e)
       {
-         responseHandler.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+         responseHandler.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), httpResponse);
          return;
       }
 
@@ -137,7 +133,7 @@ public class OpenIdRpAuthenticationService
    }
 
    @Dialogued(join = true)
-   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes)
+   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response)
    {
       try
       {
@@ -166,12 +162,12 @@ public class OpenIdRpAuthenticationService
 
          String url = authReq.getDestinationUrl(true);
 
-         responseHandler.sendHttpRedirectToUserAgent(url);
+         responseHandler.sendHttpRedirectToUserAgent(url, response);
       }
       catch (OpenIDException e)
       {
          log.warn("Authentication failed", e);
-         openIdRelyingPartySpi.get().loginFailed(e.getMessage());
+         openIdRelyingPartySpi.get().loginFailed(e.getMessage(), responseHandler.createResponseHolder(response));
       }
    }
 

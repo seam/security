@@ -23,6 +23,8 @@ package org.jboss.seam.security.external.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Marcel Kolsteren
  * 
@@ -37,5 +39,5 @@ public interface OpenIdRelyingPartyApi
     *           has an account)
     * @param attributes attributes that are requested
     */
-   void login(String identifier, List<OpenIdRequestedAttribute> attributes);
+   void login(String identifier, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response);
 }

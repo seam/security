@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.externaltest.integration.MetaDataLoader;
 
 @WebServlet(name = "IdpTestServlet", urlPatterns = { "/testservlet" })
@@ -22,23 +21,19 @@ public class IdpTestServlet extends HttpServlet
    private SamlIdpApplicationMock samlIdpApplicationMock;
 
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private MetaDataLoader metaDataLoader;
 
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
-      responseHolder.setResponse(response);
       String command = request.getParameter("command");
       if (command.equals("authenticate"))
       {
-         samlIdpApplicationMock.handleLogin(request.getParameter("userName"));
+         samlIdpApplicationMock.handleLogin(request.getParameter("userName"), response);
       }
       else if (command.equals("singleLogout"))
       {
-         samlIdpApplicationMock.handleSingleLogout();
+         samlIdpApplicationMock.handleSingleLogout(response);
       }
       else if (command.equals("getNrOfSessions"))
       {

@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
-
 @WebServlet(name = "OpTestServlet", urlPatterns = { "/testservlet" })
 public class OpTestServlet extends HttpServlet
 {
@@ -20,23 +18,19 @@ public class OpTestServlet extends HttpServlet
    @Inject
    private OpenIdProviderApplicationMock openIdProviderApplicationMock;
 
-   @Inject
-   private ResponseHolder responseHolder;
-
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
-      responseHolder.setResponse(response);
       String command = request.getParameter("command");
       if (command.equals("authenticate"))
       {
          String userName = request.getParameter("userName");
-         openIdProviderApplicationMock.handleLogin(userName);
+         openIdProviderApplicationMock.handleLogin(userName, response);
       }
       else if (command.equals("setAttribute"))
       {
          String email = request.getParameter("email");
-         openIdProviderApplicationMock.setAttribute("email", email);
+         openIdProviderApplicationMock.setAttribute("email", email, response);
       }
       else if (command.equals("getNrOfDialogues"))
       {

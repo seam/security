@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.jboss.seam.security.external.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.api.ResponseHolder;
 
 /**
  * @author Marcel Kolsteren
@@ -51,7 +52,7 @@ public interface OpenIdProviderSpi
     * @param immediate if this is true, there must be no interaction with the
     *           user (silent authentication)
     */
-   void authenticate(String realm, String userName, boolean immediate);
+   void authenticate(String realm, String userName, boolean immediate, ResponseHolder responseHolder);
 
    /**
     * This method is called to check whether a username exists.
@@ -61,5 +62,5 @@ public interface OpenIdProviderSpi
     */
    boolean userExists(String userName);
 
-   void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes);
+   void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes, ResponseHolder responseHolder);
 }

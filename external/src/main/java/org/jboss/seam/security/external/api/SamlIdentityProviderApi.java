@@ -23,6 +23,8 @@ package org.jboss.seam.security.external.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
@@ -61,7 +63,7 @@ public interface SamlIdentityProviderApi
     * @param remoteUrl the URL where the user agent needs to be redirected to by
     *           the service provider (can be null)
     */
-   void remoteLogin(String spEntityId, String remoteUrl);
+   void remoteLogin(String spEntityId, String remoteUrl, HttpServletResponse response);
 
    /**
     * This is one of the possible responses that relate to the SPI call
@@ -71,7 +73,7 @@ public interface SamlIdentityProviderApi
     * service provider, using the local SAML session, which must have been
     * established before this call is done.
     */
-   void authenticationSucceeded();
+   void authenticationSucceeded(HttpServletResponse response);
 
    /**
     * This is one of the possible responses that relate to the SPI call
@@ -80,7 +82,7 @@ public interface SamlIdentityProviderApi
     * identity provider to send a positive authentication result back to the
     * service provider.
     */
-   void authenticationFailed();
+   void authenticationFailed(HttpServletResponse response);
 
    /**
     * Gets the current SAML session. This contains information about the logged
@@ -106,5 +108,5 @@ public interface SamlIdentityProviderApi
     * participate in the current session. The result of the global logout is
     * reported asynchronously through the SPI.
     */
-   void globalLogout();
+   void globalLogout(HttpServletResponse response);
 }

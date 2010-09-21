@@ -26,8 +26,10 @@ import java.util.List;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
+import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.api.SamlPrincipal;
 import org.jboss.seam.security.external.dialogues.DialogueManager;
@@ -76,7 +78,10 @@ public class SamlIdpSingleLogoutService
    @Inject
    private DialogueManager dialogueManager;
 
-   public void processSPRequest(HttpServletRequest httpRequest, RequestAbstractType request) throws InvalidRequestException
+   @Inject
+   private ResponseHandler responseHandler;
+
+   public void processSPRequest(HttpServletRequest httpRequest, HttpServletResponse httpResponse, RequestAbstractType request) throws InvalidRequestException
    {
       if (!(request instanceof LogoutRequestType))
       {
@@ -91,18 +96,18 @@ public class SamlIdpSingleLogoutService
       samlIdpIncomingLogoutDialogue.get().setNameId(samlNameId);
       samlIdpIncomingLogoutDialogue.get().setSessionIndexes(logoutRequest.getSessionIndex());
 
-      removeNextSessionParticipant();
+      removeNextSessionParticipant(httpResponse);
    }
 
-   public void handleIDPInitiatedSingleLogout(SamlPrincipal principal, List<String> indexes)
+   public void handleIDPInitiatedSingleLogout(SamlPrincipal principal, List<String> indexes, HttpServletResponse response)
    {
       samlIdpIncomingLogoutDialogue.get().setNameId(principal.getNameId());
       samlIdpIncomingLogoutDialogue.get().setSessionIndexes(indexes);
 
-      removeNextSessionParticipant();
+      removeNextSessionParticipant(response);
    }
 
-   private void removeNextSessionParticipant()
+   private void removeNextSessionParticipant(HttpServletResponse response)
    {
       SamlNameId samlNameId = samlIdpIncomingLogoutDialogue.get().getNameId();
       List<String> sessionIndexes = samlIdpIncomingLogoutDialogue.get().getSessionIndexes();
@@ -147,7 +152,7 @@ public class SamlIdpSingleLogoutService
                   dialogueManager.beginDialogue();
                   samlIdpOutgoingLogoutDialogue.get().setIncomingDialogueId(incomingDialogueId);
 
-                  sendSingleLogoutRequestToSP(sessionToRemove, sp);
+                  sendSingleLogoutRequestToSP(sessionToRemove, sp, response);
                   readyForNow = true;
                }
             }
@@ -164,35 +169,35 @@ public class SamlIdpSingleLogoutService
          }
          else
          {
-            finishSingleLogoutProcess();
+            finishSingleLogoutProcess(response);
             readyForNow = true;
          }
       }
    }
 
-   private void finishSingleLogoutProcess()
+   private void finishSingleLogoutProcess(HttpServletResponse response)
    {
       boolean failed = samlIdpIncomingLogoutDialogue.get().isFailed();
       if (samlDialogue.get().getExternalProvider() != null)
       {
-         StatusResponseType response = samlMessageFactory.createStatusResponse(failed ? SamlConstants.STATUS_RESPONDER : SamlConstants.STATUS_SUCCESS, null);
-         samlMessageSender.sendResponse(samlDialogue.get().getExternalProvider(), response, SamlProfile.SINGLE_LOGOUT);
+         StatusResponseType statusResponse = samlMessageFactory.createStatusResponse(failed ? SamlConstants.STATUS_RESPONDER : SamlConstants.STATUS_SUCCESS, null);
+         samlMessageSender.sendResponse(samlDialogue.get().getExternalProvider(), statusResponse, SamlProfile.SINGLE_LOGOUT, response);
       }
       else
       {
          if (failed)
          {
-            samlIdentityProviderSpi.get().singleLogoutFailed();
+            samlIdentityProviderSpi.get().singleLogoutFailed(responseHandler.createResponseHolder(response));
          }
          else
          {
-            samlIdentityProviderSpi.get().singleLogoutSucceeded();
+            samlIdentityProviderSpi.get().singleLogoutSucceeded(responseHandler.createResponseHolder(response));
          }
       }
       dialogue.get().setFinished(true);
    }
 
-   public void processSPResponse(HttpServletRequest httpRequest, StatusResponseType response)
+   public void processSPResponse(HttpServletRequest httpRequest, HttpServletResponse httpResponse, StatusResponseType statusResponse)
    {
       // End the outgoing samlDialogue and re-attach to the incoming
       // samlDialogue
@@ -200,20 +205,20 @@ public class SamlIdpSingleLogoutService
       dialogueManager.endDialogue();
       dialogueManager.attachDialogue(incomingDialogueId);
 
-      if (response.getStatus() != null && !response.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
+      if (statusResponse.getStatus() != null && !statusResponse.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
       {
          samlIdpIncomingLogoutDialogue.get().setFailed(true);
       }
 
-      removeNextSessionParticipant();
+      removeNextSessionParticipant(httpResponse);
    }
 
-   public void sendSingleLogoutRequestToSP(SamlIdpSession session, SamlExternalServiceProvider sp)
+   public void sendSingleLogoutRequestToSP(SamlIdpSession session, SamlExternalServiceProvider sp, HttpServletResponse response)
    {
       LogoutRequestType logoutRequest;
       logoutRequest = samlMessageFactory.createLogoutRequest(session.getPrincipal().getNameId(), session.getSessionIndex());
       samlDialogue.get().setExternalProvider(sp);
 
-      samlMessageSender.sendRequest(sp, SamlProfile.SINGLE_LOGOUT, logoutRequest);
+      samlMessageSender.sendRequest(sp, SamlProfile.SINGLE_LOGOUT, logoutRequest, response);
    }
 }

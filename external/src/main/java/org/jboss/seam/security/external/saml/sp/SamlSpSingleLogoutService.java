@@ -26,8 +26,10 @@ import java.util.List;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
+import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.NameIDType;
@@ -68,7 +70,10 @@ public class SamlSpSingleLogoutService
    @Inject
    private SamlDialogue samlDialogue;
 
-   public void processIDPRequest(HttpServletRequest httpRequest, RequestAbstractType request) throws InvalidRequestException
+   @Inject
+   private ResponseHandler responseHandler;
+
+   public void processIDPRequest(HttpServletRequest httpRequest, HttpServletResponse httpResponse, RequestAbstractType request) throws InvalidRequestException
    {
       if (!(request instanceof LogoutRequestType))
       {
@@ -82,9 +87,9 @@ public class SamlSpSingleLogoutService
       SamlNameId samlNameId = new SamlNameId(nameIdJaxb.getValue(), nameIdJaxb.getFormat(), nameIdJaxb.getNameQualifier());
       removeSessions(samlNameId, idp.getEntityId(), logoutRequest.getSessionIndex());
 
-      StatusResponseType response = samlMessageFactory.createStatusResponse(SamlConstants.STATUS_SUCCESS, null);
+      StatusResponseType statusResponse = samlMessageFactory.createStatusResponse(SamlConstants.STATUS_SUCCESS, null);
 
-      samlMessageSender.sendResponse(idp, response, SamlProfile.SINGLE_LOGOUT);
+      samlMessageSender.sendResponse(idp, statusResponse, SamlProfile.SINGLE_LOGOUT, httpResponse);
 
       dialogue.setFinished(true);
    }
@@ -104,21 +109,21 @@ public class SamlSpSingleLogoutService
       }
    }
 
-   public void processIDPResponse(HttpServletRequest httpRequest, StatusResponseType response)
+   public void processIDPResponse(HttpServletRequest httpRequest, HttpServletResponse httpResponse, StatusResponseType statusResponse)
    {
-      if (response.getStatus() != null && response.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
+      if (statusResponse.getStatus() != null && statusResponse.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
       {
-         samlServiceProviderSpi.get().globalLogoutSucceeded();
+         samlServiceProviderSpi.get().globalLogoutSucceeded(responseHandler.createResponseHolder(httpResponse));
       }
       else
       {
-         String statusCode = response.getStatus() == null ? "null" : response.getStatus().getStatusCode().getValue();
-         samlServiceProviderSpi.get().globalLogoutFailed(statusCode);
+         String statusCode = statusResponse.getStatus() == null ? "null" : statusResponse.getStatus().getStatusCode().getValue();
+         samlServiceProviderSpi.get().globalLogoutFailed(statusCode, responseHandler.createResponseHolder(httpResponse));
       }
       dialogue.setFinished(true);
    }
 
-   public void sendSingleLogoutRequestToIDP(SamlSpSession session)
+   public void sendSingleLogoutRequestToIDP(SamlSpSession session, HttpServletResponse httpResponse)
    {
       SamlExternalIdentityProvider idp = session.getIdentityProvider();
       LogoutRequestType logoutRequest;
@@ -127,6 +132,6 @@ public class SamlSpSingleLogoutService
       samlDialogue.setExternalProvider(idp);
       samlSpLogoutDialogue.setSession(session);
 
-      samlMessageSender.sendRequest(idp, SamlProfile.SINGLE_LOGOUT, logoutRequest);
+      samlMessageSender.sendRequest(idp, SamlProfile.SINGLE_LOGOUT, logoutRequest, httpResponse);
    }
 }

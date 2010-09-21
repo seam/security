@@ -24,6 +24,8 @@ package org.jboss.seam.security.external.api;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
 
@@ -33,17 +35,17 @@ import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
  */
 public interface SamlMultiUserIdentityProviderApi
 {
-   void authenticationSucceeded(SamlIdpSession session);
+   void authenticationSucceeded(SamlIdpSession session, HttpServletResponse response);
 
-   void authenticationFailed();
+   void authenticationFailed(HttpServletResponse response);
 
    Set<SamlIdpSession> getSessions();
 
    SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes);
 
-   void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl);
+   void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl, HttpServletResponse response);
 
    void localLogout(SamlIdpSession session);
 
-   void globalLogout(SamlIdpSession session);
+   void globalLogout(SamlIdpSession session, HttpServletResponse response);
 }

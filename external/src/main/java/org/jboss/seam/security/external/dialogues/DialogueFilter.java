@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external;
+package org.jboss.seam.security.external.dialogues;
 
 import java.io.IOException;
 
@@ -33,9 +33,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
-
 @WebFilter(filterName = "DialogueFilter", urlPatterns = "/*")
 public class DialogueFilter implements Filter
 {
@@ -44,17 +41,12 @@ public class DialogueFilter implements Filter
    @Inject
    private DialogueManager manager;
 
-   @Inject
-   private ResponseHolder responseHolder;
-
    public void init(FilterConfig filterConfig) throws ServletException
    {
    }
 
    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
    {
-      responseHolder.setResponse((HttpServletResponse) response);
-
       if (manager.isAttached())
       {
          manager.detachDialogue();

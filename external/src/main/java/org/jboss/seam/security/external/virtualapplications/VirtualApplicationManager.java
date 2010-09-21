@@ -64,7 +64,7 @@ public class VirtualApplicationManager
    protected void servletInitialized(@Observes @Initialized final ServletContextEvent e)
    {
       log.trace("Servlet initialized with event {}", e);
-      virtualApplicationContextExtension.getVirtualApplicationContext().initialize(e.getServletContext());
+      getVirtualApplicationContext().initialize(e.getServletContext());
 
       AfterVirtualApplicationManagerCreation afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreation();
       beanManager.fireEvent(afterVirtualApplicationManagerCreation);
@@ -72,10 +72,10 @@ public class VirtualApplicationManager
       for (String hostName : afterVirtualApplicationManagerCreation.getHostNames())
       {
          hostNames.add(hostName);
-         virtualApplicationContextExtension.getVirtualApplicationContext().create(hostName);
+         getVirtualApplicationContext().create(hostName);
          virtualApplication.get().setHostName(hostName);
          beanManager.fireEvent(new AfterVirtualApplicationCreation());
-         virtualApplicationContextExtension.getVirtualApplicationContext().detach();
+         getVirtualApplicationContext().detach();
       }
       beanManager.fireEvent(new AfterVirtualApplicationsCreation());
    }
@@ -85,10 +85,10 @@ public class VirtualApplicationManager
       log.trace("Servlet destroyed with event {}", e);
       for (String hostName : hostNames)
       {
-         if (virtualApplicationContextExtension.getVirtualApplicationContext().isExistingVirtualApplication(hostName))
+         if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
          {
             attach(hostName);
-            virtualApplicationContextExtension.getVirtualApplicationContext().destroy();
+            getVirtualApplicationContext().destroy();
          }
       }
    }
@@ -97,28 +97,39 @@ public class VirtualApplicationManager
    {
       log.trace("Servlet request initialized with event {}", e);
       String hostName = e.getServletRequest().getServerName();
-      attach(hostName);
+      if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
+      {
+         attach(hostName);
+      }
    }
 
    protected void requestDestroyed(@Observes @Destroyed final ServletRequestEvent e)
    {
       log.trace("Servlet request destroyed with event {}", e);
-      detach();
+      if (getVirtualApplicationContext().isActive())
+      {
+         detach();
+      }
    }
 
    public void attach(String hostName)
    {
-      virtualApplicationContextExtension.getVirtualApplicationContext().attach(hostName);
+      getVirtualApplicationContext().attach(hostName);
       virtualApplication.get().setHostName(hostName);
    }
 
    public void detach()
    {
-      virtualApplicationContextExtension.getVirtualApplicationContext().detach();
+      getVirtualApplicationContext().detach();
    }
 
    public Set<String> getHostNames()
    {
       return hostNames;
+   }
+
+   private VirtualApplicationContext getVirtualApplicationContext()
+   {
+      return virtualApplicationContextExtension.getVirtualApplicationContext();
    }
 }

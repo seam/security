@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -61,9 +62,9 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, O
    private JAXBContext jaxbContext;
 
    @Dialogued(join = true)
-   public void login(String identifier, List<OpenIdRequestedAttribute> attributes)
+   public void login(String identifier, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response)
    {
-      openIdSingleLoginSender.sendAuthRequest(identifier, attributes);
+      openIdSingleLoginSender.sendAuthRequest(identifier, attributes, response);
    }
 
    public String getServiceURL(OpenIdService service)

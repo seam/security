@@ -26,6 +26,7 @@ import java.io.IOException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
@@ -41,9 +42,6 @@ import org.slf4j.Logger;
 public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
 {
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private DialogueManager dialogueManager;
 
    @Inject
@@ -57,7 +55,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
    @Inject
    private Logger log;
 
-   public void authenticate()
+   public void authenticate(ResponseHolder responseHolder)
    {
       dialogueId = dialogue.getDialogueId();
       try
@@ -70,11 +68,11 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
       }
    }
 
-   public void handleLogin(String userName)
+   public void handleLogin(String userName, HttpServletResponse response)
    {
       SamlIdpSession session = idpApi.get().localLogin(new SamlNameId(userName, null, null), null);
       dialogueManager.attachDialogue(dialogueId);
-      idpApi.get().authenticationSucceeded(session);
+      idpApi.get().authenticationSucceeded(session, response);
       dialogueManager.detachDialogue();
    }
 
@@ -83,7 +81,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
       return idpApi.get().getSessions().size();
    }
 
-   public void singleLogoutFailed()
+   public void singleLogoutFailed(ResponseHolder responseHolder)
    {
       try
       {
@@ -95,7 +93,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutSucceeded()
+   public void singleLogoutSucceeded(ResponseHolder responseHolder)
    {
       try
       {
@@ -108,9 +106,9 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
    }
 
    @Dialogued
-   public void handleSingleLogout()
+   public void handleSingleLogout(HttpServletResponse response)
    {
-      idpApi.get().globalLogout(idpApi.get().getSessions().iterator().next());
+      idpApi.get().globalLogout(idpApi.get().getSessions().iterator().next(), response);
    }
 
    public void loggedOut(SamlIdpSession session)

@@ -33,6 +33,7 @@ import java.util.zip.DeflaterOutputStream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.Binder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -85,7 +86,7 @@ public class SamlMessageSender
    @Inject
    private Instance<SamlDialogue> samlDialogue;
 
-   public void sendRequest(SamlExternalEntity samlProvider, SamlProfile profile, RequestAbstractType samlRequest)
+   public void sendRequest(SamlExternalEntity samlProvider, SamlProfile profile, RequestAbstractType samlRequest, HttpServletResponse response)
    {
       Document message = null;
 
@@ -132,10 +133,10 @@ public class SamlMessageSender
          throw new RuntimeException(e);
       }
 
-      sendMessage(samlProvider, message, SamlRequestOrResponse.REQUEST, endpoint);
+      sendMessage(samlProvider, message, SamlRequestOrResponse.REQUEST, endpoint, response);
    }
 
-   public void sendResponse(SamlExternalEntity samlProvider, StatusResponseType samlResponse, SamlProfile profile)
+   public void sendResponse(SamlExternalEntity samlProvider, StatusResponseType samlResponse, SamlProfile profile, HttpServletResponse response)
    {
       Document message = null;
 
@@ -176,7 +177,7 @@ public class SamlMessageSender
          throw new RuntimeException(e);
       }
 
-      sendMessage(samlDialogue.get().getExternalProvider(), message, SamlRequestOrResponse.RESPONSE, endpoint);
+      sendMessage(samlDialogue.get().getExternalProvider(), message, SamlRequestOrResponse.RESPONSE, endpoint, response);
    }
 
    public SamlEndpoint getEndpoint(SamlService service)
@@ -194,7 +195,7 @@ public class SamlMessageSender
       return endpoint;
    }
 
-   private void sendMessage(SamlExternalEntity samlProvider, Document message, SamlRequestOrResponse samlRequestOrResponse, SamlEndpoint endpoint)
+   private void sendMessage(SamlExternalEntity samlProvider, Document message, SamlRequestOrResponse samlRequestOrResponse, SamlEndpoint endpoint, HttpServletResponse response)
    {
       if (log.isDebugEnabled())
       {
@@ -239,7 +240,7 @@ public class SamlMessageSender
             {
                privateKey = samlEntityBean.get().getSigningKey().getPrivateKey();
             }
-            sendSamlRedirect(base64EncodedResponse, signMessage, samlRequestOrResponse, privateKey, endpoint);
+            sendSamlRedirect(base64EncodedResponse, signMessage, samlRequestOrResponse, privateKey, endpoint, response);
          }
          else
          {
@@ -257,7 +258,7 @@ public class SamlMessageSender
             samlPostMessage.setRequestOrResponse(samlRequestOrResponse);
             samlPostMessage.setSamlMessage(base64EncodedMessage);
             samlPostMessage.setRelayState(samlDialogue.get().getExternalProviderRelayState());
-            responseHandler.sendFormToUserAgent(endpoint.getLocation(), samlPostMessage);
+            responseHandler.sendFormToUserAgent(endpoint.getLocation(), samlPostMessage, response);
          }
       }
       catch (IOException e)
@@ -266,7 +267,7 @@ public class SamlMessageSender
       }
    }
 
-   private void sendSamlRedirect(String base64EncodedSamlMessage, boolean sign, SamlRequestOrResponse samlRequestOrResponse, PrivateKey signingKey, SamlEndpoint endpoint)
+   private void sendSamlRedirect(String base64EncodedSamlMessage, boolean sign, SamlRequestOrResponse samlRequestOrResponse, PrivateKey signingKey, SamlEndpoint endpoint, HttpServletResponse response)
    {
       SamlRedirectMessage redirectMessage = new SamlRedirectMessage();
 
@@ -295,7 +296,7 @@ public class SamlMessageSender
          redirectMessage.setSamlMessage(base64EncodedSamlMessage);
       }
 
-      responseHandler.sendHttpRedirectToUserAgent(endpoint.getLocation(), redirectMessage);
+      responseHandler.sendHttpRedirectToUserAgent(endpoint.getLocation(), redirectMessage, response);
    }
 
 }

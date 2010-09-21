@@ -23,6 +23,8 @@ package org.jboss.seam.security.external.api;
 
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jboss.seam.security.external.saml.sp.SamlSpSession;
 
 /**
@@ -31,11 +33,11 @@ import org.jboss.seam.security.external.saml.sp.SamlSpSession;
  */
 public interface SamlMultiUserServiceProviderApi
 {
-   public void login(String idpEntityId);
+   public void login(String idpEntityId, HttpServletResponse response);
 
    public void localLogout(SamlSpSession session);
 
-   public void globalLogout(SamlSpSession session);
+   public void globalLogout(SamlSpSession session, HttpServletResponse response);
 
    public Set<SamlSpSession> getSessions();
 }

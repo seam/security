@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.ResponseHolder;
 import org.slf4j.Logger;
 
 /**
@@ -47,9 +46,6 @@ public class SamlServlet extends HttpServlet
 
    @Inject
    private Logger log;
-
-   @Inject
-   private ResponseHolder responseHolder;
 
    @Inject
    private SamlMessageReceiver samlMessageReceiver;
@@ -76,8 +72,7 @@ public class SamlServlet extends HttpServlet
    {
       try
       {
-         responseHolder.setResponse(response);
-         handleMessage(request);
+         handleMessage(request, response);
       }
       catch (InvalidRequestException e)
       {
@@ -89,13 +84,13 @@ public class SamlServlet extends HttpServlet
       }
    }
 
-   private void handleMessage(HttpServletRequest httpRequest) throws InvalidRequestException
+   private void handleMessage(HttpServletRequest httpRequest, HttpServletResponse response) throws InvalidRequestException
    {
       Matcher matcher = Pattern.compile("/(IDP|SP)/(.*?)$").matcher(httpRequest.getRequestURI());
       boolean found = matcher.find();
       if (!found)
       {
-         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.");
+         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.", response);
       }
       SamlIdpOrSp idpOrSp = SamlIdpOrSp.valueOf(matcher.group(1));
       SamlServiceType service = SamlServiceType.getByName(matcher.group(2));
@@ -105,10 +100,10 @@ public class SamlServlet extends HttpServlet
       case SAML_SINGLE_LOGOUT_SERVICE:
       case SAML_SINGLE_SIGN_ON_SERVICE:
       case SAML_ASSERTION_CONSUMER_SERVICE:
-         samlMessageReceiver.handleIncomingSamlMessage(service, httpRequest, idpOrSp);
+         samlMessageReceiver.handleIncomingSamlMessage(service, httpRequest, response, idpOrSp);
          break;
       case SAML_META_DATA_SERVICE:
-         samlEntityBean.get().writeMetaData(responseHandler.getWriter("application/xml"));
+         samlEntityBean.get().writeMetaData(responseHandler.getWriter("application/xml", response));
          break;
       default:
          throw new RuntimeException("Unsupported service " + service);

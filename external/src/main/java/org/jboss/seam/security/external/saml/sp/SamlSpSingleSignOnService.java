@@ -27,10 +27,12 @@ import java.util.List;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
 
 import org.jboss.seam.security.external.InvalidRequestException;
+import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.api.SamlPrincipal;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
@@ -88,7 +90,10 @@ public class SamlSpSingleSignOnService
    @Inject
    private SamlMessageFactory samlMessageFactory;
 
-   public void processIDPResponse(HttpServletRequest httpRequest, StatusResponseType statusResponse) throws InvalidRequestException
+   @Inject
+   private ResponseHandler responseHandler;
+
+   public void processIDPResponse(HttpServletRequest httpRequest, HttpServletResponse httpResponse, StatusResponseType statusResponse) throws InvalidRequestException
    {
       SamlExternalIdentityProvider idp = (SamlExternalIdentityProvider) samlDialogue.getExternalProvider();
 
@@ -101,7 +106,7 @@ public class SamlSpSingleSignOnService
       String statusValue = status.getStatusCode().getValue();
       if (SamlConstants.STATUS_SUCCESS.equals(statusValue) == false)
       {
-         samlServiceProviderSpi.get().loginFailed();
+         samlServiceProviderSpi.get().loginFailed(responseHandler.createResponseHolder(httpResponse));
       }
 
       if (!(statusResponse instanceof ResponseType))
@@ -125,7 +130,7 @@ public class SamlSpSingleSignOnService
       else
       {
          session.setIdentityProvider(idp);
-         loginUser(httpRequest, session, statusResponse.getInResponseTo() == null, httpRequest.getParameter(SamlRedirectMessage.QSP_RELAY_STATE));
+         loginUser(httpRequest, httpResponse, session, statusResponse.getInResponseTo() == null, httpRequest.getParameter(SamlRedirectMessage.QSP_RELAY_STATE));
       }
 
       dialogue.setFinished(true);
@@ -272,26 +277,26 @@ public class SamlSpSingleSignOnService
       }
    }
 
-   private void loginUser(HttpServletRequest httpRequest, SamlSpSession session, boolean unsolicited, String relayState)
+   private void loginUser(HttpServletRequest httpRequest, HttpServletResponse response, SamlSpSession session, boolean unsolicited, String relayState)
    {
       samlSpSessions.addSession(session);
 
       if (unsolicited)
       {
-         samlServiceProviderSpi.get().loggedIn(session, relayState);
+         samlServiceProviderSpi.get().loggedIn(session, relayState, responseHandler.createResponseHolder(response));
       }
       else
       {
-         samlServiceProviderSpi.get().loginSucceeded(session);
+         samlServiceProviderSpi.get().loginSucceeded(session, responseHandler.createResponseHolder(response));
       }
    }
 
-   public void sendAuthenticationRequestToIDP(SamlExternalIdentityProvider idp)
+   public void sendAuthenticationRequestToIDP(SamlExternalIdentityProvider idp, HttpServletResponse response)
    {
       AuthnRequestType authnRequest = samlMessageFactory.createAuthnRequest();
 
       samlDialogue.setExternalProvider(idp);
 
-      samlMessageSender.sendRequest(idp, SamlProfile.SINGLE_SIGN_ON, authnRequest);
+      samlMessageSender.sendRequest(idp, SamlProfile.SINGLE_SIGN_ON, authnRequest, response);
    }
 }

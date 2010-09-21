@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
@@ -42,9 +43,6 @@ import com.google.common.collect.Maps;
 public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
 {
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private OpenIdProviderApi opApi;
 
    private String dialogueId;
@@ -55,36 +53,36 @@ public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
    @Inject
    private DialogueManager dialogueManager;
 
-   public void handleLogin(String userName)
+   public void handleLogin(String userName, HttpServletResponse response)
    {
       dialogueManager.attachDialogue(dialogueId);
-      opApi.authenticationSucceeded(userName);
+      opApi.authenticationSucceeded(userName, response);
       dialogueManager.detachDialogue();
    }
 
-   public void setAttribute(String alias, String value)
+   public void setAttribute(String alias, String value, HttpServletResponse response)
    {
       dialogueManager.attachDialogue(dialogueId);
       Map<String, List<String>> attributes = Maps.newHashMap();
       attributes.put(alias, Lists.newArrayList(value));
-      opApi.setAttributes(attributes);
+      opApi.setAttributes(attributes, response);
       dialogueManager.detachDialogue();
    }
 
-   public void authenticate(String realm, String userName, boolean immediate)
+   public void authenticate(String realm, String userName, boolean immediate, ResponseHolder responseHolder)
    {
       if (userName == null)
       {
-         writeMessageToResponse("Please login.");
+         writeMessageToResponse("Please login.", responseHolder);
       }
       else
       {
-         writeMessageToResponse("Please provide the password for " + userName + ".");
+         writeMessageToResponse("Please provide the password for " + userName + ".", responseHolder);
       }
       dialogueId = dialogue.getDialogueId();
    }
 
-   private void writeMessageToResponse(String message)
+   private void writeMessageToResponse(String message, ResponseHolder responseHolder)
    {
       try
       {
@@ -101,9 +99,9 @@ public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
       return true;
    }
 
-   public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes)
+   public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes, ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Please provide your " + requestedAttributes.get(0).getAlias() + ".");
+      writeMessageToResponse("Please provide your " + requestedAttributes.get(0).getAlias() + ".", responseHolder);
       dialogueId = dialogue.getDialogueId();
    }
 }

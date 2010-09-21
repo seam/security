@@ -31,6 +31,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -103,7 +104,7 @@ public class SamlMessageReceiver
    @JaxbContext( { RequestAbstractType.class, StatusResponseType.class })
    private JAXBContext jaxbContext;
 
-   public void handleIncomingSamlMessage(SamlServiceType service, HttpServletRequest httpRequest, SamlIdpOrSp idpOrSp) throws InvalidRequestException
+   public void handleIncomingSamlMessage(SamlServiceType service, HttpServletRequest httpRequest, HttpServletResponse httpResponse, SamlIdpOrSp idpOrSp) throws InvalidRequestException
    {
       String samlRequestParam = httpRequest.getParameter(SamlRedirectMessage.QSP_SAML_REQUEST);
       String samlResponseParam = httpRequest.getParameter(SamlRedirectMessage.QSP_SAML_RESPONSE);
@@ -248,11 +249,11 @@ public class SamlMessageReceiver
          {
             if (samlRequestOrResponse.isRequest())
             {
-               samlIdpSingleSignOnService.processSPRequest(httpRequest, samlRequestMessage);
+               samlIdpSingleSignOnService.processSPRequest(httpRequest, httpResponse, samlRequestMessage);
             }
             else
             {
-               samlSpSingleSignOnService.processIDPResponse(httpRequest, samlResponseMessage);
+               samlSpSingleSignOnService.processIDPResponse(httpRequest, httpResponse, samlResponseMessage);
             }
          }
          else
@@ -261,22 +262,22 @@ public class SamlMessageReceiver
             {
                if (idpOrSp == SamlIdpOrSp.IDP)
                {
-                  samlIdpSingleLogoutService.processSPRequest(httpRequest, samlRequestMessage);
+                  samlIdpSingleLogoutService.processSPRequest(httpRequest, httpResponse, samlRequestMessage);
                }
                else
                {
-                  samlSpSingleLogoutService.processIDPRequest(httpRequest, samlRequestMessage);
+                  samlSpSingleLogoutService.processIDPRequest(httpRequest, httpResponse, samlRequestMessage);
                }
             }
             else
             {
                if (idpOrSp == SamlIdpOrSp.IDP)
                {
-                  samlIdpSingleLogoutService.processSPResponse(httpRequest, samlResponseMessage);
+                  samlIdpSingleLogoutService.processSPResponse(httpRequest, httpResponse, samlResponseMessage);
                }
                else
                {
-                  samlSpSingleLogoutService.processIDPResponse(httpRequest, samlResponseMessage);
+                  samlSpSingleLogoutService.processIDPResponse(httpRequest, httpResponse, samlResponseMessage);
                }
             }
          }

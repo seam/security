@@ -51,14 +51,14 @@ public interface SamlServiceProviderSpi
     * 
     * @param session session
     */
-   void loginSucceeded(SamlSpSession session);
+   void loginSucceeded(SamlSpSession session, ResponseHolder responseHolder);
 
    /**
     * This method is called after failed external authentication of the user.
     * The call takes place in the same dialogue context as the corresponding API
     * call.
     */
-   void loginFailed();
+   void loginFailed(ResponseHolder responseHolder);
 
    /**
     * When the service provider receives an unsolicited login from an identity
@@ -68,7 +68,7 @@ public interface SamlServiceProviderSpi
     * @param url URL where the user needs to be redirected to; this URL is
     *           supplied by the identity provider and can be null
     */
-   void loggedIn(SamlSpSession session, String url);
+   void loggedIn(SamlSpSession session, String url, ResponseHolder responseHolder);
 
    /**
     * This method is the asynchronous callbacks related to
@@ -78,7 +78,7 @@ public interface SamlServiceProviderSpi
     * implementation of this method will typically redirect the user to a page
     * where a message is shown that the user has been logged out.
     */
-   void globalLogoutSucceeded();
+   void globalLogoutSucceeded(ResponseHolder responseHolder);
 
    /**
     * <p>
@@ -96,7 +96,7 @@ public interface SamlServiceProviderSpi
     * couldn't perform a successful logout, while the others could.
     * </p>
     */
-   void globalLogoutFailed(String statusCode);
+   void globalLogoutFailed(String statusCode, ResponseHolder responseHolder);
 
    /**
     * When the service provider receives a logout request from an identity

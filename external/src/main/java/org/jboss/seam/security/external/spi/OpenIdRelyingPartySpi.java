@@ -22,6 +22,7 @@
 package org.jboss.seam.security.external.spi;
 
 import org.jboss.seam.security.external.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.api.ResponseHolder;
 
 /**
  * @author Marcel Kolsteren
@@ -29,7 +30,7 @@ import org.jboss.seam.security.external.api.OpenIdPrincipal;
  */
 public interface OpenIdRelyingPartySpi
 {
-   public void loginSucceeded(OpenIdPrincipal principal);
+   public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder);
 
-   public void loginFailed(String message);
+   public void loginFailed(String message, ResponseHolder responseHolder);
 }

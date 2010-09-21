@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -59,8 +60,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
@@ -106,7 +105,7 @@ public class IntegrationTest
    @Test
    public void samlTest()
    {
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "loadMetaData");
       sendMessageToApplication("www.sp1.com", "sp", params);
       sendMessageToApplication("www.sp2.com", "sp", params);
@@ -157,7 +156,7 @@ public class IntegrationTest
       String opIdentifier = "http://localhost:8080/op/openid/OP/XrdsService";
       String userName = "john_doe";
 
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "login");
       params.put("identifier", opIdentifier);
       params.put("fetchEmail", "false");
@@ -165,7 +164,7 @@ public class IntegrationTest
 
       checkApplicationMessage("Please login.");
 
-      params = Maps.newHashMap();
+      params = new HashMap<String, String>();
       params.put("command", "authenticate");
       params.put("userName", userName);
       sendMessageToApplication("localhost", "op", params);
@@ -183,7 +182,7 @@ public class IntegrationTest
       String userName = "jane_doe";
       String claimedId = "http://localhost:8080/op/users/" + userName;
 
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "login");
       params.put("identifier", claimedId);
       params.put("fetchEmail", "true");
@@ -191,14 +190,14 @@ public class IntegrationTest
 
       checkApplicationMessage("Please provide the password for " + userName + ".");
 
-      params = Maps.newHashMap();
+      params = new HashMap<String, String>();
       params.put("command", "authenticate");
       params.put("userName", userName);
       sendMessageToApplication("localhost", "op", params);
 
       checkApplicationMessage("Please provide your email.");
 
-      params = Maps.newHashMap();
+      params = new HashMap<String, String>();
       params.put("command", "setAttribute");
       String email = "jane_doe@op.com";
       params.put("email", email);
@@ -213,7 +212,7 @@ public class IntegrationTest
 
    private void checkNrOfSessions(String serverName, String spOrIdp, int expectedNumber)
    {
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "getNrOfSessions");
       sendMessageToApplication(serverName, spOrIdp, params);
       checkApplicationMessage(Integer.toString(expectedNumber));
@@ -221,14 +220,14 @@ public class IntegrationTest
 
    private void samlSignOn(String spHostName, String idpEntityId, String userName)
    {
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "login");
       params.put("idpEntityId", idpEntityId);
       sendMessageToApplication(spHostName, "sp", params);
 
       checkApplicationMessage("Please login");
 
-      params = Maps.newHashMap();
+      params = new HashMap<String, String>();
       params.put("command", "authenticate");
       params.put("userName", userName);
       sendMessageToApplication("www.idp.com", "idp", params);
@@ -263,7 +262,7 @@ public class IntegrationTest
 
    private void checkDialogueTermination(String serverName, String spOrIdp)
    {
-      Map<String, String> params = Maps.newHashMap();
+      Map<String, String> params = new HashMap<String, String>();
       params.put("command", "getNrOfDialogues");
       sendMessageToApplication(serverName, spOrIdp, params);
       checkApplicationMessage("0");

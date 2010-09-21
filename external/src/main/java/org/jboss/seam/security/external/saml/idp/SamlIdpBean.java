@@ -23,12 +23,14 @@ package org.jboss.seam.security.external.saml.idp;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -49,8 +51,6 @@ import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlIdpOrSp;
 import org.jboss.seam.security.external.saml.SamlServiceType;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author Marcel Kolsteren
@@ -174,16 +174,16 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
    }
 
    @Dialogued(join = true)
-   public void authenticationSucceeded(SamlIdpSession session)
+   public void authenticationSucceeded(SamlIdpSession session, HttpServletResponse response)
    {
       session.getServiceProviders().add((SamlExternalServiceProvider) samlDialogue.get().getExternalProvider());
-      samlIdpSingleSignOnService.handleSucceededAuthentication(session);
+      samlIdpSingleSignOnService.handleSucceededAuthentication(session, response);
    }
 
    @Dialogued(join = true)
-   public void authenticationFailed()
+   public void authenticationFailed(HttpServletResponse response)
    {
-      samlIdpSingleSignOnService.handleFailedAuthentication();
+      samlIdpSingleSignOnService.handleFailedAuthentication(response);
    }
 
    public Set<SamlIdpSession> getSessions()
@@ -212,7 +212,7 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
    }
 
    @Dialogued(join = true)
-   public void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl)
+   public void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl, HttpServletResponse response)
    {
       for (SamlExternalServiceProvider sp : session.getServiceProviders())
       {
@@ -222,7 +222,7 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
          }
       }
       session.getServiceProviders().add(getExternalSamlEntityByEntityId(spEntityId));
-      samlIdpSingleSignOnService.remoteLogin(spEntityId, session, remoteUrl);
+      samlIdpSingleSignOnService.remoteLogin(spEntityId, session, remoteUrl, response);
    }
 
    public void localLogout(SamlIdpSession session)
@@ -231,10 +231,10 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
    }
 
    @Dialogued(join = true)
-   public void globalLogout(SamlIdpSession session)
+   public void globalLogout(SamlIdpSession session, HttpServletResponse response)
    {
       SamlPrincipal principal = session.getPrincipal();
-      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, Lists.newArrayList(session.getSessionIndex()));
+      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, Arrays.asList(session.getSessionIndex()), response);
    }
 
    @Override

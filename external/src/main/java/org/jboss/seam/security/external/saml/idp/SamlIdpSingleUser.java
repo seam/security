@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
 import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
@@ -36,14 +37,14 @@ public class SamlIdpSingleUser implements SamlIdentityProviderApi
    @Inject
    private Instance<SamlMultiUserIdentityProviderApi> multiUserApi;
 
-   public void authenticationSucceeded()
+   public void authenticationSucceeded(HttpServletResponse response)
    {
-      multiUserApi.get().authenticationSucceeded(getSession());
+      multiUserApi.get().authenticationSucceeded(getSession(), response);
    }
 
-   public void authenticationFailed()
+   public void authenticationFailed(HttpServletResponse response)
    {
-      multiUserApi.get().authenticationFailed();
+      multiUserApi.get().authenticationFailed(response);
    }
 
    public SamlIdpSession getSession()
@@ -63,14 +64,14 @@ public class SamlIdpSingleUser implements SamlIdentityProviderApi
       multiUserApi.get().localLogin(nameId, attributes);
    }
 
-   public void remoteLogin(String spEntityId, String remoteUrl)
+   public void remoteLogin(String spEntityId, String remoteUrl, HttpServletResponse response)
    {
       SamlIdpSession session = getSession();
       if (session == null)
       {
          throw new IllegalStateException("Need to login locally first.");
       }
-      multiUserApi.get().remoteLogin(spEntityId, session, remoteUrl);
+      multiUserApi.get().remoteLogin(spEntityId, session, remoteUrl, response);
    }
 
    public void localLogout()
@@ -83,13 +84,13 @@ public class SamlIdpSingleUser implements SamlIdentityProviderApi
       multiUserApi.get().localLogout(session);
    }
 
-   public void globalLogout()
+   public void globalLogout(HttpServletResponse response)
    {
       SamlIdpSession session = getSession();
       if (session == null)
       {
          throw new IllegalStateException("Logout not possible because there is no current session.");
       }
-      multiUserApi.get().globalLogout(session);
+      multiUserApi.get().globalLogout(session, response);
    }
 }

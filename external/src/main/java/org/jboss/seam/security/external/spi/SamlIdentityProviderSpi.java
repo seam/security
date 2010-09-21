@@ -21,6 +21,7 @@
  */
 package org.jboss.seam.security.external.spi;
 
+import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
 
 /**
@@ -29,11 +30,11 @@ import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
  */
 public interface SamlIdentityProviderSpi
 {
-   public void authenticate();
+   public void authenticate(ResponseHolder responseHolder);
 
    public void loggedOut(SamlIdpSession session);
 
-   public void singleLogoutSucceeded();
+   public void singleLogoutSucceeded(ResponseHolder responseHolder);
 
-   public void singleLogoutFailed();
+   public void singleLogoutFailed(ResponseHolder responseHolder);
 }

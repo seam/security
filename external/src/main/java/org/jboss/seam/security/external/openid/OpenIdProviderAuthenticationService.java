@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
@@ -75,18 +76,18 @@ public class OpenIdProviderAuthenticationService
    @Inject
    private Instance<OpenIdProviderBean> opBean;
 
-   public void handleIncomingMessage(HttpServletRequest httpRequest) throws InvalidRequestException
+   public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException
    {
       ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
 
       String mode = parameterList.getParameterValue("openid.mode");
 
-      Message response;
+      Message associationResponse;
 
       if ("associate".equals(mode))
       {
-         response = openIdServerManager.get().associationResponse(parameterList);
-         writeMessageToResponse(response);
+         associationResponse = openIdServerManager.get().associationResponse(parameterList);
+         writeMessageToResponse(associationResponse, httpResponse);
       }
       else if ("checkid_setup".equals(mode) || "checkid_immediate".equals(mode))
       {
@@ -133,30 +134,30 @@ public class OpenIdProviderAuthenticationService
 
             if (opLocalIdentifier.equals(AuthRequest.SELECT_ID))
             {
-               openIdProviderSpi.get().authenticate(realm, null, immediate);
+               openIdProviderSpi.get().authenticate(realm, null, immediate, responseHandler.createResponseHolder(httpResponse));
             }
             else
             {
                String userName = opBean.get().getUserNameFromOpLocalIdentifier(opLocalIdentifier);
-               openIdProviderSpi.get().authenticate(realm, userName, immediate);
+               openIdProviderSpi.get().authenticate(realm, userName, immediate, responseHandler.createResponseHolder(httpResponse));
             }
          }
          else
          {
-            response = DirectError.createDirectError("Invalid request; claimed_id or identity attribute is missing");
-            writeMessageToResponse(response);
+            associationResponse = DirectError.createDirectError("Invalid request; claimed_id or identity attribute is missing");
+            writeMessageToResponse(associationResponse, httpResponse);
          }
          dialogueManager.detachDialogue();
       }
       else if ("check_authentication".equals(mode))
       {
-         response = openIdServerManager.get().verify(parameterList);
-         writeMessageToResponse(response);
+         associationResponse = openIdServerManager.get().verify(parameterList);
+         writeMessageToResponse(associationResponse, httpResponse);
       }
       else
       {
-         response = DirectError.createDirectError("Unknown request");
-         writeMessageToResponse(response);
+         associationResponse = DirectError.createDirectError("Unknown request");
+         writeMessageToResponse(associationResponse, httpResponse);
       }
    }
 
@@ -176,7 +177,7 @@ public class OpenIdProviderAuthenticationService
       }
    }
 
-   public void sendAuthenticationResponse(boolean authenticationSuccesful, Map<String, List<String>> attributeValues)
+   public void sendAuthenticationResponse(boolean authenticationSuccesful, Map<String, List<String>> attributeValues, HttpServletResponse response)
    {
       ParameterList parameterList = openIdProviderRequest.get().getParameterList();
       String userName = openIdProviderRequest.get().getUserName();
@@ -187,11 +188,11 @@ public class OpenIdProviderAuthenticationService
          claimedIdentifier = opLocalIdentifier;
       }
 
-      Message response = openIdServerManager.get().authResponse(parameterList, opLocalIdentifier, claimedIdentifier, authenticationSuccesful);
+      Message authResponse = openIdServerManager.get().authResponse(parameterList, opLocalIdentifier, claimedIdentifier, authenticationSuccesful);
 
       if (response instanceof DirectError)
       {
-         writeMessageToResponse(response);
+         writeMessageToResponse(authResponse, response);
       }
       else
       {
@@ -200,7 +201,7 @@ public class OpenIdProviderAuthenticationService
             try
             {
                FetchResponse fetchResponse = FetchResponse.createFetchResponse(openIdProviderRequest.get().getFetchRequest(), attributeValues);
-               response.addExtension(fetchResponse);
+               authResponse.addExtension(fetchResponse);
             }
             catch (MessageException e)
             {
@@ -211,8 +212,8 @@ public class OpenIdProviderAuthenticationService
          // caller will need to decide which of the following to use:
 
          // option1: GET HTTP-redirect to the return_to URL
-         String destinationUrl = response.getDestinationUrl(true);
-         responseHandler.sendHttpRedirectToUserAgent(destinationUrl);
+         String destinationUrl = authResponse.getDestinationUrl(true);
+         responseHandler.sendHttpRedirectToUserAgent(destinationUrl, response);
 
          // option2: HTML FORM Redirection
          // RequestDispatcher dispatcher =
@@ -227,9 +228,9 @@ public class OpenIdProviderAuthenticationService
       dialogue.get().setFinished(true);
    }
 
-   private void writeMessageToResponse(Message message)
+   private void writeMessageToResponse(Message message, HttpServletResponse response)
    {
-      Writer writer = responseHandler.getWriter("text/plain");
+      Writer writer = responseHandler.getWriter("text/plain", response);
       try
       {
          writer.append(message.keyValueFormEncoding());

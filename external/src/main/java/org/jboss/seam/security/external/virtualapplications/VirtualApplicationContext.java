@@ -21,46 +21,51 @@
  */
 package org.jboss.seam.security.external.virtualapplications;
 
+import java.lang.annotation.Annotation;
+
+import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.Contextual;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.servlet.ServletContext;
 
+import org.jboss.seam.security.external.contexts.ContextualInstanceImpl;
+import org.jboss.seam.security.external.contexts.HashMapBeanStore;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
-import org.jboss.weld.context.AbstractMapContext;
-import org.jboss.weld.context.api.BeanStore;
-import org.jboss.weld.context.beanstore.HashMapBeanStore;
+import org.jboss.weld.context.api.ContextualInstance;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class VirtualApplicationContext extends AbstractMapContext
+public class VirtualApplicationContext implements Context
 {
    private static final String BEAN_STORE_ATTRIBUTE_NAME_PREFIX = "virtualApplicationContextBeanStore";
+
    private ServletContext servletContext;
+
    private final ThreadLocal<String> hostNameThreadLocal;
 
    public VirtualApplicationContext()
    {
-      super(VirtualApplicationScoped.class);
       hostNameThreadLocal = new ThreadLocal<String>();
    }
 
-   @Override
-   protected BeanStore getBeanStore()
+   protected HashMapBeanStore getBeanStore()
    {
       return getBeanStore(hostNameThreadLocal.get());
    }
 
-   private BeanStore getBeanStore(String hostName)
+   private HashMapBeanStore getBeanStore(String hostName)
    {
-      BeanStore beanStore = (BeanStore) servletContext.getAttribute(getAttributeName(hostName));
+      HashMapBeanStore beanStore = (HashMapBeanStore) servletContext.getAttribute(getAttributeName(hostName));
       return beanStore;
    }
 
-   private BeanStore createBeanStore(String hostName)
+   private void createBeanStore(String hostName)
    {
-      BeanStore beanStore = new HashMapBeanStore();
+      HashMapBeanStore beanStore = new HashMapBeanStore();
       servletContext.setAttribute(getAttributeName(hostName), beanStore);
-      return beanStore;
    }
 
    private void removeBeanStore(String hostName)
@@ -71,13 +76,6 @@ public class VirtualApplicationContext extends AbstractMapContext
    private String getAttributeName(String hostName)
    {
       return BEAN_STORE_ATTRIBUTE_NAME_PREFIX + "_" + hostName;
-   }
-
-   @Override
-   protected boolean isCreationLockRequired()
-   {
-      // TODO: find out whether the creation lock is required
-      return false;
    }
 
    public void initialize(ServletContext servletContext)
@@ -98,6 +96,7 @@ public class VirtualApplicationContext extends AbstractMapContext
 
    public void remove()
    {
+      getBeanStore().clear();
       removeBeanStore(this.hostNameThreadLocal.get());
       detach();
    }
@@ -110,12 +109,52 @@ public class VirtualApplicationContext extends AbstractMapContext
    public void attach(String hostName)
    {
       this.hostNameThreadLocal.set(hostName);
-      setActive(true);
    }
 
    public void detach()
    {
       this.hostNameThreadLocal.set(null);
-      setActive(false);
+   }
+
+   public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext)
+   {
+      if (!isActive())
+      {
+         throw new ContextNotActiveException();
+      }
+      ContextualInstance<T> beanInstance = getBeanStore().get(contextual);
+      if (beanInstance != null)
+      {
+         return beanInstance.getInstance();
+      }
+      else if (creationalContext != null)
+      {
+         T instance = contextual.create(creationalContext);
+         if (instance != null)
+         {
+            beanInstance = new ContextualInstanceImpl<T>(contextual, creationalContext, instance);
+            getBeanStore().put(contextual, beanInstance);
+         }
+         return instance;
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   public <T> T get(Contextual<T> contextual)
+   {
+      return get(contextual, null);
+   }
+
+   public Class<? extends Annotation> getScope()
+   {
+      return VirtualApplicationScoped.class;
+   }
+
+   public boolean isActive()
+   {
+      return hostNameThreadLocal.get() != null;
    }
 }

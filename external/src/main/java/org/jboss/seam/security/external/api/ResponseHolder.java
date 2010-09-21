@@ -32,4 +32,8 @@ public interface ResponseHolder
    void setResponse(HttpServletResponse response);
 
    HttpServletResponse getResponse();
+
+   void redirectWithDialoguePropagation(String url);
+
+   String addDialogueIdToUrl(String url);
 }

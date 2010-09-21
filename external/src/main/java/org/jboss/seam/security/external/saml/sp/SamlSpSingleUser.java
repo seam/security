@@ -23,6 +23,7 @@ package org.jboss.seam.security.external.saml.sp;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.api.SamlServiceProviderApi;
@@ -36,9 +37,9 @@ public class SamlSpSingleUser implements SamlServiceProviderApi
    @Inject
    private Instance<SamlMultiUserServiceProviderApi> multiUserApi;
 
-   public void login(String idpEntityId)
+   public void login(String idpEntityId, HttpServletResponse response)
    {
-      multiUserApi.get().login(idpEntityId);
+      multiUserApi.get().login(idpEntityId, response);
    }
 
    public void localLogout()
@@ -51,14 +52,14 @@ public class SamlSpSingleUser implements SamlServiceProviderApi
       multiUserApi.get().localLogout(session);
    }
 
-   public void globalLogout()
+   public void globalLogout(HttpServletResponse response)
    {
       SamlSpSession session = getSession();
       if (session == null)
       {
          throw new IllegalStateException("Logout not possible because there is no current session.");
       }
-      multiUserApi.get().globalLogout(session);
+      multiUserApi.get().globalLogout(session, response);
    }
 
    public SamlSpSession getSession()

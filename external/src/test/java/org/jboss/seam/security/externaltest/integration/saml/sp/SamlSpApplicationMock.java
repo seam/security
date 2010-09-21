@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
@@ -41,43 +42,40 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
    private Instance<SamlMultiUserServiceProviderApi> spApi;
 
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private Logger log;
 
    @Dialogued
-   public void login(String idpEntityId)
+   public void login(String idpEntityId, HttpServletResponse response)
    {
-      spApi.get().login(idpEntityId);
+      spApi.get().login(idpEntityId, response);
    }
 
-   public void loginFailed()
+   public void loginFailed(ResponseHolder responseHolder)
    {
-      writeMessageToResponse("login failed");
+      writeMessageToResponse("login failed", responseHolder);
    }
 
-   public void loginSucceeded(SamlSpSession session)
+   public void loginSucceeded(SamlSpSession session, ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Login succeeded (" + session.getPrincipal().getNameId().getValue() + ")");
+      writeMessageToResponse("Login succeeded (" + session.getPrincipal().getNameId().getValue() + ")", responseHolder);
    }
 
-   public void globalLogoutFailed(String statusCode)
+   public void globalLogoutFailed(String statusCode, ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Single logout failed");
+      writeMessageToResponse("Single logout failed", responseHolder);
    }
 
-   public void globalLogoutSucceeded()
+   public void globalLogoutSucceeded(ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Single logout succeeded");
+      writeMessageToResponse("Single logout succeeded", responseHolder);
    }
 
-   public void loggedIn(SamlSpSession session, String url)
+   public void loggedIn(SamlSpSession session, String url, ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Logged in unsolicited");
+      writeMessageToResponse("Logged in unsolicited", responseHolder);
    }
 
-   private void writeMessageToResponse(String message)
+   private void writeMessageToResponse(String message, ResponseHolder responseHolder)
    {
       try
       {
@@ -95,10 +93,10 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
    }
 
    @Dialogued
-   public void handleGlobalLogout()
+   public void handleGlobalLogout(HttpServletResponse response)
    {
       SamlSpSession session = spApi.get().getSessions().iterator().next();
-      spApi.get().globalLogout(session);
+      spApi.get().globalLogout(session, response);
    }
 
    public void loggedOut(SamlSpSession session)

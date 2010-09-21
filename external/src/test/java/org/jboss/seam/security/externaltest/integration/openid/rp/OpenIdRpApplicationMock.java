@@ -24,6 +24,7 @@ package org.jboss.seam.security.externaltest.integration.openid.rp;
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
@@ -37,44 +38,41 @@ import com.google.common.collect.Lists;
 public class OpenIdRpApplicationMock implements OpenIdRelyingPartySpi
 {
    @Inject
-   private ResponseHolder responseHolder;
-
-   @Inject
    private OpenIdRelyingPartyApi rpApi;
 
    @Dialogued
-   public void login(String identifier, boolean fetchEmail)
+   public void login(String identifier, boolean fetchEmail, HttpServletResponse response)
    {
       if (fetchEmail)
       {
          OpenIdRequestedAttribute requestedAttribute = new OpenIdRequestedAttribute("email", "http://axschema.org/contact/email", true, 1);
-         rpApi.login(identifier, Lists.newArrayList(requestedAttribute));
+         rpApi.login(identifier, Lists.newArrayList(requestedAttribute), response);
       }
       else
       {
-         rpApi.login(identifier, null);
+         rpApi.login(identifier, null, response);
       }
    }
 
-   public void loginFailed(String message)
+   public void loginFailed(String message, ResponseHolder responseHolder)
    {
-      writeMessageToResponse("Login failed: " + message);
+      writeMessageToResponse("Login failed: " + message, responseHolder);
    }
 
-   public void loginSucceeded(OpenIdPrincipal principal)
+   public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder)
    {
       if (principal.getAttributeValues() != null)
       {
          String email = (String) principal.getAttribute("email");
-         writeMessageToResponse("Login succeeded (" + principal.getIdentifier() + ", email " + email + ")");
+         writeMessageToResponse("Login succeeded (" + principal.getIdentifier() + ", email " + email + ")", responseHolder);
       }
       else
       {
-         writeMessageToResponse("Login succeeded (" + principal.getIdentifier() + ")");
+         writeMessageToResponse("Login succeeded (" + principal.getIdentifier() + ")", responseHolder);
       }
    }
 
-   private void writeMessageToResponse(String message)
+   private void writeMessageToResponse(String message, ResponseHolder responseHolder)
    {
       try
       {

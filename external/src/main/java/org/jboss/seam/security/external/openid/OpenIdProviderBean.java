@@ -31,12 +31,14 @@ import java.util.Map;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.JaxbContext;
+import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
@@ -71,6 +73,9 @@ public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi,
    @Inject
    @JaxbContext(ObjectFactory.class)
    private JAXBContext jaxbContext;
+
+   @Inject
+   private ResponseHandler responseHandler;
 
    public String getServiceURL(OpenIdService service)
    {
@@ -210,28 +215,28 @@ public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi,
    }
 
    @Dialogued(join = true)
-   public void authenticationFailed()
+   public void authenticationFailed(HttpServletResponse response)
    {
-      openIdSingleLoginSender.sendAuthenticationResponse(false, null);
+      openIdSingleLoginSender.sendAuthenticationResponse(false, null, response);
    }
 
    @Dialogued(join = true)
-   public void authenticationSucceeded(String userName)
+   public void authenticationSucceeded(String userName, HttpServletResponse response)
    {
       openIdProviderRequest.get().setUserName(userName);
       if (openIdProviderRequest.get().getRequestedAttributes() == null)
       {
-         openIdSingleLoginSender.sendAuthenticationResponse(true, null);
+         openIdSingleLoginSender.sendAuthenticationResponse(true, null, response);
       }
       else
       {
-         openIdProviderSpi.get().fetchParameters(openIdProviderRequest.get().getRequestedAttributes());
+         openIdProviderSpi.get().fetchParameters(openIdProviderRequest.get().getRequestedAttributes(), responseHandler.createResponseHolder(response));
       }
    }
 
    @Dialogued(join = true)
-   public void setAttributes(Map<String, List<String>> attributeValues)
+   public void setAttributes(Map<String, List<String>> attributeValues, HttpServletResponse response)
    {
-      openIdSingleLoginSender.sendAuthenticationResponse(true, attributeValues);
+      openIdSingleLoginSender.sendAuthenticationResponse(true, attributeValues, response);
    }
 }

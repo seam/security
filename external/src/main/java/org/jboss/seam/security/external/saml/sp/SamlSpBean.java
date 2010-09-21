@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -179,7 +179,7 @@ public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServicePr
    }
 
    @Dialogued(join = true)
-   public void login(String idpEntityId)
+   public void login(String idpEntityId, HttpServletResponse response)
    {
       SamlExternalIdentityProvider idp = getExternalSamlEntityByEntityId(idpEntityId);
       if (idp == null)
@@ -187,7 +187,7 @@ public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServicePr
          throw new RuntimeException("Identity provider " + idpEntityId + " not found");
       }
 
-      samlSpSingleSignOnService.sendAuthenticationRequestToIDP(idp);
+      samlSpSingleSignOnService.sendAuthenticationRequestToIDP(idp, response);
    }
 
    @Dialogued(join = true)
@@ -197,10 +197,10 @@ public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServicePr
    }
 
    @Dialogued(join = true)
-   public void globalLogout(SamlSpSession session)
+   public void globalLogout(SamlSpSession session, HttpServletResponse response)
    {
       localLogout(session);
-      samlSpSingleLogoutService.sendSingleLogoutRequestToIDP(session);
+      samlSpSingleLogoutService.sendSingleLogoutRequestToIDP(session, response);
    }
 
    public Set<SamlSpSession> getSessions()

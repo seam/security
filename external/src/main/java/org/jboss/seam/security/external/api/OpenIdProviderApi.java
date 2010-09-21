@@ -24,17 +24,19 @@ package org.jboss.seam.security.external.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Marcel Kolsteren
  * 
  */
 public interface OpenIdProviderApi
 {
-   void authenticationSucceeded(String userName);
+   void authenticationSucceeded(String userName, HttpServletResponse response);
 
-   void authenticationFailed();
+   void authenticationFailed(HttpServletResponse response);
 
-   void setAttributes(Map<String, List<String>> attributeValues);
+   void setAttributes(Map<String, List<String>> attributeValues, HttpServletResponse response);
 
    String getOpLocalIdentifierForUserName(String userName);
 }

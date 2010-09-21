@@ -5,8 +5,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.dialogues.DialogueManager;
+import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.saml.SamlMessage;
 import org.jboss.seam.security.external.saml.SamlPostMessage;
 import org.jboss.seam.security.external.saml.SamlRedirectMessage;
@@ -18,9 +20,12 @@ import org.jboss.seam.security.external.saml.SamlRedirectMessage;
 public class ResponseHandler
 {
    @Inject
-   private ResponseHolder responseHolder;
+   private DialogueManager dialogueManager;
 
-   public void sendFormToUserAgent(String destination, SamlPostMessage message)
+   @Inject
+   private Dialogue dialogue;
+
+   public void sendFormToUserAgent(String destination, SamlPostMessage message, HttpServletResponse response)
    {
       String key = message.getRequestOrResponse().isRequest() ? SamlMessage.QSP_SAML_REQUEST : SamlMessage.QSP_SAML_RESPONSE;
 
@@ -47,16 +52,16 @@ public class ResponseHandler
       }
       builder.append("</FORM></BODY></HTML>");
 
-      PrintWriter writer = getWriter();
+      PrintWriter writer = getWriter(response);
       writer.print(builder.toString());
       writer.flush();
    }
 
-   public void sendHttpRedirectToUserAgent(String url)
+   public void sendHttpRedirectToUserAgent(String url, HttpServletResponse response)
    {
       try
       {
-         responseHolder.getResponse().sendRedirect(url);
+         response.sendRedirect(url);
       }
       catch (IOException e)
       {
@@ -64,17 +69,17 @@ public class ResponseHandler
       }
    }
 
-   public void sendHttpRedirectToUserAgent(String location, SamlRedirectMessage redirectMessage)
+   public void sendHttpRedirectToUserAgent(String location, SamlRedirectMessage redirectMessage, HttpServletResponse response)
    {
       String url = location + "?" + redirectMessage.createQueryString();
-      sendHttpRedirectToUserAgent(url);
+      sendHttpRedirectToUserAgent(url, response);
    }
 
-   public void sendError(int statusCode, String message)
+   public void sendError(int statusCode, String message, HttpServletResponse response)
    {
       try
       {
-         responseHolder.getResponse().sendError(statusCode, message);
+         response.sendError(statusCode, message);
       }
       catch (IOException e)
       {
@@ -82,11 +87,11 @@ public class ResponseHandler
       }
    }
 
-   private PrintWriter getWriter()
+   private PrintWriter getWriter(HttpServletResponse response)
    {
       try
       {
-         return responseHolder.getResponse().getWriter();
+         return response.getWriter();
       }
       catch (IOException e)
       {
@@ -94,9 +99,19 @@ public class ResponseHandler
       }
    }
 
-   public Writer getWriter(String mimeType)
+   public Writer getWriter(String mimeType, HttpServletResponse response)
    {
-      responseHolder.getResponse().setContentType(mimeType);
-      return getWriter();
+      response.setContentType(mimeType);
+      return getWriter(response);
+   }
+
+   public ResponseHolderImpl createResponseHolder(HttpServletResponse response)
+   {
+      String dialogueId = null;
+      if (dialogueManager.isAttached())
+      {
+         dialogueId = dialogue.getDialogueId();
+      }
+      return new ResponseHolderImpl(response, dialogueId);
    }
 }

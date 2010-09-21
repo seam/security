@@ -19,13 +19,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.dialogues.api;
+package org.jboss.seam.security.external.contexts;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class AfterDialogueActivation
+import javax.enterprise.context.spi.Contextual;
+import javax.enterprise.context.spi.CreationalContext;
+
+import org.jboss.weld.context.api.ContextualInstance;
+
+public class ContextualInstanceImpl<T> implements ContextualInstance<T>
 {
+   private Contextual<T> contextual;
+
+   private CreationalContext<T> creationalContext;
+
+   private T instance;
+
+   public ContextualInstanceImpl(Contextual<T> contextual, CreationalContext<T> creationalContext, T instance)
+   {
+      this.contextual = contextual;
+      this.creationalContext = creationalContext;
+      this.instance = instance;
+   }
+
+   public Contextual<T> getContextual()
+   {
+      return contextual;
+   }
+
+   public CreationalContext<T> getCreationalContext()
+   {
+      return creationalContext;
+   }
+
+   public T getInstance()
+   {
+      return instance;
+   }
 
 }

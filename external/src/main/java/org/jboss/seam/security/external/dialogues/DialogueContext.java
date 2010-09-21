@@ -21,46 +21,51 @@
  */
 package org.jboss.seam.security.external.dialogues;
 
+import java.lang.annotation.Annotation;
 import java.util.UUID;
 
+import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.Contextual;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.servlet.ServletContext;
 
+import org.jboss.seam.security.external.contexts.ContextualInstanceImpl;
+import org.jboss.seam.security.external.contexts.HashMapBeanStore;
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
-import org.jboss.weld.context.AbstractMapContext;
-import org.jboss.weld.context.api.BeanStore;
-import org.jboss.weld.context.beanstore.HashMapBeanStore;
+import org.jboss.weld.context.api.ContextualInstance;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class DialogueContext extends AbstractMapContext
+public class DialogueContext implements Context
 {
    private static final String BEAN_STORE_ATTRIBUTE_NAME_PREFIX = "DialogueContextBeanStore";
+
    private ServletContext servletContext;
+
    private final ThreadLocal<String> dialogueIdThreadLocal;
 
    public DialogueContext()
    {
-      super(DialogueScoped.class);
       dialogueIdThreadLocal = new ThreadLocal<String>();
    }
 
-   @Override
-   protected BeanStore getBeanStore()
+   protected HashMapBeanStore getBeanStore()
    {
       return getBeanStore(dialogueIdThreadLocal.get());
    }
 
-   private BeanStore getBeanStore(String dialogueId)
+   private HashMapBeanStore getBeanStore(String dialogueId)
    {
-      BeanStore beanStore = (BeanStore) servletContext.getAttribute(getAttributeName(dialogueId));
+      HashMapBeanStore beanStore = (HashMapBeanStore) servletContext.getAttribute(getAttributeName(dialogueId));
       return beanStore;
    }
 
    private void createBeanStore(String dialogueId)
    {
-      BeanStore beanStore = new HashMapBeanStore();
+      HashMapBeanStore beanStore = new HashMapBeanStore();
       servletContext.setAttribute(getAttributeName(dialogueId), beanStore);
    }
 
@@ -72,13 +77,6 @@ public class DialogueContext extends AbstractMapContext
    private String getAttributeName(String dialogueId)
    {
       return BEAN_STORE_ATTRIBUTE_NAME_PREFIX + "_" + dialogueId;
-   }
-
-   @Override
-   protected boolean isCreationLockRequired()
-   {
-      // TODO: find out whether the creation lock is required
-      return false;
    }
 
    public void initialize(ServletContext servletContext)
@@ -107,15 +105,14 @@ public class DialogueContext extends AbstractMapContext
 
       this.dialogueIdThreadLocal.set(dialogueId);
       createBeanStore(dialogueId);
-      setActive(true);
       return dialogueId;
    }
 
    public void remove()
    {
+      getBeanStore().clear();
       removeBeanStore(this.dialogueIdThreadLocal.get());
       this.dialogueIdThreadLocal.set(null);
-      setActive(false);
    }
 
    public boolean isExistingDialogue(String dialogueId)
@@ -124,7 +121,7 @@ public class DialogueContext extends AbstractMapContext
    }
 
    /**
-    * Attaches an existing request to the current thread
+    * Attaches an existing dialogue to the current thread
     * 
     * @param dialogueIdThreadLocal
     */
@@ -139,19 +136,59 @@ public class DialogueContext extends AbstractMapContext
          throw new RuntimeException("There is no active context with request id " + dialogueId);
       }
       this.dialogueIdThreadLocal.set(dialogueId);
-      setActive(true);
    }
 
    /**
-    * Detaches the request from the current thread
+    * Detaches the dialogue from the current thread
     */
    public void detach()
    {
       this.dialogueIdThreadLocal.set(null);
-      setActive(false);
    }
 
    public boolean isAttached()
+   {
+      return dialogueIdThreadLocal.get() != null;
+   }
+
+   public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext)
+   {
+      if (!isActive())
+      {
+         throw new ContextNotActiveException();
+      }
+      ContextualInstance<T> beanInstance = getBeanStore().get(contextual);
+      if (beanInstance != null)
+      {
+         return beanInstance.getInstance();
+      }
+      else if (creationalContext != null)
+      {
+         T instance = contextual.create(creationalContext);
+         if (instance != null)
+         {
+            beanInstance = new ContextualInstanceImpl<T>(contextual, creationalContext, instance);
+            getBeanStore().put(contextual, beanInstance);
+         }
+         return instance;
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   public <T> T get(Contextual<T> contextual)
+   {
+      return get(contextual, null);
+   }
+
+   public Class<? extends Annotation> getScope()
+   {
+      return DialogueScoped.class;
+   }
+
+   public boolean isActive()
    {
       return dialogueIdThreadLocal.get() != null;
    }

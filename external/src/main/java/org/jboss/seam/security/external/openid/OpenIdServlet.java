@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.ResponseHolder;
 import org.slf4j.Logger;
 
 /**
@@ -47,9 +46,6 @@ public class OpenIdServlet extends HttpServlet
 
    @Inject
    private Logger log;
-
-   @Inject
-   private ResponseHolder responseHolder;
 
    @Inject
    private ResponseHandler responseHandler;
@@ -82,8 +78,7 @@ public class OpenIdServlet extends HttpServlet
    {
       try
       {
-         responseHolder.setResponse(response);
-         handleMessage(request);
+         handleMessage(request, response);
       }
       catch (InvalidRequestException e)
       {
@@ -95,13 +90,13 @@ public class OpenIdServlet extends HttpServlet
       }
    }
 
-   private void handleMessage(HttpServletRequest httpRequest) throws InvalidRequestException
+   private void handleMessage(HttpServletRequest httpRequest, HttpServletResponse response) throws InvalidRequestException
    {
       Matcher matcher = Pattern.compile("/(OP|RP)/([^/]*?)$").matcher(httpRequest.getRequestURI());
       boolean found = matcher.find();
       if (!found)
       {
-         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.");
+         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.", response);
          return;
       }
       OpenIdProviderOrRelyingParty opOrRp = OpenIdProviderOrRelyingParty.valueOf(matcher.group(1));
@@ -109,7 +104,7 @@ public class OpenIdServlet extends HttpServlet
 
       if (service == null)
       {
-         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.");
+         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.", response);
          return;
       }
 
@@ -118,21 +113,21 @@ public class OpenIdServlet extends HttpServlet
       case OPEN_ID_SERVICE:
          if (opOrRp == OpenIdProviderOrRelyingParty.OP)
          {
-            openIdProviderAuthenticationService.handleIncomingMessage(httpRequest);
+            openIdProviderAuthenticationService.handleIncomingMessage(httpRequest, response);
          }
          else
          {
-            openIdRpAuthenticationService.handleIncomingMessage(httpRequest);
+            openIdRpAuthenticationService.handleIncomingMessage(httpRequest, response);
          }
          break;
       case XRDS_SERVICE:
          if (opOrRp == OpenIdProviderOrRelyingParty.OP)
          {
-            opBean.get().writeOpIdentifierXrds(responseHandler.getWriter("application/xrds+xml"));
+            opBean.get().writeOpIdentifierXrds(responseHandler.getWriter("application/xrds+xml", response));
          }
          else
          {
-            rpBean.get().writeRpXrds(responseHandler.getWriter("application/xrds+xml"));
+            rpBean.get().writeRpXrds(responseHandler.getWriter("application/xrds+xml", response));
          }
          break;
       default:

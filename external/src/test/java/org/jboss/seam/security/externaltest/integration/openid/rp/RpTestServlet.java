@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
-
 @WebServlet(name = "RpTestServlet", urlPatterns = { "/testservlet" })
 public class RpTestServlet extends HttpServlet
 {
@@ -20,19 +18,15 @@ public class RpTestServlet extends HttpServlet
    @Inject
    private OpenIdRpApplicationMock openIdRpApplicationMock;
 
-   @Inject
-   private ResponseHolder responseHolder;
-
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
-      responseHolder.setResponse(response);
       String command = request.getParameter("command");
       if (command.equals("login"))
       {
          String identifier = request.getParameter("identifier");
          boolean fetchEmail = Boolean.parseBoolean(request.getParameter("fetchEmail"));
-         openIdRpApplicationMock.login(identifier, fetchEmail);
+         openIdRpApplicationMock.login(identifier, fetchEmail, response);
       }
       else if (command.equals("getNrOfDialogues"))
       {

@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.externaltest.integration.MetaDataLoader;
 
 @WebServlet(name = "SpTestServlet", urlPatterns = { "/testservlet" })
@@ -24,22 +23,18 @@ public class SpTestServlet extends HttpServlet
    @Inject
    private MetaDataLoader metaDataLoader;
 
-   @Inject
-   private ResponseHolder responseHolder;
-
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
-      responseHolder.setResponse(response);
       String command = request.getParameter("command");
       if (command.equals("login"))
       {
          String idpEntityId = request.getParameter("idpEntityId");
-         samlSpApplicationMock.login(idpEntityId);
+         samlSpApplicationMock.login(idpEntityId, response);
       }
       else if (command.equals("singleLogout"))
       {
-         samlSpApplicationMock.handleGlobalLogout();
+         samlSpApplicationMock.handleGlobalLogout(response);
       }
       else if (command.equals("getNrOfSessions"))
       {
