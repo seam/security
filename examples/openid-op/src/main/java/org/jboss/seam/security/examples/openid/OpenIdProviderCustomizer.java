@@ -24,7 +24,7 @@ package org.jboss.seam.security.examples.openid;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.api.OpenIdProviderConfigurationApi;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 
 public class OpenIdProviderCustomizer

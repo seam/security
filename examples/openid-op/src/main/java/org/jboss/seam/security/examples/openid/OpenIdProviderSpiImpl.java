@@ -28,9 +28,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 
 public class OpenIdProviderSpiImpl implements OpenIdProviderSpi

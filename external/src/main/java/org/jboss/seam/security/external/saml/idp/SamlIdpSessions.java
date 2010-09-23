@@ -27,7 +27,8 @@ import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 
-import org.jboss.seam.security.external.api.SamlPrincipal;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlPrincipal;
 
 /**
  * @author Marcel Kolsteren
@@ -38,7 +39,7 @@ public class SamlIdpSessions implements Serializable
 {
    private static final long serialVersionUID = 6297278286428111620L;
 
-   private Set<SamlIdpSession> sessions = new HashSet<SamlIdpSession>();
+   private Set<SamlIdpSessionImpl> sessions = new HashSet<SamlIdpSessionImpl>();
 
    public SamlIdpSession addSession(SamlPrincipal principal)
    {
@@ -50,7 +51,7 @@ public class SamlIdpSessions implements Serializable
       }
       while (getSession(principal, sessionIndex) != null);
 
-      SamlIdpSession session = new SamlIdpSession();
+      SamlIdpSessionImpl session = new SamlIdpSessionImpl();
       session.setPrincipal(principal);
       session.setSessionIndex(sessionIndex);
       sessions.add(session);
@@ -60,7 +61,7 @@ public class SamlIdpSessions implements Serializable
 
    public SamlIdpSession getSession(SamlPrincipal principal, String sessionIndex)
    {
-      for (SamlIdpSession session : sessions)
+      for (SamlIdpSessionImpl session : sessions)
       {
          if (session.getPrincipal().equals(principal) && session.getSessionIndex().equals(sessionIndex))
          {
@@ -70,12 +71,12 @@ public class SamlIdpSessions implements Serializable
       return null;
    }
 
-   public void removeSession(SamlIdpSession session)
+   public void removeSession(SamlIdpSessionImpl session)
    {
       sessions.remove(session);
    }
 
-   public Set<SamlIdpSession> getSessions()
+   public Set<SamlIdpSessionImpl> getSessions()
    {
       return sessions;
    }

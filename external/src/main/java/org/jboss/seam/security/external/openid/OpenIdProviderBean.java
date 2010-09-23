@@ -39,8 +39,6 @@ import javax.xml.bind.Marshaller;
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.xrds.LocalID;
 import org.jboss.seam.security.external.jaxb.xrds.ObjectFactory;
@@ -49,6 +47,8 @@ import org.jboss.seam.security.external.jaxb.xrds.Type;
 import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
 import org.jboss.seam.security.external.jaxb.xrds.XRD;
 import org.jboss.seam.security.external.jaxb.xrds.XRDS;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 import org.openid4java.discovery.DiscoveryInformation;
 

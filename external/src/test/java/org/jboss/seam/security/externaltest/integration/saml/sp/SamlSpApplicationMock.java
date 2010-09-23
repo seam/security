@@ -27,10 +27,10 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.seam.security.external.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
-import org.jboss.seam.security.external.saml.sp.SamlSpSession;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
       spApi.get().login(idpEntityId, response);
    }
 
-   public void loginFailed(ResponseHolder responseHolder)
+   public void loginFailed(String statusCodeLevel1, String statusCodeLevel2, ResponseHolder responseHolder)
    {
       writeMessageToResponse("login failed", responseHolder);
    }
@@ -60,7 +60,7 @@ public class SamlSpApplicationMock implements SamlServiceProviderSpi
       writeMessageToResponse("Login succeeded (" + session.getPrincipal().getNameId().getValue() + ")", responseHolder);
    }
 
-   public void globalLogoutFailed(String statusCode, ResponseHolder responseHolder)
+   public void globalLogoutFailed(String statusCodeLevel1, String statusCodeLevel2, ResponseHolder responseHolder)
    {
       writeMessageToResponse("Single logout failed", responseHolder);
    }

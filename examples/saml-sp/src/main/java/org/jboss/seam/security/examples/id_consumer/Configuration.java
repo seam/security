@@ -35,8 +35,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
+import org.jboss.seam.security.external.saml.api.SamlServiceProviderConfigurationApi;
 
 @Model
 public class Configuration

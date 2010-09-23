@@ -33,9 +33,7 @@ import javax.xml.bind.Marshaller;
 
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.JaxbContext;
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.OpenIdRequestedAttributeImpl;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.xrds.ObjectFactory;
 import org.jboss.seam.security.external.jaxb.xrds.Service;
@@ -43,6 +41,9 @@ import org.jboss.seam.security.external.jaxb.xrds.Type;
 import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
 import org.jboss.seam.security.external.jaxb.xrds.XRD;
 import org.jboss.seam.security.external.jaxb.xrds.XRDS;
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.openid4java.discovery.DiscoveryInformation;
 
 /**
@@ -115,5 +116,10 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, O
       {
          throw new RuntimeException(e);
       }
+   }
+
+   public OpenIdRequestedAttribute createOpenIdRequestedAttribute(String alias, String typeUri, boolean required, Integer count)
+   {
+      return new OpenIdRequestedAttributeImpl(alias, typeUri, required, count);
    }
 }

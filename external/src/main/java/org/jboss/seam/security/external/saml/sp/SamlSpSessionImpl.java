@@ -19,24 +19,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.saml.sp;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
+import org.jboss.seam.security.external.saml.api.SamlPrincipal;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public interface OpenIdProviderApi
+public class SamlSpSessionImpl implements SamlSpSession
 {
-   void authenticationSucceeded(String userName, HttpServletResponse response);
+   private SamlPrincipal principal;
 
-   void authenticationFailed(HttpServletResponse response);
+   private String sessionIndex;
 
-   void setAttributes(Map<String, List<String>> attributeValues, HttpServletResponse response);
+   private SamlExternalIdentityProvider identityProvider;
 
-   String getOpLocalIdentifierForUserName(String userName);
+   public SamlPrincipal getPrincipal()
+   {
+      return principal;
+   }
+
+   public void setPrincipal(SamlPrincipal samlPrincipal)
+   {
+      this.principal = samlPrincipal;
+   }
+
+   public String getSessionIndex()
+   {
+      return sessionIndex;
+   }
+
+   public void setSessionIndex(String sessionIndex)
+   {
+      this.sessionIndex = sessionIndex;
+   }
+
+   public SamlExternalIdentityProvider getIdentityProvider()
+   {
+      return identityProvider;
+   }
+
+   public void setIdentityProvider(SamlExternalIdentityProvider identityProvider)
+   {
+      this.identityProvider = identityProvider;
+   }
+
 }

@@ -19,53 +19,58 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.saml.idp;
+package org.jboss.seam.security.external;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.jboss.seam.security.external.api.SamlPrincipal;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 /**
- * @author Marcel Kolsteren
  * 
+ * @author Marcel Kolsteren
  */
-public class SamlIdpSession
+public class SamlNameIdImpl implements SamlNameId
 {
-   private SamlPrincipal principal;
+   private String value;
 
-   private String sessionIndex;
+   private String format;
 
-   private Set<SamlExternalServiceProvider> serviceProviders = new HashSet<SamlExternalServiceProvider>();
+   private String qualifier;
 
-   public SamlPrincipal getPrincipal()
+   public SamlNameIdImpl(String value, String format, String qualifier)
    {
-      return principal;
+      super();
+      this.value = value;
+      this.format = format;
+      this.qualifier = qualifier;
    }
 
-   public void setPrincipal(SamlPrincipal samlPrincipal)
+   public String getValue()
    {
-      this.principal = samlPrincipal;
+      return value;
    }
 
-   public String getSessionIndex()
+   public void setValue(String value)
    {
-      return sessionIndex;
+      this.value = value;
    }
 
-   public void setSessionIndex(String sessionIndex)
+   public String getFormat()
    {
-      this.sessionIndex = sessionIndex;
+      return format;
    }
 
-   public Set<SamlExternalServiceProvider> getServiceProviders()
+   public void setFormat(String format)
    {
-      return serviceProviders;
+      this.format = format;
    }
 
-   public void setServiceProviders(Set<SamlExternalServiceProvider> serviceProviders)
+   public String getQualifier()
    {
-      this.serviceProviders = serviceProviders;
+      return qualifier;
+   }
+
+   public void setQualifier(String qualifier)
+   {
+      this.qualifier = qualifier;
    }
 
    @Override
@@ -73,8 +78,9 @@ public class SamlIdpSession
    {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((principal == null) ? 0 : principal.hashCode());
-      result = prime * result + ((sessionIndex == null) ? 0 : sessionIndex.hashCode());
+      result = prime * result + ((format == null) ? 0 : format.hashCode());
+      result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+      result = prime * result + ((value == null) ? 0 : value.hashCode());
       return result;
    }
 
@@ -87,20 +93,27 @@ public class SamlIdpSession
          return false;
       if (getClass() != obj.getClass())
          return false;
-      SamlIdpSession other = (SamlIdpSession) obj;
-      if (principal == null)
+      SamlNameIdImpl other = (SamlNameIdImpl) obj;
+      if (format == null)
       {
-         if (other.principal != null)
+         if (other.format != null)
             return false;
       }
-      else if (!principal.equals(other.principal))
+      else if (!format.equals(other.format))
          return false;
-      if (sessionIndex == null)
+      if (qualifier == null)
       {
-         if (other.sessionIndex != null)
+         if (other.qualifier != null)
             return false;
       }
-      else if (!sessionIndex.equals(other.sessionIndex))
+      else if (!qualifier.equals(other.qualifier))
+         return false;
+      if (value == null)
+      {
+         if (other.value != null)
+            return false;
+      }
+      else if (!value.equals(other.value))
          return false;
       return true;
    }

@@ -7,8 +7,8 @@ import java.io.Writer;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.dialogues.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.saml.SamlMessage;
 import org.jboss.seam.security.external.saml.SamlPostMessage;
 import org.jboss.seam.security.external.saml.SamlRedirectMessage;
@@ -110,7 +110,7 @@ public class ResponseHandler
       String dialogueId = null;
       if (dialogueManager.isAttached())
       {
-         dialogueId = dialogue.getDialogueId();
+         dialogueId = dialogue.getId();
       }
       return new ResponseHolderImpl(response, dialogueId);
    }

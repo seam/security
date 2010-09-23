@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external;
 
 import java.util.List;
 import java.util.Set;
@@ -27,7 +27,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 /**
  * @author Marcel Kolsteren
@@ -42,6 +43,8 @@ public interface SamlMultiUserIdentityProviderApi
    Set<SamlIdpSession> getSessions();
 
    SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes);
+
+   SamlNameId createNameId(String value, String format, String qualifier);
 
    void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl, HttpServletResponse response);
 

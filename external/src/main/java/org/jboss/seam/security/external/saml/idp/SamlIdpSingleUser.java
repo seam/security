@@ -27,10 +27,11 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlNameId;
+import org.jboss.seam.security.external.SamlMultiUserIdentityProviderApi;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 public class SamlIdpSingleUser implements SamlIdentityProviderApi
 {
@@ -92,5 +93,10 @@ public class SamlIdpSingleUser implements SamlIdentityProviderApi
          throw new IllegalStateException("Logout not possible because there is no current session.");
       }
       multiUserApi.get().globalLogout(session, response);
+   }
+
+   public SamlNameId createNameId(String value, String format, String qualifier)
+   {
+      return multiUserApi.get().createNameId(value, format, qualifier);
    }
 }

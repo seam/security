@@ -19,11 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.saml.api;
 
-public interface OpenIdProviderConfigurationApi extends EntityConfigurationApi
+import java.util.Set;
+
+import org.jboss.seam.security.external.saml.idp.SamlExternalServiceProvider;
+
+/**
+ * Session managed by a SAML Identity Provider (IDP). Multiple Service Providers
+ * (SPs) can take part in the session. The session can be terminated as a whole,
+ * for all parties involved, by initiating a SAML single logout (either by the
+ * IDP or by a SP).
+ * 
+ * @author Marcel Kolsteren
+ * 
+ */
+public interface SamlIdpSession
 {
-   String getXrdsURL();
+   /**
+    * Returns the details of the principal, i.e. the logged in person
+    * 
+    * @return the principal
+    */
+   SamlPrincipal getPrincipal();
 
-   String getRealm();
+   /**
+    * Returns the list of service providers that participate in the session. The
+    * list can be empty. In that case, the session is local to the identity
+    * provider.
+    * 
+    * @return the list
+    */
+   Set<SamlExternalServiceProvider> getServiceProviders();
 }

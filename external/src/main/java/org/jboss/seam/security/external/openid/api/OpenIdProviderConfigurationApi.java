@@ -19,33 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.openid;
+package org.jboss.seam.security.external.openid.api;
 
-import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.api.EntityConfigurationApi;
 
-public class AttributeVO
+/**
+ * API for accessing the OpenID Provider configuration
+ * 
+ * @author Marcel Kolsteren
+ * 
+ */
+public interface OpenIdProviderConfigurationApi extends EntityConfigurationApi
 {
-   private OpenIdRequestedAttribute requestedAttribute;
-
-   private String attributeValue;
-
-   public OpenIdRequestedAttribute getRequestedAttribute()
-   {
-      return requestedAttribute;
-   }
-
-   public void setRequestedAttribute(OpenIdRequestedAttribute requestedAttribute)
-   {
-      this.requestedAttribute = requestedAttribute;
-   }
-
-   public String getAttributeValue()
-   {
-      return attributeValue;
-   }
-
-   public void setAttributeValue(String attributeValue)
-   {
-      this.attributeValue = attributeValue;
-   }
+   /**
+    * Gets the URL where the XRDS is served that can be used by relying parties
+    * for OpenID Provider discovery. The document served at this URL is
+    * described in the OpenID 2.0 Authentication specification, section
+    * 7.3.2.1.1.
+    * 
+    * @return the URL
+    */
+   String getXrdsURL();
 }

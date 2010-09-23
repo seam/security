@@ -28,13 +28,12 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.seam.security.external.SamlMultiUserIdentityProviderApi;
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
 import org.slf4j.Logger;
 
@@ -57,7 +56,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
 
    public void authenticate(ResponseHolder responseHolder)
    {
-      dialogueId = dialogue.getDialogueId();
+      dialogueId = dialogue.getId();
       try
       {
          responseHolder.getResponse().getWriter().print("Please login");
@@ -70,7 +69,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
 
    public void handleLogin(String userName, HttpServletResponse response)
    {
-      SamlIdpSession session = idpApi.get().localLogin(new SamlNameId(userName, null, null), null);
+      SamlIdpSession session = idpApi.get().localLogin(idpApi.get().createNameId(userName, null, null), null);
       dialogueManager.attachDialogue(dialogueId);
       idpApi.get().authenticationSucceeded(session, response);
       dialogueManager.detachDialogue();
@@ -81,7 +80,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
       return idpApi.get().getSessions().size();
    }
 
-   public void singleLogoutFailed(ResponseHolder responseHolder)
+   public void globalLogoutFailed(ResponseHolder responseHolder)
    {
       try
       {
@@ -93,7 +92,7 @@ public class SamlIdpApplicationMock implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutSucceeded(ResponseHolder responseHolder)
+   public void globalLogoutSucceeded(ResponseHolder responseHolder)
    {
       try
       {

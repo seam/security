@@ -29,11 +29,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 
 import com.google.common.collect.Lists;
@@ -79,7 +79,7 @@ public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
       {
          writeMessageToResponse("Please provide the password for " + userName + ".", responseHolder);
       }
-      dialogueId = dialogue.getDialogueId();
+      dialogueId = dialogue.getId();
    }
 
    private void writeMessageToResponse(String message, ResponseHolder responseHolder)
@@ -102,6 +102,6 @@ public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
    public void fetchParameters(List<OpenIdRequestedAttribute> requestedAttributes, ResponseHolder responseHolder)
    {
       writeMessageToResponse("Please provide your " + requestedAttributes.get(0).getAlias() + ".", responseHolder);
-      dialogueId = dialogue.getDialogueId();
+      dialogueId = dialogue.getId();
    }
 }

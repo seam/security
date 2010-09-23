@@ -2,8 +2,8 @@ package org.jboss.seam.security.external.saml.idp;
 
 import java.util.List;
 
-import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 /**
  * @author Marcel Kolsteren

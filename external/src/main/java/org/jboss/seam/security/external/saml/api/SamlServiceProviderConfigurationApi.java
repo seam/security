@@ -19,27 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.saml.api;
 
 import java.util.List;
 
 import org.jboss.seam.security.external.saml.sp.SamlExternalIdentityProvider;
 
 /**
+ * API for the configuration of a SAML Service Provider.
+ * 
  * @author Marcel Kolsteren
  * 
  */
 public interface SamlServiceProviderConfigurationApi extends SamlEntityConfigurationApi
 {
-   /**
-    * Returns a list with all identity providers that are supported (trusted).
-    * This allows the API client to present the list to the user, so that the
-    * user can choose the provider that needs to be used for doing the login.
-    * 
-    * @return list of identity providers
-    */
-   List<SamlExternalIdentityProvider> getIdentityProviders();
-
    /**
     * If this property is enabled, all authentication requests targeted at
     * identity providers will be signed. The property is disabled by default.
@@ -102,4 +95,15 @@ public interface SamlServiceProviderConfigurationApi extends SamlEntityConfigura
     * See {@link #isWantSingleLogoutMessagesSigned()}.
     */
    void setWantSingleLogoutMessagesSigned(boolean wantSingleLogoutMessagesSigned);
+
+   /**
+    * Returns a list with all identity providers that are trusted (i.e. identity
+    * providers that have been added by calling
+    * {@link SamlEntityConfigurationApi#addExternalSamlEntity}). This allows the
+    * API client to present the list to the user, so that the user can choose
+    * the provider that needs to be used for doing the login.
+    * 
+    * @return list of identity providers
+    */
+   List<SamlExternalIdentityProvider> getIdentityProviders();
 }

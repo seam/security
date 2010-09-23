@@ -22,33 +22,14 @@
 package org.jboss.seam.security.external.dialogues.api;
 
 /**
+ * This dialogue-scoped bean is automatically created in the dialogue scope as
+ * soon as the dialogue is created. It can be used to get dialogue properties.
+ * For background about the dialogue scope, see {@link DialogueScoped}.
+ * 
  * @author Marcel Kolsteren
  * 
  */
-@DialogueScoped
-public class Dialogue
+public interface Dialogue
 {
-   private String dialogueId;
-
-   private boolean finished;
-
-   public String getDialogueId()
-   {
-      return dialogueId;
-   }
-
-   public void setDialogueId(String requestId)
-   {
-      this.dialogueId = requestId;
-   }
-
-   public boolean isFinished()
-   {
-      return finished;
-   }
-
-   public void setFinished(boolean finished)
-   {
-      this.finished = finished;
-   }
+   public String getId();
 }

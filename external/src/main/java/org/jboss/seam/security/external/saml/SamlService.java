@@ -24,8 +24,8 @@ package org.jboss.seam.security.external.saml;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jboss.seam.security.external.api.SamlBinding;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EndpointType;
+import org.jboss.seam.security.external.saml.api.SamlBinding;
 
 /**
  * @author Marcel Kolsteren

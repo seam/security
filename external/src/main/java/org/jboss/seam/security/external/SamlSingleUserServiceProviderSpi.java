@@ -19,33 +19,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.openid;
+package org.jboss.seam.security.external;
 
-import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
-
-public class AttributeVO
+public class SamlSingleUserServiceProviderSpi
 {
-   private OpenIdRequestedAttribute requestedAttribute;
 
-   private String attributeValue;
-
-   public OpenIdRequestedAttribute getRequestedAttribute()
-   {
-      return requestedAttribute;
-   }
-
-   public void setRequestedAttribute(OpenIdRequestedAttribute requestedAttribute)
-   {
-      this.requestedAttribute = requestedAttribute;
-   }
-
-   public String getAttributeValue()
-   {
-      return attributeValue;
-   }
-
-   public void setAttributeValue(String attributeValue)
-   {
-      this.attributeValue = attributeValue;
-   }
 }

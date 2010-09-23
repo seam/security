@@ -19,11 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.virtualapplications;
 
-public interface OpenIdRelyingPartyConfigurationApi extends EntityConfigurationApi
+import java.util.HashSet;
+import java.util.Set;
+
+import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationManagerCreation;
+
+/**
+ * @author Marcel Kolsteren
+ * 
+ */
+public class AfterVirtualApplicationManagerCreationEvent implements AfterVirtualApplicationManagerCreation
 {
-   String getXrdsURL();
+   private Set<String> hostNames = new HashSet<String>();
 
-   String getRealm();
+   public void addVirtualApplication(String hostName)
+   {
+      hostNames.add(hostName);
+   }
+
+   public Set<String> getHostNames()
+   {
+      return hostNames;
+   }
+
 }

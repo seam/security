@@ -27,7 +27,7 @@ import javax.inject.Inject;
 
 import org.jboss.seam.faces.event.qualifier.Before;
 import org.jboss.seam.faces.event.qualifier.RestoreView;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.servlet.http.HttpParam;
 
 public class DialoguePhaseListener

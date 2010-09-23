@@ -24,6 +24,7 @@ package org.jboss.seam.security.external.saml.idp;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -34,10 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.security.external.api.SamlMultiUserIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.api.SamlPrincipal;
+import org.jboss.seam.security.external.SamlMultiUserIdentityProviderApi;
+import org.jboss.seam.security.external.SamlNameIdImpl;
+import org.jboss.seam.security.external.SamlPrincipalImpl;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
@@ -51,6 +51,10 @@ import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlIdpOrSp;
 import org.jboss.seam.security.external.saml.SamlServiceType;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
+import org.jboss.seam.security.external.saml.api.SamlPrincipal;
 
 /**
  * @author Marcel Kolsteren
@@ -188,7 +192,9 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
 
    public Set<SamlIdpSession> getSessions()
    {
-      return samlIdpSessions.getSessions();
+      Set<SamlIdpSession> sessions = new HashSet<SamlIdpSession>();
+      sessions.addAll(samlIdpSessions.getSessions());
+      return sessions;
    }
 
    public SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes)
@@ -196,9 +202,14 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
       return createSession(nameId, attributes);
    }
 
+   public SamlNameId createNameId(String value, String format, String qualifier)
+   {
+      return new SamlNameIdImpl(value, format, qualifier);
+   }
+
    private SamlIdpSession createSession(SamlNameId nameId, List<AttributeType> attributes)
    {
-      SamlPrincipal samlPrincipal = new SamlPrincipal();
+      SamlPrincipalImpl samlPrincipal = new SamlPrincipalImpl();
       samlPrincipal.setNameId(nameId);
       if (attributes != null)
       {
@@ -227,14 +238,14 @@ public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentity
 
    public void localLogout(SamlIdpSession session)
    {
-      samlIdpSessions.removeSession(session);
+      samlIdpSessions.removeSession((SamlIdpSessionImpl) session);
    }
 
    @Dialogued(join = true)
    public void globalLogout(SamlIdpSession session, HttpServletResponse response)
    {
       SamlPrincipal principal = session.getPrincipal();
-      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, Arrays.asList(session.getSessionIndex()), response);
+      samlIdpSingleSignLogoutService.handleIDPInitiatedSingleLogout(principal, Arrays.asList(((SamlIdpSessionImpl) session).getSessionIndex()), response);
    }
 
    @Override

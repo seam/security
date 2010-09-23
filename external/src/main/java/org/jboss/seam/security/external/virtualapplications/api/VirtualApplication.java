@@ -22,21 +22,15 @@
 package org.jboss.seam.security.external.virtualapplications.api;
 
 /**
+ * This virtual application scoped bean is automatically created in the virtual
+ * application scope as soon as the virtual application is created. It can be
+ * used to get virtual application properties. For background about the virtual
+ * application scope, see {@link VirtualApplication}.
+ * 
  * @author Marcel Kolsteren
  * 
  */
-@VirtualApplicationScoped
-public class VirtualApplication
+public interface VirtualApplication
 {
-   private String hostName;
-
-   public String getHostName()
-   {
-      return hostName;
-   }
-
-   public void setHostName(String hostName)
-   {
-      this.hostName = hostName;
-   }
+   String getHostName();
 }

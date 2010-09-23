@@ -33,9 +33,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRequestEvent;
 
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
-import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationManagerCreation;
-import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationsCreation;
-import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
 import org.jboss.seam.servlet.event.qualifier.Destroyed;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 import org.slf4j.Logger;
@@ -54,7 +51,7 @@ public class VirtualApplicationManager
    private VirtualApplicationContextExtension virtualApplicationContextExtension;
 
    @Inject
-   private Instance<VirtualApplication> virtualApplication;
+   private Instance<VirtualApplicationBean> virtualApplication;
 
    @Inject
    private BeanManager beanManager;
@@ -66,7 +63,7 @@ public class VirtualApplicationManager
       log.trace("Servlet initialized with event {}", e);
       getVirtualApplicationContext().initialize(e.getServletContext());
 
-      AfterVirtualApplicationManagerCreation afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreation();
+      AfterVirtualApplicationManagerCreationEvent afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreationEvent();
       beanManager.fireEvent(afterVirtualApplicationManagerCreation);
 
       for (String hostName : afterVirtualApplicationManagerCreation.getHostNames())
@@ -77,7 +74,6 @@ public class VirtualApplicationManager
          beanManager.fireEvent(new AfterVirtualApplicationCreation());
          getVirtualApplicationContext().detach();
       }
-      beanManager.fireEvent(new AfterVirtualApplicationsCreation());
    }
 
    protected void servletDestroyed(@Observes @Destroyed final ServletContextEvent e)

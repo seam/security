@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
-import org.jboss.seam.security.external.saml.sp.SamlSpSession;
+import org.jboss.seam.security.external.saml.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 import org.slf4j.Logger;
 
@@ -55,7 +55,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void loginFailed(ResponseHolder responseHolder)
+   public void loginFailed(String statusCodeLevel1, String statusCodeLevel2, ResponseHolder responseHolder)
    {
       try
       {
@@ -67,7 +67,7 @@ public class SamlServiceProviderSpiImpl implements SamlServiceProviderSpi
       }
    }
 
-   public void globalLogoutFailed(String statusCode, ResponseHolder responseHolder)
+   public void globalLogoutFailed(String statusCodeLevel1, String statusCodeLevel2, ResponseHolder responseHolder)
    {
       try
       {

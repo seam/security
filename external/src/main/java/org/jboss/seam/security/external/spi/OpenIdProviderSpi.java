@@ -23,14 +23,25 @@ package org.jboss.seam.security.external.spi;
 
 import java.util.List;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 /**
+ * Interface that needs to be implemented by applications that want to act as an
+ * OpenID Provider. It is the counterpart of the {@link OpenIdProviderApi}.
+ * 
+ * Most methods in this interface have a responseHolder parameter, which
+ * contains the HTTP response. This is a way of handing over the control over
+ * the browser to the application. The application is responsible for writing
+ * the response (either a normal HTML response, or an error, or a redirect).
+ * Typically, the application will redirect the user to a URL within the
+ * application.
+ * 
  * @author Marcel Kolsteren
  * 
  */
+
 public interface OpenIdProviderSpi
 {
    /**
@@ -51,6 +62,7 @@ public interface OpenIdProviderSpi
     *           needs to ask the use for her username
     * @param immediate if this is true, there must be no interaction with the
     *           user (silent authentication)
+    * @param responseHolder
     */
    void authenticate(String realm, String userName, boolean immediate, ResponseHolder responseHolder);
 

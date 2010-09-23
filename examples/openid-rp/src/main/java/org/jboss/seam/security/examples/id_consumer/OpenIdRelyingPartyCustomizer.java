@@ -24,7 +24,7 @@ package org.jboss.seam.security.examples.id_consumer;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 
 public class OpenIdRelyingPartyCustomizer

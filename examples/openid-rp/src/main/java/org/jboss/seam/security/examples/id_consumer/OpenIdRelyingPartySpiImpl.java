@@ -26,8 +26,8 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 
 public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi

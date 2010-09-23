@@ -26,8 +26,8 @@ import javax.faces.context.ExternalContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 
 @Model
 public class Login

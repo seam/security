@@ -29,8 +29,8 @@ import javax.faces.context.ExternalContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
 import org.jboss.seam.security.external.saml.idp.SamlExternalServiceProvider;
 
 @Model

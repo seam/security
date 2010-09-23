@@ -27,7 +27,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.SamlNameId;
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AssertionType;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.AudienceRestrictionType;
@@ -46,7 +45,9 @@ import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusCodeType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusType;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
+import org.jboss.seam.security.external.saml.idp.SamlIdpSessionImpl;
 
 /**
  * @author Marcel Kolsteren
@@ -132,7 +133,7 @@ public class SamlMessageFactory
       AuthnStatementType authnStatement = assertionObjectFactory.createAuthnStatementType();
       assertion.getStatementOrAuthnStatementOrAuthzDecisionStatement().add(authnStatement);
       authnStatement.setAuthnInstant(SamlUtils.getXMLGregorianCalendarNow());
-      authnStatement.setSessionIndex(session.getSessionIndex());
+      authnStatement.setSessionIndex(((SamlIdpSessionImpl) session).getSessionIndex());
 
       AuthnContextType authnContext = assertionObjectFactory.createAuthnContextType();
       authnStatement.setAuthnContext(authnContext);
@@ -160,7 +161,7 @@ public class SamlMessageFactory
 
    private void fillRequestAbstractTypeFields(RequestAbstractType request)
    {
-      request.setID(dialogue.getDialogueId());
+      request.setID(dialogue.getId());
       request.setIssueInstant(SamlUtils.getXMLGregorianCalendarNow());
 
       NameIDType issuer = assertionObjectFactory.createNameIDType();
@@ -172,7 +173,7 @@ public class SamlMessageFactory
 
    private void fillStatusResponseFields(StatusResponseType response, String statusCode, String statusMessage)
    {
-      response.setID(dialogue.getDialogueId());
+      response.setID(dialogue.getId());
       response.setIssueInstant(SamlUtils.getXMLGregorianCalendarNow());
 
       NameIDType issuer = assertionObjectFactory.createNameIDType();

@@ -24,7 +24,7 @@ package org.jboss.seam.security.externaltest.integration.saml.idp;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderConfigurationApi;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 
 public class IdpCustomizer

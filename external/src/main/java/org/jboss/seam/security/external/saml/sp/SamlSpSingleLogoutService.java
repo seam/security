@@ -30,17 +30,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.SamlNameIdImpl;
+import org.jboss.seam.security.external.dialogues.DialogueBean;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.NameIDType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.LogoutRequestType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
+import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusType;
 import org.jboss.seam.security.external.saml.SamlConstants;
 import org.jboss.seam.security.external.saml.SamlDialogue;
 import org.jboss.seam.security.external.saml.SamlMessageFactory;
 import org.jboss.seam.security.external.saml.SamlMessageSender;
 import org.jboss.seam.security.external.saml.SamlProfile;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 
 /**
@@ -65,7 +67,7 @@ public class SamlSpSingleLogoutService
    private SamlSpLogoutDialogue samlSpLogoutDialogue;
 
    @Inject
-   private Dialogue dialogue;
+   private DialogueBean dialogue;
 
    @Inject
    private SamlDialogue samlDialogue;
@@ -84,7 +86,7 @@ public class SamlSpSingleLogoutService
       SamlExternalIdentityProvider idp = (SamlExternalIdentityProvider) samlDialogue.getExternalProvider();
 
       NameIDType nameIdJaxb = logoutRequest.getNameID();
-      SamlNameId samlNameId = new SamlNameId(nameIdJaxb.getValue(), nameIdJaxb.getFormat(), nameIdJaxb.getNameQualifier());
+      SamlNameId samlNameId = new SamlNameIdImpl(nameIdJaxb.getValue(), nameIdJaxb.getFormat(), nameIdJaxb.getNameQualifier());
       removeSessions(samlNameId, idp.getEntityId(), logoutRequest.getSessionIndex());
 
       StatusResponseType statusResponse = samlMessageFactory.createStatusResponse(SamlConstants.STATUS_SUCCESS, null);
@@ -96,13 +98,13 @@ public class SamlSpSingleLogoutService
 
    private void removeSessions(SamlNameId nameId, String idpEntityId, List<String> sessionIndexes)
    {
-      for (SamlSpSession session : samlSpSessions.getSessions())
+      for (SamlSpSessionImpl session : samlSpSessions.getSessions())
       {
          if (session.getPrincipal().getNameId().equals(nameId) && session.getIdentityProvider().getEntityId().equals(idpEntityId))
          {
             if (sessionIndexes.size() == 0 || sessionIndexes.contains(session.getSessionIndex()))
             {
-               samlSpSessions.removeSession(session);
+               samlSpSessions.removeSession((SamlSpSessionImpl) session);
                samlServiceProviderSpi.get().loggedOut(session);
             }
          }
@@ -111,19 +113,25 @@ public class SamlSpSingleLogoutService
 
    public void processIDPResponse(HttpServletRequest httpRequest, HttpServletResponse httpResponse, StatusResponseType statusResponse)
    {
-      if (statusResponse.getStatus() != null && statusResponse.getStatus().getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
+      StatusType status = statusResponse.getStatus();
+      if (status.getStatusCode().getValue().equals(SamlConstants.STATUS_SUCCESS))
       {
          samlServiceProviderSpi.get().globalLogoutSucceeded(responseHandler.createResponseHolder(httpResponse));
       }
       else
       {
-         String statusCode = statusResponse.getStatus() == null ? "null" : statusResponse.getStatus().getStatusCode().getValue();
-         samlServiceProviderSpi.get().globalLogoutFailed(statusCode, responseHandler.createResponseHolder(httpResponse));
+         String statusCodeLevel1 = status.getStatusCode().getValue();
+         String statusCodeLevel2 = null;
+         if (status.getStatusCode().getStatusCode() != null)
+         {
+            statusCodeLevel2 = status.getStatusCode().getStatusCode().getValue();
+         }
+         samlServiceProviderSpi.get().globalLogoutFailed(statusCodeLevel1, statusCodeLevel2, responseHandler.createResponseHolder(httpResponse));
       }
       dialogue.setFinished(true);
    }
 
-   public void sendSingleLogoutRequestToIDP(SamlSpSession session, HttpServletResponse httpResponse)
+   public void sendSingleLogoutRequestToIDP(SamlSpSessionImpl session, HttpServletResponse httpResponse)
    {
       SamlExternalIdentityProvider idp = session.getIdentityProvider();
       LogoutRequestType logoutRequest;

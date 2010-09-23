@@ -30,10 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.api.SamlPrincipal;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.SamlNameIdImpl;
+import org.jboss.seam.security.external.dialogues.DialogueBean;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.jaxb.samlv2.assertion.NameIDType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.LogoutRequestType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
@@ -43,6 +42,9 @@ import org.jboss.seam.security.external.saml.SamlDialogue;
 import org.jboss.seam.security.external.saml.SamlMessageFactory;
 import org.jboss.seam.security.external.saml.SamlMessageSender;
 import org.jboss.seam.security.external.saml.SamlProfile;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlNameId;
+import org.jboss.seam.security.external.saml.api.SamlPrincipal;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
 
 /**
@@ -64,7 +66,7 @@ public class SamlIdpSingleLogoutService
    private Instance<SamlIdentityProviderSpi> samlIdentityProviderSpi;
 
    @Inject
-   private Instance<Dialogue> dialogue;
+   private Instance<DialogueBean> dialogue;
 
    @Inject
    private Instance<SamlDialogue> samlDialogue;
@@ -91,7 +93,7 @@ public class SamlIdpSingleLogoutService
       LogoutRequestType logoutRequest = (LogoutRequestType) request;
 
       NameIDType nameIdJaxb = logoutRequest.getNameID();
-      SamlNameId samlNameId = new SamlNameId(nameIdJaxb.getValue(), nameIdJaxb.getFormat(), nameIdJaxb.getNameQualifier());
+      SamlNameId samlNameId = new SamlNameIdImpl(nameIdJaxb.getValue(), nameIdJaxb.getFormat(), nameIdJaxb.getNameQualifier());
 
       samlIdpIncomingLogoutDialogue.get().setNameId(samlNameId);
       samlIdpIncomingLogoutDialogue.get().setSessionIndexes(logoutRequest.getSessionIndex());
@@ -123,7 +125,7 @@ public class SamlIdpSingleLogoutService
          {
             if (session.getPrincipal().getNameId().equals(samlNameId))
             {
-               if (sessionIndexes == null || sessionIndexes.size() == 0 || sessionIndexes.contains(session.getSessionIndex()))
+               if (sessionIndexes == null || sessionIndexes.size() == 0 || sessionIndexes.contains(((SamlIdpSessionImpl) session).getSessionIndex()))
                {
                   sessionToRemove = session;
                   break;
@@ -147,7 +149,7 @@ public class SamlIdpSingleLogoutService
                // participant (if available) or to the next session.
                if (sp != null && !sp.equals(samlDialogue.get().getExternalProvider()) && sp.getService(SamlProfile.SINGLE_LOGOUT) != null)
                {
-                  String incomingDialogueId = dialogue.get().getDialogueId();
+                  String incomingDialogueId = dialogue.get().getId();
                   dialogueManager.detachDialogue();
                   dialogueManager.beginDialogue();
                   samlIdpOutgoingLogoutDialogue.get().setIncomingDialogueId(incomingDialogueId);
@@ -160,7 +162,7 @@ public class SamlIdpSingleLogoutService
             {
                // Session has no participating service providers (any more).
                // Remove the session.
-               samlIdpSessions.removeSession(sessionToRemove);
+               samlIdpSessions.removeSession((SamlIdpSessionImpl) sessionToRemove);
                if (samlDialogue.get().getExternalProvider() != null)
                {
                   samlIdentityProviderSpi.get().loggedOut(sessionToRemove);
@@ -187,11 +189,11 @@ public class SamlIdpSingleLogoutService
       {
          if (failed)
          {
-            samlIdentityProviderSpi.get().singleLogoutFailed(responseHandler.createResponseHolder(response));
+            samlIdentityProviderSpi.get().globalLogoutFailed(responseHandler.createResponseHolder(response));
          }
          else
          {
-            samlIdentityProviderSpi.get().singleLogoutSucceeded(responseHandler.createResponseHolder(response));
+            samlIdentityProviderSpi.get().globalLogoutSucceeded(responseHandler.createResponseHolder(response));
          }
       }
       dialogue.get().setFinished(true);
@@ -216,7 +218,7 @@ public class SamlIdpSingleLogoutService
    public void sendSingleLogoutRequestToSP(SamlIdpSession session, SamlExternalServiceProvider sp, HttpServletResponse response)
    {
       LogoutRequestType logoutRequest;
-      logoutRequest = samlMessageFactory.createLogoutRequest(session.getPrincipal().getNameId(), session.getSessionIndex());
+      logoutRequest = samlMessageFactory.createLogoutRequest(session.getPrincipal().getNameId(), ((SamlIdpSessionImpl) session).getSessionIndex());
       samlDialogue.get().setExternalProvider(sp);
 
       samlMessageSender.sendRequest(sp, SamlProfile.SINGLE_LOGOUT, logoutRequest, response);

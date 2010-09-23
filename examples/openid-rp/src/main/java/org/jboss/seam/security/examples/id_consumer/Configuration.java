@@ -24,7 +24,7 @@ package org.jboss.seam.security.examples.id_consumer;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyConfigurationApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
 
 @Model
 public class Configuration

@@ -19,25 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external;
+
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class OpenIdRequestedAttribute
+public class OpenIdRequestedAttributeImpl implements OpenIdRequestedAttribute
 {
    private String alias;
    private String typeUri;
    private boolean required;
    private Integer count;
 
-   public OpenIdRequestedAttribute()
+   public OpenIdRequestedAttributeImpl()
    {
-
    }
 
-   public OpenIdRequestedAttribute(String alias, String typeUri, boolean required, Integer count)
+   public OpenIdRequestedAttributeImpl(String alias, String typeUri, boolean required, Integer count)
    {
       super();
       this.alias = alias;

@@ -33,9 +33,9 @@ import javax.faces.context.ExternalContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 @Model
 @DialogueScoped

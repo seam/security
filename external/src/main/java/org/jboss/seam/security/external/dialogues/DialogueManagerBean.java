@@ -26,7 +26,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.servlet.event.qualifier.Destroyed;
 import org.jboss.seam.servlet.event.qualifier.Initialized;
 
@@ -34,13 +34,13 @@ import org.jboss.seam.servlet.event.qualifier.Initialized;
  * @author Marcel Kolsteren
  * 
  */
-public class DialogueManagerImpl implements DialogueManager
+public class DialogueManagerBean implements DialogueManager
 {
    @Inject
    private DialogueContextExtension dialogueContextExtension;
 
    @Inject
-   private Instance<Dialogue> dialogue;
+   private Instance<DialogueBean> dialogue;
 
    public void servletInitialized(@Observes @Initialized final ServletContextEvent e)
    {
@@ -55,7 +55,7 @@ public class DialogueManagerImpl implements DialogueManager
    public void beginDialogue()
    {
       String dialogueId = dialogueContextExtension.getDialogueContext().create();
-      dialogue.get().setDialogueId(dialogueId);
+      dialogue.get().setId(dialogueId);
    }
 
    public void endDialogue()

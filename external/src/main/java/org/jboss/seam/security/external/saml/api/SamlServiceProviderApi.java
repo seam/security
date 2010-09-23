@@ -19,21 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.saml.api;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.seam.security.external.SamlSingleUserServiceProviderSpi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.saml.sp.SamlSpInApplicationScopeProducer;
 import org.jboss.seam.security.external.saml.sp.SamlSpInVirtualApplicationScopeProducer;
-import org.jboss.seam.security.external.saml.sp.SamlSpSession;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
-import org.jboss.seam.security.external.spi.SamlSingleUserServiceProviderSpi;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
 
 /**
  * API to the SAMLv2 compliant service provider. In order to use this API, one
- * of the following alternative beans need to be activated:
+ * of the following alternative beans needs to be activated:
  * 
  * <ul>
  * <li>{@link SamlSpInApplicationScopeProducer}</li>
@@ -43,7 +42,7 @@ import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicati
  * The former will install the service provider in application scope, the latter
  * will install it in virtual application scope. The virtual application scope
  * allows for using different service provider configurations depending on the
- * server name. See {@link VirtualApplicationScoped}
+ * server name. See {@link VirtualApplicationScoped}.
  * 
  * <p>
  * This API (implemented by the framework) comes along with an SPI:
@@ -53,11 +52,10 @@ import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicati
  * </p>
  * 
  * <p>
- * All methods in this API, except the {@link #logout} method, require that the
- * request scoped {@link ResponseHolder} bean contains a link to the current
- * HTTP response. The implementation needs to response, in order to redirect the
- * browser to the identity provider. Beware not to touch the HTTP response after
- * one of these method returns.
+ * Most methods in this API require that the HTTP response is passed as a
+ * parameter. The implementation needs the response, in order to redirect the
+ * browser to the relying party. Beware not to touch the HTTP response after one
+ * of these method returns.
  * </p>
  * 
  * @author Marcel Kolsteren
@@ -77,6 +75,7 @@ public interface SamlServiceProviderApi
     * client state that needs to survive the sign on process.
     * 
     * @param idpEntityId
+    * @param response the HTTP servlet response
     */
    public void login(String idpEntityId, HttpServletResponse response);
 
@@ -106,6 +105,8 @@ public interface SamlServiceProviderApi
     * method is called with an active dialogue scope, the same dialogue will be
     * active when the SPI method is called. This allows the API client to store
     * state information in the dialogue.
+    * 
+    * @param response the HTTP servlet response
     */
    public void globalLogout(HttpServletResponse response);
 

@@ -33,10 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
+import org.jboss.seam.security.external.OpenIdRequestedAttributeImpl;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.DialogueBean;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.DirectError;
@@ -71,7 +72,7 @@ public class OpenIdProviderAuthenticationService
    private DialogueManager dialogueManager;
 
    @Inject
-   private Instance<Dialogue> dialogue;
+   private Instance<DialogueBean> dialogue;
 
    @Inject
    private Instance<OpenIdProviderBean> opBean;
@@ -168,7 +169,7 @@ public class OpenIdProviderAuthenticationService
 
       for (Map.Entry<String, String> entry : attributes.entrySet())
       {
-         OpenIdRequestedAttribute requestedAttribute = new OpenIdRequestedAttribute();
+         OpenIdRequestedAttributeImpl requestedAttribute = new OpenIdRequestedAttributeImpl();
          requestedAttribute.setAlias(entry.getKey());
          requestedAttribute.setTypeUri(entry.getValue());
          requestedAttribute.setRequired(required);

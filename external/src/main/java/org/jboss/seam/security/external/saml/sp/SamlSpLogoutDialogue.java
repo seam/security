@@ -1,6 +1,7 @@
 package org.jboss.seam.security.external.saml.sp;
 
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren

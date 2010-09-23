@@ -26,6 +26,7 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 
 /**

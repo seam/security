@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
 import org.slf4j.Logger;
 
@@ -58,7 +58,7 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutFailed(ResponseHolder responseHolder)
+   public void globalLogoutFailed(ResponseHolder responseHolder)
    {
       try
       {
@@ -70,7 +70,7 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
       }
    }
 
-   public void singleLogoutSucceeded(ResponseHolder responseHolder)
+   public void globalLogoutSucceeded(ResponseHolder responseHolder)
    {
       try
       {

@@ -21,7 +21,7 @@
  */
 package org.jboss.seam.security.external.saml;
 
-import org.jboss.seam.security.external.api.SamlBinding;
+import org.jboss.seam.security.external.saml.api.SamlBinding;
 
 /**
  * @author Marcel Kolsteren

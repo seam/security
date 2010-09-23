@@ -25,8 +25,9 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.SamlMultiUserServiceProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren

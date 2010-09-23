@@ -31,11 +31,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
+import org.jboss.seam.security.external.OpenIdPrincipalImpl;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.DialogueBean;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerManager;
@@ -75,7 +76,7 @@ public class OpenIdRpAuthenticationService
    private Logger log;
 
    @Inject
-   private Instance<Dialogue> dialogue;
+   private Instance<DialogueBean> dialogue;
 
    public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException
    {
@@ -146,7 +147,7 @@ public class OpenIdRpAuthenticationService
 
          String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
          String realm = relyingPartyBean.getRealm();
-         String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getDialogueId();
+         String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getId();
          AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
 
          if (attributes != null && attributes.size() > 0)
@@ -173,6 +174,6 @@ public class OpenIdRpAuthenticationService
 
    private OpenIdPrincipal createPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributeValues)
    {
-      return new OpenIdPrincipal(identifier, openIdProvider, attributeValues);
+      return new OpenIdPrincipalImpl(identifier, openIdProvider, attributeValues);
    }
 }

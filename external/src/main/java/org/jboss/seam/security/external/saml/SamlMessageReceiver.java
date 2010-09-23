@@ -43,7 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.JaxbContext;
-import org.jboss.seam.security.external.dialogues.DialogueManager;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;

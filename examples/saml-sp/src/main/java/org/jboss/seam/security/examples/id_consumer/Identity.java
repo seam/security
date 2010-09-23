@@ -28,9 +28,9 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.SamlServiceProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
-import org.jboss.seam.security.external.saml.sp.SamlSpSession;
+import org.jboss.seam.security.external.saml.api.SamlServiceProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 @Model
 public class Identity

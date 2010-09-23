@@ -33,9 +33,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.OpenIdPrincipal;
-import org.jboss.seam.security.external.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 @SessionScoped
 @Named
@@ -61,7 +61,7 @@ public class Identity implements Serializable
       if (!isLoggedIn())
       {
          List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-         attributes.add(new OpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
+         attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
          openIdApi.login(openId, attributes, (HttpServletResponse) externalContext.getResponse());
       }
       else

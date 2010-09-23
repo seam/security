@@ -19,25 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.api;
+package org.jboss.seam.security.external.saml.api;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
+import org.jboss.seam.security.external.saml.sp.SamlExternalIdentityProvider;
 
 /**
- * @author Marcel Kolsteren
+ * Session at the SAML Service Provider, managed by a master session at the SAML
+ * Identity Provider. Other Service Providers can also participate in the same
+ * master session.
  * 
+ * @author Marcel Kolsteren
  */
-public interface OpenIdRelyingPartyApi
+public interface SamlSpSession
 {
+
    /**
-    * Start an OpenID login dialogue.
+    * Gets the details of the principal, i.e. the logged in user.
     * 
-    * @param identifier either a Claimed Identifier (identifying the user) or an
-    *           OP Identifier (identifying the OpenID Provider where the user
-    *           has an account)
-    * @param attributes attributes that are requested
+    * @return the principal
     */
-   void login(String identifier, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response);
+   SamlPrincipal getPrincipal();
+
+   /**
+    * Gets the entity provider that manages the session.
+    * 
+    * @return the entity provider
+    */
+   SamlExternalIdentityProvider getIdentityProvider();
+
 }

@@ -73,11 +73,14 @@ public class ResponseHolderImpl implements ResponseHolder
 
    public String addDialogueIdToUrl(String url)
    {
-      String paramName = DialogueFilter.DIALOGUE_ID_PARAM;
-      int queryStringIndex = url.indexOf("?");
-      if (queryStringIndex < 0 || url.indexOf(paramName + "=", queryStringIndex) < 0)
+      if (dialogueId != null)
       {
-         url = new StringBuilder(url).append(queryStringIndex < 0 ? "?" : "&").append(paramName).append("=").append(dialogueId).toString();
+         String paramName = DialogueFilter.DIALOGUE_ID_PARAM;
+         int queryStringIndex = url.indexOf("?");
+         if (queryStringIndex < 0 || url.indexOf(paramName + "=", queryStringIndex) < 0)
+         {
+            url = new StringBuilder(url).append(queryStringIndex < 0 ? "?" : "&").append(paramName).append("=").append(dialogueId).toString();
+         }
       }
       return url;
    }

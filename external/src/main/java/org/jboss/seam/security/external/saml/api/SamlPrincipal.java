@@ -19,33 +19,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.examples.openid;
+package org.jboss.seam.security.external.saml.api;
 
-import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
+import java.util.List;
 
-public class AttributeVO
+import org.jboss.seam.security.external.jaxb.samlv2.assertion.AttributeType;
+
+/**
+ * Object respresenting a person that has been authenticated using SAML.
+ * 
+ * @author Marcel Kolsteren
+ */
+public interface SamlPrincipal
 {
-   private OpenIdRequestedAttribute requestedAttribute;
+   /**
+    * Gets the name id of the principal.
+    * 
+    * @return the name id
+    */
+   SamlNameId getNameId();
 
-   private String attributeValue;
-
-   public OpenIdRequestedAttribute getRequestedAttribute()
-   {
-      return requestedAttribute;
-   }
-
-   public void setRequestedAttribute(OpenIdRequestedAttribute requestedAttribute)
-   {
-      this.requestedAttribute = requestedAttribute;
-   }
-
-   public String getAttributeValue()
-   {
-      return attributeValue;
-   }
-
-   public void setAttributeValue(String attributeValue)
-   {
-      this.attributeValue = attributeValue;
-   }
+   /**
+    * Gets the attributes of the principal
+    * 
+    * @return the attributes
+    */
+   List<AttributeType> getAttributes();
 }

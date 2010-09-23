@@ -24,8 +24,8 @@ package org.jboss.seam.security.external.openid;
 import java.io.Serializable;
 import java.util.List;
 
-import org.jboss.seam.security.external.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.FetchRequest;
 

@@ -19,13 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.virtualapplications.api;
+package org.jboss.seam.security.external;
+
+import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
-public class AfterVirtualApplicationsCreation
+public interface SamlMultiUserServiceProviderApi
 {
+   public void login(String idpEntityId, HttpServletResponse response);
 
+   public void localLogout(SamlSpSession session);
+
+   public void globalLogout(SamlSpSession session, HttpServletResponse response);
+
+   public Set<SamlSpSession> getSessions();
 }

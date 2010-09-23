@@ -19,50 +19,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.seam.security.external.saml.sp;
+package org.jboss.seam.security.external.dialogues;
 
-import org.jboss.seam.security.external.api.SamlPrincipal;
+import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
 
-/**
- * @author Marcel Kolsteren
- * 
- */
-public class SamlSpSession
+@DialogueScoped
+public class DialogueBean implements Dialogue
 {
-   private SamlPrincipal principal;
+   private String id;
 
-   private String sessionIndex;
+   private boolean finished;
 
-   private SamlExternalIdentityProvider identityProvider;
-
-   public SamlPrincipal getPrincipal()
+   public String getId()
    {
-      return principal;
+      return id;
    }
 
-   public void setPrincipal(SamlPrincipal samlPrincipal)
+   public void setId(String id)
    {
-      this.principal = samlPrincipal;
+      this.id = id;
    }
 
-   public String getSessionIndex()
+   public boolean isFinished()
    {
-      return sessionIndex;
+      return finished;
    }
 
-   public void setSessionIndex(String sessionIndex)
+   public void setFinished(boolean finished)
    {
-      this.sessionIndex = sessionIndex;
+      this.finished = finished;
    }
-
-   public SamlExternalIdentityProvider getIdentityProvider()
-   {
-      return identityProvider;
-   }
-
-   public void setIdentityProvider(SamlExternalIdentityProvider identityProvider)
-   {
-      this.identityProvider = identityProvider;
-   }
-
 }

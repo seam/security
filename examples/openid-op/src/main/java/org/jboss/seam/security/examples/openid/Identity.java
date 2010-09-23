@@ -29,7 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.external.api.OpenIdProviderApi;
+import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 
 @SessionScoped
 @Named

@@ -27,6 +27,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.weld.manager.BeanManagerImpl;
 
 /**

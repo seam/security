@@ -51,7 +51,7 @@ public class DialogueAwareViewHandler extends ViewHandlerWrapper
       ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
       if (DialogueBeanProvider.dialogueManager(servletContext).isAttached())
       {
-         String dialogueId = DialogueBeanProvider.dialogue(servletContext).getDialogueId();
+         String dialogueId = DialogueBeanProvider.dialogue(servletContext).getId();
          ResponseHolder responseHolder = new ResponseHolderImpl((HttpServletResponse) facesContext.getExternalContext().getResponse(), dialogueId);
          return responseHolder.addDialogueIdToUrl(actionUrl);
       }

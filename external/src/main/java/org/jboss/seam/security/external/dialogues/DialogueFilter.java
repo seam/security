@@ -33,6 +33,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.seam.security.external.dialogues.api.DialogueManager;
+
 @WebFilter(filterName = "DialogueFilter", urlPatterns = "/*")
 public class DialogueFilter implements Filter
 {

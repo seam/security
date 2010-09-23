@@ -29,9 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.security.external.api.SamlIdentityProviderApi;
-import org.jboss.seam.security.external.api.SamlNameId;
-import org.jboss.seam.security.external.saml.idp.SamlIdpSession;
+import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 
 @Named
 public class Identity implements Serializable
@@ -46,7 +45,7 @@ public class Identity implements Serializable
 
    public void localLogin(String userName)
    {
-      samlIdp.localLogin(new SamlNameId(userName, null, null), null);
+      samlIdp.localLogin(samlIdp.createNameId(userName, null, null), null);
    }
 
    public void remoteLogin(String spEntityId)

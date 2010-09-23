@@ -38,8 +38,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.jboss.seam.security.external.EntityBean;
 import org.jboss.seam.security.external.JaxbContext;
-import org.jboss.seam.security.external.api.SamlBinding;
-import org.jboss.seam.security.external.api.SamlEntityConfigurationApi;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntitiesDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.IndexedEndpointType;
@@ -50,6 +48,8 @@ import org.jboss.seam.security.external.jaxb.samlv2.metadata.RoleDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.SSODescriptorType;
 import org.jboss.seam.security.external.jaxb.xmldsig.KeyInfoType;
 import org.jboss.seam.security.external.jaxb.xmldsig.X509DataType;
+import org.jboss.seam.security.external.saml.api.SamlBinding;
+import org.jboss.seam.security.external.saml.api.SamlEntityConfigurationApi;
 
 /**
  * @author Marcel Kolsteren

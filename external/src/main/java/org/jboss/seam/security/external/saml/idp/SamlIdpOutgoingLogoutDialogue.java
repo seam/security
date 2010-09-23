@@ -1,6 +1,7 @@
 package org.jboss.seam.security.external.saml.idp;
 
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 
 /**
  * @author Marcel Kolsteren

@@ -23,6 +23,7 @@ package org.jboss.seam.security.external.saml.sp;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -32,8 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.jboss.seam.security.external.api.SamlMultiUserServiceProviderApi;
-import org.jboss.seam.security.external.api.SamlServiceProviderConfigurationApi;
+import org.jboss.seam.security.external.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.EntityDescriptorType;
 import org.jboss.seam.security.external.jaxb.samlv2.metadata.IDPSSODescriptorType;
@@ -45,6 +45,8 @@ import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlIdpOrSp;
 import org.jboss.seam.security.external.saml.SamlServiceType;
+import org.jboss.seam.security.external.saml.api.SamlServiceProviderConfigurationApi;
+import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
@@ -193,19 +195,21 @@ public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServicePr
    @Dialogued(join = true)
    public void localLogout(SamlSpSession session)
    {
-      samlSpSessions.removeSession(session);
+      samlSpSessions.removeSession((SamlSpSessionImpl) session);
    }
 
    @Dialogued(join = true)
    public void globalLogout(SamlSpSession session, HttpServletResponse response)
    {
       localLogout(session);
-      samlSpSingleLogoutService.sendSingleLogoutRequestToIDP(session, response);
+      samlSpSingleLogoutService.sendSingleLogoutRequestToIDP((SamlSpSessionImpl) session, response);
    }
 
    public Set<SamlSpSession> getSessions()
    {
-      return samlSpSessions.getSessions();
+      Set<SamlSpSession> sessions = new HashSet<SamlSpSession>();
+      sessions.addAll(samlSpSessions.getSessions());
+      return sessions;
    }
 
    @Override

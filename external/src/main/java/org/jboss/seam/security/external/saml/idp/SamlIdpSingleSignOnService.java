@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.jboss.seam.security.external.dialogues.api.Dialogue;
+import org.jboss.seam.security.external.dialogues.DialogueBean;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.AuthnRequestType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
@@ -41,6 +41,7 @@ import org.jboss.seam.security.external.saml.SamlMessageFactory;
 import org.jboss.seam.security.external.saml.SamlMessageSender;
 import org.jboss.seam.security.external.saml.SamlProfile;
 import org.jboss.seam.security.external.saml.SamlService;
+import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 import org.jboss.seam.security.external.saml.sp.SamlExternalIdentityProvider;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
 
@@ -60,7 +61,7 @@ public class SamlIdpSingleSignOnService
    private Instance<SamlIdentityProviderSpi> samlIdentityProviderSpi;
 
    @Inject
-   private Dialogue dialogue;
+   private DialogueBean dialogue;
 
    @Inject
    private SamlDialogue samlDialogue;
