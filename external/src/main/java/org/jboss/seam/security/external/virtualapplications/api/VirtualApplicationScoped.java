@@ -34,9 +34,20 @@ import javax.enterprise.context.NormalScope;
  * The virtual application scope corresponds to a part of the application that
  * serves a certain host name. It can be used for situations where a single
  * application is used by different companies, each accessing the application
- * using a host name that is part of the company's internet domain name. It is
- * comparable to virtual hosting mechanisms that can be used to share one
- * webserver with one IP-address by multiple companies.
+ * using a host name that is part of the company's internet domain name.
+ * </p>
+ * 
+ * <p>
+ * The virtual application scope is intented to be used in a multi-tenant
+ * software architecture. Wikipedia describes this architecture as follows:
+ * "Multi-tenancy refers to a principle in software architecture where a single
+ * instance of the software runs on a server, serving multiple client
+ * organizations (tenants). Multi-tenancy is contrasted with a multi-instance
+ * architecture where separate software instances (or hardware systems) are set
+ * up for different client organizations. With a multi-tenant architecture, a
+ * software application is designed to virtually partition its data and
+ * configuration thus each client organization works with a customized virtual
+ * application instance."
  * </p>
  * 
  * <p>

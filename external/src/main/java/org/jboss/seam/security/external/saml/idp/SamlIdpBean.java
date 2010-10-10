@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
@@ -60,6 +61,7 @@ import org.jboss.seam.security.external.saml.api.SamlPrincipal;
  * @author Marcel Kolsteren
  * 
  */
+@Typed(SamlIdpBean.class)
 public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentityProviderApi, SamlIdentityProviderConfigurationApi
 {
    @Inject

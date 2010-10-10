@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +57,7 @@ import org.openid4java.discovery.DiscoveryInformation;
  * @author Marcel Kolsteren
  * 
  */
+@Typed(OpenIdProviderBean.class)
 public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi, OpenIdProviderConfigurationApi
 {
    @Inject

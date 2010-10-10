@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
@@ -52,6 +53,7 @@ import org.jboss.seam.security.external.saml.api.SamlSpSession;
  * @author Marcel Kolsteren
  * 
  */
+@Typed(SamlSpBean.class)
 public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi
 {
    private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();
