@@ -108,7 +108,7 @@
  Weld archetypes:
  -  Quickstart:        http://seamframework.org/Documentation/WeldQuickstartForMavenUsers
  -  Issue tracker:     https://jira.jboss.org/jira/browse/WELDX
- -  Source code:       http://anonsvn.jboss.org/repos/weld/archetypes
+ -  Source code:       git://github.com/seam/archetypes.git
  -  Forums:            http://seamframework.org/Community/WeldUsers
  JSR-299 overview:     http://seamframework.org/Weld
  JSF community site:   http://www.javaserverfaces.org

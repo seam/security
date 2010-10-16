@@ -89,9 +89,9 @@
    </profiles>
 
    <scm>
-      <connection>scm:svn:http://anonsvn.jboss.org/repos/seam/modules/security/trunk</connection>
-      <developerConnection>scm:svn:https://svn.jboss.org/repos/seam/modules/security/trunk</developerConnection>
-      <url>http://fisheye.jboss.org/browse/Seam/modules/security/trunk</url>
+      <connection>scm:git:git://github.com/seam/security.git</connection>
+      <developerConnection>scm:git:git@github.com:seam/security.git</developerConnection>
+      <url>http://github.com/seam/security</url>
    </scm>
 
 </project>

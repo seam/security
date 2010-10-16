@@ -31,7 +31,7 @@ Seam Security URLs
 Seam Framework Home Page:      http://www.seamframework.org
 Downloads:                     http://www.seamframework.org/Download/SeamDownloads
 Forums:                        http://www.seamframework.org/Community/SeamUsers
-Source Code:                   http://anonsvn.jboss.org/repos/seam/modules/security/
+Source Code:                   git://github.com/seam/security.git
 Issue Tracking:                http://jira.jboss.org/jira/browse/SEAMSECURITY
 
 Release Notes
