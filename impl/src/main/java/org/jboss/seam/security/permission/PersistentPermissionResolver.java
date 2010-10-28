@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Identity;
@@ -16,14 +17,14 @@ import org.jboss.seam.security.Identity;
  * 
  * @author Shane Bryzak
  */
-public class PersistentPermissionResolver implements PermissionResolver, Serializable
+public @SessionScoped class PersistentPermissionResolver implements PermissionResolver, Serializable
 {
    private static final long serialVersionUID = -603389172032219059L;
    
-   @Inject BeanManager manager;
    @Inject Identity identity;
-   @Inject RuleBasedPermissionResolver ruleBasedPermissionResolver;
    @Inject PermissionStore permissionStore;
+   
+   @Inject Instance<RuleBasedPermissionResolver> ruleBasedPermissionResolver;   
    
    public PermissionStore getPermissionStore()
    {

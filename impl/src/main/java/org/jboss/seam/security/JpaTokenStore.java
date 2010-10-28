@@ -12,7 +12,7 @@ import javax.persistence.Query;
 
 //import org.jboss.seam.security.annotations.TokenUsername;
 //import org.jboss.seam.security.annotations.TokenValue;
-import org.jboss.weld.extensions.util.properties.Property;
+import org.jboss.weld.extensions.properties.Property;
 
 /**
  * A TokenStore implementation, stores tokens inside a database table.

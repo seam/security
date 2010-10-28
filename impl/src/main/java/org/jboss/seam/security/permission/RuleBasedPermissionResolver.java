@@ -1,36 +1,31 @@
 package org.jboss.seam.security.permission;
 
 import java.io.Serializable;
-import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 
 import org.drools.KnowledgeBase;
-/*import org.drools.StatefulSession;
-import org.drools.ClassObjectFilter;*/
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
-//import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.IdentityImpl;
-import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
-/*import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;*/
+import org.jboss.seam.security.events.PostLoggedOutEvent;
+import org.jboss.seam.security.qualifiers.Security;
+import org.jboss.weld.extensions.core.Requires;
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
  * 
  * @author Shane Bryzak
  */
+@Requires("org.drools.KnowledgeBase")
 @SessionScoped
 public class RuleBasedPermissionResolver implements PermissionResolver, Serializable
 {
@@ -40,7 +35,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    
    private StatefulKnowledgeSession securityContext;
    
-   private KnowledgeBase securityRules;
+   @Inject @Security KnowledgeBase securityRules;
    
    @Inject BeanManager manager;
    @Inject Identity identity;
@@ -277,16 +272,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
       if (getSecurityContext() != null)
       {
          getSecurityContext().insert(identity.getUser());
-
-         // If we were authenticated with the JpaIdentityStore, then insert the authenticated
-         // UserAccount into the security context.
-         
-         // TODO fix
-         /*if (Contexts.isEventContextActive() && Contexts.isSessionContextActive() &&
-               Contexts.getEventContext().isSet(JpaIdentityStore.AUTHENTICATED_USER))
-         {
-            getSecurityContext().insert(Contexts.getEventContext().get(JpaIdentityStore.AUTHENTICATED_USER));
-         }*/
       }
    }
 }

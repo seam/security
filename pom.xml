@@ -27,7 +27,7 @@
    <properties>
       <seam.version>3.0.0-SNAPSHOT</seam.version>
       <!-- Use snapshot WeldX -->
-      <weld.extensions.version>1.0.0-SNAPSHOT</weld.extensions.version>
+      <weld.extensions.version>1.0.0.Beta1</weld.extensions.version>
       <!-- Seam-Drools is not yet released -->
       <seam.drools.version>3.0.0-SNAPSHOT</seam.drools.version>
    </properties>
@@ -47,12 +47,24 @@
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-extensions</artifactId>
             <version>${weld.extensions.version}</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>javax.el</groupId>
+                  <artifactId>el-api</artifactId>
+               </exclusion>
+            </exclusions>
          </dependency>
 
          <dependency>
             <groupId>org.jboss.seam.drools</groupId>
             <artifactId>seam-drools-api</artifactId>
             <version>${seam.drools.version}</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>org.drools</groupId>
+                  <artifactId>drools-pipeline</artifactId>
+               </exclusion>
+            </exclusions>
          </dependency>
 
          <!-- Override sub-module versions from org.jboss.seam:seam -->

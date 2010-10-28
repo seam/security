@@ -6,11 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,14 +49,16 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    public static final String ROLES_GROUP = "Roles";
    
    Logger log = LoggerFactory.getLogger(IdentityImpl.class);
-
-   @Inject private BeanManager manager;
+  
+   @Inject BeanManager beanManager;
+   
    @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
    
    @Inject private IdentitySession identitySession;
    
    @Inject Instance<RequestSecurityState> requestSecurityState;
+   @Inject Instance<Authenticator> authenticators;
    
    private User user;
 
@@ -192,11 +192,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             // and then return.
             if (requestSecurityState.get().isSilentLogin())
             {
-               manager.fireEvent(new LoggedInEvent(user));
+               beanManager.fireEvent(new LoggedInEvent(user));
                return RESPONSE_LOGIN_SUCCESS;
             }
             
-            manager.fireEvent(new AlreadyLoggedInEvent());
+            beanManager.fireEvent(new AlreadyLoggedInEvent());
             return RESPONSE_LOGIN_SUCCESS;
          }
          
@@ -208,7 +208,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             {
                log.debug("Login successful for: " + credentials);
             }
-            manager.fireEvent(new LoggedInEvent(user));
+            beanManager.fireEvent(new LoggedInEvent(user));
             return RESPONSE_LOGIN_SUCCESS;
          }
          
@@ -222,7 +222,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
              log.debug("Login failed for: " + credentials, ex);
          }
          
-         manager.fireEvent(new LoginFailedEvent(ex));
+         beanManager.fireEvent(new LoginFailedEvent(ex));
          
          return RESPONSE_LOGIN_EXCEPTION;
       }
@@ -232,7 +232,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       try
       {
-         manager.fireEvent(new QuietLoginEvent());
+         beanManager.fireEvent(new QuietLoginEvent());
           
          // Ensure that we haven't been authenticated as a result of the EVENT_QUIET_LOGIN event
          if (!isLoggedIn())
@@ -267,23 +267,20 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          Authenticator authenticator;
          
-         Set<Bean<?>> authenticators = manager.getBeans(Authenticator.class);
-         if (authenticators.size() == 1)
-         {
-            @SuppressWarnings("unchecked")
-            Bean<Authenticator> authenticatorBean = (Bean<Authenticator>) authenticators.iterator().next();
-            authenticator = (Authenticator) manager.getReference(authenticatorBean, Authenticator.class, manager.createCreationalContext(authenticatorBean));
-         }
-         else if (authenticators.size() > 1)
+         if (authenticators.isAmbiguous())
          {
             throw new IllegalStateException("More than one Authenticator bean found - please ensure " +
-                  "only one Authenticator implementation is provided");
+               "only one Authenticator implementation is provided");
+         }
+         else if (authenticators.isUnsatisfied())
+         {
+            authenticator = null;
          }
          else
          {
-            authenticator = null;
-         }         
-         
+            authenticator = authenticators.get();
+         }
+                     
          boolean success = false;
          
          if (authenticator != null)
@@ -335,7 +332,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    protected void preAuthenticate()
    {
       preAuthenticationRoles.clear();
-      manager.fireEvent(new PreAuthenticateEvent());
+      beanManager.fireEvent(new PreAuthenticateEvent());
    }
    
    /**
@@ -373,7 +370,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          }         
       }
       
-      manager.fireEvent(new PostAuthenticateEvent());
+      beanManager.fireEvent(new PostAuthenticateEvent());
    }
    
    /**
@@ -391,13 +388,13 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       {
          PostLoggedOutEvent loggedOutEvent = new PostLoggedOutEvent(user);
          
-         manager.fireEvent(new PreLoggedOutEvent());
+         beanManager.fireEvent(new PreLoggedOutEvent());
          unAuthenticate();
          
          // TODO - invalidate the session
          // Session.instance().invalidate();
          
-         manager.fireEvent(loggedOutEvent);
+         beanManager.fireEvent(loggedOutEvent);
       }
    }
 
@@ -504,12 +501,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       {
          if ( !isLoggedIn() )
          {
-            manager.fireEvent(new NotLoggedInEvent());
+            beanManager.fireEvent(new NotLoggedInEvent());
             throw new NotLoggedInException();
          }
          else
          {
-            manager.fireEvent(new NotAuthorizedEvent());
+            beanManager.fireEvent(new NotAuthorizedEvent());
             throw new AuthorizationException(String.format(
                   "Authorization check failed for role [%s:%s]", roleType, group));
          }
@@ -526,12 +523,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       {
          if ( !isLoggedIn() )
          {
-            manager.fireEvent(new NotLoggedInEvent());
+            beanManager.fireEvent(new NotLoggedInEvent());
             throw new NotLoggedInException();
          }
          else
          {
-            manager.fireEvent(new NotAuthorizedEvent());
+            beanManager.fireEvent(new NotAuthorizedEvent());
             throw new AuthorizationException(String.format(
                   "Authorization check failed for permission[%s,%s]", target, action));
          }

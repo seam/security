@@ -59,7 +59,7 @@ public @Named @ConversationScoped class UserAction implements Serializable
       newUserFlag = true;
    }
    
-   public @Transactional void editUser(String username) throws IdentityException, FeatureNotSupportedException
+   public void editUser(String username) throws IdentityException, FeatureNotSupportedException
    {
       conversation.begin();
       this.username = username;

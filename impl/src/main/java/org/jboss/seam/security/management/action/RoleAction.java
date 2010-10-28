@@ -8,10 +8,12 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jboss.seam.persistence.transaction.Transactional;
 import org.jboss.seam.security.management.IdentityManager;
 
 @Named
 @ConversationScoped
+@Transactional
 public class RoleAction implements Serializable
 {
    private static final long serialVersionUID = -4215849488301658353L;

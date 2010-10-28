@@ -9,12 +9,12 @@
       http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
       
    <security:JpaPermissionStore>
-      <s:overrides/>      
+      <s:replaces/>      
       <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
    </security:JpaPermissionStore>
    
-   <drools:RuleResources>
-     <s:overrides/>
+   <!--drools:RuleResources>
+     <s:replaces/>
      <security:SecurityRulesConfig/>
      <drools:resources>
        <s:value>classpath;security-rules.drl;DRL</s:value>
@@ -37,10 +37,10 @@
         <s:Inject/>
         <s:Default/>
       </security:securityRules>
-   </security:RuleBasedPermissionResolver>
+   </security:RuleBasedPermissionResolver-->
    
    <plidm:JpaIdentityStoreConfiguration>
-      <s:overrides/>
+      <s:replaces/>
       <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
       <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
       <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
