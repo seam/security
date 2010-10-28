@@ -19,7 +19,6 @@ import javax.persistence.Query;
 
 import org.jboss.seam.security.annotations.permission.PermissionProperty;
 import org.jboss.seam.security.annotations.permission.PermissionPropertyType;
-import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
 import org.jboss.weld.extensions.properties.Property;
 import org.jboss.weld.extensions.properties.query.PropertyCriteria;
@@ -78,7 +77,6 @@ public class JpaPermissionStore implements PermissionStore, Serializable
    
    @Inject IdentifierPolicy identifierPolicy;
    @Inject BeanManager manager;
-   @Inject IdentityManager identityManager;
    
    @Inject Instance<EntityManager> entityManagerInstance;
    

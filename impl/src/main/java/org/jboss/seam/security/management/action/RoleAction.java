@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.persistence.transaction.Transactional;
-import org.jboss.seam.security.management.IdentityManager;
 
 @Named
 @ConversationScoped
@@ -21,7 +20,6 @@ public class RoleAction implements Serializable
    private String originalRole;
    private String role;
    
-   @Inject IdentityManager identityManager;
    @Inject Conversation conversation;
    
    public void createRole()
@@ -103,9 +101,10 @@ public class RoleAction implements Serializable
    
    public List<String> getAssignableRoles()
    {
-      List<String> roles = identityManager.getGrantableRoles();
-      roles.remove(role);
-      return roles;
+      //List<String> roles = identityManager.getGrantableRoles();
+      //roles.remove(role);
+      //return roles;
+      return null;
    }
    
    public void setRole(String role)

@@ -8,7 +8,6 @@ import java.util.List;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.security.management.IdentityManager;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
 
@@ -17,9 +16,7 @@ public @Model class UserSearch implements Serializable
    private static final long serialVersionUID = 8592034786339372510L;
 
    List<UserDTO> users;
-      
-   @Inject IdentityManager identityManager;
-   
+        
    private boolean loaded;
    
    public void loadUsers()
@@ -27,19 +24,19 @@ public @Model class UserSearch implements Serializable
       loaded = true;
       users = new ArrayList<UserDTO>();
       
-      Collection<User> results = identityManager.findUsers(null);  
+      Collection<User> results = null; // identityManager.findUsers(null);  
       for (User user : results)
       {
          UserDTO dto = new UserDTO();
          dto.setUsername(user.getId());
-         dto.setEnabled(identityManager.isUserEnabled(user.getId()));
+         //dto.setEnabled(identityManager.isUserEnabled(user.getId()));
          users.add(dto);
       }      
    }
    
    public String getUserRoles(String username)
    {
-      Collection<Role> roles = identityManager.getUserRoles(username);
+      Collection<Role> roles = null; //identityManager.getUserRoles(username);
             
       StringBuilder sb = new StringBuilder();
       

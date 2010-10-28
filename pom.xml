@@ -5,7 +5,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>3</version>
+      <version>4-SNAPSHOT</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -37,7 +37,7 @@
 
          <dependency>
             <groupId>org.jboss.seam</groupId>
-            <artifactId>seam</artifactId>
+            <artifactId>seam-bom</artifactId>
             <version>${seam.version}</version>
             <type>pom</type>
             <scope>import</scope>

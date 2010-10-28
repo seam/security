@@ -12,7 +12,6 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.permission.Permission;
 import org.jboss.seam.security.permission.PermissionManager;
 import org.picketlink.idm.spi.model.IdentityObject;
@@ -32,7 +31,6 @@ public class PermissionSearch implements Serializable
    //@DataModelSelection
    Principal selectedRecipient;
    
-   @Inject IdentityManager identityManager;   
    @Inject PermissionManager permissionManager;   
    @Inject Conversation conversation;
    

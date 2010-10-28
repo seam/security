@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.security.events.QuietLoginEvent;
-import org.jboss.seam.security.management.IdentityManager;
 import org.jboss.seam.security.util.Base64;
 import org.picketlink.idm.api.Role;
 
@@ -40,8 +39,7 @@ public class RememberMe implements Serializable
    @Inject Identity identity;
    @Inject IdentityImpl identityImpl;
    @Inject CredentialsImpl credentials;
-   @Inject IdentityManager identityManager;
-   
+  
    // Heaps of stuff commented out here because we need to add generic cookie support
 
    //private ManagedCookie usernameSelector;
@@ -149,7 +147,7 @@ public class RememberMe implements Serializable
                @Override
                public void execute()
                {
-                  if (identityManager.isUserEnabled(username))
+                  /*if (identityManager.isUserEnabled(username))
                   {
                      userEnabled.value = true;
 
@@ -157,7 +155,7 @@ public class RememberMe implements Serializable
                      {
                         roles.add(role);
                      }
-                  }
+                  }*/
                }
             });
             
