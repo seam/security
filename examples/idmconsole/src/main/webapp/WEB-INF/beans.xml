@@ -15,8 +15,8 @@
      <s:modifies/>
    </p:SeSynchronizations-->
       
-  <interceptors>
+  <!--interceptors>
     <class>org.jboss.seam.persistence.transaction.TransactionInterceptor</class>
-  </interceptors>
+  </interceptors-->
       
 </beans>
