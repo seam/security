@@ -8,8 +8,12 @@ import java.util.List;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
+import org.picketlink.idm.api.IdentitySearchCriteria;
+import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
+import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 
 public @Model class UserSearch implements Serializable
 {
@@ -19,12 +23,16 @@ public @Model class UserSearch implements Serializable
         
    private boolean loaded;
    
-   public void loadUsers()
+   @Inject IdentitySession identitySession;
+   
+   public void loadUsers() throws IdentityException
    {
       loaded = true;
       users = new ArrayList<UserDTO>();
       
-      Collection<User> results = null; // identityManager.findUsers(null);  
+      IdentitySearchCriteria criteria = new IdentitySearchCriteriaImpl();
+
+      Collection<User> results = identitySession.getPersistenceManager().findUser(criteria);  
       for (User user : results)
       {
          UserDTO dto = new UserDTO();
@@ -49,7 +57,7 @@ public @Model class UserSearch implements Serializable
       return sb.toString();
    }
    
-   public List<UserDTO> getUsers()
+   public List<UserDTO> getUsers() throws IdentityException
    {
       if (!loaded) loadUsers();
       return users;
