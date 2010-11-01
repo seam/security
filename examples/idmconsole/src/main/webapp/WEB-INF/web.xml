@@ -30,5 +30,9 @@
       <param-name>facelets.DEVELOPMENT</param-name>
       <param-value>true</param-value>
    </context-param>
+   
+   <!--listener>
+      <listener-class>org.jboss.weld.extensions.resourceLoader.servlet.ResourceListener</listener-class>
+   </listener-->
 
 </web-app>
