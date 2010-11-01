@@ -32,6 +32,7 @@ import org.jboss.weld.extensions.properties.query.NamedPropertyCriteria;
 import org.jboss.weld.extensions.properties.query.PropertyCriteria;
 import org.jboss.weld.extensions.properties.query.PropertyQueries;
 import org.jboss.weld.extensions.properties.query.TypedPropertyCriteria;
+import org.jboss.weld.extensions.reflection.Reflections;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
@@ -239,9 +240,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       String clsName = configurationContext.getStoreConfigurationMetaData()
          .getOptionSingleValue(OPTION_IDENTITY_CLASS_NAME);
 
+      if (clsName == null)
+      {
+         throw new IdentityException("Error bootstrapping JpaIdentityStore - identity entity class cannot be null");
+      }
+      
       try
       {
-         identityClass = Class.forName(clsName);
+         identityClass = Reflections.classForName(clsName);
       }
       catch (ClassNotFoundException e)
       {

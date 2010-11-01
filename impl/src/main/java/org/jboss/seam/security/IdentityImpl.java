@@ -217,10 +217,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
       catch (Exception ex)
       {
-         if ( log.isDebugEnabled() )
-         {
-             log.debug("Login failed for: " + credentials, ex);
-         }
+         log.error("Login failed for: " + credentials, ex);
          
          beanManager.fireEvent(new LoginFailedEvent(ex));
          
