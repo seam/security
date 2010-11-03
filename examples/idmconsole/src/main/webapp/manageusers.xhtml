@@ -19,7 +19,7 @@
     <h3>Manage Users</h3>
    
     <h:form>
-      <h:commandButton action="#{userAction.createUser}" styleClass="newuser" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
+      <h:commandLink action="#{userAction.createUser}" value="Create New User" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
     </h:form>
 
     <h:form>    	    

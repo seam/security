@@ -1,7 +1,6 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -9,107 +8,50 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.persistence.transaction.Transactional;
+import org.picketlink.idm.api.IdentitySession;
+import org.picketlink.idm.common.exception.FeatureNotSupportedException;
+import org.picketlink.idm.common.exception.IdentityException;
 
-@Named
-@ConversationScoped
-@Transactional
-public class RoleAction implements Serializable
+/**
+ * Action component for managing role types 
+ * 
+ * @author Shane Bryzak
+ */
+public @Named @ConversationScoped class RoleAction implements Serializable
 {
    private static final long serialVersionUID = -4215849488301658353L;
    
-   private String originalRole;
-   private String role;
+   private String roleType;
    
    @Inject Conversation conversation;
+   @Inject IdentitySession identitySession;
    
-   public void createRole()
+   public void createRoleType()
    {
       conversation.begin();
    }
    
-   public void editRole(String role)
+   public @Transactional String deleteRoleType(String roleType) throws IdentityException, FeatureNotSupportedException
    {
-      conversation.begin();
-      
-      this.originalRole = role;
-      this.role = role;
-   }
-      
-   public String save()
-   {
-      if (role != null && originalRole != null && !role.equals(originalRole))
-      {
-         //identityManager.deleteRole(originalRole);
-      }
-      
-      /*if (identityManager.roleTypeExists(role))
-      {
-         return saveExistingRole();
-      }
-      else
-      {
-         return saveNewRole();
-      }*/
-      
-      return null;
-   }
-   
-   private String saveNewRole()
-   {
-      // TODO rewrite
-      //boolean success = identityManager.createRole(role);
-      
-      /*if (success)
-      {
-         for (String r : groups)
-         {
-            identityManager.addRoleToGroup(role, r);
-         }
-         
-         conversation.end();
-      }*/
-      
+      identitySession.getRoleManager().removeRoleType(roleType);
       return "success";
    }
-   
-   private String saveExistingRole()
+      
+   public @Transactional String save() throws IdentityException, FeatureNotSupportedException
    {
-      // FIXME rewrite
-      /*List<String> grantedRoles = identityManager.getRoleGroups(role);
-      
-      if (grantedRoles != null)
-      {
-         for (String r : grantedRoles)
-         {
-            if (!groups.contains(r)) identityManager.removeRoleFromGroup(role, r);
-         }
-      }
-      
-      for (String r : groups)
-      {
-         if (grantedRoles == null || !grantedRoles.contains(r)) identityManager.addRoleToGroup(role, r);
-      }*/
-               
+      identitySession.getRoleManager().createRoleType(roleType);
       conversation.end();
       return "success";
    }
    
-   public String getRole()
+   public String getRoleType()
    {
-      return role;
+      return roleType;
    }
    
-   public List<String> getAssignableRoles()
+   public void setRoleType(String roleType)
    {
-      //List<String> roles = identityManager.getGrantableRoles();
-      //roles.remove(role);
-      //return roles;
-      return null;
-   }
-   
-   public void setRole(String role)
-   {
-      this.role = role;
+      this.roleType = roleType;
    }
 
 }

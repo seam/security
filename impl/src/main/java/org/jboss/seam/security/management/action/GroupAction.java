@@ -19,7 +19,7 @@ import org.picketlink.idm.common.exception.IdentityException;
  *  
  * @author Shane Bryzak
  */
-public @Transactional @Named @ConversationScoped class GroupAction implements Serializable
+public @Named @ConversationScoped class GroupAction implements Serializable
 {
    private static final long serialVersionUID = -1553124158319503903L;
    
@@ -28,20 +28,21 @@ public @Transactional @Named @ConversationScoped class GroupAction implements Se
    @Inject IdentitySession identitySession;
    
    private String groupName;
-   private String groupType;
+   
+   private String groupType = "GROUP";
    
    public void createGroup()
    {
       conversation.begin();
    }
    
-   public void deleteGroup(String name, String groupType) throws IdentityException
+   public @Transactional void deleteGroup(String name, String groupType) throws IdentityException
    {
       Group group = new GroupImpl(name, groupType);
       identitySession.getPersistenceManager().removeGroup(group, true);
    }
       
-   public String save() throws IdentityException
+   public @Transactional String save() throws IdentityException
    {
       identitySession.getPersistenceManager().createGroup(groupName, groupType);
       conversation.end();      

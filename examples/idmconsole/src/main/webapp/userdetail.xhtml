@@ -57,7 +57,7 @@
           
           <div class="formRow">            
             <ui:repeat value="#{userAction.roles}" var="role">
-              #{role.roleType.name}<span> in group </span>#{role.group.name}<br/>
+              <b>#{role.roleType.name}</b><span> in group </span><b>#{role.group.name}</b><br/>
             </ui:repeat>            
           </div>
           

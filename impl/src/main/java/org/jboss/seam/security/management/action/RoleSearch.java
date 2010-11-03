@@ -1,50 +1,42 @@
 package org.jboss.seam.security.management.action;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.enterprise.context.SessionScoped;
-import javax.inject.Named;
+import javax.enterprise.inject.Model;
+import javax.inject.Inject;
 
-@Named
-@SessionScoped
-public class RoleSearch implements Serializable
+import org.picketlink.idm.api.IdentitySession;
+import org.picketlink.idm.api.RoleType;
+import org.picketlink.idm.common.exception.FeatureNotSupportedException;
+import org.picketlink.idm.common.exception.IdentityException;
+
+/**
+ * Action class used to search for role types 
+ * 
+ * @author Shane Bryzak
+ */
+public @Model class RoleSearch implements Serializable
 {
    private static final long serialVersionUID = -1014495134519417515L;
-
-   /*
-   @DataModel
-   List<String> roles;
+  
+   @Inject IdentitySession identitySession;
    
-   @DataModelSelection
-   String selectedRole;
+   private List<String> roleTypes;
    
-   @Current IdentityManager identityManager;
-   
-   public void loadRoles()
+   @Inject public void loadRoleTypes() throws IdentityException, FeatureNotSupportedException
    {
-      roles = identityManager.listRoles();
-   }
-   
-   public String getRoleGroups(String role)
-   {
-      List<String> roles = identityManager.getRoleGroups(role);
+      roleTypes = new ArrayList<String>();
       
-      if (roles == null) return "";
-      
-      StringBuilder sb = new StringBuilder();
-      
-      for (String r : roles)
+      for (RoleType roleType : identitySession.getRoleManager().findRoleTypes())
       {
-         sb.append((sb.length() > 0 ? ", " : "") + r);
+         roleTypes.add(roleType.getName());
       }
-      
-      return sb.toString();
    }
    
-   public String getSelectedRole()
+   public List<String> getRoleTypes()
    {
-      return selectedRole;
+      return roleTypes;
    }
-   
-   */
 }

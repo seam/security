@@ -12,31 +12,31 @@
   <ui:define name="content">
     <script type="text/javascript">
       function confirmDelete() {
-        return confirm("Are you sure you wish to delete this group? This action cannot be undone.");
+        return confirm("Are you sure you wish to delete this role type? This action cannot be undone.");
       }
     </script>  
   
-    <h3>Manage Groups</h3>
+    <h3>Manage Role Types</h3>
    
     <h:form>
-      <h:commandLink action="#{groupAction.createGroup}" value="Create new group" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
+      <h:commandLink action="#{roleAction.createRoleType}" value="Create new role type" rendered="#{identity.hasPermission('seam.account', 'create')}"/>
     </h:form>
 
     <h:form>    	    
       <h:dataTable 
         id="threads"
-        value="#{groupSearch.groups}" 
-        var="group" 
+        value="#{roleSearch.roleTypes}" 
+        var="role" 
         styleClass="security"
         cellspacing="0"
         headerClass="header"
         rowClasses="odd,even"
-        columnClasses=",,action">
+        columnClasses=",,enabled,action">
         <h:column width="auto">
           <f:facet name="header">
-            Group name
+            Role type
           </f:facet>
-          #{group.name}
+          #{role}
         </h:column>
         <h:column id="action" width="auto">
           <f:facet name="header">
@@ -44,7 +44,7 @@
           </f:facet>
         
           <ui:fragment rendered="#{identity.hasPermission('seam.identity', 'delete')}">
-            <h:commandLink id="delete" value="Delete" action="#{groupAction.deleteGroup(group.name, group.groupType)}" onclick="return confirmDelete()"/>
+            <h:commandLink id="delete" value="Delete" action="#{roleAction.deleteRoleType(role)}" onclick="return confirmDelete()"/>
           </ui:fragment>
         </h:column>
       </h:dataTable>

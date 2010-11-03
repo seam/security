@@ -50,8 +50,6 @@ import org.picketlink.idm.spi.store.FeaturesMetaData;
 import org.picketlink.idm.spi.store.IdentityObjectSearchCriteriaType;
 import org.picketlink.idm.spi.store.IdentityStoreInvocationContext;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
-/*import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;*/
 
 /**
  * IdentityStore implementation that allows identity related data to be 
@@ -62,8 +60,6 @@ import org.slf4j.LoggerFactory;*/
 public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentityStore, Serializable
 {
    private static final long serialVersionUID = 7729139146633529501L;
-   
-   //private Logger log = LoggerFactory.getLogger(JpaIdentityStore.class);   
    
    public static final String OPTION_IDENTITY_CLASS_NAME = "identityEntityClassName";
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
@@ -1207,8 +1203,22 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public String createRelationshipName(IdentityStoreInvocationContext ctx,
          String name) throws IdentityException, OperationNotSupportedException
    {
-      // TODO Auto-generated method stub
-      return null;
+      try
+      {
+         Property<Object> roleTypeNameProp = modelProperties.get(PROPERTY_ROLE_TYPE_NAME);
+         
+         Object roleTypeInstance = roleTypeClass.newInstance();
+         roleTypeNameProp.setValue(roleTypeInstance, name);
+         
+         EntityManager em = getEntityManager(ctx);
+         
+         em.persist(roleTypeInstance);
+         return name;
+      }
+      catch (Exception ex)
+      {
+         throw new IdentityException("Error creating relationship name", ex);
+      }
    }
    
    public EntityManager getEntityManager(IdentityStoreInvocationContext invocationContext)
@@ -1513,8 +1523,19 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public String removeRelationshipName(IdentityStoreInvocationContext ctx,
          String name) throws IdentityException, OperationNotSupportedException
    {
-      System.out.println("*** Invoked unimplemented method removeRelationshipName()");
-      // TODO Auto-generated method stub
+      Property<?> nameProp = modelProperties.get(PROPERTY_ROLE_TYPE_NAME);
+      EntityManager em = getEntityManager(ctx);
+      
+      CriteriaBuilder builder = em.getCriteriaBuilder();
+      CriteriaQuery<?> criteria = builder.createQuery(roleTypeClass);
+      Root<?> root = criteria.from(roleTypeClass);
+      
+      List<Predicate> predicates = new ArrayList<Predicate>();
+      predicates.add(builder.equal(root.get(nameProp.getName()), name));
+      criteria.where(predicates.toArray((new Predicate[0])));
+      Object roleType = em.createQuery(criteria).getSingleResult();
+      em.remove(roleType);
+      
       return null;
    }
 

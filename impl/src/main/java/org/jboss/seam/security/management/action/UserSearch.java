@@ -15,19 +15,22 @@ import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.IdentitySearchCriteriaImpl;
 
+/**
+ * Action component for locating users
+ * 
+ * @author Shane Bryzak
+ *
+ */
 public @Model class UserSearch implements Serializable
 {
    private static final long serialVersionUID = 8592034786339372510L;
 
    List<UserDTO> users;
-        
-   private boolean loaded;
-   
+           
    @Inject IdentitySession identitySession;
    
-   public void loadUsers() throws IdentityException
+   @Inject public void loadUsers() throws IdentityException
    {
-      loaded = true;
       users = new ArrayList<UserDTO>();
       
       IdentitySearchCriteria criteria = new IdentitySearchCriteriaImpl();
@@ -59,7 +62,6 @@ public @Model class UserSearch implements Serializable
    
    public List<UserDTO> getUsers() throws IdentityException
    {
-      if (!loaded) loadUsers();
       return users;
    }   
    

@@ -74,7 +74,25 @@
          <to-view-id>/userdetail.xhtml</to-view-id>
          <redirect/>
       </navigation-case>      
-   </navigation-rule>      
+   </navigation-rule>    
+   
+   <navigation-rule>
+      <from-view-id>/roletypedetail.xhtml</from-view-id>
+      
+      <navigation-case>
+         <from-action>#{roleAction.save}</from-action>
+         <from-outcome>success</from-outcome>
+         <if>#{true}</if>
+         <to-view-id>/manageroletypes.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>
+      
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/manageroletypes.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>      
+   </navigation-rule>        
    
    <navigation-rule>
       <from-view-id>/managegroups.xhtml</from-view-id>
@@ -94,6 +112,27 @@
       </navigation-case>
       
    </navigation-rule>
+
+   <navigation-rule>
+      <from-view-id>/manageroletypes.xhtml</from-view-id>
+      
+      <navigation-case>
+         <from-action>#{roleAction.createRoleType}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/roletypedetail.xhtml</to-view-id>
+         <redirect/>
+      </navigation-case>
+      
+      <navigation-case>
+         <from-action>#{roleAction.deleteRoleType(role)}</from-action>
+         <if>#{true}</if>
+         <to-view-id>/manageroletypes.xhtml</to-view-id>
+         <redirect />
+      </navigation-case>
+      
+   </navigation-rule>
+   
+   
    
    <navigation-rule>
       <from-view-id>/groupdetail.xhtml</from-view-id>
