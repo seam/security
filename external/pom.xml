@@ -134,6 +134,12 @@
          <groupId>org.openid4java</groupId>
          <artifactId>openid4java</artifactId>
          <version>0.9.5</version>
+         <exclusions>
+            <exclusion>
+               <groupId>xerces</groupId>
+               <artifactId>xercesImpl</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <!--

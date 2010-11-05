@@ -21,14 +21,13 @@
  */
 package org.jboss.seam.security.external.dialogues;
 
-import static org.jboss.weld.servlet.ServletHelper.getModuleBeanManager;
-
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
-import org.jboss.weld.manager.BeanManagerImpl;
+import org.jboss.weld.extensions.beanManager.BeanManagerAccessor;
 
 /**
  * Provides dialogue beans to classes that are not able to inject.
@@ -40,14 +39,14 @@ public class DialogueBeanProvider
 {
    public static Dialogue dialogue(ServletContext servletContext)
    {
-      BeanManagerImpl beanManager = getModuleBeanManager(servletContext);
+      BeanManager beanManager = BeanManagerAccessor.getManager(); //  getModuleBeanManager(servletContext);
       Bean<?> bean = beanManager.resolve(beanManager.getBeans(Dialogue.class));
       return (Dialogue) beanManager.getReference(bean, Dialogue.class, beanManager.createCreationalContext(bean));
    }
 
    public static DialogueManager dialogueManager(ServletContext servletContext)
    {
-      BeanManagerImpl beanManager = getModuleBeanManager(servletContext);
+      BeanManager beanManager = BeanManagerAccessor.getManager(); //getModuleBeanManager(servletContext);
       Bean<?> bean = beanManager.resolve(beanManager.getBeans(DialogueManager.class));
       return (DialogueManager) beanManager.getReference(bean, DialogueManager.class, beanManager.createCreationalContext(bean));
    }

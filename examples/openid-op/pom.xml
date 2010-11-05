@@ -19,7 +19,7 @@
    </properties>
 
    <build>
-      <finalName>openid-rp</finalName>
+      <finalName>openid-op</finalName>
    </build>
 
    <dependencies>
