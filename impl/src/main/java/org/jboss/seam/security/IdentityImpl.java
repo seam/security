@@ -3,9 +3,12 @@ package org.jboss.seam.security;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
@@ -25,9 +28,16 @@ import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.permission.PermissionMapper;
 import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
+import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
+import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.model.SimpleGroup;
+import org.picketlink.idm.impl.api.model.SimpleRole;
+import org.picketlink.idm.impl.api.model.SimpleRoleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +55,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    private static final String RESPONSE_LOGIN_EXCEPTION = "exception";
    
    protected static boolean securityEnabled = true;
-   
-   public static final String ROLES_GROUP = "Roles";
    
    Logger log = LoggerFactory.getLogger(IdentityImpl.class);
   
@@ -68,11 +76,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     */
    private Map<String,Map<String,List<String>>> preAuthenticationRoles = new HashMap<String,Map<String,List<String>>>();
 
-   /**
-    * Contains a group name to group type:role list mapping of roles granted 
-    * after the authentication process has completed   
-    */
-   private Map<String,Map<String,List<String>>> activeRoles = new HashMap<String,Map<String,List<String>>>();
+   private Set<Role> activeRoles = new HashSet<Role>();
    
    /**
     * Map of group name:group type group memberships assigned during the 
@@ -80,11 +84,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     */
    private Map<String,List<String>> preAuthenticationGroups = new HashMap<String,List<String>>();
    
-   /**
-    * Map of group name:group type group memberships granted after the 
-    * authentication process has completed
-    */
-   private Map<String,List<String>> activeGroups = new HashMap<String,List<String>>();
+   private Set<Group> activeGroups = new HashSet<Group>();
    
    private transient ThreadLocal<Boolean> systemOp;
    
@@ -252,7 +252,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
    }
     
-   protected boolean authenticate() throws IdentityException
+   protected boolean authenticate() throws IdentityException, FeatureNotSupportedException
    {
       try
       {
@@ -289,18 +289,24 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             // Otherwise if identity management is enabled, use it.
             if (identitySession != null)
             {            
+               User u = new UserImpl(credentials.getUsername()); 
+               
                success = identitySession.getAttributesManager().validateCredentials(
-                     new UserImpl(credentials.getUsername()), 
-                     new Credential[] {credentials.getCredential()});
+                     u, new Credential[] {credentials.getCredential()});
                
                if (success)
                {
-                  // TODO implement role population
-                  //for (Role role : identityManager.getImpliedRoles(username))
-                  //{
-                    // idCallback.getIdentity().addRole(role.getRoleType().getName(), 
-                      //     role.getGroup().getName(), role.getGroup().getGroupType());
-                  //}
+                  Collection<RoleType> roleTypes = identitySession.getRoleManager()
+                      .findUserRoleTypes(u);
+                  
+                  for (RoleType roleType : roleTypes)
+                  {
+                     for (Role role : identitySession.getRoleManager().findRoles(u, roleType))
+                     {
+                        addRole(role.getRoleType().getName(), 
+                              role.getGroup().getName(), role.getGroup().getGroupType());   
+                     }
+                  }                  
                }
             }
          }
@@ -361,7 +367,10 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          {
             for (String group : preAuthenticationGroups.keySet())
             {
-               activeGroups.put(group, preAuthenticationGroups.get(group));
+               for (String groupType : preAuthenticationGroups.get(group))
+               {
+                  activeGroups.add(new SimpleGroup(group, groupType));  
+               }               
             }
             preAuthenticationGroups.clear();
          }         
@@ -402,9 +411,17 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       
       tryLogin();
       
-      Map<String,List<String>> groupTypes = activeRoles.get(group);      
-      List<String> roles = groupTypes != null ? groupTypes.get(groupType) : null;      
-      return (roles != null && roles.contains(roleType));
+      for (Role role : activeRoles)
+      {
+         if (role.getRoleType().getName().equals(roleType) && 
+               role.getGroup().getName().equals(group) &&
+               role.getGroup().getGroupType().equals(groupType))
+         {
+            return true;
+         }
+      }
+      
+      return false;
    }
    
    public boolean addRole(String roleType, String group, String groupType)
@@ -412,34 +429,44 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       if (roleType == null || "".equals(roleType) || group == null || "".equals(group) 
             || groupType == null || "".equals(groupType)) return false;
       
-      Map<String,Map<String,List<String>>> roleMap = isLoggedIn() ? activeRoles : 
-         preAuthenticationRoles;
-
-      List<String> roleTypes = null;
-      
-      Map<String,List<String>> groupTypes = roleMap.get(group);
-      if (groupTypes != null)
+      if (isLoggedIn())
       {
-         roleTypes = groupTypes.get(groupType);
+         return activeRoles.add(new SimpleRole(new SimpleRoleType(roleType), 
+               user, new SimpleGroup(group, groupType)));
       }
       else
       {
-         groupTypes = new HashMap<String,List<String>>();
-         roleMap.put(group, groupTypes);
-      }
-      
-      if (roleTypes == null)
-      {
-         roleTypes = new ArrayList<String>();
-         groupTypes.put(groupType, roleTypes);         
-      }
-      
-      return roleTypes.add(roleType);
+         List<String> roleTypes = null;
+         
+         Map<String,List<String>> groupTypes = preAuthenticationRoles.get(group);
+         if (groupTypes != null)
+         {
+            roleTypes = groupTypes.get(groupType);
+         }
+         else
+         {
+            groupTypes = new HashMap<String,List<String>>();
+            preAuthenticationRoles.put(group, groupTypes);
+         }
+         
+         if (roleTypes == null)
+         {
+            roleTypes = new ArrayList<String>();
+            groupTypes.put(groupType, roleTypes);         
+         }
+         
+         return roleTypes.add(roleType);         
+      }      
    }
    
    public boolean inGroup(String name, String groupType)
    {
-      return activeGroups.containsKey(name) && activeGroups.get(name).contains(groupType);
+      for (Group group : activeGroups)
+      {
+         if (group.getName().equals(name) && group.getGroupType().equals(groupType)) return true;
+      }
+      
+      return false;
    }
    
    public boolean addGroup(String name, String groupType)
@@ -449,27 +476,36 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          return false;
       }
       
-      Map<String,List<String>> groupMap = isLoggedIn() ? activeGroups : preAuthenticationGroups;
-      
-      List<String> groupTypes = null;
-      if (groupMap.containsKey(name))
+      if (isLoggedIn())
       {
-         groupTypes = groupMap.get(name);
+         return activeGroups.add(new SimpleGroup(name, groupType));
       }
       else
-      {
-         groupTypes = new ArrayList<String>();
-         groupMap.put(name, groupTypes);
+      {         
+         List<String> groupTypes = null;
+         if (preAuthenticationGroups.containsKey(name))
+         {
+            groupTypes = preAuthenticationGroups.get(name);
+         }
+         else
+         {
+            groupTypes = new ArrayList<String>();
+            preAuthenticationGroups.put(name, groupTypes);
+         }
+         
+         return groupTypes.add(groupType);         
       }
-      
-      return groupTypes.add(groupType);
    }
    
    public void removeGroup(String name, String groupType)
    {
-      if (activeGroups.containsKey(name))
+      for (Group group : activeGroups)
       {
-         activeGroups.get(name).remove(groupType);
+         if (group.getName().equals(name) && group.getGroupType().equals(groupType))
+         {
+            activeGroups.remove(group);
+            return;
+         }
       }
    }
 
@@ -479,13 +515,15 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     * @param role The name of the role to remove
     */
    public void removeRole(String roleType, String group, String groupType)
-   {      
-      if (activeRoles.containsKey(group))
+   {   
+      for (Role role : activeRoles)
       {
-         Map<String,List<String>> groupTypes = activeRoles.get(group);
-         if (groupTypes.containsKey(groupType))
+         if (role.getRoleType().getName().equals(roleType) && 
+               role.getGroup().getName().equals(group) &&
+               role.getGroup().getGroupType().equals(groupType))
          {
-            groupTypes.get(groupType).remove(roleType);
+            activeRoles.remove(role);
+            return;
          }
       }
    }
@@ -575,12 +613,22 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
 
    public void checkRestriction(String expr)
    {
-      // TODO Auto-generated method stub
+      // TODO Do we still need this method?
       
    }
 
    public User getUser()
    {
       return user;
+   }
+
+   public Set<Role> getRoles()
+   {
+      return Collections.unmodifiableSet(activeRoles);
+   }
+
+   public Set<Group> getGroups()
+   {
+      return Collections.unmodifiableSet(activeGroups);
    }
 }

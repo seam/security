@@ -11,6 +11,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import org.drools.ClassObjectFilter;
 import org.drools.KnowledgeBase;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
@@ -18,14 +19,14 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.qualifiers.Security;
-import org.jboss.weld.extensions.core.Requires;
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.Role;
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
  * 
  * @author Shane Bryzak
  */
-@Requires("org.drools.KnowledgeBase")
 @SessionScoped
 public class RuleBasedPermissionResolver implements PermissionResolver, Serializable
 {
@@ -190,59 +191,68 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    private void synchronizeContext()
    {
       if (getSecurityContext() != null)
-      {
+      {         
          getSecurityContext().insert(identity.getUser());
          
-/*         for ( Group sg : identity.getSubject().getPrincipals(Group.class) )
+         for (Role role : identity.getRoles())
          {
-            if ( IdentityImpl.ROLES_GROUP.equals( sg.getName() ) )
+            Iterator<?> iter = getSecurityContext().getObjects(
+                  new ClassObjectFilter(Role.class)).iterator();
+
+            boolean found = false;
+            while (iter.hasNext())
             {
-               Enumeration<?> e = sg.members();
-               while (e.hasMoreElements())
-               {*/
-                  //Principal role = (Principal) e.nextElement();
-   
-                  //boolean found = false;
-                  //Iterator<?> iter = getSecurityContext().getObjects(
-                  //      new ClassObjectFilter(RoleImpl.class)).iterator();
-                  
-                  // TODO fix
-                  /*
-                  while (iter.hasNext())
-                  {
-                     RoleImpl r = (RoleImpl) iter.next();
-                     // TODO fix
-                     if (r.getName().equals(role.getName()))
-                     {
-                        found = true;
-                        break;
-                     }
-                  }
-                  
-                  if (!found)
-                  {
-                     getSecurityContext().insert(new RoleImpl(role.getName()));
-                  }*/
-                  
- //              }
- //           }
- //        }
-         
-         //Iterator<?> iter = getSecurityContext().getObjects(new ClassObjectFilter(RoleImpl.class)).iterator();
-         //while (iter.hasNext())
-         //{
-            //RoleImpl r = (RoleImpl) iter.next();
+               Role r = (Role) iter.next();
+               if (r.equals(role))
+               {
+                  found = true;
+                  break;
+               }
+            }
             
-            // TODO fix
-            /*if (!identity.hasRole(r.getName()))
+            if (!found)
+            {
+               getSecurityContext().insert(role);
+            }
+         }
+         
+         for (Group group : identity.getGroups())
+         {
+            Iterator<?> iter = getSecurityContext().getObjects(
+                  new ClassObjectFilter(Group.class)).iterator();
+
+            boolean found = false;
+            while (iter.hasNext())
+            {
+               Group g = (Group) iter.next();
+               if (g.equals(group))
+               {
+                  found = true;
+                  break;
+               }
+            }
+            
+            if (!found)
+            {
+               getSecurityContext().insert(group);
+            }
+         }
+         
+         Iterator<?> iter = getSecurityContext().getObjects(
+               new ClassObjectFilter(Role.class)).iterator();
+         while (iter.hasNext())
+         {
+            Role r = (Role) iter.next();
+            
+            if (!identity.hasRole(r.getRoleType().getName(), 
+                  r.getGroup().getName(), r.getGroup().getGroupType()))
             {
                FactHandle fh = getSecurityContext().getFactHandle(r);
                getSecurityContext().retract(fh);
-            }*/
-         //}
+            }
+         }
       }
    }
-   
    
    public StatefulKnowledgeSession getSecurityContext()
    {

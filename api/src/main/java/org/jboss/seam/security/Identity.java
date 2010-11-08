@@ -2,9 +2,12 @@ package org.jboss.seam.security;
 
 import java.security.Principal;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.picketlink.idm.api.Group;
+import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
 
 /**
@@ -163,5 +166,19 @@ public interface Identity
     * 
     * @return true if the user has the required permission, otherwise false
     */
-   boolean hasPermission(Object resource, String permission);      
+   boolean hasPermission(Object resource, String permission);
+   
+   /**
+    * Returns an immutable set containing all the current user's granted roles
+    * 
+    * @return
+    */
+   Set<Role> getRoles();
+   
+   /**
+    * Returns an immutable set containing all the current user's group memberships
+    * 
+    * @return
+    */
+   Set<Group> getGroups();
 }

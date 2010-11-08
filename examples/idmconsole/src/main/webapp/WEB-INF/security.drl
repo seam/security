@@ -5,6 +5,7 @@ dialect 'mvel'
 import java.security.Principal;
 
 import org.jboss.seam.security.permission.PermissionCheck;
+import org.picketlink.idm.api.Role;
 
 # Allow all users to read the available roles
 
@@ -13,7 +14,7 @@ rule ReadRoles
   activation-group "permissions"
 when
   check: PermissionCheck(resource == "seam.role", permission == "read", granted == false)
-//  Role(name == "user")
+  Role(roleType.name == "user")
 then
   check.grant();
 end
@@ -23,7 +24,7 @@ rule CreateAccount
   activation-group "permissions"
 when
   check: PermissionCheck(resource == "seam.account", permission == "create", granted == false)
-//  Role(name == "admin")
+  Role(roleType.name == "admin")
 then
   check.grant();
 end
@@ -39,6 +40,7 @@ rule ManageIdentities
   activation-group "permissions"
 when
   check: PermissionCheck(resource == "seam.identity", granted == false)
+  Role(roleType.name == "admin")
 then
   check.grant();
 end
