@@ -67,7 +67,7 @@
          <scope>provided</scope>
       </dependency>
 
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.seam.drools</groupId>
          <artifactId>seam-drools-api</artifactId>
          <optional>true</optional>
@@ -133,7 +133,7 @@
             </exclusion>
          </exclusions>
 
-      </dependency>
+      </dependency-->
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
