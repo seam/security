@@ -543,10 +543,30 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          {
             beanManager.fireEvent(new NotAuthorizedEvent());
             throw new AuthorizationException(String.format(
-                  "Authorization check failed for role [%s:%s]", roleType, group));
+                  "Authorization check failed for role [%s:%s:%s]", roleType, group, groupType));
          }
       }
    }
+   
+   public void checkGroup(String group, String groupType)
+   {
+      tryLogin();
+      
+      if ( !inGroup(group, groupType) )
+      {
+         if ( !isLoggedIn() )
+         {
+            beanManager.fireEvent(new NotLoggedInEvent());
+            throw new NotLoggedInException();
+         }
+         else
+         {
+            beanManager.fireEvent(new NotAuthorizedEvent());
+            throw new AuthorizationException(String.format(
+                  "Authorization check failed for group [%s:%s]", group, groupType));
+         }
+      }
+   }   
    
    public void checkPermission(Object target, String action)
    {

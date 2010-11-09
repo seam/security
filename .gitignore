@@ -2,5 +2,5 @@ target
 .classpath
 .project
 .settings
-external/source/main/generated-source
+/external/source/main/generated-source
 *.sw?

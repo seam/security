@@ -139,6 +139,13 @@ public interface Identity
    void checkRole(String role, String group, String groupType);
    
    /**
+    * 
+    * @param group
+    * @param groupType
+    */
+   void checkGroup(String group, String groupType);
+   
+   /**
     * Checks if the currently authenticated user has the specified permission 
     * for the specified resource.
     * 
