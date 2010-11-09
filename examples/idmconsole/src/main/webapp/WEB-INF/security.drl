@@ -2,8 +2,6 @@ package IDMConsolePermissions;
 
 dialect 'mvel'
 
-import java.security.Principal;
-
 import org.jboss.seam.security.permission.PermissionCheck;
 import org.picketlink.idm.api.Role;
 
