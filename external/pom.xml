@@ -82,8 +82,8 @@
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet</artifactId>
-         <version>3.0.0i.Alpha1</version>
+         <artifactId>seam-servlet-impl</artifactId>
+         <version>3.0.0.Alpha1</version>
       </dependency>
 
       <dependency>
