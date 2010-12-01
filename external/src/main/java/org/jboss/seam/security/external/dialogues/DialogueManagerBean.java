@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
-import org.jboss.seam.servlet.event.qualifier.Destroyed;
-import org.jboss.seam.servlet.event.qualifier.Initialized;
+import org.jboss.seam.servlet.event.Destroyed;
+import org.jboss.seam.servlet.event.Initialized;
 
 /**
  * @author Marcel Kolsteren

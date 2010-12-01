@@ -33,8 +33,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRequestEvent;
 
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
-import org.jboss.seam.servlet.event.qualifier.Destroyed;
-import org.jboss.seam.servlet.event.qualifier.Initialized;
+import org.jboss.seam.servlet.event.Destroyed;
+import org.jboss.seam.servlet.event.Initialized;
 import org.slf4j.Logger;
 
 /**
