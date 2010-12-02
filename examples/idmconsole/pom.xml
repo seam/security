@@ -49,7 +49,7 @@
       <!-- Seam Security -->
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security</artifactId>
+         <artifactId>seam-security-impl</artifactId>
          <version>${project.version}</version>
          <exclusions>
            <exclusion>

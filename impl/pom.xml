@@ -10,7 +10,7 @@
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
-   <artifactId>seam-security</artifactId>
+   <artifactId>seam-security-impl</artifactId>
    <packaging>jar</packaging>
    <name>Seam Security Implementation</name>
 
