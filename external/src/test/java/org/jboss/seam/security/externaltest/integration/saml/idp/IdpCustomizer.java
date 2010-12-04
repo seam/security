@@ -25,7 +25,7 @@ import javax.enterprise.event.Observes;
 import javax.servlet.ServletContextEvent;
 
 import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.servlet.event.qualifier.Initialized;
+import org.jboss.seam.servlet.event.Initialized;
 
 public class IdpCustomizer
 {
