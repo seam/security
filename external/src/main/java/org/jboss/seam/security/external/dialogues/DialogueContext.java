@@ -30,10 +30,9 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.servlet.ServletContext;
 
-import org.jboss.seam.security.external.contexts.ContextualInstanceImpl;
+import org.jboss.seam.security.external.contexts.ContextualInstance;
 import org.jboss.seam.security.external.contexts.HashMapBeanStore;
 import org.jboss.seam.security.external.dialogues.api.DialogueScoped;
-import org.jboss.weld.context.api.ContextualInstance;
 
 /**
  * @author Marcel Kolsteren
@@ -167,7 +166,7 @@ public class DialogueContext implements Context
          T instance = contextual.create(creationalContext);
          if (instance != null)
          {
-            beanInstance = new ContextualInstanceImpl<T>(contextual, creationalContext, instance);
+            beanInstance = new ContextualInstance<T>(contextual, creationalContext, instance);
             getBeanStore().put(contextual, beanInstance);
          }
          return instance;

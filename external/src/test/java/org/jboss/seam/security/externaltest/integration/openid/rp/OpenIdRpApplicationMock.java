@@ -22,6 +22,8 @@
 package org.jboss.seam.security.externaltest.integration.openid.rp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -32,8 +34,6 @@ import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
-
-import com.google.common.collect.Lists;
 
 public class OpenIdRpApplicationMock implements OpenIdRelyingPartySpi
 {
@@ -46,7 +46,9 @@ public class OpenIdRpApplicationMock implements OpenIdRelyingPartySpi
       if (fetchEmail)
       {
          OpenIdRequestedAttribute requestedAttribute = rpApi.createOpenIdRequestedAttribute("email", "http://axschema.org/contact/email", true, 1);
-         rpApi.login(identifier, Lists.newArrayList(requestedAttribute), response);
+         List<OpenIdRequestedAttribute> requestedAttributes = new ArrayList<OpenIdRequestedAttribute>();
+         requestedAttributes.add(requestedAttribute);
+         rpApi.login(identifier, requestedAttributes, response);
       }
       else
       {

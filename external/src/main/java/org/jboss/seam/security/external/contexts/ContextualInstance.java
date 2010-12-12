@@ -24,9 +24,7 @@ package org.jboss.seam.security.external.contexts;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 
-import org.jboss.weld.context.api.ContextualInstance;
-
-public class ContextualInstanceImpl<T> implements ContextualInstance<T>
+public class ContextualInstance<T> 
 {
    private Contextual<T> contextual;
 
@@ -34,7 +32,7 @@ public class ContextualInstanceImpl<T> implements ContextualInstance<T>
 
    private T instance;
 
-   public ContextualInstanceImpl(Contextual<T> contextual, CreationalContext<T> creationalContext, T instance)
+   public ContextualInstance(Contextual<T> contextual, CreationalContext<T> creationalContext, T instance)
    {
       this.contextual = contextual;
       this.creationalContext = creationalContext;

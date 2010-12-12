@@ -22,6 +22,8 @@
 package org.jboss.seam.security.externaltest.integration.openid.op;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +37,6 @@ import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @ApplicationScoped
 public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
@@ -63,8 +62,9 @@ public class OpenIdProviderApplicationMock implements OpenIdProviderSpi
    public void setAttribute(String alias, String value, HttpServletResponse response)
    {
       dialogueManager.attachDialogue(dialogueId);
-      Map<String, List<String>> attributes = Maps.newHashMap();
-      attributes.put(alias, Lists.newArrayList(value));
+      Map<String, List<String>> attributes = new HashMap<String, List<String>>();
+      attributes.put(alias, new ArrayList<String>());
+      attributes.get(alias).add(value);
       opApi.setAttributes(attributes, response);
       dialogueManager.detachDialogue();
    }

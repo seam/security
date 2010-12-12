@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.enterprise.context.spi.Contextual;
 
-import org.jboss.weld.context.api.ContextualInstance;
-
 /**
  * Non-serializable bean store, based on a hash map. This bean store should not
  * be used for passivating scopes!
