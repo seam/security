@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.inject.Model;
-import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,9 +47,6 @@ public class Attributes implements Serializable
 
    @Inject
    private OpenIdProviderApi providerApi;
-
-   @Inject
-   private ExternalContext externalContext;
 
    public void setRequestedAttributes(List<OpenIdRequestedAttribute> requestedAttributes)
    {
@@ -78,6 +75,6 @@ public class Attributes implements Serializable
             attributeValues.put(attributeVO.getRequestedAttribute().getAlias(), Arrays.asList(attributeVO.getAttributeValue()));
          }
       }
-      providerApi.setAttributes(attributeValues, (HttpServletResponse) externalContext.getResponse());
+      providerApi.setAttributes(attributeValues, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
    }
 }

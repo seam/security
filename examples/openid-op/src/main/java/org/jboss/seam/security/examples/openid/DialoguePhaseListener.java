@@ -22,13 +22,12 @@
 package org.jboss.seam.security.examples.openid;
 
 import javax.enterprise.event.Observes;
-import javax.faces.event.PhaseEvent;
 import javax.inject.Inject;
+import javax.servlet.ServletRequest;
 
-import org.jboss.seam.faces.event.qualifier.Before;
-import org.jboss.seam.faces.event.qualifier.RestoreView;
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
-import org.jboss.seam.servlet.http.HttpParam;
+import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.seam.servlet.http.RequestParam;
 
 public class DialoguePhaseListener
 {
@@ -40,10 +39,10 @@ public class DialoguePhaseListener
    private DialogueManager manager;
 
    @Inject
-   @HttpParam("dialogueId")
+   @RequestParam("dialogueId")
    private String dialogueId;
 
-   public void beforeRestoreView(@Observes @Before @RestoreView PhaseEvent phaseEvent)
+   public void requestInitialized(@Observes @Initialized final ServletRequest request)
    {
       if (dialogueId != null && !manager.isAttached())
       {

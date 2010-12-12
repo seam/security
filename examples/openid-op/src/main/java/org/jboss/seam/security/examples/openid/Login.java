@@ -22,7 +22,7 @@
 package org.jboss.seam.security.examples.openid;
 
 import javax.enterprise.inject.Model;
-import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,9 +46,6 @@ public class Login
 
    @Inject
    private Identity identity;
-
-   @Inject
-   private ExternalContext externalContext;
 
    public String getUserName()
    {
@@ -91,7 +88,7 @@ public class Login
       identity.localLogin(userName);
       if (dialogueManager.isAttached())
       {
-         opApi.authenticationSucceeded(userName, (HttpServletResponse) externalContext.getResponse());
+         opApi.authenticationSucceeded(userName, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
          return null;
       }
       else
@@ -104,7 +101,7 @@ public class Login
    {
       if (dialogueManager.isAttached())
       {
-         opApi.authenticationFailed((HttpServletResponse) externalContext.getResponse());
+         opApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
       }
       else
       {

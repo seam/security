@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.enterprise.inject.Model;
-import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,9 +41,6 @@ public class SessionManagement
 
    @Inject
    private SamlIdentityProviderConfigurationApi idpConfApi;
-
-   @Inject
-   private ExternalContext externalContext;
 
    public List<String> getNonParticipatingServiceProviders()
    {
@@ -82,6 +79,6 @@ public class SessionManagement
       {
          throw new RuntimeException("No local SAML session.");
       }
-      idpApi.remoteLogin(spEntityId, null, (HttpServletResponse) externalContext.getResponse());
+      idpApi.remoteLogin(spEntityId, null, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
    }
 }

@@ -26,11 +26,11 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
 import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 import org.jboss.seam.security.external.spi.SamlIdentityProviderSpi;
-import org.slf4j.Logger;
 
 public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi
 {

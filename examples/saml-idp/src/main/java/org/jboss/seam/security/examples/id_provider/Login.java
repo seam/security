@@ -22,7 +22,7 @@
 package org.jboss.seam.security.examples.id_provider;
 
 import javax.enterprise.inject.Model;
-import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,9 +44,6 @@ public class Login
 
    @Inject
    private Identity identity;
-
-   @Inject
-   private ExternalContext externalContext;
 
    public String getUserName()
    {
@@ -74,7 +71,7 @@ public class Login
       if (dialogueId != null)
       {
          dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationSucceeded((HttpServletResponse) externalContext.getResponse());
+         samlIdentityProviderApi.authenticationSucceeded((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
          dialogueManager.detachDialogue();
          return "SAML_LOGIN";
       }
@@ -89,7 +86,7 @@ public class Login
       if (dialogueId != null)
       {
          dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationFailed((HttpServletResponse) externalContext.getResponse());
+         samlIdentityProviderApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
          dialogueManager.detachDialogue();
       }
       else

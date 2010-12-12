@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,9 +47,6 @@ public class Identity implements Serializable
    @Inject
    private OpenIdRelyingPartyApi openIdApi;
 
-   @Inject
-   private ExternalContext externalContext;
-
    public OpenIdPrincipal getOpenIdPrincipal()
    {
       return openIdPrincipal;
@@ -62,7 +58,7 @@ public class Identity implements Serializable
       {
          List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
          attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
-         openIdApi.login(openId, attributes, (HttpServletResponse) externalContext.getResponse());
+         openIdApi.login(openId, attributes, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
       }
       else
       {

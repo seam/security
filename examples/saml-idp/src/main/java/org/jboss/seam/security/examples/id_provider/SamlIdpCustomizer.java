@@ -22,14 +22,14 @@
 package org.jboss.seam.security.examples.id_provider;
 
 import javax.enterprise.event.Observes;
-import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.servlet.event.qualifier.Initialized;
+import org.jboss.seam.servlet.event.Initialized;
 
 public class SamlIdpCustomizer
 {
-   public void servletInitialized(@Observes @Initialized final ServletContextEvent e, SamlIdentityProviderConfigurationApi idp)
+   public void servletInitialized(@Observes @Initialized final ServletContext context, SamlIdentityProviderConfigurationApi idp)
    {
       idp.setEntityId("http://www.saml-idp.com");
       idp.setHostName("www.saml-idp.com");
