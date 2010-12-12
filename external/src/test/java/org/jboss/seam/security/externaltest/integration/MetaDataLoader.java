@@ -46,7 +46,7 @@ public class MetaDataLoader
       {
          URL url = new URL("http://localhost:8080/" + idpOrSp + "/saml/" + idpOrSp.toUpperCase() + "/MetaDataService");
          uc = url.openConnection();
-         uc.setRequestProperty("Host", hostName);
+         uc.setRequestProperty("host", hostName);
          Reader reader = new InputStreamReader(uc.getInputStream());
          samlEntityBean.get().addExternalSamlEntity(reader);
       }

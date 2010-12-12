@@ -16,9 +16,10 @@
 
    <properties>
       <arquillian.version>1.0.0.Alpha3</arquillian.version>
+      <seam.servlet.version>3.0.0.Alpha2</seam.servlet.version>
+      <weld.core.version>1.1.0.Beta2</weld.core.version>
       <jbossas.server.manager.version>1.0.3.GA</jbossas.server.manager.version>
-      <jbossas.client.version>6.0.0.20100721-M4</jbossas.client.version>
-      <weld.extensions.version>1.0.0.Alpha2</weld.extensions.version>
+      <jbossas.client.version>6.0.0.20100911-M5</jbossas.client.version>
    </properties>
 
    <build>
@@ -66,6 +67,7 @@
          <groupId>org.jboss.weld</groupId>
          <artifactId>weld-core</artifactId>
          <scope>provided</scope>
+         <version>${weld.core.version}</version>
       </dependency>
 
       <dependency>
@@ -77,13 +79,13 @@
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet-api</artifactId>
-         <version>3.0.0.Alpha1</version>
+         <version>${seam.servlet.version}</version>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet-impl</artifactId>
-         <version>3.0.0.Alpha1</version>
+         <version>${seam.servlet.version}</version>
       </dependency>
 
       <dependency>

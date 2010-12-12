@@ -62,6 +62,7 @@ import org.jboss.seam.security.external.saml.api.SamlPrincipal;
  * 
  */
 @Typed(SamlIdpBean.class)
+@SuppressWarnings("restriction")
 public class SamlIdpBean extends SamlEntityBean implements SamlMultiUserIdentityProviderApi, SamlIdentityProviderConfigurationApi
 {
    @Inject

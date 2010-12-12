@@ -24,6 +24,7 @@ package org.jboss.seam.security.external.dialogues;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
@@ -42,12 +43,12 @@ public class DialogueManagerBean implements DialogueManager
    @Inject
    private Instance<DialogueBean> dialogue;
 
-   public void servletInitialized(@Observes @Initialized final ServletContextEvent e)
+   public void servletInitialized(@Observes @Initialized final ServletContext context)
    {
-      dialogueContextExtension.getDialogueContext().initialize(e.getServletContext());
+      dialogueContextExtension.getDialogueContext().initialize(context);
    }
 
-   public void servletDestroyed(@Observes @Destroyed final ServletContextEvent e)
+   public void servletDestroyed(@Observes @Destroyed final ServletContext context)
    {
       dialogueContextExtension.getDialogueContext().destroy();
    }

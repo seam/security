@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBException;
  * @author Marcel Kolsteren
  * 
  */
+@SuppressWarnings("restriction")
 public class JaxbContextProducer
 {
    @Produces

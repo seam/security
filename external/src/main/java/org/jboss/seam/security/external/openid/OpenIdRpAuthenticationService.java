@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.OpenIdPrincipalImpl;
 import org.jboss.seam.security.external.ResponseHandler;
@@ -49,7 +50,6 @@ import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
-import org.slf4j.Logger;
 
 /**
  * @author Marcel Kolsteren

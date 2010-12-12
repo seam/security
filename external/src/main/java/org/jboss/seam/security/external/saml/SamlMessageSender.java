@@ -42,6 +42,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.ResponseHandler;
@@ -53,7 +54,6 @@ import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
 import org.jboss.seam.security.external.saml.api.SamlBinding;
 import org.jboss.seam.security.external.saml.sp.SamlExternalIdentityProvider;
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -62,6 +62,7 @@ import org.w3c.dom.Node;
  * 
  */
 @ApplicationScoped
+@SuppressWarnings("restriction")
 public class SamlMessageSender
 {
    @Inject
@@ -197,10 +198,7 @@ public class SamlMessageSender
 
    private void sendMessage(SamlExternalEntity samlProvider, Document message, SamlRequestOrResponse samlRequestOrResponse, SamlEndpoint endpoint, HttpServletResponse response)
    {
-      if (log.isDebugEnabled())
-      {
-         log.debug("Sending " + samlRequestOrResponse + ": " + SamlUtils.getDocumentAsString(message));
-      }
+      log.debug("Sending " + samlRequestOrResponse + ": " + SamlUtils.getDocumentAsString(message));
 
       try
       {

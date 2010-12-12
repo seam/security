@@ -29,13 +29,12 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
 import org.jboss.seam.servlet.event.Destroyed;
 import org.jboss.seam.servlet.event.Initialized;
-import org.slf4j.Logger;
 
 /**
  * @author Marcel Kolsteren
@@ -44,9 +43,6 @@ import org.slf4j.Logger;
 @ApplicationScoped
 public class VirtualApplicationManager
 {
-   @Inject
-   private Logger log;
-
    @Inject
    private VirtualApplicationContextExtension virtualApplicationContextExtension;
 
@@ -58,10 +54,9 @@ public class VirtualApplicationManager
 
    private Set<String> hostNames = new HashSet<String>();
 
-   protected void servletInitialized(@Observes @Initialized final ServletContextEvent e)
+   protected void servletInitialized(@Observes @Initialized final ServletContext context)
    {
-      log.trace("Servlet initialized with event {}", e);
-      getVirtualApplicationContext().initialize(e.getServletContext());
+      getVirtualApplicationContext().initialize(context);
 
       AfterVirtualApplicationManagerCreationEvent afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreationEvent();
       beanManager.fireEvent(afterVirtualApplicationManagerCreation);
@@ -76,9 +71,8 @@ public class VirtualApplicationManager
       }
    }
 
-   protected void servletDestroyed(@Observes @Destroyed final ServletContextEvent e)
+   protected void servletDestroyed(@Observes @Destroyed final ServletContext context)
    {
-      log.trace("Servlet destroyed with event {}", e);
       for (String hostName : hostNames)
       {
          if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
@@ -89,19 +83,17 @@ public class VirtualApplicationManager
       }
    }
 
-   protected void requestInitialized(@Observes @Initialized final ServletRequestEvent e)
+   protected void requestInitialized(@Observes @Initialized final ServletRequest request)
    {
-      log.trace("Servlet request initialized with event {}", e);
-      String hostName = e.getServletRequest().getServerName();
+      String hostName = request.getServerName();
       if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
       {
          attach(hostName);
       }
    }
 
-   protected void requestDestroyed(@Observes @Destroyed final ServletRequestEvent e)
+   protected void requestDestroyed(@Observes @Destroyed final ServletRequest request)
    {
-      log.trace("Servlet request destroyed with event {}", e);
       if (getVirtualApplicationContext().isActive())
       {
          detach();

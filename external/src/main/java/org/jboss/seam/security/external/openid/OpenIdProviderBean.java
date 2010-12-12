@@ -58,6 +58,7 @@ import org.openid4java.discovery.DiscoveryInformation;
  * 
  */
 @Typed(OpenIdProviderBean.class)
+@SuppressWarnings("restriction")
 public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi, OpenIdProviderConfigurationApi
 {
    @Inject

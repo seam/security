@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
-import org.slf4j.Logger;
 
 /**
  * @author Marcel Kolsteren
@@ -77,10 +77,7 @@ public class SamlServlet extends HttpServlet
       catch (InvalidRequestException e)
       {
          response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getDescription());
-         if (log.isInfoEnabled())
-         {
-            log.info("Bad request received from {}: {}", request.getRemoteHost(), e.getDescription());
-         }
+         log.infof("Bad request received from %s: %s", request.getRemoteHost(), e.getDescription());
       }
    }
 

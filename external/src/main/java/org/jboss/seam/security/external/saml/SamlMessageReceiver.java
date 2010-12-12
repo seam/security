@@ -40,6 +40,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.JaxbContext;
@@ -53,7 +54,6 @@ import org.jboss.seam.security.external.saml.idp.SamlIdpSingleSignOnService;
 import org.jboss.seam.security.external.saml.sp.SamlSpBean;
 import org.jboss.seam.security.external.saml.sp.SamlSpSingleLogoutService;
 import org.jboss.seam.security.external.saml.sp.SamlSpSingleSignOnService;
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -62,6 +62,7 @@ import org.xml.sax.SAXException;
  * 
  */
 @ApplicationScoped
+@SuppressWarnings("restriction")
 public class SamlMessageReceiver
 {
    @Inject
@@ -154,10 +155,7 @@ public class SamlMessageReceiver
          samlResponseMessage = getSamlResponse(document);
          issuerEntityId = samlResponseMessage.getIssuer().getValue();
       }
-      if (log.isDebugEnabled())
-      {
-         log.debug("Received: " + SamlUtils.getDocumentAsString(document));
-      }
+      log.debug("Received: " + SamlUtils.getDocumentAsString(document));
 
       try
       {
@@ -230,10 +228,6 @@ public class SamlMessageReceiver
 
          if (validate)
          {
-            if (log.isDebugEnabled())
-            {
-               log.debug("Validating the signature");
-            }
             if (httpRequest.getMethod().equals("POST"))
             {
                signatureUtilForPostBinding.validateSignature(externalProvider.getPublicKey(), document);

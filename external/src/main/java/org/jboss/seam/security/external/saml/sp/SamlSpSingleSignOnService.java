@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.SamlNameIdImpl;
@@ -58,12 +59,12 @@ import org.jboss.seam.security.external.saml.SamlRedirectMessage;
 import org.jboss.seam.security.external.saml.SamlServiceType;
 import org.jboss.seam.security.external.saml.SamlUtils;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
-import org.slf4j.Logger;
 
 /**
  * @author Marcel Kolsteren
  * 
  */
+@SuppressWarnings("restriction")
 public class SamlSpSingleSignOnService
 {
    @Inject
@@ -267,7 +268,7 @@ public class SamlSpSingleSignOnService
                }
                else
                {
-                  log.debug("Validation of assertion failed: validRecipient: {}; notTootLate: {}; validInResponseTo: {}", new Object[] { validRecipient, notTooLate, validInResponseTo });
+                  log.debugf("Validation of assertion failed: validRecipient: %b; notTootLate: %b; validInResponseTo: %b", new Object[] { validRecipient, notTooLate, validInResponseTo });
                }
             }
          }

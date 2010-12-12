@@ -39,14 +39,14 @@ public class DialogueBeanProvider
 {
    public static Dialogue dialogue(ServletContext servletContext)
    {
-      BeanManager beanManager = BeanManagerAccessor.getManager(); //  getModuleBeanManager(servletContext);
+      BeanManager beanManager = BeanManagerAccessor.getBeanManager(); //  getModuleBeanManager(servletContext);
       Bean<?> bean = beanManager.resolve(beanManager.getBeans(Dialogue.class));
       return (Dialogue) beanManager.getReference(bean, Dialogue.class, beanManager.createCreationalContext(bean));
    }
 
    public static DialogueManager dialogueManager(ServletContext servletContext)
    {
-      BeanManager beanManager = BeanManagerAccessor.getManager(); //getModuleBeanManager(servletContext);
+      BeanManager beanManager = BeanManagerAccessor.getBeanManager(); //getModuleBeanManager(servletContext);
       Bean<?> bean = beanManager.resolve(beanManager.getBeans(DialogueManager.class));
       return (DialogueManager) beanManager.getReference(bean, DialogueManager.class, beanManager.createCreationalContext(bean));
    }

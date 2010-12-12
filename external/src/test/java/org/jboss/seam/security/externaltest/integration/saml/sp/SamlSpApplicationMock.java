@@ -27,13 +27,13 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
 import org.jboss.seam.security.external.saml.api.SamlSpSession;
 import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
-import org.slf4j.Logger;
 
 @VirtualApplicationScoped
 public class SamlSpApplicationMock implements SamlServiceProviderSpi
