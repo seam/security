@@ -16,7 +16,7 @@
    <modules>
       <module>api</module>
       <module>impl</module>
-      <!--module>external</module-->
+      <module>external</module>
    </modules>
    
    <prerequisites>

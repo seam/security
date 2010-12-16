@@ -651,4 +651,10 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       return Collections.unmodifiableSet(activeGroups);
    }
+
+   public boolean isVerified()
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
 }

@@ -53,7 +53,7 @@
       </dependencySet>
       <!-- Pull in the example projects -->
       <dependencySet>
-         <outputDirectory>examples</outputDirectory>
+         <outputDirectory>examples/idmconsole</outputDirectory>
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>

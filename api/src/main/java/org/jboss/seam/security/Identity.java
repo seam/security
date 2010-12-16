@@ -25,6 +25,14 @@ public interface Identity
    boolean isLoggedIn();
    
    /**
+    * Returns true if the currently authenticated user has provided their correct credentials
+    * within the verification window configured by the application.
+    * 
+    * @return
+    */
+   boolean isVerified();
+   
+   /**
     * Will attempt to authenticate quietly if the user's credentials are set and they haven't
     * authenticated already.  A quiet authentication doesn't throw any exceptions if authentication
     * fails.
