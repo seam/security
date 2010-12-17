@@ -1,6 +1,9 @@
 package org.jboss.seam.security;
 
+import org.jboss.weld.extensions.core.Requires;
+
 import org.hibernate.EmptyInterceptor;
+
 /*
 import static org.jboss.seam.security.EntityAction.DELETE;
 import static org.jboss.seam.security.EntityAction.INSERT;
@@ -19,6 +22,7 @@ import org.hibernate.type.Type;*/
  * @author Shane Bryzak
  *
  */
+@Requires("org.hibernate.EmptyInterceptor")
 public class HibernateSecurityInterceptor extends EmptyInterceptor
 {
    private static final long serialVersionUID = 4418010755107869488L;
