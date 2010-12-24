@@ -16,7 +16,6 @@
 
    <properties>
       <arquillian.version>1.0.0.Alpha3</arquillian.version>
-      <seam.servlet.version>3.0.0.Alpha2</seam.servlet.version>
       <weld.core.version>1.1.0.Beta2</weld.core.version>
       <jbossas.server.manager.version>1.0.3.GA</jbossas.server.manager.version>
       <jbossas.client.version>6.0.0.20100911-M5</jbossas.client.version>
@@ -64,28 +63,21 @@
    <dependencies>
 
       <dependency>
-         <groupId>org.jboss.weld</groupId>
-         <artifactId>weld-extensions</artifactId>
-         <version>${weld.extensions.version}</version>
-      </dependency>
-
-      <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet-api</artifactId>
-         <version>${seam.servlet.version}</version>
+         <artifactId>seam-servlet</artifactId>
+         <version>3.0.0.Alpha3</version>
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet-impl</artifactId>
-         <version>${seam.servlet.version}</version>
+         <groupId>org.jboss.seam.solder</groupId>
+         <artifactId>seam-solder</artifactId>
       </dependency>
 
-      <dependency>
+      <!--dependency>
          <groupId>javax.el</groupId>
          <artifactId>el-api</artifactId>
          <scope>provided</scope>
-      </dependency>
+      </dependency-->
 
       <dependency>
          <groupId>javax.validation</groupId>

@@ -62,11 +62,10 @@ class ArchiveBuilder
    {
       WebArchive war = ShrinkWrap.create(WebArchive.class, entity + ".war");
 
-      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet-impl"));
-      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet-api"));
+      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet"));
       war.addLibraries(MavenArtifactResolver.resolve("org.openid4java", "openid4java"));
       war.addLibraries(MavenArtifactResolver.resolve("nekohtml", "nekohtml"));
-      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.weld:weld-extensions"));
+      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.solder:seam-solder"));
       war.addLibraries(MavenArtifactResolver.resolve("commons-httpclient:commons-httpclient"));
 
       war.addWebResource("WEB-INF/" + entity + "-beans.xml", "beans.xml");

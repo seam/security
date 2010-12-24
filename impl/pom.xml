@@ -19,11 +19,11 @@
 
    <dependencies>
 
-      <dependency>
+      <!--dependency>
          <groupId>javax.el</groupId>
          <artifactId>el-api</artifactId>
          <scope>provided</scope>
-      </dependency>
+      </dependency-->
 
       <dependency>
          <groupId>javax.validation</groupId>
@@ -41,21 +41,6 @@
          <groupId>org.jboss.spec.javax.interceptor</groupId>
          <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
          <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.weld</groupId>
-         <artifactId>weld-extensions</artifactId>
-         <exclusions>
-            <exclusion>
-               <groupId>javassist</groupId>
-               <artifactId>javassist</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>javax.transaction</groupId>
-               <artifactId>jta</artifactId>
-            </exclusion>
-         </exclusions>
       </dependency>
 
       <dependency>
@@ -158,9 +143,14 @@
 
       <dependency>
          <groupId>org.jboss.seam.persistence</groupId>
-         <artifactId>seam-persistence-api</artifactId>
-         <version>3.0.0.Beta1</version>
+         <artifactId>seam-persistence</artifactId>
+         <version>3.0.0.Beta2</version>
          <optional>true</optional>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.solder</groupId>
+         <artifactId>seam-solder</artifactId>
       </dependency>
 
       <dependency>

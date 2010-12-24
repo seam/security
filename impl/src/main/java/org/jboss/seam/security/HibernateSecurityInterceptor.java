@@ -1,6 +1,6 @@
 package org.jboss.seam.security;
 
-import org.jboss.weld.extensions.core.Requires;
+import org.jboss.seam.solder.core.Requires;
 
 import org.hibernate.EmptyInterceptor;
 

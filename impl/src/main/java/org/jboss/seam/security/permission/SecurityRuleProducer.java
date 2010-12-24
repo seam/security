@@ -17,7 +17,7 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.jboss.seam.security.qualifiers.Security;
-import org.jboss.weld.extensions.resourceLoader.Resource;
+import org.jboss.seam.solder.resourceLoader.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
