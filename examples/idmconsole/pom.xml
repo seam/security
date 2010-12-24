@@ -72,14 +72,14 @@
 
       <dependency>
          <groupId>org.jboss.seam.persistence</groupId>
-         <artifactId>seam-persistence-impl</artifactId>
-         <version>3.0.0.Beta1</version>
+         <artifactId>seam-persistence</artifactId>
+         <version>3.0.0.Beta2</version>
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.xml</groupId>
-         <artifactId>seam-xml-config</artifactId>
-         <version>3.0.0.Beta1</version>
+         <groupId>org.jboss.seam.config</groupId>
+         <artifactId>seam-config-xml</artifactId>
+         <version>3.0.0.Beta2</version>
          <exclusions>
             <exclusion>
                <groupId>org.jboss.spec.javax.interceptor</groupId>
@@ -92,12 +92,6 @@
       <dependency>
          <groupId>javax.enterprise</groupId>
          <artifactId>cdi-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-      <!-- Common annotations (e.g., @PostConstruct, @PreDestroy, @Generated, @Resource)  -->
-      <dependency>
-         <groupId>javax.annotation</groupId>
-         <artifactId>jsr250-api</artifactId>
          <scope>provided</scope>
       </dependency>
 
