@@ -24,25 +24,6 @@
       <jboss.domain>default</jboss.domain>
    </properties>
 
-   <repositories>
-       <!-- Several key Java EE APIs and RIs are missing from the Maven Central Repository -->
-       <!-- The goal is to eventually eliminate the reliance on the JBoss repository -->
-       <repository>
-          <id>repository.jboss.org</id>
-          <name>JBoss Repository</name>
-          <url>http://repository.jboss.org/maven2</url>
-       </repository>
-   </repositories>
-
-   <pluginRepositories>
-      <!-- GlassFish repository required for embedded-glassfish plugin -->
-      <!--pluginRepository>
-         <id>glassfish</id>
-         <name>GlassFish Maven 2 Repository</name>
-         <url>http://download.java.net/maven/glassfish</url>
-      </pluginRepository-->
-   </pluginRepositories>
-
    <dependencies>
 
       <!-- Seam Security -->
@@ -50,12 +31,6 @@
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-impl</artifactId>
          <version>${project.version}</version>
-         <exclusions>
-           <exclusion>
-             <groupId>javassist</groupId>
-             <artifactId>javassist</artifactId>
-           </exclusion>
-         </exclusions>
       </dependency>
 
       <dependency>
@@ -80,12 +55,6 @@
          <groupId>org.jboss.seam.config</groupId>
          <artifactId>seam-config-xml</artifactId>
          <version>3.0.0.Beta2</version>
-         <exclusions>
-            <exclusion>
-               <groupId>org.jboss.spec.javax.interceptor</groupId>
-               <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-            </exclusion>
-         </exclusions>
       </dependency>
 
       <!-- CDI (JSR-299) -->
@@ -107,6 +76,7 @@
          <artifactId>validation-api</artifactId>
          <scope>provided</scope>
       </dependency>
+
       <!-- Bean Validation Implementation -->
       <!-- Provides portable constraints such as @NotEmpty, @Email and @Url -->
       <!-- Hibernate Validator is the only JSR-303 implementation at the moment, so we can assume it's provided -->
@@ -116,6 +86,7 @@
          <version>4.0.0.GA</version>
          <scope>provided</scope>
       </dependency>
+
       <!-- JSF -->
       <dependency>
          <groupId>javax.faces</groupId>
@@ -161,19 +132,6 @@
             </configuration>
          </plugin>
 
-         <!-- Eclipse plugin can force download of source and JavaDoc jars -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-eclipse-plugin</artifactId>
-            <configuration>
-               <wtpversion>2.0</wtpversion>
-               <!--
-               <downloadSources>true</downloadSources>
-               <downloadJavadocs>true</downloadJavadocs>
-               -->
-            </configuration>
-         </plugin>
-         
          <!-- Configure the JBoss AS Maven deploy plugin -->
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -186,17 +144,6 @@
                </fileNames> 
             </configuration>
          </plugin>
-         <!-- Configure the Embedded GlassFish Maven plugin -->
-         <!--plugin>
-            <groupId>org.glassfish</groupId>
-            <artifactId>maven-embedded-glassfish-plugin</artifactId>
-            <version>3.0</version>
-            <configuration>
-               <app>${project.build.directory}/${project.build.finalName}.war</app>
-               <port>7070</port>
-               <containerType>web</containerType>
-            </configuration>
-         </plugin-->
       </plugins>
    </build>
 </project>
