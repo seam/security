@@ -38,7 +38,7 @@
             <scope>import</scope>
          </dependency>
 
-         <!-- Override sub-module versions from org.jboss.seam:seam -->
+         <!-- Override sub-module versions from org.jboss.seam:seam-bom -->
          <dependency>
             <groupId>org.jboss.seam.security</groupId>
             <artifactId>seam-security-api</artifactId>
@@ -65,7 +65,6 @@
          <modules>
             <module>dist</module>
             <module>docs</module>
-            <!--module>examples/seamspace</module-->
             <module>examples/idmconsole</module>
          </modules>
       </profile>
