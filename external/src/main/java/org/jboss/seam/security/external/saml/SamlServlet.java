@@ -44,8 +44,9 @@ public class SamlServlet extends HttpServlet
 {
    private static final long serialVersionUID = -6125510783395424719L;
 
-   @Inject
-   private Logger log;
+   // TODO: use injection as soon as Jira issue SOLDER-63 has been solved
+   // @Inject
+   private Logger log = Logger.getLogger(SamlServlet.class);
 
    @Inject
    private SamlMessageReceiver samlMessageReceiver;

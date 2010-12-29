@@ -44,8 +44,9 @@ public class OpenIdServlet extends HttpServlet
 {
    private static final long serialVersionUID = -3058316157797375740L;
 
-   @Inject
-   private Logger log;
+   // TODO: use injection as soon as Jira issue SOLDER-63 has been solved
+   // @Inject
+   private Logger log = Logger.getLogger(OpenIdServlet.class);
 
    @Inject
    private ResponseHandler responseHandler;

@@ -36,6 +36,12 @@
 			</exclusions>
 		</dependency>
 
+      <dependency>
+         <groupId>org.jboss.seam.servlet</groupId>
+         <artifactId>seam-servlet</artifactId>
+         <version>3.0.0.Alpha3</version>
+      </dependency>
+
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
