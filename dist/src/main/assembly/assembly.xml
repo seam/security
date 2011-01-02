@@ -29,6 +29,7 @@
          <includes>
             <include>org.jboss.seam.security:seam-security-api</include>
             <include>org.jboss.seam.security:seam-security-impl</include>
+            <include>org.jboss.seam.security:seam-security-external</include>
          </includes>
          <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
@@ -57,11 +58,46 @@
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
-            <!--include>org.jboss.seam.security:seam-security-seamspace-example</include-->
             <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
          </includes>
       </dependencySet>
+      <dependencySet>
+         <outputDirectory>examples/openid-op</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:openid-op</include>
+         </includes>
+      </dependencySet>
+      <dependencySet>
+         <outputDirectory>examples/openid-rp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:openid-rp</include>
+         </includes>
+      </dependencySet>
+      
+      <dependencySet>
+         <outputDirectory>examples/saml-idp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:saml-idp</include>
+         </includes>
+      </dependencySet>
+      
+      <dependencySet>
+         <outputDirectory>examples/saml-sp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:saml-sp</include>
+         </includes>
+      </dependencySet>      
+      
       <!-- Pull in docbook artifacts -->
+      
       <dependencySet>
          <outputDirectory>doc/reference</outputDirectory>
          <unpack>true</unpack>

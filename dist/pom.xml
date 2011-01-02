@@ -19,6 +19,7 @@
    </properties>
 
    <dependencies>
+      <!-- Libraries -->
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
@@ -30,6 +31,14 @@
          <artifactId>seam-security-impl</artifactId>
          <optional>true</optional>
       </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-external</artifactId>
+         <optional>true</optional>
+      </dependency>
+      
+      <!-- Source -->
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
@@ -41,20 +50,28 @@
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-impl</artifactId>
+         <version>${project.version}</version>
+         <classifier>sources</classifier>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-external</artifactId>
+         <version>${project.version}</version>
+         <classifier>sources</classifier>
+      </dependency>      
+      
+      <!-- Javadoc -->
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
          <version>${project.version}</version>
          <classifier>javadoc</classifier>
          <optional>true</optional>
       </dependency>
 
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-impl</artifactId>
-         <version>${project.version}</version>
-         <classifier>sources</classifier>
-      </dependency>
-
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-impl</artifactId>
@@ -62,6 +79,16 @@
          <classifier>javadoc</classifier>
          <optional>true</optional>
       </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-external</artifactId>
+         <version>${project.version}</version>
+         <classifier>javadoc</classifier>
+         <optional>true</optional>
+      </dependency>
+      
+      <!-- Reference docs -->
 
       <!--dependency>
          <groupId>org.jboss.seam.security</groupId>
@@ -70,14 +97,8 @@
          <type>war</type>
          <optional>true</optional>
       </dependency-->
-
-      <!--dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-seamspace-example</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency-->
+      
+      <!-- Examples -->
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
@@ -86,6 +107,38 @@
          <type>war</type>
          <optional>true</optional>
       </dependency>
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>openid-op</artifactId>
+         <version>${project.version}</version>
+         <type>war</type>
+         <optional>true</optional>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>openid-rp</artifactId>
+         <version>${project.version}</version>
+         <type>war</type>
+         <optional>true</optional>
+      </dependency>  
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>saml-idp</artifactId>
+         <version>${project.version}</version>
+         <type>war</type>
+         <optional>true</optional>
+      </dependency>
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>saml-sp</artifactId>
+         <version>${project.version}</version>
+         <type>war</type>
+         <optional>true</optional>
+      </dependency>                
 
    </dependencies>
 
