@@ -7,5 +7,7 @@ package org.jboss.seam.security;
  */
 public interface Authenticator
 {
-   boolean authenticate();
+   public enum AuthStatus { SUCCESS, FAILURE, DEFERRED }
+   
+   AuthStatus authenticate();
 }

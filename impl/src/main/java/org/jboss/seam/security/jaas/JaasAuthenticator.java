@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.Model;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Shane Bryzak
  *
  */
-public @RequestScoped @Alternative class JaasAuthenticator implements Authenticator
+public @Model class JaasAuthenticator implements Authenticator
 {  
    Logger log = LoggerFactory.getLogger(JaasAuthenticator.class);
    
@@ -47,7 +48,7 @@ public @RequestScoped @Alternative class JaasAuthenticator implements Authentica
       subject = new Subject();
    }
    
-   public boolean authenticate()
+   public AuthStatus authenticate()
    {
       if (getJaasConfigName() == null)
       {
@@ -57,12 +58,12 @@ public @RequestScoped @Alternative class JaasAuthenticator implements Authentica
       try
       {
          getLoginContext().login();
-         return true;
+         return AuthStatus.SUCCESS;
       }
       catch (LoginException e)
       {
          log.error("JAAS authentication failed", e);
-         return false;
+         return AuthStatus.FAILURE;
       }
    }
 

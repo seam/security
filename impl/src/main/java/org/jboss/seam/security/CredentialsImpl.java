@@ -3,12 +3,14 @@ package org.jboss.seam.security;
 import java.io.Serializable;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.security.events.CredentialsInitializedEvent;
 import org.jboss.seam.security.events.CredentialsUpdatedEvent;
+import org.jboss.seam.security.events.LoginFailedEvent;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.impl.api.PasswordCredential;
 
@@ -119,6 +121,11 @@ public @Named("credentials") @SessionScoped class CredentialsImpl implements Cre
       username = null;
       this.credential = null;
       initialized = false;
+   }
+   
+   public void loginFailed(@Observes LoginFailedEvent event)
+   {
+      invalidate();
    }
    
    @Override

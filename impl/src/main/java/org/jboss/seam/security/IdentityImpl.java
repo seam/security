@@ -11,11 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jboss.seam.security.Authenticator.AuthStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
@@ -27,6 +30,8 @@ import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
 import org.jboss.seam.security.permission.PermissionMapper;
+import org.jboss.seam.security.util.Strings;
+import org.jboss.seam.solder.literal.NamedLiteral;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
@@ -63,12 +68,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    @Inject private Credentials credentials;
    @Inject private PermissionMapper permissionMapper;
    
-   @Inject private IdentitySession identitySession;
-   
    @Inject Instance<RequestSecurityState> requestSecurityState;
    @Inject Instance<Authenticator> authenticators;
    
    private User user;
+   
+   private String authenticatorName;
 
    /**
     * Contains a group name to group type:role list mapping of roles assigned 
@@ -107,6 +112,16 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       // If there is a user set, then the user is logged in.
       return user != null;
+   }
+   
+   public String getAuthenticatorName()
+   {
+      return authenticatorName;
+   }
+   
+   public void setAuthenticatorName(String authenticatorName)
+   {
+      this.authenticatorName = authenticatorName;
    }
    
    public boolean tryLogin()
@@ -206,18 +221,18 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          {
             if (log.isDebugEnabled())
             {
-               log.debug("Login successful for: " + credentials);
+               log.debug("Login successful");
             }
             beanManager.fireEvent(new LoggedInEvent(user));
             return RESPONSE_LOGIN_SUCCESS;
          }
          
-         credentials.invalidate();         
+         beanManager.fireEvent(new LoginFailedEvent(null));
          return RESPONSE_LOGIN_FAILED;
       }
       catch (Exception ex)
       {
-         log.error("Login failed for: " + credentials, ex);
+         log.error("Login failed", ex);
          
          beanManager.fireEvent(new LoginFailedEvent(ex));
          
@@ -252,7 +267,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
    }
     
-   protected boolean authenticate() throws IdentityException, FeatureNotSupportedException
+   protected boolean authenticate() throws AuthenticationException
    {
       try
       {
@@ -262,62 +277,16 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          preAuthenticate();
          
-         Authenticator authenticator;
+         Authenticator authenticator = lookupAuthenticator();
          
-         if (authenticators.isAmbiguous())
-         {
-            throw new IllegalStateException("More than one Authenticator bean found - please ensure " +
-               "only one Authenticator implementation is provided");
-         }
-         else if (authenticators.isUnsatisfied())
-         {
-            authenticator = null;
-         }
-         else
-         {
-            authenticator = authenticators.get();
-         }
-                     
-         boolean success = false;
-         
-         if (authenticator != null)
-         {
-            success = authenticator.authenticate();
-         }
-         else
-         {
-            // Otherwise if identity management is enabled, use it.
-            if (identitySession != null)
-            {            
-               User u = new UserImpl(credentials.getUsername()); 
-               
-               success = identitySession.getAttributesManager().validateCredentials(
-                     u, new Credential[] {credentials.getCredential()});
-               
-               if (success)
-               {
-                  Collection<RoleType> roleTypes = identitySession.getRoleManager()
-                      .findUserRoleTypes(u);
-                  
-                  for (RoleType roleType : roleTypes)
-                  {
-                     for (Role role : identitySession.getRoleManager().findRoles(u, roleType))
-                     {
-                        addRole(role.getRoleType().getName(), 
-                              role.getGroup().getName(), role.getGroup().getGroupType());   
-                     }
-                  }                  
-               }
-            }
-         }
-         
-         if (success)
+         if (AuthStatus.SUCCESS.equals(authenticator.authenticate()))
          {
             user = new UserImpl(credentials.getUsername());
             postAuthenticate();
+            return true;
          }
          
-         return success;
+         return false;
       }
       finally
       {
@@ -325,6 +294,48 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          credentials.setCredential(null);
          authenticating = false;
       }
+   }
+   
+   /**
+    * Returns an Authenticator instance to be used for authentication. The default
+    * implementation obeys the following business logic:
+    * 
+    * 1. If the user has specified an authenticatorName property, use it to
+    * locate and return the Authenticator with that name
+    * 2. If the authenticatorName hasn't been specified, and the user has provided
+    * their own custom Authenticator, return that one
+    * 3. If the user hasn't provided a custom Authenticator, return IdmAuthenticator
+    * and attempt to use the identity management API to authenticate
+    * 
+    * @return
+    */
+   protected Authenticator lookupAuthenticator() throws AuthenticationException
+   {
+      if (!Strings.isEmpty(authenticatorName))
+      {
+         try
+         {
+            return authenticators.select(new NamedLiteral(authenticatorName)).get();
+         }
+         catch (UnsatisfiedResolutionException ex)
+         {
+            throw new AuthenticationException("The specified Authenticator [" + 
+                  authenticatorName + "] cannot be located");
+         }
+         catch (AmbiguousResolutionException ex)
+         {
+            throw new AuthenticationException("Multiple Authenticator instances named [" +
+                  authenticatorName + "] were located");
+         }
+      }
+      
+      
+      for (Authenticator auth : authenticators)
+      {
+       //  auth.
+      }      
+      
+      return null;
    }
    
    /**

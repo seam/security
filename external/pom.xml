@@ -61,6 +61,11 @@
    <dependencies>
 
       <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-api</artifactId>
+      </dependency>
+
+      <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet</artifactId>
       </dependency>

@@ -8,25 +8,14 @@
 
 		<h:form>
 			Either choose a pre-configured OpenID provider:
-			<ul>
-				<li><h:commandLink
-					action="#{identity.startLogin('https://www.google.com/accounts/o8/id')}"
-					value="Google" /></li>
-				<li><h:commandLink
-					action="#{identity.startLogin('https://me.yahoo.com')}"
-					value="Yahoo" /> <br />
-				</li>
-				<li><h:commandLink
-					action="#{identity.startLogin('https://myopenid.com')}"
-					value="myOpenID" /> <br />
-				</li>
-				<li><h:commandLink
-					action="#{identity.startLogin('http://www.openid-op.com:8080/openid-op/openid/OP/XrdsService')}"
-					value="Seam Sample OpenID Provider" /></li>
-			</ul>
+			
+			<h:selectOneRadio value="#{openIdAuthenticator.providerCode}">
+			  <f:selectItems value="#{openIdAuthenticator.providers}" var="p" itemValue="p.code" itemLabel="p.name"/>
+			</h:selectOneRadio>
+			
 			or use your own OpenID:
-			<p><h:inputText value="#{login.openId}" /> <h:commandLink
-				action="#{login.login}" value="login" /></p>
+			<p><h:inputText value="#{openIdAuthenticator.openIdProviderUrl}" /> <h:commandLink
+				action="#{identity.login}" value="login" /></p>
 		</h:form>
 
 	</ui:composition>
