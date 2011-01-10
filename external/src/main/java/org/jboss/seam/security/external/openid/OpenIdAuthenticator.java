@@ -22,8 +22,6 @@ public @Model class OpenIdAuthenticator implements Authenticator
 {
    private String openIdProviderUrl;
    
-   //private OpenIdProvider provider;
-   
    @Inject private OpenIdRelyingPartyApi openIdApi;
    
    @Inject List<OpenIdProvider> providers;

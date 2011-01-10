@@ -10,10 +10,10 @@
 			Either choose a pre-configured OpenID provider:
 			
 			<h:selectOneRadio value="#{openIdAuthenticator.providerCode}">
-			  <f:selectItems value="#{openIdAuthenticator.providers}" var="p" itemValue="p.code" itemLabel="p.name"/>
+			  <f:selectItems value="#{openIdAuthenticator.providers}" var="p" itemValue="#{p.code}" itemLabel="#{p.name}"/>
 			</h:selectOneRadio>
 			
-			or use your own OpenID:
+			or alternatively, provide your own OpenID URL:
 			<p><h:inputText value="#{openIdAuthenticator.openIdProviderUrl}" /> <h:commandLink
 				action="#{identity.login}" value="login" /></p>
 		</h:form>

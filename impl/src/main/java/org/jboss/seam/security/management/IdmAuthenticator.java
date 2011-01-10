@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
 import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
@@ -17,6 +16,8 @@ import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Authenticates using Identity Management
@@ -26,7 +27,8 @@ import org.picketlink.idm.common.exception.IdentityException;
  */
 public @Model class IdmAuthenticator implements Authenticator
 {
-   @Inject Logger log;
+   Logger log = LoggerFactory.getLogger(IdmAuthenticator.class);
+   
    @Inject IdentitySession identitySession;
    @Inject Credentials credentials;
    @Inject Identity identity;
