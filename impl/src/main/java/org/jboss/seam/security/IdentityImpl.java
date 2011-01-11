@@ -274,6 +274,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          Authenticator authenticator = lookupAuthenticator();
          
+         if (authenticator == null)
+         {
+            throw new AuthenticationException("No Authenticator could be located");
+         }
+         
          if (AuthStatus.SUCCESS.equals(authenticator.authenticate()))
          {
             user = new UserImpl(credentials.getUsername());

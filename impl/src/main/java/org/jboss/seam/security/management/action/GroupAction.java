@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.jboss.seam.persistence.transaction.Transactional;
 import org.jboss.seam.security.GroupImpl;
+import org.jboss.seam.solder.core.Requires;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.common.exception.IdentityException;
@@ -19,6 +20,7 @@ import org.picketlink.idm.common.exception.IdentityException;
  *  
  * @author Shane Bryzak
  */
+@Requires("org.jboss.seam.persistence.transaction.TransactionInterceptor")
 public @Named @ConversationScoped class GroupAction implements Serializable
 {
    private static final long serialVersionUID = -1553124158319503903L;
