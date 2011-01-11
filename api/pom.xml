@@ -16,11 +16,6 @@
    <dependencies>
 
       <dependency>
-         <groupId>org.jboss.seam.persistence</groupId>
-         <artifactId>seam-persistence</artifactId>
-      </dependency>
-
-      <dependency>
          <groupId>javax.enterprise</groupId>
          <artifactId>cdi-api</artifactId>
          <scope>provided</scope>
