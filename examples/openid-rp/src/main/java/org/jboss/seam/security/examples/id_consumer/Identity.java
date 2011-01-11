@@ -37,7 +37,7 @@ import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 @SessionScoped
-@Named
+//@Named
 public class Identity implements Serializable
 {
    private static final long serialVersionUID = -7096110154986991513L;

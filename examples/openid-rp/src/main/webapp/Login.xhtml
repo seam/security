@@ -14,8 +14,9 @@
 			</h:selectOneRadio>
 			
 			or alternatively, provide your own OpenID URL:
-			<p><h:inputText value="#{openIdAuthenticator.openIdProviderUrl}" /> <h:commandLink
-				action="#{identity.login}" value="login" /></p>
+			<p><h:inputText value="#{openIdAuthenticator.openIdProviderUrl}" /></p>
+			
+			<h:commandButton action="#{identity.login}" value="login" />
 		</h:form>
 
 	</ui:composition>
