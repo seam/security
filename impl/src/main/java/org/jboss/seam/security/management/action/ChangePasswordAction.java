@@ -7,13 +7,11 @@ import javax.inject.Inject;
 
 import org.jboss.seam.persistence.transaction.Transactional;
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.solder.core.Requires;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.PasswordCredential;
 
-@Requires("org.jboss.seam.persistence.transaction.TransactionInterceptor")
 public @Transactional @Model class ChangePasswordAction implements Serializable
 {
    private static final long serialVersionUID = -8727330690588109980L;

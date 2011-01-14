@@ -1,10 +1,7 @@
 package org.jboss.seam.security;
 
-import java.security.Principal;
 import java.util.Collection;
 import java.util.Set;
-
-import javax.security.auth.Subject;
 
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;

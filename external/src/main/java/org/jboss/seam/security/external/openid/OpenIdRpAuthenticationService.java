@@ -88,6 +88,10 @@ public class OpenIdRpAuthenticationService
 
          // retrieve the previously stored discovery information
          DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
+         if (discovered == null)
+         {
+            throw new IllegalStateException("No discovery information found in OpenID request");
+         }         
 
          // extract the receiving URL from the HTTP request
          StringBuffer receivingURL = httpRequest.getRequestURL();

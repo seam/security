@@ -59,12 +59,14 @@
          <groupId>org.drools</groupId>
          <artifactId>drools-core</artifactId>
          <version>${drools.version}</version>
+         <optional>true</optional>
       </dependency>
 
       <dependency>
          <groupId>org.drools</groupId>
          <artifactId>drools-compiler</artifactId>
          <version>${drools.version}</version>
+         <optional>true</optional>
       </dependency>
 
       <!--dependency>
@@ -144,7 +146,6 @@
       <dependency>
          <groupId>org.jboss.seam.persistence</groupId>
          <artifactId>seam-persistence</artifactId>
-         <optional>true</optional>
       </dependency>
 
       <dependency>

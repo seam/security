@@ -12,7 +12,6 @@ import javax.inject.Named;
 
 import org.jboss.seam.persistence.transaction.Transactional;
 import org.jboss.seam.security.UserImpl;
-import org.jboss.seam.solder.core.Requires;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
@@ -28,7 +27,6 @@ import org.picketlink.idm.impl.api.model.SimpleRole;
  * 
  * @author Shane Bryzak
  */
-@Requires("org.jboss.seam.persistence.transaction.TransactionInterceptor")
 public @Named @ConversationScoped class UserAction implements Serializable
 {
    private static final long serialVersionUID = 5820385095080724087L;

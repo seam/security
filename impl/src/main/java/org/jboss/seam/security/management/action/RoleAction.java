@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.seam.persistence.transaction.Transactional;
-import org.jboss.seam.solder.core.Requires;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
@@ -18,7 +17,6 @@ import org.picketlink.idm.common.exception.IdentityException;
  * 
  * @author Shane Bryzak
  */
-@Requires("org.jboss.seam.persistence.transaction.TransactionInterceptor")
 public @Named @ConversationScoped class RoleAction implements Serializable
 {
    private static final long serialVersionUID = -4215849488301658353L;

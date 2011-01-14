@@ -29,6 +29,18 @@
                <artifactId>validation-api</artifactId>
                <groupId>javax.validation</groupId>
             </exclusion>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-api</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-impl</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.logging</groupId>
+               <artifactId>jboss-logging</artifactId>
+            </exclusion>
          </exclusions>
       </dependency>
       
@@ -36,11 +48,41 @@
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-impl</artifactId>
          <version>${project.version}</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-api</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-impl</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.logging</groupId>
+               <artifactId>jboss-logging</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.config</groupId>
+         <artifactId>seam-config-xml</artifactId>
+         <version>3.0.0.Beta2</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-api</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.seam.solder</groupId>
+               <artifactId>seam-solder-impl</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>

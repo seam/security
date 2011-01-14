@@ -6,9 +6,9 @@
    xsi:schemaLocation="
       http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
 
-   <security:Identity>
-      <s:replaces/>
+   <security:IdentityImpl>
+      <s:modifies/>
       <security:authenticatorName>openIdAuthenticator</security:authenticatorName>
-   </security>
+   </security:IdentityImpl>
       
 </beans>

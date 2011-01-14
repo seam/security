@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.AmbiguousResolutionException;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.BeanManager;
@@ -64,7 +65,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    @Inject private PermissionMapper permissionMapper;
    
    @Inject Instance<RequestSecurityState> requestSecurityState;
-   @Inject Instance<Authenticator> authenticators;
+   @Inject @Any Instance<Authenticator> authenticators;
    
    private User user;
    
@@ -276,7 +277,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          if (authenticator == null)
          {
-            throw new AuthenticationException("No Authenticator could be located");
+            throw new AuthenticationException("An Authenticator could be located");
          }
          
          if (AuthStatus.SUCCESS.equals(authenticator.authenticate()))
@@ -313,26 +314,25 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       if (!Strings.isEmpty(authenticatorName))
       {
-         try
+         Instance<Authenticator> selected = authenticators.select(new NamedLiteral(authenticatorName));
+         if (selected.isAmbiguous())
          {
-            return authenticators.select(new NamedLiteral(authenticatorName)).get();
+            log.error("Multiple Authenticators found with configured name [" + authenticatorName + "]");
+            return null;
          }
-         catch (UnsatisfiedResolutionException ex)
+         
+         if (selected.isUnsatisfied())
          {
-            throw new AuthenticationException("The specified Authenticator [" + 
-                  authenticatorName + "] cannot be located");
+            log.error("No authenticator with name [" + authenticatorName + "] was found");
+            return null;               
          }
-         catch (AmbiguousResolutionException ex)
-         {
-            throw new AuthenticationException("Multiple Authenticator instances named [" +
-                  authenticatorName + "] were located");
-         }
+         
+         return selected.get();
       }
-      
-      
+            
       for (Authenticator auth : authenticators)
       {
-       //  auth.
+         log.debug("Found authenticator: " + auth);
       }      
       
       return null;
