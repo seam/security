@@ -4,7 +4,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>5</version>
+      <version>8</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -24,7 +24,7 @@
    </prerequisites>
 
    <properties>
-      <seam.version>3.0.0.b04</seam.version>
+      <seam.version>3.0.0.b07</seam.version>
    </properties>
 
    <dependencyManagement>
