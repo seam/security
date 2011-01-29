@@ -6,6 +6,7 @@ import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
 import org.jboss.seam.security.Authenticator;
+import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.UserImpl;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author Shane Bryzak
  *
  */
-public @Model class IdmAuthenticator implements Authenticator
+public @Model class IdmAuthenticator extends BaseAuthenticator implements Authenticator
 {
    Logger log = LoggerFactory.getLogger(IdmAuthenticator.class);
    
@@ -33,7 +34,7 @@ public @Model class IdmAuthenticator implements Authenticator
    @Inject Credentials credentials;
    @Inject Identity identity;
    
-   public AuthStatus authenticate()
+   public void authenticate()
    {
       if (identitySession != null)
       {            
@@ -57,7 +58,7 @@ public @Model class IdmAuthenticator implements Authenticator
                            role.getGroup().getName(), role.getGroup().getGroupType());   
                   }
                }
-               return AuthStatus.SUCCESS;
+               setStatus(AuthenticationStatus.SUCCESS);
             }
          }
          catch (IdentityException ex)
@@ -70,7 +71,9 @@ public @Model class IdmAuthenticator implements Authenticator
          }         
       }
       
-      return AuthStatus.FAILURE;
+      setStatus(AuthenticationStatus.FAILURE);
    }
+   
+   public void postAuthenticate() {}
 
 }

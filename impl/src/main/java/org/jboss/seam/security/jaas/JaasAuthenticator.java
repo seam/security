@@ -17,6 +17,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.jboss.seam.security.Authenticator;
+import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.impl.api.PasswordCredential;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author Shane Bryzak
  *
  */
-public @Model class JaasAuthenticator implements Authenticator
+public @Model class JaasAuthenticator extends BaseAuthenticator implements Authenticator
 {  
    Logger log = LoggerFactory.getLogger(JaasAuthenticator.class);
    
@@ -48,7 +49,7 @@ public @Model class JaasAuthenticator implements Authenticator
       subject = new Subject();
    }
    
-   public AuthStatus authenticate()
+   public void authenticate()
    {
       if (getJaasConfigName() == null)
       {
@@ -58,12 +59,12 @@ public @Model class JaasAuthenticator implements Authenticator
       try
       {
          getLoginContext().login();
-         return AuthStatus.SUCCESS;
+         setStatus(AuthenticationStatus.SUCCESS);
       }
       catch (LoginException e)
       {
+         setStatus(AuthenticationStatus.FAILURE);
          log.error("JAAS authentication failed", e);
-         return AuthStatus.FAILURE;
       }
    }
 
@@ -117,4 +118,6 @@ public @Model class JaasAuthenticator implements Authenticator
    {
       this.jaasConfigName = jaasConfigName;
    }   
+   
+   public void postAuthenticate() {}
 }

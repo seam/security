@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.logging.Logger;
 import org.jboss.seam.security.Authenticator;
+import org.jboss.seam.security.BaseAuthenticator;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
@@ -20,7 +23,8 @@ import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
  * @author Shane Bryzak
  *
  */
-public @Named("openIdAuthenticator") @RequestScoped class OpenIdAuthenticator implements Authenticator
+public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator 
+   extends BaseAuthenticator implements Authenticator
 {
    private String openIdProviderUrl;
    
@@ -29,6 +33,10 @@ public @Named("openIdAuthenticator") @RequestScoped class OpenIdAuthenticator im
    @Inject List<OpenIdProvider> providers;
    
    @Inject Logger log;
+   
+   private AuthenticationStatus status;
+   
+   private OpenIdPrincipal openIdPrincipal;
    
    private String providerCode;
    
@@ -64,7 +72,7 @@ public @Named("openIdAuthenticator") @RequestScoped class OpenIdAuthenticator im
       return null;
    }
    
-   public AuthStatus authenticate()
+   public void authenticate()
    {
       List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
       attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
@@ -77,12 +85,22 @@ public @Named("openIdAuthenticator") @RequestScoped class OpenIdAuthenticator im
       openIdApi.login(url, attributes, 
             (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());      
       
-      return AuthStatus.DEFERRED;
+      status = AuthenticationStatus.DEFERRED;
    }
    
    public List<OpenIdProvider> getProviders()
    {
       return providers;
+   }
+   
+   public void success(OpenIdPrincipal principal)
+   {
+      this.openIdPrincipal = principal;
+   }
+   
+   public void postAuthenticate()
+   {
+      
    }
 
 }

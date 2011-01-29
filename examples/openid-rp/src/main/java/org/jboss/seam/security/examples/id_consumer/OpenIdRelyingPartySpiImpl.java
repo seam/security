@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.openid.OpenIdAuthenticator;
 import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 
@@ -35,14 +36,13 @@ public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi
    @Inject
    private ServletContext servletContext;
 
-   @Inject
-   private Identity identity;
+   @Inject OpenIdAuthenticator openIdAuthenticator;
 
    public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder)
    {
       try
       {
-         identity.finishLogin(principal);
+         openIdAuthenticator.success(principal);
          responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/UserInfo.jsf");
       }
       catch (IOException e)

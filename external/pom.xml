@@ -14,7 +14,7 @@
    <name>Seam Security External Authentication Services</name>
 
    <properties>
-      <arquillian.version>1.0.0.Alpha3</arquillian.version>
+      <arquillian.version>1.0.0.Alpha4</arquillian.version>
       <jbossas.server.manager.version>1.0.3.GA</jbossas.server.manager.version>
       <jbossas.client.version>6.0.0.20100911-M5</jbossas.client.version>
    </properties>
@@ -63,6 +63,13 @@
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-impl</artifactId>
+         <scope>provided</scope>
       </dependency>
 
       <dependency>

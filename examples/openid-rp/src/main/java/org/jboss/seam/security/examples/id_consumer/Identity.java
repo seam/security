@@ -67,10 +67,10 @@ public class Identity implements Serializable
       }
    }
 
-   public void finishLogin(OpenIdPrincipal openIdPrincipal)
+   /*public void finishLogin(OpenIdPrincipal openIdPrincipal)
    {
       this.openIdPrincipal = openIdPrincipal;
-   }
+   }*/
 
    public void logout()
    {

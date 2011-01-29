@@ -13,11 +13,11 @@
 
 		<h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
 			<h:outputText value="Verified User Identifier" />
-			<h:outputText value="#{identity.openIdPrincipal.identifier}" />
+			<h:outputText value="#{identity.user.identifier}" />
 			<h:outputText value="OpenID Provider" />
-			<h:outputText value="#{identity.openIdPrincipal.openIdProvider}" />
+			<h:outputText value="#{identity.user.openIdProvider}" />
 			<h:outputText value="Email" />
-			<h:outputText value="#{identity.openIdPrincipal.attributeValues['email']}" />
+			<h:outputText value="#{identity.user.attributes['email']}" />
 		</h:panelGrid>
 
 	</ui:composition>

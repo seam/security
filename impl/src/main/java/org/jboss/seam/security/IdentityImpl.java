@@ -11,15 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.UnsatisfiedResolutionException;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.Authenticator.AuthStatus;
+import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
@@ -66,6 +65,8 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    @Inject Instance<RequestSecurityState> requestSecurityState;
    @Inject @Any Instance<Authenticator> authenticators;
+   
+   private Authenticator activeAuthenticator;
    
    private User user;
    
@@ -273,16 +274,18 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          preAuthenticate();
          
-         Authenticator authenticator = lookupAuthenticator();
+         activeAuthenticator = lookupAuthenticator();
          
-         if (authenticator == null)
+         if (activeAuthenticator == null)
          {
             throw new AuthenticationException("An Authenticator could be located");
          }
          
-         if (AuthStatus.SUCCESS.equals(authenticator.authenticate()))
+         activeAuthenticator.authenticate();
+         
+         if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
          {
-            user = new UserImpl(credentials.getUsername());
+            user = activeAuthenticator.getUser(); // new UserImpl(credentials.getUsername());
             postAuthenticate();
             return true;
          }
@@ -356,6 +359,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     */
    protected void postAuthenticate()
    {  
+      if (activeAuthenticator != null)
+      {
+         activeAuthenticator.postAuthenticate();
+      }
+      
       if (isLoggedIn())
       {
          if (!preAuthenticationRoles.isEmpty())

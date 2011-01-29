@@ -1,5 +1,7 @@
 package org.jboss.seam.security;
 
+import org.picketlink.idm.api.User;
+
 /**
  * Authenticator bean type
  *  
@@ -7,7 +9,13 @@ package org.jboss.seam.security;
  */
 public interface Authenticator
 {
-   public enum AuthStatus { SUCCESS, FAILURE, DEFERRED }
+   public enum AuthenticationStatus { SUCCESS, FAILURE, DEFERRED }
    
-   AuthStatus authenticate();
+   void authenticate();
+   
+   void postAuthenticate();
+   
+   User getUser();
+   
+   AuthenticationStatus getStatus();
 }
