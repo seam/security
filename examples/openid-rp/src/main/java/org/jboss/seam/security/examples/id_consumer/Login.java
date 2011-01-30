@@ -44,6 +44,6 @@ public class Login
 
    public void login()
    {
-      identity.startLogin(openId);
+      //identity.startLogin(openId);
    }
 }

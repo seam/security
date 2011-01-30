@@ -50,7 +50,7 @@ public class OldIdentity implements Serializable
 
    public void logout()
    {
-      if (isLoggedIn())
+      /*if (isLoggedIn())
       {
          openIdPrincipal = null;
          redirectToViewId("/Index.xhtml");
@@ -59,15 +59,15 @@ public class OldIdentity implements Serializable
       {
          FacesMessage facesMessage = new FacesMessage("Not logged in.");
          FacesContext.getCurrentInstance().addMessage(null, facesMessage);
-      }
+      }*/
    }
 
    public void redirectToLoginIfNotLoggedIn()
    {
-      if (!isLoggedIn())
+      /*if (!isLoggedIn())
       {
          redirectToViewId("/Login.xhtml");
-      }
+      }*/
    }
 
    private void redirectToViewId(String viewId)
