@@ -30,7 +30,7 @@ public class Login
    private String openId;
 
    @Inject
-   private Identity identity;
+   private OldIdentity identity;
 
    public String getOpenId()
    {

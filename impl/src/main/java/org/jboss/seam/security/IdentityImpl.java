@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
@@ -20,6 +21,7 @@ import javax.inject.Named;
 
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
+import org.jboss.seam.security.events.DeferredAuthenticationEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
 import org.jboss.seam.security.events.NotAuthorizedEvent;
@@ -266,39 +268,112 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     
    protected boolean authenticate() throws AuthenticationException
    {
+      if (authenticating)
+      {
+         authenticating = false;            
+         throw new IllegalStateException("Authentication already in progress.");            
+      }
+      
+      authenticating = true;
+      
+      user = null;
+      
+      preAuthenticate();
+      
+      activeAuthenticator = lookupAuthenticator();
+      
+      if (activeAuthenticator == null)
+      {
+         throw new AuthenticationException("An Authenticator could be located");
+      }
+      
+      activeAuthenticator.authenticate();
+      
+      if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
+      {
+         postAuthenticate();
+         return true;
+      }
+      
+      return false;
+   }
+   
+   /**
+    * Clears any roles added by calling addRole() while not authenticated.
+    * This method may be overridden by a subclass if different
+    * pre-authentication logic should occur.
+    */
+   protected void preAuthenticate()
+   {
+      preAuthenticationRoles.clear();
+      beanManager.fireEvent(new PreAuthenticateEvent());
+   }
+   
+   protected void deferredAuthenticationObserver(@Observes DeferredAuthenticationEvent event)
+   {
+      postAuthenticate();
+   }
+   
+   /**
+    * Extracts the principal from the subject, and uses it to create the User object.  
+    * This method may be overridden by a subclass if
+    * different post-authentication logic should occur.
+    */
+   protected void postAuthenticate()
+   {
+      if (activeAuthenticator == null)
+      {
+         throw new IllegalStateException("activeAuthenticator is null");
+      }
+      
       try
       {
-         authenticating = true;
+         activeAuthenticator.postAuthenticate();
          
-         user = null;
+         if (!activeAuthenticator.getStatus().equals(AuthenticationStatus.SUCCESS)) return;            
+            
+         user = activeAuthenticator.getUser();      
          
-         preAuthenticate();
-         
-         activeAuthenticator = lookupAuthenticator();
-         
-         if (activeAuthenticator == null)
+         if (isLoggedIn())
          {
-            throw new AuthenticationException("An Authenticator could be located");
+            if (!preAuthenticationRoles.isEmpty())
+            {
+               for (String group : preAuthenticationRoles.keySet())
+               {
+                  Map<String,List<String>> groupTypeRoles = preAuthenticationRoles.get(group);
+                  for (String groupType : groupTypeRoles.keySet())
+                  {
+                     for (String roleType : groupTypeRoles.get(groupType))
+                     {
+                        addRole(roleType, group, groupType);
+                     }
+                  }
+               }
+               preAuthenticationRoles.clear();
+            }
+            
+            if (!preAuthenticationGroups.isEmpty())
+            {
+               for (String group : preAuthenticationGroups.keySet())
+               {
+                  for (String groupType : preAuthenticationGroups.get(group))
+                  {
+                     activeGroups.add(new SimpleGroup(group, groupType));  
+                  }               
+               }
+               preAuthenticationGroups.clear();
+            }         
          }
          
-         activeAuthenticator.authenticate();
-         
-         if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
-         {
-            user = activeAuthenticator.getUser(); // new UserImpl(credentials.getUsername());
-            postAuthenticate();
-            return true;
-         }
-         
-         return false;
+         beanManager.fireEvent(new PostAuthenticateEvent());
       }
       finally
       {
          // Set credential to null whether authentication is successful or not
          credentials.setCredential(null);
-         authenticating = false;
+         authenticating = false;         
       }
-   }
+   }   
    
    /**
     * Returns an Authenticator instance to be used for authentication. The default
@@ -339,64 +414,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }      
       
       return null;
-   }
-   
-   /**
-    * Clears any roles added by calling addRole() while not authenticated.
-    * This method may be overridden by a subclass if different
-    * pre-authentication logic should occur.
-    */
-   protected void preAuthenticate()
-   {
-      preAuthenticationRoles.clear();
-      beanManager.fireEvent(new PreAuthenticateEvent());
-   }
-   
-   /**
-    * Extracts the principal from the subject, and uses it to create the User object.  
-    * This method may be overridden by a subclass if
-    * different post-authentication logic should occur.
-    */
-   protected void postAuthenticate()
-   {  
-      if (activeAuthenticator != null)
-      {
-         activeAuthenticator.postAuthenticate();
-      }
-      
-      if (isLoggedIn())
-      {
-         if (!preAuthenticationRoles.isEmpty())
-         {
-            for (String group : preAuthenticationRoles.keySet())
-            {
-               Map<String,List<String>> groupTypeRoles = preAuthenticationRoles.get(group);
-               for (String groupType : groupTypeRoles.keySet())
-               {
-                  for (String roleType : groupTypeRoles.get(groupType))
-                  {
-                     addRole(roleType, group, groupType);
-                  }
-               }
-            }
-            preAuthenticationRoles.clear();
-         }
-         
-         if (!preAuthenticationGroups.isEmpty())
-         {
-            for (String group : preAuthenticationGroups.keySet())
-            {
-               for (String groupType : preAuthenticationGroups.get(group))
-               {
-                  activeGroups.add(new SimpleGroup(group, groupType));  
-               }               
-            }
-            preAuthenticationGroups.clear();
-         }         
-      }
-      
-      beanManager.fireEvent(new PostAuthenticateEvent());
-   }
+   }   
    
    /**
     * Resets all security state and credentials

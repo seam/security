@@ -1,7 +1,7 @@
-Seam Security 3.0.0 Alpha 1
-===========================
+Seam Security 3.0.0.Beta1 
+=========================
 
-Seam Security provides a number of features for securing your CDI-based application.
+Seam Security provides a number of features for securing your Java EE6 application.
 
 
 Contents of distribution
@@ -36,6 +36,10 @@ Issue Tracking:                http://jira.jboss.org/jira/browse/SEAMSECURITY
 
 Release Notes
 =============
+
+Version 3.0.0.Beta1
+-------------------
+New Authentication API 
 
 Version 3.0.0 Alpha 1
 ---------------------

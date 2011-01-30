@@ -38,7 +38,7 @@ import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 @SessionScoped
 //@Named
-public class Identity implements Serializable
+public class OldIdentity implements Serializable
 {
    private static final long serialVersionUID = -7096110154986991513L;
 
@@ -47,30 +47,6 @@ public class Identity implements Serializable
    @Inject
    private OpenIdRelyingPartyApi openIdApi;
 
-   public OpenIdPrincipal getOpenIdPrincipal()
-   {
-      return openIdPrincipal;
-   }
-
-   public void startLogin(String openId)
-   {
-      if (!isLoggedIn())
-      {
-         List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-         attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
-         openIdApi.login(openId, attributes, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
-      }
-      else
-      {
-         FacesMessage facesMessage = new FacesMessage("Already logged in.");
-         FacesContext.getCurrentInstance().addMessage(null, facesMessage);
-      }
-   }
-
-   /*public void finishLogin(OpenIdPrincipal openIdPrincipal)
-   {
-      this.openIdPrincipal = openIdPrincipal;
-   }*/
 
    public void logout()
    {
@@ -84,11 +60,6 @@ public class Identity implements Serializable
          FacesMessage facesMessage = new FacesMessage("Not logged in.");
          FacesContext.getCurrentInstance().addMessage(null, facesMessage);
       }
-   }
-
-   public boolean isLoggedIn()
-   {
-      return openIdPrincipal != null;
    }
 
    public void redirectToLoginIfNotLoggedIn()

@@ -96,6 +96,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    public void success(OpenIdPrincipal principal)
    {
       this.openIdPrincipal = principal;
+      setStatus(AuthenticationStatus.SUCCESS);
    }
    
    public void postAuthenticate()
