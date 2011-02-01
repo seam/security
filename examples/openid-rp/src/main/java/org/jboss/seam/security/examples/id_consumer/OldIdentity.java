@@ -22,21 +22,15 @@
 package org.jboss.seam.security.examples.id_consumer;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
-@SessionScoped
+//@SessionScoped
 //@Named
 public class OldIdentity implements Serializable
 {

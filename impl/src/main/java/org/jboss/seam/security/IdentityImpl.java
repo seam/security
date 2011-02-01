@@ -14,7 +14,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Identity implementation for authorization and authentication via Seam security.
+ * Identity implementation for authentication and authorization 
  * 
  * @author Shane Bryzak
  */
@@ -314,11 +313,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       postAuthenticate();
    }
    
-   /**
-    * Extracts the principal from the subject, and uses it to create the User object.  
-    * This method may be overridden by a subclass if
-    * different post-authentication logic should occur.
-    */
    protected void postAuthenticate()
    {
       if (activeAuthenticator == null)
