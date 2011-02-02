@@ -34,17 +34,7 @@
 
       <dependency>
          <groupId>org.picketlink.idm</groupId>
-         <artifactId>picketlink-idm-core</artifactId>
-         <exclusions>
-            <exclusion>
-               <groupId>log4j</groupId>
-               <artifactId>log4j</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>com.sun.xml.bind</groupId>
-               <artifactId>jaxb-impl</artifactId>
-            </exclusion>
-         </exclusions>
+         <artifactId>picketlink-idm-spi</artifactId>
       </dependency>
 
    </dependencies>
