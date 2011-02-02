@@ -66,7 +66,7 @@ public abstract class SamlEntityBean extends EntityBean implements SamlEntityCon
 
    private SamlBinding preferredBinding = SamlBinding.HTTP_Post;
 
-   //@Inject
+   @Inject
    private ServletContext servletContext;
 
    @Inject
