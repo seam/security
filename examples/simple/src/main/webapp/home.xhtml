@@ -5,6 +5,14 @@
 
   <p>This example demonstrates how to implement a simple Authenticator</p>
   
+  <ui:fragment rendered="#{identity.loggedIn}">
+    <div>Currently logged in as: <b>#{identity.user.id}</b></div>
+    
+    <h:form>
+      <h:commandButton id="logout" value="Log out" action="#{identity.logout}"/>
+    </h:form>
+  </ui:fragment>
+  
   <h:form id="loginForm" rendered="#{not identity.loggedIn}">
     <h:messages />
     
