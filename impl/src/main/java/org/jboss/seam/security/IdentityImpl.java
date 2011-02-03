@@ -293,11 +293,15 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          activeAuthenticator.authenticate();
          
-         if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
+         switch (activeAuthenticator.getStatus())
          {
-            postAuthenticate();
-            return true;
-         }
+            case SUCCESS:
+               postAuthenticate();
+               return true;
+            case FAILURE:
+               authenticating = false;
+               return false;
+         }                 
          
          return false;
       }

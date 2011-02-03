@@ -58,8 +58,9 @@ public @Model class IdmAuthenticator extends BaseAuthenticator implements Authen
                            role.getGroup().getName(), role.getGroup().getGroupType());   
                   }
                }
-               setStatus(AuthenticationStatus.SUCCESS);
                setUser(u);
+               setStatus(AuthenticationStatus.SUCCESS);               
+               return;
             }
          }
          catch (IdentityException ex)
