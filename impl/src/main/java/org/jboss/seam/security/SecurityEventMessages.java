@@ -4,8 +4,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.enterprise.event.Observes;
 
-//import org.jboss.seam.international.StatusMessages;
-//import org.jboss.seam.international.StatusMessage.Severity;
+import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
@@ -32,14 +31,12 @@ class SecurityEventMessages
    private static final String DEFAULT_ALREADY_LOGGED_IN_MESSAGE = "You're already logged in. Please log out first if you wish to log in again.";
    private static final String DEFAULT_NOT_LOGGED_IN_MESSAGE = "Please log in first.";
    
-   //@Inject StatusMessages statusMessages;
-   @Inject CredentialsImpl credentials;
+   @Inject Messages messages;
+   @Inject Identity identity;
 
    public void postAuthenticate(@Observes PostAuthenticateEvent event)
    {
-      // org.jboss.security.saml.SSOManager.processManualLoginNotification(
-      // ServletContexts.instance().getRequest(),
-      // identity.getPrincipal().getName());
+      messages.info(DEFAULT_LOGIN_SUCCESSFUL_MESSAGE, identity.getUser().getId());
    }
 
    public void addLoginFailedMessage(@Observes LoginFailedEvent event)

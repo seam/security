@@ -33,11 +33,10 @@
          <version>${project.version}</version>
       </dependency>
 
-      <!--dependency>
-         <groupId>org.jboss.seam.config</groupId>
-         <artifactId>seam-config-xml</artifactId>
-         <version>3.0.0.Beta2</version>
-      </dependency-->
+      <dependency>
+         <groupId>org.jboss.seam.faces</groupId>
+         <artifactId>seam-faces</artifactId>
+      </dependency>
 
       <!-- CDI (JSR-299) -->
       <dependency>

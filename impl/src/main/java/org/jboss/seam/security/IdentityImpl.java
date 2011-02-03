@@ -30,6 +30,8 @@ import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.events.PreAuthenticateEvent;
 import org.jboss.seam.security.events.PreLoggedOutEvent;
 import org.jboss.seam.security.events.QuietLoginEvent;
+import org.jboss.seam.security.jaas.JaasAuthenticator;
+import org.jboss.seam.security.management.IdmAuthenticator;
 import org.jboss.seam.security.permission.PermissionMapper;
 import org.jboss.seam.security.util.Strings;
 import org.jboss.seam.solder.literal.NamedLiteral;
@@ -273,28 +275,39 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          throw new IllegalStateException("Authentication already in progress.");            
       }
       
-      authenticating = true;
-      
-      user = null;
-      
-      preAuthenticate();
-      
-      activeAuthenticator = lookupAuthenticator();
-      
-      if (activeAuthenticator == null)
-      {
-         throw new AuthenticationException("An Authenticator could be located");
+      try
+      {      
+         authenticating = true;
+         
+         user = null;
+         
+         preAuthenticate();
+         
+         activeAuthenticator = lookupAuthenticator();
+         
+         if (activeAuthenticator == null)
+         {
+            authenticating = false;
+            throw new AuthenticationException("An Authenticator could not be located");
+         }
+         
+         activeAuthenticator.authenticate();
+         
+         if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
+         {
+            postAuthenticate();
+            return true;
+         }
+         
+         return false;
       }
-      
-      activeAuthenticator.authenticate();
-      
-      if (AuthenticationStatus.SUCCESS.equals(activeAuthenticator.getStatus()))
+      catch (Exception ex)
       {
-         postAuthenticate();
-         return true;
+         authenticating = false;
+         if (ex instanceof AuthenticationException) throw (AuthenticationException) ex;
+         
+         throw new RuntimeException(ex);
       }
-      
-      return false;
    }
    
    /**
@@ -402,12 +415,28 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          return selected.get();
       }
             
+      Authenticator selectedAuth = null;
+      
       for (Authenticator auth : authenticators)
       {
-         log.debug("Found authenticator: " + auth);
-      }      
+         // If the user has provided their own custom authenticator then use it -
+         // a custom authenticator is one that isn't one of the known authenticators;
+         // JaasAuthenticator, IdmAuthenticator, or any external authenticator, etc
+         if (!JaasAuthenticator.class.isAssignableFrom(auth.getClass()) &&
+             !IdmAuthenticator.class.isAssignableFrom(auth.getClass()) &&
+             !auth.getClass().getName().startsWith("org.jboss.seam.security.external."))
+         {
+            selectedAuth = auth;
+            break;
+         }
+         
+         if (IdmAuthenticator.class.isAssignableFrom(auth.getClass()))
+         {
+            selectedAuth = auth;
+         }
+      }
       
-      return null;
+      return selectedAuth;
    }   
    
    /**

@@ -32,4 +32,9 @@ public abstract class BaseAuthenticator implements Authenticator
    {
       this.user = user;
    }      
+   
+   public void postAuthenticate()
+   {
+      // No-op, override if any post-authentication processing is required.
+   }
 }

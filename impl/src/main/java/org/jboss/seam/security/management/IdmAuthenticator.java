@@ -59,6 +59,7 @@ public @Model class IdmAuthenticator extends BaseAuthenticator implements Authen
                   }
                }
                setStatus(AuthenticationStatus.SUCCESS);
+               setUser(u);
             }
          }
          catch (IdentityException ex)
@@ -73,7 +74,4 @@ public @Model class IdmAuthenticator extends BaseAuthenticator implements Authen
       
       setStatus(AuthenticationStatus.FAILURE);
    }
-   
-   public void postAuthenticate() {}
-
 }

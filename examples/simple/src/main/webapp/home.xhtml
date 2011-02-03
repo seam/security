@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:ui="http://java.sun.com/jsf/facelets">
 
   <p>This example demonstrates how to implement a simple Authenticator</p>
   
   <h:form id="loginForm" rendered="#{not identity.loggedIn}">
-    <h:messages id="messages" globalOnly="true"/>
+    <h:messages />
     
     <div class="loginRow">
       <h:outputLabel for="name" value="Username" styleClass="loginLabel"/>
