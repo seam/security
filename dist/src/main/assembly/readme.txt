@@ -22,8 +22,8 @@ lib/
 Licensing
 =========
 
-This distribution, as a whole, is licensed under the terms of the GNU Lesser General Public License
-(LGPL) Version 2.1, the text of which is contained in the file lgpl.txt.
+ This distribution, as a whole, is licensed under the terms of the Apache
+ Software License, Version 2.0 (ASL).
 
 Seam Security URLs
 ==================
