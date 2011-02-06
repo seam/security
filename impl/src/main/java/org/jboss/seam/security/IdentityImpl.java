@@ -450,6 +450,10 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       user = null;      
       credentials.clear();
+      preAuthenticationRoles.clear();
+      activeRoles.clear();
+      preAuthenticationGroups.clear();
+      activeGroups.clear();
    }
    
    public void logout()
