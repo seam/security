@@ -19,6 +19,7 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.qualifiers.Security;
+import org.jboss.seam.solder.core.Requires;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 
@@ -27,12 +28,11 @@ import org.picketlink.idm.api.Role;
  * 
  * @author Shane Bryzak
  */
+@Requires("org.drools.KnowledgeBase")
 @SessionScoped
 public class RuleBasedPermissionResolver implements PermissionResolver, Serializable
 {
    private static final long serialVersionUID = -7572627522601793024L;
-
-   //private Logger log = LoggerFactory.getLogger(RuleBasedPermissionResolver.class);
    
    private StatefulKnowledgeSession securityContext;
    
