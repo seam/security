@@ -1,5 +1,6 @@
 package org.jboss.seam.security.external.openid;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,8 +25,10 @@ import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
  *
  */
 public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator 
-   extends BaseAuthenticator implements Authenticator
+   extends BaseAuthenticator implements Authenticator, Serializable
 {
+   private static final long serialVersionUID = 4669651866032932651L;
+
    private String openIdProviderUrl;
    
    @Inject private OpenIdRelyingPartyApi openIdApi;
@@ -33,11 +36,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    @Inject List<OpenIdProvider> providers;
    
    @Inject Logger log;
-   
-   private AuthenticationStatus status;
-   
-   private OpenIdPrincipal openIdPrincipal;
-   
+        
    private String providerCode;
    
    public String getProviderCode()
@@ -75,7 +74,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    public void authenticate()
    {
       List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-      attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", false, null));
+      attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
       
       OpenIdProvider selectedProvider = getSelectedProvider();
       String url = selectedProvider != null ? selectedProvider.getUrl() : getOpenIdProviderUrl();
@@ -85,7 +84,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
       openIdApi.login(url, attributes, 
             (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());      
       
-      status = AuthenticationStatus.DEFERRED;
+      setStatus(AuthenticationStatus.DEFERRED);
    }
    
    public List<OpenIdProvider> getProviders()
@@ -95,13 +94,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    
    public void success(OpenIdPrincipal principal)
    {
-      this.openIdPrincipal = principal;
+      setUser(new OpenIdUser(principal));
       setStatus(AuthenticationStatus.SUCCESS);
    }
-   
-   public void postAuthenticate()
-   {
-      
-   }
-
 }

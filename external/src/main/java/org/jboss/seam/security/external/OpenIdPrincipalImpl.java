@@ -63,6 +63,8 @@ public class OpenIdPrincipalImpl implements OpenIdPrincipal
 
    public String getAttribute(String alias)
    {
+      if (attributeValues == null) return null;
+      
       List<String> values = attributeValues.get(alias);
       if (values.size() == 0)
       {

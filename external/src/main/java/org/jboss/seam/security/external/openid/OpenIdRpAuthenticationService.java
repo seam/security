@@ -78,7 +78,8 @@ public class OpenIdRpAuthenticationService
    @Inject
    private Instance<DialogueBean> dialogue;
 
-   public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException
+   public void handleIncomingMessage(HttpServletRequest httpRequest, 
+         HttpServletResponse httpResponse) throws InvalidRequestException
    {
       try
       {
@@ -101,7 +102,8 @@ public class OpenIdRpAuthenticationService
 
          // verify the response; ConsumerManager needs to be the same
          // (static) instance used to place the authentication request
-         VerificationResult verification = openIdConsumerManager.verify(receivingURL.toString(), parameterList, discovered);
+         VerificationResult verification = openIdConsumerManager.verify(
+               receivingURL.toString(), parameterList, discovered);
 
          // examine the verification result and extract the verified identifier
          Identifier identifier = verification.getVerifiedId();
@@ -119,13 +121,16 @@ public class OpenIdRpAuthenticationService
                attributeValues = attrValues;
             }
 
-            OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), discovered.getOPEndpoint(), attributeValues);
+            OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), 
+                  discovered.getOPEndpoint(), attributeValues);
 
-            openIdRelyingPartySpi.get().loginSucceeded(principal, responseHandler.createResponseHolder(httpResponse));
+            openIdRelyingPartySpi.get().loginSucceeded(principal, 
+                  responseHandler.createResponseHolder(httpResponse));
          }
          else
          {
-            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg(), responseHandler.createResponseHolder(httpResponse));
+            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg(), 
+                  responseHandler.createResponseHolder(httpResponse));
          }
       }
       catch (OpenIDException e)
@@ -138,7 +143,8 @@ public class OpenIdRpAuthenticationService
    }
 
    @Dialogued(join = true)
-   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response)
+   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes, 
+         HttpServletResponse response)
    {
       try
       {
@@ -172,7 +178,8 @@ public class OpenIdRpAuthenticationService
       catch (OpenIDException e)
       {
          log.warn("Authentication failed", e);
-         openIdRelyingPartySpi.get().loginFailed(e.getMessage(), responseHandler.createResponseHolder(response));
+         openIdRelyingPartySpi.get().loginFailed(e.getMessage(), 
+               responseHandler.createResponseHolder(response));
       }
    }
 

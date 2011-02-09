@@ -1,47 +1,39 @@
 package org.jboss.seam.security.external.openid;
 
-import java.util.Map;
-
-import org.jboss.security.auth.spi.Users.User;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
+import org.picketlink.idm.api.User;
 
 /**
  * Represents a user authenticated using OpenID
  * 
  * @author Shane Bryzak
  */
-public class OpenIdUser extends User
+public class OpenIdUser implements User
 {
-   private String identifier;
-   private String openIdProvider;
-   private Map<String,String> attributes;
+   private OpenIdPrincipal principal;
    
-   public String getIdentifier()
+   public OpenIdUser(OpenIdPrincipal principal)
    {
-      return identifier;
+      this.principal = principal;
    }
    
-   public void setIdentifier(String identifier)
+   public String getId()
    {
-      this.identifier = identifier;
+      return principal.getIdentifier();
    }
    
-   public String getOpenIdProvider()
+   public String getKey()
    {
-      return openIdProvider;
+      return principal.getOpenIdProvider().toString() + ":" + principal.getIdentifier();
    }
    
-   public void setOpenIdProvider(String openIdProvider)
+   public String getAttribute(String alias)
    {
-      this.openIdProvider = openIdProvider;
+      return principal.getAttribute(alias);
    }
    
-   public Map<String,String> getAttributes()
+   public String getProvider()
    {
-      return attributes;
-   }
-   
-   public void setAttributes(Map<String,String> attributes)
-   {
-      this.attributes = attributes;
+      return principal.getOpenIdProvider().toString();
    }
 }

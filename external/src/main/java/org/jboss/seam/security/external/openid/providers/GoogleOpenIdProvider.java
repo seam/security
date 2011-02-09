@@ -1,7 +1,7 @@
 package org.jboss.seam.security.external.openid.providers;
 
 /**
- * Open ID provider for Google accounts
+ * Open ID provider for Google Accounts
  * 
  * @author Shane Bryzak
  *

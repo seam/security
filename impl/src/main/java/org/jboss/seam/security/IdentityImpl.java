@@ -345,6 +345,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             
          user = activeAuthenticator.getUser();      
          
+         if (user == null)
+         {
+            throw new AuthenticationException("Authenticator must provide a non-null User after successful authentication");
+         }
+         
          if (isLoggedIn())
          {
             if (!preAuthenticationRoles.isEmpty())
