@@ -25,7 +25,7 @@
    </prerequisites>
 
    <properties>
-      <seam.version>3.0.0-SNAPSHOT</seam.version>
+      <seam.version>3.0.0.b09</seam.version>
    </properties>
 
    <dependencyManagement>
