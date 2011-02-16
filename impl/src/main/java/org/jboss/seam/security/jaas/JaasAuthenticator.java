@@ -3,10 +3,9 @@ package org.jboss.seam.security.jaas;
 import java.io.IOException;
 
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Model;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Shane Bryzak
  *
  */
-public @Model class JaasAuthenticator extends BaseAuthenticator implements Authenticator
+public @Named @RequestScoped class JaasAuthenticator extends BaseAuthenticator implements Authenticator
 {  
    Logger log = LoggerFactory.getLogger(JaasAuthenticator.class);
    
