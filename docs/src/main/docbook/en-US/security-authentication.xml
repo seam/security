@@ -29,9 +29,11 @@
     </para>
     
     <note>
-      The bean type of the <literal>Identity</literal> bean is <literal>org.jboss.seam.security.Identity</literal>.  This
-      interface is what you should inject if you need to access the <literal>Identity</literal> bean from your
-      own beans.  The default implementation is <literal>org.jboss.seam.security.IdentityImpl</literal>.
+      <para>
+        The bean type of the <literal>Identity</literal> bean is <literal>org.jboss.seam.security.Identity</literal>.  This
+        interface is what you should inject if you need to access the <literal>Identity</literal> bean from your
+        own beans.  The default implementation is <literal>org.jboss.seam.security.IdentityImpl</literal>.
+      </para>
     </note>
     
     <para>
@@ -49,12 +51,14 @@
     </para>
     
     <note>
-      The bean type of the <literal>Credential</literal> bean is <literal>org.jboss.seam.security.Credentials</literal>.  The
-      default implementation for this bean type is <literal>org.jboss.seam.security.CredentialsImpl</literal>.
-      Also, as credentials may come in many forms (such as passwords, biometric data such as that from a fingerprint reader, etc) the
-      <literal>credential</literal> property of the <literal>Credentials</literal> bean must be able to support each variation,
-      not just passwords.  To allow for this, any credential that implements the <literal>org.picketlink.idm.api.Credential</literal>
-      interface is a valid value for the <literal>credential</literal> property.
+      <para>
+        The bean type of the <literal>Credential</literal> bean is <literal>org.jboss.seam.security.Credentials</literal>.  The
+        default implementation for this bean type is <literal>org.jboss.seam.security.CredentialsImpl</literal>.
+        Also, as credentials may come in many forms (such as passwords, biometric data such as that from a fingerprint reader, etc) the
+        <literal>credential</literal> property of the <literal>Credentials</literal> bean must be able to support each variation,
+        not just passwords.  To allow for this, any credential that implements the <literal>org.picketlink.idm.api.Credential</literal>
+        interface is a valid value for the <literal>credential</literal> property.
+      </para>
     </note>
   </section>
   
@@ -94,10 +98,11 @@
     <title>Which Authenticator will Seam use?</title>
   
     <para>
-      The <literal>Identity</literal> bean has an <literal>authenticatorClass</literal> property, which if set, the
-      <literal>Authenticator</literal> bean implementation with that exact type will be the one invoked during the
-      authentication process.  This property may be set by either configuring it with a predefined authenticator type,
-      for example using the Seam Config module.  The XML configuration for this may look something like the following:
+      The <literal>Identity</literal> bean has an <literal>authenticatorClass</literal> property, which if set will be used
+      to determine which <literal>Authenticator</literal> bean implementation to invoke during the
+      authentication process.  This property may be set by configuring it with a predefined authenticator type,
+      for example by using the Seam Config module.  The following XML configuration example shows how you would configure the
+      <literal>Identity</literal> bean to use the <literal>com.acme.MyCustomerAuthenticator</literal> bean for authentication:
     </para>
     
     <programlisting role="XML"><![CDATA[<beans xmlns="http://java.sun.com/xml/ns/javaee"
@@ -117,7 +122,7 @@
       specifying the name of the <literal>Authenticator</literal> implementation (i.e. for those annotated with
       the <literal>@Named</literal> annotation), the <literal>authenticatorName</literal> property may be set instead.  
       This might be useful if you wish to offer your users the choice of how they would like to authenticate, whether it
-      be through a local user database, a remote OpenID provider, or some other method.
+      be through a local user database, an external OpenID provider, or some other method.
     </para>
     
     <para>
@@ -182,7 +187,7 @@
     <para>
       The <literal>getStatus()</literal> method must return the current status of authentication, represented by the
       <literal>AuthenticationStatus</literal> enum.  Possible values are <literal>SUCCESS</literal>, <literal>FAILURE</literal>
-      and <literal>DEFERRED</literal>.  The last of these values should be used for special circumstances, such as
+      and <literal>DEFERRED</literal>.  The <literal>DEFERRED</literal> value should be used for special circumstances, such as
       asynchronous authentication as a result of authenticating against a third party as is the case with OpenID, etc.
     </para>
       
@@ -199,6 +204,46 @@
     </para>
     
     <programlisting role="JAVA"><![CDATA[@Inject Credentials credentials;]]></programlisting>
+    
+    <para>
+      Once the credentials are injected, the <literal>authenticate()</literal> method is responsible for checking that
+      the provided credentials are valid.  Here is a complete example:
+    </para>
+    
+    <programlisting role="JAVA"><![CDATA[public class SimpleAuthenticator extends BaseAuthenticator implements Authenticator {
+   @Inject Credentials credentials;
+   
+   @Override
+   public void authenticate() {
+      if ("demo".equals(credentials.getUsername()) && 
+            credentials.getCredential() instanceof PasswordCredential &&
+            "demo".equals(((PasswordCredential) credentials.getCredential()).getValue()))  {
+         setStatus(AuthenticationStatus.SUCCESS);
+         setUser(new SimpleUser("demo"));
+      }
+   }
+}]]></programlisting>
+
+   <note>
+     <para>
+       The above code was taken from the simple authentication example, included in the Seam Security distribution.
+     </para>
+   </note>
+   
+   <para>
+     In the above code, the <literal>authenticate()</literal> method checks that the user has provided a username of
+     <emphasis>demo</emphasis> and a password of <emphasis>demo</emphasis>.  If so, the authentication is deemed as successful
+     and the status is set to <literal>AuthenticationStatus.SUCCESS</literal>, and a new <literal>SimpleUser</literal> instance 
+     is created to represent the authenticated user.  
+   </para>
+   
+   <warning>
+     <para>
+       The <literal>Authenticator</literal> implementation <emphasis>must</emphasis> return a non-null value when 
+       <literal>getUser()</literal> is invoked if authentication is successful.  Failure to return a non-null value
+       will result in an <literal>AuthenticationException</literal> being thrown.
+     </para>
+   </warning>
   
   </section>
     
