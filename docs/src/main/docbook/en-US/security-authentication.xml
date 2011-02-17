@@ -221,6 +221,10 @@
          setStatus(AuthenticationStatus.SUCCESS);
          setUser(new SimpleUser("demo"));
       }
+      else
+      {
+         setStatus(AuthenticationStatus.FAILURE);
+      }
    }
 }]]></programlisting>
 
