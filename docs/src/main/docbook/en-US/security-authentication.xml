@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="security-authentication">
+  <title>Security - Authentication</title>
+
+  <section>
+    <title>Basic Concepts</title>
+       
+    <para>
+      The majority of the Security API is centered around the <literal>Identity</literal> bean.  This bean represents the
+      identity of the current user, the default implementation of which is a session-scoped, named bean.  This
+      means that once logged in, a user's identity is scoped to the lifecycle of their current session.  The two most
+      important methods that you need to know about at this stage in regard to authentication are <literal>login()</literal> and
+      <literal>logout()</literal>, which as the names suggest are used to log the user in and out, respectively.
+    </para>
+    
+    <para>
+      As the default implementation of the <literal>Identity</literal> bean is named, it may be referenced via an EL
+      expression, or be used as the target of an EL action.  Take the following JSF code snippet for example:
+    </para>
+    
+    <programlisting><![CDATA[  <h:commandButton action="#{identity.login}" value="Log in"/>    
+]]></programlisting>
+
+    <para>
+      This JSF command button would typically be used in a login form (which would also contain inputs for the user's username
+      and password) that allows the user to log into the application.
+    </para>
+    
+    <note>
+      The bean type of the <literal>Identity</literal> bean is <literal>org.jboss.seam.security.Identity</literal>.  This
+      interface is what you should inject if you need to access the <literal>Identity</literal> bean from your
+      own beans.  The default implementation is <literal>org.jboss.seam.security.IdentityImpl</literal>.
+    </note>
+    
+    <para>
+      The other important bean to know about right now is the <literal>Credentials</literal> bean.  Its' purpose is to
+      hold the user's credentials (such as their username and password) before the user logs in.  The default implementation
+      of the <literal>Credentials</literal> bean is also a session-scoped, named bean (just like the <literal>Identity</literal>
+      bean).
+    </para>
+    
+    <para>
+      The <literal>Credentials</literal> bean has two properties, <literal>username</literal> and <literal>credential</literal>
+      that are used to hold the current user's username and credential (e.g. a password) values.  The default implementation of
+      the <literal>Credentials</literal> bean provides an additional convenience property called <literal>password</literal>,
+      which may be used in lieu of the <literal>credential</literal> property when a simple password is required.
+    </para>
+    
+    <note>
+      The bean type of the <literal>Credential</literal> bean is <literal>org.jboss.seam.security.Credentials</literal>.  The
+      default implementation for this bean type is <literal>org.jboss.seam.security.CredentialsImpl</literal>.
+      Also, as credentials may come in many forms (such as passwords, biometric data such as that from a fingerprint reader, etc) the
+      <literal>credential</literal> property of the <literal>Credentials</literal> bean must be able to support each variation,
+      not just passwords.  To allow for this, any credential that implements the <literal>org.picketlink.idm.api.Credential</literal>
+      interface is a valid value for the <literal>credential</literal> property.
+    </note>
+  </section>
+  
+  <section>
+    <title>Built-in Authenticators</title>
+    
+    <para>
+      The Seam Security module provides the following built-in <literal>Authenticator</literal> implementations:
+    </para>
+    
+    <itemizedlist>
+      <listitem>
+        <para>
+          <literal>org.jboss.seam.security.jaas.JaasAuthenticator</literal> - used to authenticate against a JAAS
+          configuration defined by the container.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>org.jboss.seam.security.management.IdmAuthenticator</literal> - used to authenticate against an
+          Identity Store using the Identity Management API.  See the Identity Management chapter for details on how
+          to configure this authenticator.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>org.jboss.seam.security.external.openid.OpenIdAuthenticator</literal> (provided by the external module) - used 
+          to authenticate against an external OpenID provider, such as Google, Yahoo, etc.  See the External Authentication chapter
+          for details on how to configure this authenticator.
+        </para>
+      </listitem>      
+      
+    </itemizedlist>
+  </section>
+  
+  <section>
+    <title>Which Authenticator will Seam use?</title>
+  
+    <para>
+      The <literal>Identity</literal> bean has an <literal>authenticatorClass</literal> property, which if set, the
+      <literal>Authenticator</literal> bean implementation with that exact type will be the one invoked during the
+      authentication process.  This property may be set by either configuring it with a predefined authenticator type,
+      for example using the Seam Config module.  The XML configuration for this may look something like the following:
+    </para>
+    
+    <programlisting role="XML"><![CDATA[<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:ee" 
+   xmlns:security="urn:java:org.jboss.seam.security"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+       
+   <security:IdentityImpl>
+      <s:modifies/>      
+      <security:authenticatorClass>com.acme.MyCustomAuthenticator</security:authenticatorClass>
+   </security:IdentityImpl>      
+</beans>]]></programlisting>
+
+    <para>
+      Alternatively, if you wish to be able to select the <literal>Authenticator</literal> to authenticate with by
+      specifying the name of the <literal>Authenticator</literal> implementation (i.e. for those annotated with
+      the <literal>@Named</literal> annotation), the <literal>authenticatorName</literal> property may be set instead.  
+      This might be useful if you wish to offer your users the choice of how they would like to authenticate, whether it
+      be through a local user database, a remote OpenID provider, or some other method.
+    </para>
+    
+    <para>
+      The following example shows how you might configure the <literal>authenticatorName</literal> property with the
+      Seam Config module:
+    </para>
+    
+    <programlisting role="XML"><![CDATA[<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:ee" 
+   xmlns:security="urn:java:org.jboss.seam.security"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+   <security:IdentityImpl>
+      <s:modifies/>
+      <security:authenticatorName>openIdAuthenticator</security:authenticatorName>
+   </security:IdentityImpl>      
+</beans>]]></programlisting>
+
+    <para>
+      If neither the <literal>authenticatorClass</literal> or <literal>authenticatorName</literal> properties are set,
+      then the authentication process with automatically use a custom <literal>Authenticator</literal> implementation, if
+      the developer has provided one (and only one) within their application.
+    </para>
+    
+    <para>
+      If neither property is set, and the user has not provided a custom <literal>Authenticator</literal>, then the
+      authentication process will fall back to the Identity Management API to attempt to authenticate the user.
+    </para>
+
+  </section>
+  
+  <section>
+    <title>Writing a custom Authenticator</title>
+    
+    <para>
+      All <literal>Authenticator</literal> implementations must implement the <literal>org.jboss.seam.security.Authenticator</literal>
+      interface. This interface defines the following methods:
+    </para> 
+      
+    <programlisting role="JAVA"><![CDATA[public interface Authenticator {
+  void authenticate();   
+  void postAuthenticate();   
+  User getUser();   
+  AuthenticationStatus getStatus();
+}]]></programlisting>
+
+    <para>
+      The <literal>authenticate()</literal> method is invoked during the authentication process and is responsible for performing the
+      work necessary to validate whether the current user is who they claim to be.
+    </para>
+    
+    <para>
+      The <literal>postAuthenticate()</literal> method is invoked after the authentication process has already completed, and
+      may be used to perform any post-authentication business logic, such as setting session variables, logging, auditing, etc.    
+    </para>
+    
+    <para>
+      The <literal>getUser()</literal> method should return an instance of <literal>org.picketlink.idm.api.User</literal>, 
+      which is generally determined during the authentication process.
+    </para>
+    
+    <para>
+      The <literal>getStatus()</literal> method must return the current status of authentication, represented by the
+      <literal>AuthenticationStatus</literal> enum.  Possible values are <literal>SUCCESS</literal>, <literal>FAILURE</literal>
+      and <literal>DEFERRED</literal>.  The last of these values should be used for special circumstances, such as
+      asynchronous authentication as a result of authenticating against a third party as is the case with OpenID, etc.
+    </para>
+      
+    <para>
+      The easiest way to get started writing your own custom authenticator is to extend the 
+      <literal>org.jboss.seam.security.BaseAuthenticator</literal> abstract class.  This class implements the 
+      <literal>getUser()</literal> and <literal>getStatus()</literal> methods for you, and provides 
+      <literal>setUser()</literal> and <literal>setStatus()</literal> methods for setting both the user and status values.
+    </para>
+    
+    <para>
+      To access the user's credentials from within the <literal>authenticate()</literal> method, you can inject the
+      <literal>Credentials</literal> bean like so:
+    </para>
+    
+    <programlisting role="JAVA"><![CDATA[@Inject Credentials credentials;]]></programlisting>
+  
+  </section>
+    
+</chapter>

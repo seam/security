@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="security-introduction">
+  <title>Security - Introduction</title>
+
+  <section>
+    <title>Overview</title>
+    
+    <para>
+      The Seam Security module provides a number of useful features for securing your Java EE application, which are briefly
+      summarised in the following sections.  The rest of the chapters contained in this documentation each focus on one
+      major aspect of each of the following features.
+    </para>
+    
+    <section>
+      <title>Authentication</title>
+      
+      <para>
+        <emphasis>Authentication</emphasis> is the act of establishing, or confirming, the identity of a user.  In many 
+        applications a user confirms their identity by providing a username and password (also known as their 
+        <emphasis>credentials</emphasis>). Seam Security allows the developer to control how users are authenticated, by 
+        providing a flexible <emphasis>Authentication API</emphasis> that can be easily configured to allow authentication 
+        against any number of sources, including but not limited to databases, LDAP directory servers or some other external 
+        authentication service.
+      </para>
+      
+      <para>
+        If none of the built-in authentication providers are suitable for your application, then it is also possible to write
+        your own custom Authenticator implementation.
+      </para>
+    </section>
+    
+    <section>
+      <title>Identity Management</title>
+      
+      <para>
+        Identity Management is a set of useful APIs for managing the users, groups and roles within your application.  The
+        identity management features in Seam are provided by PicketLink IDM, and allow you to manage users stored in a 
+        variety of backend security stores, such as in a database or LDAP directory.
+      </para>
+    </section>
+    
+    <section>
+      <title>External Authentication</title>
+
+      <para>
+        Seam Security contains an external authentication sub-module that provides a number of features for authenticating
+        your application users against external authentication services, such as OpenID and SAML.
+      </para>    
+    </section>
+    
+    <section>
+      <title>Authorization</title>
+      
+      <para>
+        While <emphasis>authentication</emphasis> is used to confirm the identity of the user, <emphasis>authorization</emphasis>
+        is used to control which actions a user may perform within your application.  Authorization can be roughly divided
+        into two categories; coarse-grained and fine-grained.  An example of a coarse-grained restriction is allowing only members of
+        a certain group or role to perform a privileged operation.  A fine-grained restriction on the other hand may allow only
+        a certain individual user to perform a specific action on a specific object within your application.
+      </para>
+      
+      <para>
+        There are also rule-based permissions, which bridge the gap between fine-grained and coarse-grained restrictions.  These
+        permissions may be used to determine a user's privileges based on any type of business logic.
+      </para>
+      
+    </section>
+    
+  </section>
+  
+  <section>
+    <title>Configuration</title>
+    
+    <section>
+      <title>Maven Dependencies</title>
+      
+      <para>
+        The Maven artifacts for all Seam modules are hosted within the JBoss Maven repository.  Please refer to the
+        <ulink url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven Getting Started Guide</ulink> 
+        for information about configuring your Maven installation to use the JBoss repository.
+      </para>
+      
+      <para>
+        To use Seam Security within your Maven-based project, it is advised that you import the Seam BOM (Bill of
+        Materials) which declares the versions for all Seam modules.  First declare a property value for
+        <literal>${seam.version}</literal> as follows:
+      </para>
+
+      <programlisting role="XML"><![CDATA[<properties>
+  <seam.version>3.0.0.Final</seam.version>
+</properties>]]></programlisting>
+
+      <para>
+        You can check the <ulink url="https://repository.jboss.org/nexus/content/groups/public/org/jboss/seam/seam-bom/">JBoss Maven Repository</ulink> 
+        directly to determine the latest version of the Seam BOM to use.
+      </para>
+        
+      <para>
+        Now add the following lines to the list of dependencies within the <literal>dependencyManagement</literal> 
+        section of your project's <literal>pom.xml</literal> file:
+      </para>
+
+      <programlisting role="XML"><![CDATA[<dependency>
+  <groupId>org.jboss.seam</groupId>
+  <artifactId>seam-bom</artifactId>
+  <version>${seam.version}</version>
+  <type>pom</type>
+  <scope>import</scope>
+</dependency>]]></programlisting>
+
+      <para>
+        Once that is done, add the following dependency (no version is required as it comes from <literal>seam-bom</literal>):
+      </para>
+              
+      <programlisting role="XML"><![CDATA[<dependency>
+  <groupId>org.jboss.seam.security</groupId>
+  <artifactId>seam-security</artifactId>
+</dependency>]]></programlisting>
+
+      <para>
+        It is also possible to import the security module as separate API and implementation modules, for situations
+        where you may not want to use the default implementation (such as testing environments where you may wish to substitute
+        mock objects instead of the actual implementation).  To do this, the following dependencies may be declared instead:
+      </para>
+      
+      <programlisting role="XML"><![CDATA[<dependency>
+  <groupId>org.jboss.seam.security</groupId>
+  <artifactId>seam-security-api</artifactId>
+</dependency>
+
+<dependency>
+  <groupId>org.jboss.seam.security</groupId>
+  <artifactId>seam-security-impl</artifactId>
+</dependency>]]></programlisting>      
+
+      <para>
+        If you wish to use the external authentication module in your application to allow authentication using OpenID or
+        SAML, then add the following dependency also:
+      </para>
+      
+      <programlisting role="XML"><![CDATA[<dependency>
+  <groupId>org.jboss.seam.security</groupId>
+  <artifactId>seam-security-external</artifactId>
+</dependency>]]></programlisting>   
+      
+    </section>
+    
+  </section>
+    
+</chapter>

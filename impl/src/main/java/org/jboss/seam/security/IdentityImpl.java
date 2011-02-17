@@ -73,6 +73,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    private User user;
    
+   private Class<Authenticator> authenticatorClass;
    private String authenticatorName;
 
    /**
@@ -112,6 +113,16 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    {
       // If there is a user set, then the user is logged in.
       return user != null;
+   }
+   
+   public Class<Authenticator> getAuthenticatorClass()
+   {
+      return authenticatorClass;
+   }
+   
+   public void setAuthenticatorClass(Class<Authenticator> authenticatorClass)
+   {
+      this.authenticatorClass = authenticatorClass;
    }
    
    public String getAuthenticatorName()
@@ -395,17 +406,24 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
     * Returns an Authenticator instance to be used for authentication. The default
     * implementation obeys the following business logic:
     * 
-    * 1. If the user has specified an authenticatorName property, use it to
+    * 1. If the user has specified an authenticatorClass property, use it to
+    * locate the Authenticator with that exact type
+    * 2. If the user has specified an authenticatorName property, use it to
     * locate and return the Authenticator with that name
-    * 2. If the authenticatorName hasn't been specified, and the user has provided
-    * their own custom Authenticator, return that one
-    * 3. If the user hasn't provided a custom Authenticator, return IdmAuthenticator
+    * 3. If the authenticatorClass and authenticatorName haven't been specified, 
+    * and the user has provided their own custom Authenticator, return that one
+    * 4. If the user hasn't provided a custom Authenticator, return IdmAuthenticator
     * and attempt to use the identity management API to authenticate
     * 
     * @return
     */
    protected Authenticator lookupAuthenticator() throws AuthenticationException
    {
+      if (authenticatorClass != null)
+      {
+         return authenticators.select(authenticatorClass).get();
+      }      
+      
       if (!Strings.isEmpty(authenticatorName))
       {
          Instance<Authenticator> selected = authenticators.select(new NamedLiteral(authenticatorName));

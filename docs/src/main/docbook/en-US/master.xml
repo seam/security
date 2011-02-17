@@ -1,11 +1,16 @@
 <?xml version='1.0' encoding="utf-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"  [ ]>
-<book lang="en">
-      
+<book lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" >
+
+   <title>Seam Security</title>
+         
    <toc/>
-   
-   <title>Seam Remoting</title>      
-   <xi:include href="security-general.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+   <xi:include href="security-introduction.xml"/>
+   <xi:include href="security-authentication.xml"/>
+   <xi:include href="security-identitymanagement.xml"/>   
+   <xi:include href="security-authentication-external.xml"/>
+   <xi:include href="security-authorization.xml"/>
 
 </book>
