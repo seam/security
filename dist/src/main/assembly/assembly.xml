@@ -45,7 +45,7 @@
       </dependencySet>
       <!-- Pull in javadoc for api -->
       <dependencySet>
-         <outputDirectory>doc/apidocs</outputDirectory>
+         <outputDirectory>doc/api</outputDirectory>
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
