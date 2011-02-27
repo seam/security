@@ -1,4 +1,4 @@
-Seam Security 3.0.0.Beta1 
+Seam Security ${project.version}
 =========================
 
 Seam Security provides a number of features for securing your Java EE6 application.
@@ -7,17 +7,25 @@ Seam Security provides a number of features for securing your Java EE6 applicati
 Contents of distribution
 ========================
 
-doc/
+ artifacts/
+ 
+   Seam Security libraries
 
-  API Docs and reference guide.
+ doc/
+
+   API Docs and reference guide.
   
-examples/
+ examples/
 
-  Seam Security Examples
+   Seam Security Examples
   
-lib/
+ lib/
 
-  Seam Security jar files
+   Library dependencies for this module
+   
+ source/
+ 
+   Source code for this module
   
 Licensing
 =========

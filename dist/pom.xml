@@ -22,13 +22,7 @@
       <!-- Libraries -->
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-api</artifactId>
-         <optional>true</optional>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-impl</artifactId>
+         <artifactId>seam-security</artifactId>
          <optional>true</optional>
       </dependency>
 
@@ -90,29 +84,29 @@
       
       <!-- Reference docs -->
 
-      <!--dependency>
+      <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-reference-guide</artifactId>
          <version>${project.version}</version>
          <type>war</type>
          <optional>true</optional>
-      </dependency-->
+      </dependency>
       
       <!-- Examples -->
+      
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-simple-example</artifactId>
+         <version>${project.version}</version>
+         <type>zip</type>
+         <optional>true</optional>
+      </dependency>      
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-idmconsole-example</artifactId>
          <version>${project.version}</version>
-         <type>war</type>
-         <optional>true</optional>
-      </dependency>
-      
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>openid-op</artifactId>
-         <version>${project.version}</version>
-         <type>war</type>
+         <type>zip</type>
          <optional>true</optional>
       </dependency>
       
@@ -120,11 +114,11 @@
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>openid-rp</artifactId>
          <version>${project.version}</version>
-         <type>war</type>
+         <type>zip</type>
          <optional>true</optional>
       </dependency>  
       
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>saml-idp</artifactId>
          <version>${project.version}</version>
@@ -138,7 +132,7 @@
          <version>${project.version}</version>
          <type>war</type>
          <optional>true</optional>
-      </dependency>                
+      </dependency-->                
 
    </dependencies>
 

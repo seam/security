@@ -124,5 +124,22 @@
       <profile>
          <id>ftest</id>
       </profile>
+      
+      <profile>
+         <id>distribution</id>
+         <activation>
+            <property>
+               <name>release</name>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>         
    </profiles>
 </project>

@@ -14,9 +14,11 @@
       <fileSet>
          <directory>src/main/assembly</directory>
          <outputDirectory>.</outputDirectory>
+         <filtered>true</filtered>
          <includes>
             <include>readme.txt</include>
-            <include>lgpl.txt</include>
+            <include>license.txt</include>
+            <include>notice.txt</include>
          </includes>
       </fileSet>
    </fileSets>
@@ -27,12 +29,16 @@
          <outputDirectory>artifacts</outputDirectory>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
-            <include>org.jboss.seam.security:seam-security-api</include>
-            <include>org.jboss.seam.security:seam-security-impl</include>
+            <include>org.jboss.seam.security:seam-security</include>
             <include>org.jboss.seam.security:seam-security-external</include>
          </includes>
+         <excludes>
+            <exclude>org.jboss.seam.security:*:*:javadoc</exclude>
+            <exclude>org.jboss.seam.security:*:*:sources</exclude>            
+         </excludes>
          <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
+      
       <!-- Add necessary dependencies -->
       <dependencySet>
          <outputDirectory>lib</outputDirectory>
@@ -43,6 +49,7 @@
          </excludes>
          <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
+      
       <!-- Pull in javadoc for api -->
       <dependencySet>
          <outputDirectory>doc/api</outputDirectory>
@@ -52,49 +59,6 @@
             <include>org.jboss.seam.security:seam-security-api:jar:javadoc</include>
          </includes>
       </dependencySet>
-      <!-- Pull in the example projects -->
-      <dependencySet>
-         <outputDirectory>examples/idmconsole</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
-         </includes>
-      </dependencySet>
-      <dependencySet>
-         <outputDirectory>examples/openid-op</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:openid-op</include>
-         </includes>
-      </dependencySet>
-      <dependencySet>
-         <outputDirectory>examples/openid-rp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:openid-rp</include>
-         </includes>
-      </dependencySet>
-      
-      <dependencySet>
-         <outputDirectory>examples/saml-idp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:saml-idp</include>
-         </includes>
-      </dependencySet>
-      
-      <dependencySet>
-         <outputDirectory>examples/saml-sp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:saml-sp</include>
-         </includes>
-      </dependencySet>      
       
       <!-- Pull in docbook artifacts -->
       
@@ -110,6 +74,70 @@
                <exclude>META-INF/</exclude>
             </excludes>
          </unpackOptions>
+      </dependencySet>      
+      
+      <!-- Pull in the example projects -->
+      <dependencySet>
+         <outputDirectory>examples/idmconsole</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
+         </includes>
       </dependencySet>
+      
+      <dependencySet>
+         <outputDirectory>examples/openid-op</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:openid-op</include>
+         </includes>
+      </dependencySet>
+      
+      <dependencySet>
+         <outputDirectory>examples/openid-rp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:openid-rp</include>
+         </includes>
+      </dependencySet>
+      
+      <!--dependencySet>
+         <outputDirectory>examples/saml-idp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:saml-idp</include>
+         </includes>
+      </dependencySet>
+      
+      <dependencySet>
+         <outputDirectory>examples/saml-sp</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:saml-sp</include>
+         </includes>
+      </dependencySet-->      
+      
+      <!-- Add the source -->
+      <dependencySet>
+         <outputDirectory>source</outputDirectory>
+         <unpack>true</unpack>
+         <useProjectArtifact>false</useProjectArtifact>
+         <includes>
+            <include>org.jboss.seam.security:seam-security-api:*:sources</include>
+            <include>org.jboss.seam.security:seam-security-impl:*:sources</include>
+            <include>org.jboss.seam.security:seam-security-external:*:sources</include>
+         </includes>
+         <unpackOptions>
+            <excludes>
+               <exclude>META-INF/</exclude>
+            </excludes>
+         </unpackOptions>
+      </dependencySet>        
+      
    </dependencySets>
 </assembly>

@@ -14,8 +14,7 @@
    <name>Seam Security Reference Guide</name>
 
    <properties>
-      <pdf.name>security-reference.pdf</pdf.name>
-      <weld.docbook.version>1.1.1-Beta5</weld.docbook.version>
+      <pdf.name>${project.artifactId}.pdf</pdf.name>
    </properties>
 
    <build>
@@ -32,52 +31,63 @@
             <groupId>org.jboss.maven.plugins</groupId>
             <artifactId>maven-jdocbook-plugin</artifactId>
          </plugin>
+         
+         <!-- Attach docs as a war so dist can retrieve them -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>attach-zip</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>attach-artifact</goal>
+                  </goals>
+                  <configuration>
+                     <artifacts>
+                        <artifact>
+                           <file>${project.build.outputDirectory}/${project.artifactId}-${project.version}.war</file>
+                           <type>war</type>
+                        </artifact>
+                     </artifacts>
+                  </configuration>
+               </execution>
+               
+               <execution>
+                 <id>attach-source</id>
+                 <phase>generate-sources</phase>
+                 <goals>
+                   <goal>add-source</goal>
+                 </goals>
+                 <configuration>
+                   <sources>
+                     <source>src/main/docbook/en-US</source>
+                   </sources>
+                 </configuration>
+               </execution>                
+            </executions>
+         </plugin>         
       </plugins>
+      
    </build>
 
    <profiles>
-
       <profile>
-         <id>translations</id>
+         <id>distribution</id>
+         <activation>
+            <property>
+               <name>release</name>
+            </property>
+         </activation>
          <build>
             <plugins>
                <plugin>
-                  <groupId>org.jboss.maven.plugins</groupId>
-                  <artifactId>maven-jdocbook-plugin</artifactId>
-
-                  <executions>
-                     <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                           <goal>translate</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-
-                  <configuration>
-                     <translations>
-                        <!--translation>it-IT</translation>
-                        <translation>zh-CN</translation>
-                        <translation>zh-TW</translation>
-                        <translation>es-ES</translation>
-                        <translation>ko-KR</translation>
-
-                        <translation>de-DE</translation>
-                        <translation>pt-BR</translation-->
-                     </translations>
-                  </configuration>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
                </plugin>
             </plugins>
          </build>
       </profile>
-
    </profiles>
-
-
-   <scm>
-      <connection>scm:git:git://github.com/seam/security.git</connection>
-      <developerConnection>scm:git:git@github.com:seam/security.git</developerConnection>
-      <url>http://github.com/seam/security</url>
-   </scm>
    
 </project>
