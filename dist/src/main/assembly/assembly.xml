@@ -78,49 +78,18 @@
       
       <!-- Pull in the example projects -->
       <dependencySet>
-         <outputDirectory>examples/idmconsole</outputDirectory>
+         <outputDirectory>examples</outputDirectory>
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
+            <include>org.jboss.seam.security:seam-security-simple-example</include>
             <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
-         </includes>
-      </dependencySet>
-      
-      <dependencySet>
-         <outputDirectory>examples/openid-op</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
             <include>org.jboss.seam.security:openid-op</include>
-         </includes>
-      </dependencySet>
-      
-      <dependencySet>
-         <outputDirectory>examples/openid-rp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
             <include>org.jboss.seam.security:openid-rp</include>
+            <!--include>org.jboss.seam.security:saml-idp</include>
+            <include>org.jboss.seam.security:saml-sp</include-->
          </includes>
-      </dependencySet>
-      
-      <!--dependencySet>
-         <outputDirectory>examples/saml-idp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:saml-idp</include>
-         </includes>
-      </dependencySet>
-      
-      <dependencySet>
-         <outputDirectory>examples/saml-sp</outputDirectory>
-         <unpack>true</unpack>
-         <useProjectArtifact>false</useProjectArtifact>
-         <includes>
-            <include>org.jboss.seam.security:saml-sp</include>
-         </includes>
-      </dependencySet-->      
+      </dependencySet>    
       
       <!-- Add the source -->
       <dependencySet>
