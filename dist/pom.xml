@@ -24,24 +24,28 @@
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
+         <version>${project.version}</version>         
          <optional>true</optional>
       </dependency>      
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-impl</artifactId>
+         <version>${project.version}</version>         
          <optional>true</optional>
       </dependency>      
       
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security</artifactId>
+         <version>${project.version}</version>         
          <optional>true</optional>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-external</artifactId>
+         <version>${project.version}</version>         
          <optional>true</optional>
       </dependency>
       
