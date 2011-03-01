@@ -176,6 +176,9 @@ public class OpenIdProviderBean extends EntityBean implements OpenIdProviderApi,
 
    public String getOpLocalIdentifierForUserName(String userName)
    {
+       if (userName==null){
+           return null;
+       }
       try
       {
          return createURL(getUsersPath() + URLEncoder.encode(userName, "UTF-8"));

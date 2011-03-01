@@ -6,6 +6,11 @@
    <packaging>war</packaging>
    <name>OpenID Relying Party</name>
 
+	<properties>
+		<jboss-javaee6-spec.version>1.0.0.Final</jboss-javaee6-spec.version>
+	</properties>
+
+
    <parent>
       <groupId>org.jboss.seam.security</groupId>
       <artifactId>seam-security-parent</artifactId>
@@ -30,7 +35,18 @@
             </exclusion>
          </exclusions>
       </dependency>
-
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-impl</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      
+            <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-api</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet</artifactId>
@@ -67,7 +83,214 @@
          <artifactId>jboss-servlet-api_3.0_spec</artifactId>
          <scope>provided</scope>
       </dependency>
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Optional, but highly recommended -->
+		<!--
+			Arquillian allows you to test enterprise code such as EJBs and
+			Transactional(JTA) JPA from JUnit/TestNG
+		-->
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
    </dependencies>
 
+	<profiles>
+		<profile>
+			<!--
+				The default profile skips all tests, though you can tune it to run
+				just unit tests based on a custom pattern
+			-->
+			<!--
+				Seperate profiles are provided for running all tests, including
+				Arquillian tests that execute in the specified container
+			-->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<!-- Java EE 6 API dependency -->
+				<!--
+					This one dependency imports all APIs available for a Java EE 6.0
+					application
+				-->
+				<dependency>
+					<groupId>org.jboss.spec</groupId>
+					<artifactId>jboss-javaee-6.0</artifactId>
+					<version>${jboss-javaee6-spec.version}</version>
+					<type>pom</type>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.4.3</version>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+					<!--
+						Optional JBoss deployer plugin will deploy your war to a local
+						JBoss AS container if you've declared $JBOSS_HOME in your OS
+					-->
+					<!--
+						To use, set the JBOSS_HOME environment variable (or jboss.home in
+						$HOME/.m2/settings.xml) and run 'mvn package jboss:hard-deploy'
+					-->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>jboss-maven-plugin</artifactId>
+						<version>1.4.1</version>
+						<configuration>
+							<jbossHome>${jboss.home}</jbossHome>
+							<serverName>${jboss.domain}</serverName>
+							<fileNames>
+								<fileName>${project.build.directory}/${project.build.finalName}.war</fileName>
+								<!--
+									JNDI Datasource that connects to in-memory HSQLDB to
+									demonstrate JPA
+								-->
+								<fileName>src/main/resources-jbossas/default-ds.xml</fileName>
+							</fileNames>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!--
+				An optional Arquillian testing profile that executes tests in
+				GlassFish Embedded
+			-->
+			<!-- Run with 'mvn clean test -Pglassfish-embedded-3' -->
+			<id>glassfish-embedded-3</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-embedded-3</artifactId>
+					<version>${arquillian.version}</version>
+					<scope>test</scope>
+				</dependency>
+				<!--
+					This imports the Java EE 6 runtime libraries provided by GlassFish
+					Embedded
+				-->
+				<dependency>
+					<groupId>org.glassfish.extras</groupId>
+					<artifactId>glassfish-embedded-all</artifactId>
+					<version>3.0.1-b20</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<testResources>
+					<testResource>
+						<directory>src/test/resources</directory>
+					</testResource>
+					<testResource>
+						<directory>src/main/webapp</directory>
+					</testResource>
+					
+					<!--
+						Overrides default configuration to use alternate persistence.xml
+						with eclipselink settings and declare a Glassfish Datasource
+					-->
+					<!-- Used by Arquillian -->
+					<testResource>
+						<directory>src/test/resources-glassfish-embedded</directory>
+					</testResource>
+				</testResources>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<!--
+							don't use version 2.5 as it creates seperate test suites per
+							class
+						-->
+						<version>2.4.3</version>
+						<configuration>
+							<systemProperties>
+								<!--
+									This optional property fixes an annoyance with Glassfish that
+									puts derby.log in the project root
+								-->
+								<property>
+									<name>derby.stream.error.file</name>
+									<!--
+										If you save the log in target it is less likely to get
+										committed in your project
+									-->
+									<value>target/derby.log</value>
+								</property>
+							</systemProperties>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!--
+				An optional Arquillian testing profile that executes tests in a
+				remote JBoss AS instance
+			-->
+			<!-- Run with 'mvn clean test -Pjbossas-remote-6' -->
+			<id>jbossas-remote-6</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-jbossas-remote-6</artifactId>
+					<scope>test</scope>
+				</dependency>
+				<!-- Java EE 6 API dependency -->
+				<!--
+					This one dependency imports all APIs available for a Java EE 6.0
+					application
+				-->
+				<dependency>
+					<groupId>org.jboss.spec</groupId>
+					<artifactId>jboss-javaee-6.0</artifactId>
+					<version>${jboss-javaee6-spec.version}</version>					
+					<type>pom</type>
+					<scope>provided</scope>
+				</dependency>
+				<!-- needed for org.jnp.interfaces.NamingContextFactory -->
+				<dependency>
+					<groupId>org.jboss.jbossas</groupId>
+					<artifactId>jboss-as-client</artifactId>
+					<type>pom</type>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<testResources>
+					<testResource>
+						<directory>src/test/resources</directory>
+					</testResource>
+					<testResource>
+						<directory>src/main/webapp</directory>
+					</testResource>
+					<!--
+						Overrides default configuration to use alternate persistence.xml
+						with Hibernate settings and declare a JBoss AS Datasource
+					-->
+					<!-- Used by Arquillian -->
+					<testResource>
+						<directory>src/test/resources-jbossas</directory>
+					</testResource>
+				</testResources>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -28,6 +28,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
@@ -49,7 +50,7 @@ public class OpenIdProviderSpiImpl implements OpenIdProviderSpi
 
    public void authenticate(String realm, String userName, boolean immediate, ResponseHolder responseHolder)
    {
-      if (identity.isLoggedIn() && userName != null && !userName.equals(identity.getUserName()))
+      if (identity.isLoggedIn() && userName != null && !userName.equals(((LocalUser)identity.getUser()).getUserName()))
       {
          opApi.authenticationFailed(responseHolder.getResponse());
       }

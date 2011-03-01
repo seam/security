@@ -21,41 +21,40 @@
  */
 package org.jboss.seam.security.examples.openid;
 
+import java.io.Serializable;
+
 import javax.enterprise.inject.Model;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jboss.seam.security.Authenticator;
+import org.jboss.seam.security.BaseAuthenticator;
+import org.jboss.seam.security.Credentials;
+import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 
 @Model
-public class Login
+public class ServerAuthenticator extends BaseAuthenticator implements Authenticator, Serializable
 {
    @Inject
-   private OpenIdProviderApi opApi;
+   private OpenIdProviderApi providerApi;
+   
 
    private String userNameReceivedFromRp;
 
    private String realm;
-
-   private String userName;
 
    @Inject
    private DialogueManager dialogueManager;
 
    @Inject
    private Identity identity;
+   
+   @Inject
+   Credentials credentials;
 
-   public String getUserName()
-   {
-      return userName;
-   }
-
-   public void setUserName(String userName)
-   {
-      this.userName = userName;
-   }
 
    public String getUserNameReceivedFromRp()
    {
@@ -82,30 +81,47 @@ public class Login
       return dialogueManager.isAttached();
    }
 
-   public String login()
-   {
-      String userName = userNameReceivedFromRp != null ? userNameReceivedFromRp : this.userName;
-      identity.localLogin(userName);
-      if (dialogueManager.isAttached())
-      {
-         opApi.authenticationSucceeded(userName, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
-         return null;
-      }
-      else
-      {
-         return "LOCAL_LOGIN";
-      }
-   }
+   public void authenticate() {
+       String userName = userNameReceivedFromRp != null ? userNameReceivedFromRp : credentials.getUsername();
 
+       LocalUser user = new LocalUser();
+       user.setUserName(userName);
+       user.setOpLocalIdentifier(providerApi.getOpLocalIdentifierForUserName(userName));
+       
+       if (user != null) {
+           setUser(user);
+           
+           if (dialogueManager.isAttached())
+           {
+               providerApi.authenticationSucceeded(userName, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+           }
+           setStatus(AuthenticationStatus.SUCCESS);
+           return;
+       }
+       setStatus(AuthenticationStatus.FAILURE);
+   }
+   
    public void cancel()
    {
       if (dialogueManager.isAttached())
       {
-         opApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+          providerApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
       }
       else
       {
          throw new IllegalStateException("cancel method can only be called during an OpenID login");
       }
    }
+
+    public void redirectToLoginIfNotLoggedIn() {
+        if (!identity.isLoggedIn()) {
+            redirectToViewId("/Login.xhtml");
+        }
+    }
+
+    private void redirectToViewId(String viewId) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        FacesContext.getCurrentInstance().getApplication().getNavigationHandler()
+                .handleNavigation(facesContext, null, viewId + "?faces-redirect=true");
+    }
 }

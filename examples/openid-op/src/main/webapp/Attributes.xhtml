@@ -5,7 +5,7 @@
 	xmlns:f="http://java.sun.com/jsf/core">
 	<f:metadata>
 		<f:event type="preRenderView"
-			listener="#{identity.redirectToLoginIfNotLoggedIn}" />
+			listener="#{serverAuthenticator.redirectToLoginIfNotLoggedIn}" />
 	</f:metadata>
 	<ui:composition template="/PageTemplate.xhtml">
 

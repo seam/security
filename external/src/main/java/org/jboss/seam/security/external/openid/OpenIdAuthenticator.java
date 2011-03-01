@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Instance;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
 
    private String openIdProviderUrl;
    
-   @Inject private OpenIdRelyingPartyApi openIdApi;
+   @Inject private Instance<OpenIdRelyingPartyApi> openIdApi;
    
    @Inject List<OpenIdProvider> providers;
    
@@ -74,14 +74,14 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    public void authenticate()
    {
       List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-      attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
+      attributes.add(openIdApi.get().createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
       
       OpenIdProvider selectedProvider = getSelectedProvider();
       String url = selectedProvider != null ? selectedProvider.getUrl() : getOpenIdProviderUrl();
       
       if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + url);
       
-      openIdApi.login(url, attributes, 
+      openIdApi.get().login(url, attributes, 
             (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());      
       
       setStatus(AuthenticationStatus.DEFERRED);

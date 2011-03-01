@@ -4,8 +4,8 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:f="http://java.sun.com/jsf/core">
 	<f:metadata>
-		<f:viewParam name="realm" value="#{login.realm}" />
-		<f:viewParam name="userName" value="#{login.userNameReceivedFromRp}" />
+		<f:viewParam name="realm" value="#{serverAuthenticator.realm}" />
+		<f:viewParam name="userName" value="#{serverAuthenticator.userNameReceivedFromRp}" />
 	</f:metadata>
 	<ui:composition template="/PageTemplate.xhtml">
 		<h:messages />
@@ -17,21 +17,21 @@
 				<h1>Login</h1>
 			</c:otherwise>
 		</c:choose>
-		<h:form>
+		<h:form id="form">
 			<h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
 				<h:outputText value="User name" />
 				<c:choose>
-					<c:when test="#{login.userNameReceivedFromRp == null}">
-						<h:inputText value="#{login.userName}" />
+					<c:when test="#{serverAuthenticator.userNameReceivedFromRp == null}">
+						<h:inputText value="#{credentials.username}" />
 					</c:when>
 					<c:otherwise>
-						<h:outputText value="#{login.userNameReceivedFromRp}" />
+						<h:outputText value="#{serverAuthenticator.userNameReceivedFromRp}" />
 					</c:otherwise>
 				</c:choose>
 			</h:panelGrid>
-			<p><h:commandButton action="#{login.login}" value="Login" /> <h:commandButton
-				action="#{login.cancel}" value="Cancel"
-				rendered="#{login.dialogueActive}" /></p>
+			<p><h:commandButton id="login" action="#{identity.login}" value="Login" /> <h:commandButton
+				action="#{serverAuthenticator.cancel}" value="Cancel"
+				rendered="#{serverAuthenticator.dialogueActive}" /></p>
 		</h:form>
 	</ui:composition>
 </f:view>
