@@ -12,6 +12,7 @@
    <artifactId>seam-security-impl</artifactId>
    <packaging>jar</packaging>
    <name>Seam Security Implementation</name>
+   <url>${project.parent.url}</url>
 
    <properties>
       <drools.version>5.1.1</drools.version>

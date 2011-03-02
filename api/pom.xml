@@ -12,6 +12,7 @@
    <artifactId>seam-security-api</artifactId>
    <packaging>jar</packaging>   
    <name>Seam Security API</name>
+   <url>${project.parent.url}</url>
   
    <dependencies>
 
