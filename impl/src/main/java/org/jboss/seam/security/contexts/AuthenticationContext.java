@@ -26,29 +26,8 @@ public class AuthenticationContext implements Context
    public <T> T get(Contextual<T> contextual,
          CreationalContext<T> creationalContext)
    {
-      if (!isActive())
-      {
-         throw new ContextNotActiveException();
-      }
-      ContextualInstance<T> beanInstance = getBeanStore().get(contextual);
-      if (beanInstance != null)
-      {
-         return beanInstance.getInstance();
-      }
-      else if (creationalContext != null)
-      {
-         T instance = contextual.create(creationalContext);
-         if (instance != null)
-         {
-            beanInstance = new ContextualInstance<T>(contextual, creationalContext, instance);
-            getBeanStore().put(contextual, beanInstance);
-         }
-         return instance;
-      }
-      else
-      {
-         return null;
-      }
+      // FIXME
+      return null;
 
    }
 
@@ -60,11 +39,6 @@ public class AuthenticationContext implements Context
    public boolean isActive()
    {
       return active;
-   }
-
-   protected HashMapBeanStore getBeanStore()
-   {
-      return getBeanStore();
    }
 
 }

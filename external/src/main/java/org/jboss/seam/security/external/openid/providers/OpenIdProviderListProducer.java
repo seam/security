@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
@@ -15,24 +16,19 @@ import javax.inject.Inject;
  * @author Shane Bryzak
  *
  */
-public @ApplicationScoped class OpenIdProviderListProducer
+public class OpenIdProviderListProducer
 {
    @Inject Instance<OpenIdProvider> providerInstances;
    
-   private List<OpenIdProvider> providers;
-   
-   @Inject public void init()
+   @Produces @RequestScoped public List<OpenIdProvider> listProviders()
    {
-      providers = new ArrayList<OpenIdProvider>();
+      List<OpenIdProvider> providers = new ArrayList<OpenIdProvider>();
       
       for (OpenIdProvider provider : providerInstances)
       {
          providers.add(provider);
       }
-   }
-   
-   @Produces public List<OpenIdProvider> listProviders()
-   {
-      return providers;
+      
+      return providers;      
    }
 }

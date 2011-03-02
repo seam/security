@@ -29,8 +29,8 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.servlet.ServletContext;
 
-import org.jboss.seam.security.contexts.ContextualInstance;
-import org.jboss.seam.security.contexts.HashMapBeanStore;
+import org.jboss.seam.security.external.contexts.ContextualInstance;
+import org.jboss.seam.security.external.contexts.HashMapBeanStore;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
 
 /**

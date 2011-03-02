@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ import org.openid4java.message.ax.FetchResponse;
  * @author Marcel Kolsteren
  * 
  */
-public class OpenIdRpAuthenticationService
+public @ApplicationScoped class OpenIdRpAuthenticationService
 {
    @Inject
    private OpenIdRequest openIdRequest;

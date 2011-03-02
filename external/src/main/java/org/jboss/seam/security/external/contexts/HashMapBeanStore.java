@@ -1,4 +1,4 @@
-package org.jboss.seam.security.contexts;
+package org.jboss.seam.security.external.contexts;
 
 import java.util.HashMap;
 import java.util.Map;

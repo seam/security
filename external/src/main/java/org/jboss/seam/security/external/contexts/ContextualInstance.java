@@ -1,4 +1,4 @@
-package org.jboss.seam.security.contexts;
+package org.jboss.seam.security.external.contexts;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;

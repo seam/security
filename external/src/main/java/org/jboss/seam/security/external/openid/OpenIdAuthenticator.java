@@ -28,8 +28,6 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    extends BaseAuthenticator implements Authenticator, Serializable
 {
    private static final long serialVersionUID = 4669651866032932651L;
-
-   private String openIdProviderUrl;
    
    @Inject private OpenIdRelyingPartyApi openIdApi;
    
@@ -47,16 +45,6 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    public void setProviderCode(String providerCode)
    {
       this.providerCode = providerCode;
-   }
-   
-   public String getOpenIdProviderUrl()
-   {
-      return openIdProviderUrl;
-   }
-   
-   public void setOpenIdProviderUrl(String openIdProviderUrl)
-   {
-      this.openIdProviderUrl = openIdProviderUrl;
    }
    
    protected OpenIdProvider getSelectedProvider()
@@ -77,11 +65,14 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
       attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
       
       OpenIdProvider selectedProvider = getSelectedProvider();
-      String url = selectedProvider != null ? selectedProvider.getUrl() : getOpenIdProviderUrl();
+      if (selectedProvider == null)
+      {
+         throw new IllegalStateException("No OpenID provider has been selected");
+      }
       
-      if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + url);
+      if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + selectedProvider.getUrl());
       
-      openIdApi.login(url, attributes, 
+      openIdApi.login(selectedProvider.getUrl(), attributes, 
             (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());      
       
       setStatus(AuthenticationStatus.DEFERRED);
