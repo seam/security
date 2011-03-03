@@ -65,6 +65,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    public static final String OPTION_CREDENTIAL_CLASS_NAME = "credentialEntityClassName";
    public static final String OPTION_RELATIONSHIP_CLASS_NAME = "relationshipEntityClassName";
    public static final String OPTION_ROLE_TYPE_CLASS_NAME = "roleTypeEntityClassName";
+   public static final String OPTION_ATTRIBUTE_CLASS_NAME = "attributeEntityClassName";
    
    private static final String DEFAULT_USER_IDENTITY_TYPE = "USER";
    private static final String DEFAULT_ROLE_IDENTITY_TYPE = "ROLE";
@@ -298,6 +299,20 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          catch (ClassNotFoundException e)
          {
             throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid role type entity class: " + clsName);
+         }
+      }
+      
+      clsName = configurationContext.getStoreConfigurationMetaData()
+         .getOptionSingleValue(OPTION_ATTRIBUTE_CLASS_NAME);
+      if (clsName != null)
+      {
+         try
+         {
+            attributeClass = Class.forName(clsName);
+         }
+         catch (ClassNotFoundException e)
+         {
+            throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid attribute entity class: " + clsName);
          }
       }
       
@@ -1930,12 +1945,50 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return false;
    }
 
-   public void addAttributes(IdentityStoreInvocationContext invocationCtx,
-         IdentityObject identity, IdentityObjectAttribute[] attributes)
+   public void addAttributes(IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject, IdentityObjectAttribute[] attributes)
          throws IdentityException
    {
-      // TODO Auto-generated method stub
-      
+      try
+      {
+         EntityManager em = getEntityManager(ctx);
+         
+         Object identity = lookupIdentity(identityObject, em);
+         
+         if (attributeClass != null)
+         {
+            Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+            Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
+            Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
+            
+            for (IdentityObjectAttribute attrib : attributes)
+            {
+               if (attrib.getSize() == 1)
+               {
+                  Object attribute = attributeClass.newInstance();
+                  attributeIdentityProp.setValue(attribute, identity);
+                  attributeNameProp.setValue(attribute, attrib.getName());
+                  attributeValueProp.setValue(attribute, attrib.getValue());
+                  em.persist(attribute);
+               }
+               else
+               {
+                  for (Object value : attrib.getValues())
+                  {
+                     Object attribute = attributeClass.newInstance();
+                     attributeIdentityProp.setValue(attribute, identity);
+                     attributeNameProp.setValue(attribute, attrib.getName());
+                     attributeValueProp.setValue(attribute, value);
+                     em.persist(attribute);   
+                  }
+               }
+            }
+         }
+      }
+      catch (Exception e)
+      {
+         throw new IdentityException("Error while adding attributes.", e);
+      }      
    }
 
    public IdentityObject findIdentityObjectByUniqueAttribute(
@@ -2071,20 +2124,104 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return null;
    }
 
-   public void removeAttributes(IdentityStoreInvocationContext invocationCtx,
-         IdentityObject identity, String[] attributeNames)
+   public void removeAttributes(IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject, String[] attributeNames)
          throws IdentityException
-   {
-      // TODO Auto-generated method stub
+   {      
+      EntityManager em = getEntityManager(ctx);
       
+      Object identity = lookupIdentity(identityObject, em);
+            
+      if (attributeClass != null)
+      {
+         Property<?> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+         Property<?> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
+         
+         CriteriaBuilder builder = em.getCriteriaBuilder();
+         CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
+         Root<?> root = criteria.from(attributeClass);
+         
+         List<Predicate> predicates = new ArrayList<Predicate>();
+         predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
+               identity));
+         
+         criteria.where(predicates.toArray(new Predicate[0]));
+         
+         List<?> results = em.createQuery(criteria).getResultList();
+         
+         for (Object result : results)
+         {
+            String name = attributeNameProp.getValue(result).toString();
+            for (String n : attributeNames)
+            {
+               if (name != null && name.equals(n))
+               {
+                  em.remove(result);
+                  break;
+               }
+            }            
+         }
+      }
    }
 
-   public void updateAttributes(IdentityStoreInvocationContext invocationCtx,
-         IdentityObject identity, IdentityObjectAttribute[] attributes)
+   public void updateAttributes(IdentityStoreInvocationContext ctx,
+         IdentityObject identityObject, IdentityObjectAttribute[] attributes)
          throws IdentityException
-   {
-      // TODO Auto-generated method stub
+   {     
+      try
+      {
+         EntityManager em = getEntityManager(ctx);
+         
+         Object identity = lookupIdentity(identityObject, em);
+         
+         if (attributeClass != null)
+         {
+            Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+            Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
+            Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
+            
+            for (IdentityObjectAttribute attrib : attributes)
+            {
+               CriteriaBuilder builder = em.getCriteriaBuilder();
+               CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
+               Root<?> root = criteria.from(attributeClass);
+               
+               List<Predicate> predicates = new ArrayList<Predicate>();
+               predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
+                     identity));
+               predicates.add(builder.equal(root.get(attributeNameProp.getName()), 
+                     attrib.getName()));
+               
+               criteria.where(predicates.toArray(new Predicate[0]));
+               
+               List<?> results = em.createQuery(criteria).getResultList();
       
+               // All existing attribute values should be overwritten, so we
+               // will first remove them, then add the new values
+               
+               if (!results.isEmpty())
+               {
+                  for (Object result : results)
+                  {
+                     em.remove(result);
+                  }
+               }
+               
+               for (Object value : attrib.getValues())
+               {
+                  Object attribute = attributeClass.newInstance();
+                  attributeIdentityProp.setValue(attribute, identity);
+                  attributeNameProp.setValue(attribute, attrib.getName());
+                  attributeValueProp.setValue(attribute, value.toString());
+                  em.persist(attribute);   
+               }
+            }
+         }
+      }
+      catch (Exception e)
+      {
+         throw new IdentityException("Error while updating attributes.", e);
+      }
    }
 
    public IdentityStoreSession createIdentityStoreSession()

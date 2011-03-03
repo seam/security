@@ -15,12 +15,14 @@ import org.jboss.seam.security.UserImpl;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
+import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.model.SimpleRole;
+import org.picketlink.idm.impl.api.SimpleAttribute;
 
 /**
  * A conversation-scoped component for creating and managing user accounts
@@ -141,6 +143,8 @@ public @Named @ConversationScoped class UserAction implements Serializable
    
    private String saveExistingUser() throws IdentityException, FeatureNotSupportedException
    {
+      User user = identitySession.getPersistenceManager().findUser(username);      
+      
       // Check if a new password has been entered
       if (password != null && !"".equals(password))
       {
@@ -152,13 +156,13 @@ public @Named @ConversationScoped class UserAction implements Serializable
          }
          else
          {
-            identitySession.getAttributesManager().updatePassword(new UserImpl(username), password);
+            identitySession.getAttributesManager().updatePassword(user, password);
          }
       }
       
       Collection<Role> grantedRoles = new ArrayList<Role>();
       
-      Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
+      Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(user);
       
       for (RoleType roleType : roleTypes)
       {
@@ -175,9 +179,7 @@ public @Named @ConversationScoped class UserAction implements Serializable
             }                  
          }
       }
-      
-      User user = identitySession.getPersistenceManager().findUser(username);
-      
+            
       for (Role role : roles)
       {
          if (grantedRoles == null || !grantedRoles.contains(role))
@@ -186,15 +188,9 @@ public @Named @ConversationScoped class UserAction implements Serializable
          }
       }
       
-      if (enabled)
-      {
-         //identityManager.enableUser(username);
-      }
-      else
-      {
-         //identityManager.disableUser(username);
-      }
-         
+      identitySession.getAttributesManager().updateAttributes(user, 
+            new Attribute[] {new SimpleAttribute(ATTRIBUTE_NAME_USER_ENABLED, enabled)}); 
+
       conversation.end();
       return "success";
    }

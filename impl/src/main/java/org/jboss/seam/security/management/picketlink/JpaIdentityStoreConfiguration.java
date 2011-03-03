@@ -115,6 +115,12 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
             createOptionList(roleTypeClass.getName()));
       }
       
+      if (attributeClass != null)
+      {
+         options.put(JpaIdentityStore.OPTION_ATTRIBUTE_CLASS_NAME, 
+               createOptionList(attributeClass.getName()));
+      }
+      
       store.setOptions(options);      
    }
       
