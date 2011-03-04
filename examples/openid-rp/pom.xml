@@ -15,6 +15,15 @@
 
    <build>
       <finalName>openid-rp</finalName>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <skip>true</skip>
+            </configuration>
+         </plugin>
+      </plugins>
    </build>
 
    <dependencies>
@@ -67,6 +76,20 @@
          <scope>provided</scope>
       </dependency>
 
+      <dependency>
+         <groupId>org.seleniumhq.selenium.client-drivers</groupId>
+         <artifactId>selenium-java-client-driver</artifactId>
+         <version>${selenium.java.client.version}</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.test</groupId>
+         <artifactId>richfaces-selenium</artifactId>
+         <version>${richfaces.selenium.version}</version>
+         <scope>test</scope>
+      </dependency>
+
    </dependencies>
    
    <profiles>
@@ -86,6 +109,15 @@
             </plugins>
          </build>
       </profile> 
+      <profile>
+         <id>ftest</id>
+         <properties>
+            <selenium.browser>*chrome</selenium.browser>
+            <context.host>www.openid-rp.com</context.host>
+            <context.root>http://${context.host}:8080/</context.root>
+            <context.deploy.path>${context.path}</context.deploy.path>
+         </properties>
+      </profile>
    </profiles>   
    
 </project>
