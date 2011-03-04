@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Seam OpenId-rp Example" verbose="2" parallel="false">
+   <test name="openid-rp_ftest">
+      <packages>
+         <package name="org.jboss.seam.security.examples.openidrp.ftest" />
+      </packages>
+   </test>
+</suite>
