@@ -15,7 +15,6 @@ import org.jboss.seam.security.UserImpl;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
-import org.picketlink.idm.api.IdentityType;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
@@ -76,8 +75,32 @@ public @Named @ConversationScoped class UserAction implements Serializable
       }          
       
       Attribute enabledAttr = identitySession.getAttributesManager().getAttribute(username, 
-            ATTRIBUTE_NAME_USER_ENABLED); 
-      enabled = enabledAttr != null ? (Boolean) enabledAttr.getValue() : true;
+            ATTRIBUTE_NAME_USER_ENABLED);
+      
+      if (enabledAttr != null)
+      {
+         Object value = enabledAttr.getValue();
+         if (value != null)
+         {
+            if (Boolean.class.isAssignableFrom(value.getClass()))
+            {
+               enabled = (Boolean) value;
+            }
+            else
+            {
+               enabled = Boolean.valueOf((String) value);
+            }
+         }
+         else
+         {
+            enabled = true;
+         }
+      }
+      else
+      {
+         enabled = true;
+      }
+
       
       newUserFlag = false;
    }
@@ -293,7 +316,5 @@ public @Named @ConversationScoped class UserAction implements Serializable
    public Collection<Group> getRoleGroups()
    {
       return roleGroups;
-   }
-   
-   
+   }   
 }

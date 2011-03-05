@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +96,15 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    private static final String PROPERTY_ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
    private static final String PROPERTY_ATTRIBUTE_VALUE = "ATTRIBUTE_VALUE";
    private static final String PROPERTY_ATTRIBUTE_IDENTITY = "ATTRIBUTE_IDENTITY";  
+   private static final String PROPERTY_ATTRIBUTE_TYPE = "ATTRIBUTE_TYPE";
+   
+   private static final String ATTRIBUTE_TYPE_TEXT = "text";
+   private static final String ATTRIBUTE_TYPE_BOOLEAN = "boolean";
+   private static final String ATTRIBUTE_TYPE_DATE = "date";
+   private static final String ATTRIBUTE_TYPE_INT = "int";
+   private static final String ATTRIBUTE_TYPE_LONG = "long";
+   private static final String ATTRIBUTE_TYPE_FLOAT = "float";
+   private static final String ATTRIBUTE_TYPE_DOUBLE = "double";
    
    private class EntityToSpiConverter
    {
@@ -939,6 +949,21 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             throw new IdentityException("Error initializing JpaIdentityStore - " +
                   "no attribute identity property found.");
          }
+         
+         props = PropertyQueries.createQuery(attributeClass)
+            .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
+            .getResultList();
+         
+         if (props.size() == 1)
+         {
+            modelProperties.put(PROPERTY_ATTRIBUTE_TYPE, props.get(0));
+         }
+         else if (props.size() > 1)
+         {
+            throw new IdentityException(
+                  "Ambiguous attribute type property in class " +
+                  attributeClass.getName());
+         }
       }
 
       // Scan for additional attributes in the identity class also
@@ -981,6 +1006,28 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       if (relationshipNameProp != null)
       {         
          modelProperties.put(PROPERTY_ROLE_TYPE_NAME, relationshipNameProp);
+      }
+   }
+   
+   protected class AttributeValue
+   {
+      private String encoded;
+      private String type;
+      
+      public AttributeValue(String encoded, String type)
+      {
+         this.encoded = encoded;
+         this.type = type;
+      }
+      
+      public String getEncoded()
+      {
+         return encoded;
+      }
+      
+      public String getType()
+      {
+         return type;
       }
    }
    
@@ -1955,6 +2002,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          
          Object identity = lookupIdentity(identityObject, em);
          
+         // TODO support for attributeProperties
+         
          if (attributeClass != null)
          {
             Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
@@ -2179,6 +2228,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
             Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
             Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
+            Property<Object> attributeTypeProp = modelProperties.get(PROPERTY_ATTRIBUTE_TYPE);
             
             for (IdentityObjectAttribute attrib : attributes)
             {
@@ -2212,7 +2262,57 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                   Object attribute = attributeClass.newInstance();
                   attributeIdentityProp.setValue(attribute, identity);
                   attributeNameProp.setValue(attribute, attrib.getName());
-                  attributeValueProp.setValue(attribute, value.toString());
+
+                  // If there is an attribute type property, then determine the value type
+                  // TODO this is messy, refactor it by abstracting into a utility class
+                  if (attributeTypeProp != null)
+                  {
+                     if (String.class.equals(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, value.toString());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_TEXT);
+                     }
+                     else if (Boolean.class.equals(value.getClass()) || Boolean.TYPE.equals(value.getClass()))
+                     {  
+                        attributeValueProp.setValue(attribute, Boolean.toString((Boolean) value));
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_BOOLEAN);
+                     }
+                     else if (Date.class.isAssignableFrom(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, "" + ((Date) value).getTime());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_DATE);
+                     }
+                     else if (Integer.class.equals(value.getClass()) || Integer.TYPE.equals(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, ((Integer) value).toString());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_INT);
+                     }
+                     else if (Long.class.equals(value.getClass()) || Long.TYPE.equals(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, ((Long) value).toString());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_LONG);
+                     }
+                     else if (Float.class.equals(value.getClass()) || Float.TYPE.equals(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, ((Float) value).toString());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_FLOAT);
+                     }
+                     else if (Double.class.equals(value.getClass()) || Double.TYPE.equals(value.getClass()))
+                     {
+                        attributeValueProp.setValue(attribute, ((Double) value).toString());
+                        attributeTypeProp.setValue(attribute, ATTRIBUTE_TYPE_DOUBLE);
+                     }
+                     else
+                     {
+                        throw new IdentityException("Could not persist attribute value - unsupported attribute value type " +
+                              value.getClass());
+                     }
+                  }
+                  else
+                  {
+                     attributeValueProp.setValue(attribute, value.toString());
+                  }
+                  
                   em.persist(attribute);   
                }
             }
