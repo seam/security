@@ -4,12 +4,76 @@
 <chapter id="security-authorization">
   <title>Security - Authorization</title>
 
-  <sect1>
-    <title>TO DO</title>
+  <section>
+    <title>Basic Concepts</title>
     
     <para>
-      This chapter coming soon.
+      Seam Security provides a number of options for restricting access to certain parts of your application. As mentioned
+      previously, the security API is centered around the <code>Identity</code> bean, which is a session-scoped bean used to represent 
+      the <emphasis>identity</emphasis> of the current user.
     </para>
-  </sect1>
+    
+    <para>
+      To be able to restrict the sensitive parts of your code, you must first inject the <code>Identity</code> bean into your class:
+    </para>
+    
+    <programlisting><![CDATA[@Inject Identity identity;]]></programlisting>
+    
+    <para>
+       Once you have injected the <code>Identity</code> bean, you may invoke its methods to perform various types of authorization.
+       The following sections will examine each of these in more detail.
+    </para>
+    
+    <para>
+       The security model in Seam Security is based upon the PicketLink API.  Let's examine a few of the core classes provided by
+       PicketLink that are used in Seam.
+    </para>
+    
+    <section>
+       <title>IdentityType</title>
+       
+       <para>
+          Fully qualified class: <code>org.picketlink.idm.api.IdentityType</code>
+       </para>
+       
+       <para>
+          This is the common base interface for both <code>User</code> and <code>Group</code>.  It declares a single method
+          called <code>getKey()</code>:
+       </para>
+       
+       <programlisting><![CDATA[public interface IdentityType
+{
+   String getKey();
+}]]></programlisting>
+
+
+    </section>
+    
+    
+  </section>
+  
+  <section>
+    <title>Role and Group-based authorization</title>
+    
+    <para>
+       This is the simplest type of authorization, used to define coarse-grained privileges for users assigned to a certain role or
+       belonging to a certain group.  Users may belong to zero or more roles and groups, and inversely, roles and groups may contain
+       zero or more members.
+    </para>
+    
+    <note>
+       <para>
+          The concept of a <emphasis>role</emphasis> in Seam Security is based upon the model defined by PicketLink.  I.e, a role
+          membership consists of three aspects - a member, a role name and a group.  For example, user <emphasis>Bob</emphasis> 
+          (the member) may be an <emphasis>admin</emphasis> (the role name) user in the <emphasis>HEAD OFFICE</emphasis> group.
+       </para>
+    </note>
+    
+    <para>
+       To perform a role-check, inject
+    
+    </para>
+  
+  </section>
     
 </chapter>

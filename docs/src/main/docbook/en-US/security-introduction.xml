@@ -63,7 +63,7 @@
       
       <para>
         There are also rule-based permissions, which bridge the gap between fine-grained and coarse-grained restrictions.  These
-        permissions may be used to determine a user's privileges based on any type of business logic.
+        permissions may be used to determine a user's privileges based on certain business logic.
       </para>
       
     </section>
