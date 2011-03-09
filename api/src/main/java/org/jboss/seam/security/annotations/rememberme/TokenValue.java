@@ -1,6 +1,6 @@
-package org.jboss.seam.security.annotations;
+package org.jboss.seam.security.annotations.rememberme;
 
-import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -10,15 +10,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * 
- *
+ * Flags an entity field or method as representing the value for an authentication token
+ *  
  * @author Shane Bryzak
  */
-@Target({METHOD, PARAMETER})
+@Target({METHOD,FIELD})
 @Documented
 @Retention(RUNTIME)
 @Inherited
-@PermissionCheck
-public @interface Delete {
-   Class value() default void.class;
+public @interface TokenValue
+{
+
 }

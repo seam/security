@@ -13,6 +13,12 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
+/**
+ * Qualifier used for injecting security rules
+ * 
+ * @author Shane Bryzak
+ *
+ */
 @Qualifier
 @Target( { TYPE, METHOD, FIELD, PARAMETER })
 @Documented

@@ -120,7 +120,7 @@ public @Named @ConversationScoped class UserAction implements Serializable
       return "success";
    }
    
-   public void deleteUser(String username) throws IdentityException
+   public @Transactional void deleteUser(String username) throws IdentityException
    {
       identitySession.getPersistenceManager().removeUser(new UserImpl(username), true);
    }

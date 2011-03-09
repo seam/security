@@ -1,4 +1,4 @@
-package org.jboss.seam.security.annotations;
+package org.jboss.seam.security.annotations.rememberme;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -10,7 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Flags an entity field or method as representing the value for an authentication token
+ * Flags an entity field or method as representing the username for an authentication token
  *  
  * @author Shane Bryzak
  */
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Inherited
-public @interface TokenValue
+public @interface TokenUsername
 {
 
 }

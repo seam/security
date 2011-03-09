@@ -1140,21 +1140,26 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName(), 
                   getEntityManager(ctx)));
          }
-               
-         //beanManager.fireEvent(new PrePersistUserEvent(identityInstance));
          
          EntityManager em = getEntityManager(ctx);
          
          em.persist(identityInstance);
          
-         //beanManager.fireEvent(new UserCreatedEvent(identityInstance));
-         
-         // TODO persist attributes
-
          Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
          IdentityObject obj = new IdentityObjectImpl(
                (id != null ? id.toString() : null),
                name, identityObjectType);
+         
+         List<IdentityObjectAttribute> attribs = new ArrayList<IdentityObjectAttribute>();
+         for (String key : attributes.keySet())
+         {
+            for (String value : attributes.get(key))
+            {
+               attribs.add(new SimpleAttribute(key, value));
+            }
+         }
+         
+         updateAttributes(ctx, obj, attribs.toArray(new IdentityObjectAttribute[attribs.size()]));         
 
          return obj;
       }
@@ -1220,7 +1225,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       // TODO add criteria for identity type
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       return em.createQuery(criteria).getSingleResult();
    }
@@ -1235,7 +1240,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       
       List<Predicate> predicates = new ArrayList<Predicate>();
       predicates.add(builder.equal(root.get(credentialTypeNameProp.getName()), name));      
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
 
       return em.createQuery(criteria).getSingleResult();
    }
@@ -1252,7 +1257,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          
          List<Predicate> predicates = new ArrayList<Predicate>();
          predicates.add(builder.equal(root.get(relationshipTypeNameProp.getName()), relationshipType.getName()));      
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
 
          return em.createQuery(criteria).getSingleResult();
       }
@@ -1372,7 +1377,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                lookupIdentityType(identityType.getName(), em)));
       }
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       List<?> results = em.createQuery(criteria).getResultList();
       
@@ -1386,40 +1391,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       return objs;
    }
 
-   public Collection<IdentityObject> findIdentityObject(
-         IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
-         IdentityObjectRelationshipType relationshipType, boolean parent,
-         IdentityObjectSearchCriteria criteria) throws IdentityException
-   {
-      List<IdentityObject> objs = new ArrayList<IdentityObject>();
-      
-      System.out.println("*** Invoked unimplemented method findIdentityObject()");
-      
-      // TODO Auto-generated method stub
-      return objs;
-   }
-
    public String getId()
    {
       return id;
-   }
-
-   public int getIdentityObjectsCount(
-         IdentityStoreInvocationContext invocationCtx,
-         IdentityObjectType identityType) throws IdentityException
-   {
-      System.out.println("*** Invoked unimplemented method getIdentityObjectsCount()");
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   public Map<String, String> getRelationshipNameProperties(
-         IdentityStoreInvocationContext ctx, String name)
-         throws IdentityException, OperationNotSupportedException
-   {
-      System.out.println("*** Invoked unimplemented method getRelationshipNameProperties()");
-      // TODO Auto-generated method stub
-      return null;
    }
 
    public Set<String> getRelationshipNames(IdentityStoreInvocationContext ctx,
@@ -1469,7 +1443,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       predicates.add(builder.equal(root.get(identityToProperty.getName()), 
             lookupIdentity(identity, em)));
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       List<?> results = em.createQuery(criteria).getResultList();
       for (Object result : results)
@@ -1485,9 +1459,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          IdentityObjectRelationship relationship) throws IdentityException,
          OperationNotSupportedException
    {
-      System.out.println("*** Invoked unimplemented method getRelationshipProperties()");
-      // TODO Auto-generated method stub
-      return null;
+      throw new OperationNotSupportedException("getRelationshipProperties() not supported");
    }
 
    public FeaturesMetaData getSupportedFeatures()
@@ -1501,10 +1473,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    {
       removeRelationships(ctx, identity, null, false);
       
-      Property<?> nameProperty = modelProperties.get(PROPERTY_IDENTITY_NAME);
-      Property<?> typeProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE);
-      
       EntityManager em = getEntityManager(ctx);
+      
+      Property<?> nameProperty = modelProperties.get(PROPERTY_IDENTITY_NAME);
+      Property<?> typeProperty = modelProperties.get(PROPERTY_IDENTITY_TYPE);      
       
       CriteriaBuilder builder = em.getCriteriaBuilder();
       
@@ -1517,7 +1489,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       predicates.add(builder.equal(root.get(typeProperty.getName()),
             lookupIdentityType(identity.getIdentityType().getName(), em)));
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       try
       {
@@ -1533,8 +1505,27 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             
             predicates = new ArrayList<Predicate>();
             predicates.add(builder.equal(root.get(credentialIdentityProp.getName()),
-                  lookupIdentity(identity, em)));
-            criteria.where(predicates.toArray(new Predicate[0]));
+                  instance));
+            criteria.where(predicates.toArray(new Predicate[predicates.size()]));
+            
+            List<?> results = em.createQuery(criteria).getResultList();
+            for (Object result : results)
+            {
+               em.remove(result);
+            }
+         }
+         
+         // If there is an attribute class, delete any attributes
+         if (attributeClass != null)
+         {
+            Property<?> attributeIdentityProperty = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
+            criteria = builder.createQuery(attributeClass);
+            root = criteria.from(attributeClass);
+            
+            predicates = new ArrayList<Predicate>();
+            predicates.add(builder.equal(root.get(attributeIdentityProperty.getName()), 
+                  instance));
+            criteria.where(predicates.toArray(new Predicate[predicates.size()]));
             
             List<?> results = em.createQuery(criteria).getResultList();
             for (Object result : results)
@@ -1576,7 +1567,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       predicates.add(builder.equal(root.get(relationshipTypeProp.getName()), 
             lookupRelationshipType(relationshipType, em)));
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       Object relationship = em.createQuery(criteria).getSingleResult();
       em.remove(relationship);
@@ -1599,22 +1590,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       em.remove(roleType);
       
       return null;
-   }
-
-   public void removeRelationshipNameProperties(
-         IdentityStoreInvocationContext ctx, String name, Set<String> properties)
-         throws IdentityException, OperationNotSupportedException
-   {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method removeRelationshipNameProperties()");
-   }
-
-   public void removeRelationshipProperties(IdentityStoreInvocationContext ctx,
-         IdentityObjectRelationship relationship, Set<String> properties)
-         throws IdentityException, OperationNotSupportedException
-   {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method removeRelationshipProperties()");
    }
 
    public void removeRelationships(
@@ -1645,7 +1620,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                lookupIdentity(identity2, em)));
       }
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       List<?> results = em.createQuery(criteria).getResultList();
       for (Object result : results)
@@ -1670,7 +1645,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                lookupIdentity(identity1, em)));
       }
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       results = em.createQuery(criteria).getResultList();
       for (Object result : results)
@@ -1718,7 +1693,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                lookupRelationshipType(relationshipType, em)));
       }
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       List<?> results = em.createQuery(criteria).getResultList();
       
@@ -1789,7 +1764,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          }
       }
       
-      criteria.where(predicates.toArray(new Predicate[0]));
+      criteria.where(predicates.toArray(new Predicate[predicates.size()]));
       
       List<?> results = em.createQuery(criteria).getResultList();
       
@@ -1808,24 +1783,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
       
       return relationships;
-   }
-
-   public void setRelationshipNameProperties(
-         IdentityStoreInvocationContext ctx, String name,
-         Map<String, String> properties) throws IdentityException,
-         OperationNotSupportedException
-   {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method setRelationshipNameProperties()");
-      
-   }
-
-   public void setRelationshipProperties(IdentityStoreInvocationContext ctx,
-         IdentityObjectRelationship relationship, Map<String, String> properties)
-         throws IdentityException, OperationNotSupportedException
-   {
-      // TODO Auto-generated method stub
-      System.out.println("*** Invoked unimplemented method setRelationshipProperties()");
    }
 
    public void updateCredential(IdentityStoreInvocationContext ctx,
@@ -1864,7 +1821,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             }
          }
          
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
          
          List<?> results = em.createQuery(criteria).getResultList();
          
@@ -1981,7 +1938,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          predicates.add(builder.equal(root.get(identityNameProp.getName()), 
                identityObject.getName()));
          
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
          
          Object result = em.createQuery(criteria).getSingleResult();
          
@@ -2040,15 +1997,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }      
    }
 
-   public IdentityObject findIdentityObjectByUniqueAttribute(
-         IdentityStoreInvocationContext invocationCtx,
-         IdentityObjectType identityObjectType,
-         IdentityObjectAttribute attribute) throws IdentityException
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
    public IdentityObjectAttribute getAttribute(IdentityStoreInvocationContext ctx,
          IdentityObject identity, String name) throws IdentityException
    {
@@ -2081,7 +2029,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          predicates.add(builder.equal(root.get(attributeNameProp.getName()),
                name));
          
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
          
          List<?> results = em.createQuery(criteria).getResultList();
          
@@ -2133,7 +2081,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
                identity));
          
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
          
          List<?> results = em.createQuery(criteria).getResultList();
 
@@ -2155,22 +2103,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
       }
       
       return attributes;
-   }
-   
-   public Map<String, IdentityObjectAttributeMetaData> getAttributesMetaData(
-         IdentityStoreInvocationContext invocationContext,
-         IdentityObjectType identityType)
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   public Set<String> getSupportedAttributeNames(
-         IdentityStoreInvocationContext invocationContext,
-         IdentityObjectType identityType) throws IdentityException
-   {
-      // TODO Auto-generated method stub
-      return null;
    }
 
    public void removeAttributes(IdentityStoreInvocationContext ctx,
@@ -2194,7 +2126,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          predicates.add(builder.equal(root.get(attributeIdentityProp.getName()), 
                identity));
          
-         criteria.where(predicates.toArray(new Predicate[0]));
+         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
          
          List<?> results = em.createQuery(criteria).getResultList();
          
@@ -2242,7 +2174,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                predicates.add(builder.equal(root.get(attributeNameProp.getName()), 
                      attrib.getName()));
                
-               criteria.where(predicates.toArray(new Predicate[0]));
+               criteria.where(predicates.toArray(new Predicate[predicates.size()]));
                
                List<?> results = em.createQuery(criteria).getResultList();
       
@@ -2329,4 +2261,87 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
    {
       return createIdentityStoreSession(null);
    }
+
+   public Collection<IdentityObject> findIdentityObject(
+         IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
+         IdentityObjectRelationshipType relationshipType, boolean parent,
+         IdentityObjectSearchCriteria criteria) throws IdentityException
+   {
+      List<IdentityObject> objs = new ArrayList<IdentityObject>();
+      
+      System.out.println("*** Invoked unimplemented method findIdentityObject()");
+      
+      // TODO Auto-generated method stub
+      return objs;
+   }
+   
+   public IdentityObject findIdentityObjectByUniqueAttribute(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObjectType identityObjectType,
+         IdentityObjectAttribute attribute) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }   
+   
+   public Map<String, IdentityObjectAttributeMetaData> getAttributesMetaData(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObjectType identityType)
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public Set<String> getSupportedAttributeNames(
+         IdentityStoreInvocationContext invocationContext,
+         IdentityObjectType identityType) throws IdentityException
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+   
+   public int getIdentityObjectsCount(
+         IdentityStoreInvocationContext invocationCtx,
+         IdentityObjectType identityType) throws IdentityException
+   {
+      System.out.println("*** Invoked unimplemented method getIdentityObjectsCount()");
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   public Map<String, String> getRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name)
+         throws IdentityException, OperationNotSupportedException
+   {
+      throw new OperationNotSupportedException("getRelationshipNameProperties() not supported");
+   }
+   
+   public void setRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name,
+         Map<String, String> properties) throws IdentityException,
+         OperationNotSupportedException
+   {
+      throw new OperationNotSupportedException("setRelationshipNameProperties() not supported");      
+   }
+
+   public void setRelationshipProperties(IdentityStoreInvocationContext ctx,
+         IdentityObjectRelationship relationship, Map<String, String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      throw new OperationNotSupportedException("setRelationshipProperties() not supported");
+   }
+   
+   public void removeRelationshipNameProperties(
+         IdentityStoreInvocationContext ctx, String name, Set<String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      throw new OperationNotSupportedException("removeRelationshipNameProperties() not supported");
+   }
+
+   public void removeRelationshipProperties(IdentityStoreInvocationContext ctx,
+         IdentityObjectRelationship relationship, Set<String> properties)
+         throws IdentityException, OperationNotSupportedException
+   {
+      throw new OperationNotSupportedException("removeRelationshipProperties() not supported");
+   }   
 }
