@@ -1,31 +1,27 @@
-package org.jboss.seam.security;
+package org.jboss.seam.security.extension;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.jboss.seam.security.annotations.PermissionCheck;
-import org.jboss.seam.security.annotations.Restrict;
-import org.jboss.seam.security.annotations.RoleCheck;
-import org.jboss.seam.security.util.Strings;
+import org.jboss.seam.security.Identity;
+import org.jboss.seam.security.IdentityImpl;
 
 /**
  * Provides authorization services for component invocations.
  * 
  * @author Shane Bryzak
  */
-@Secure @Interceptor
+@SecurityInterceptorBinding @Interceptor
 public class SecurityInterceptor implements Serializable
 {
    private static final long serialVersionUID = -6567750187000766925L;
@@ -196,90 +192,6 @@ public class SecurityInterceptor implements Serializable
                /*Method method = getComponent().getBeanClass().getMethod(
                      interfaceMethod.getName(), interfaceMethod.getParameterTypes() );*/
                
-               Restrict restrict = null;
-               
-               if ( interfaceMethod.isAnnotationPresent(Restrict.class) )
-               {
-                  restrict = interfaceMethod.getAnnotation(Restrict.class);
-               }
-               else if ( interfaceMethod.getDeclaringClass().isAnnotationPresent(Restrict.class) )
-               {
-                   restrict = interfaceMethod.getDeclaringClass().getAnnotation(Restrict.class);
-               }
-               
-               if (restrict != null)
-               {
-                  if (restriction == null) restriction = new Restriction();
-                  
-                  if ( Strings.isEmpty(restrict.value()) )
-                  {
-                     Bean<?> bean = manager.getBeans(interfaceMethod.getDeclaringClass()).iterator().next();
-                     restriction.setPermissionTarget(bean.getName());
-                     restriction.setPermissionAction(interfaceMethod.getName());
-                  }
-                  else
-                  {
-                     restriction.setExpression(restrict.value());
-                  }
-               }
-               
-               for (Annotation annotation : interfaceMethod.getDeclaringClass().getAnnotations())
-               {
-                  if (annotation.annotationType().isAnnotationPresent(RoleCheck.class))
-                  {
-                     if (restriction == null) restriction = new Restriction();
-                     restriction.addRoleRestriction(annotation.annotationType().getSimpleName().toLowerCase());
-                  }
-               }
-               
-               for (Annotation annotation : interfaceMethod.getAnnotations())
-               {
-                  if (annotation.annotationType().isAnnotationPresent(PermissionCheck.class))
-                  {
-                     PermissionCheck permissionCheck = annotation.annotationType().getAnnotation(
-                           PermissionCheck.class);
-                     
-                     Method valueMethod = null;
-                     for (Method m : annotation.annotationType().getDeclaredMethods())
-                     {
-                        valueMethod = m;
-                        break;
-                     }
-                     
-                     if (valueMethod != null)
-                     {
-                        if (restriction == null) restriction = new Restriction();
-                        Object target = valueMethod.invoke(annotation);
-                        if (!target.equals(void.class))
-                        {
-                           if (restriction == null) restriction = new Restriction();
-                           restriction.addMethodRestriction(target,
-                                 getPermissionAction(permissionCheck, annotation));
-                        }
-                     }
-                  }
-                  if (annotation.annotationType().isAnnotationPresent(RoleCheck.class))
-                  {
-                     if (restriction == null) restriction = new Restriction();
-                     restriction.addRoleRestriction(annotation.annotationType().getSimpleName().toLowerCase());
-                  }
-               }
-               
-               for (int i = 0; i < interfaceMethod.getParameterAnnotations().length; i++)
-               {
-                  Annotation[] annotations = interfaceMethod.getParameterAnnotations()[i];
-                  for (Annotation annotation : annotations)
-                  {
-                     if (annotation.annotationType().isAnnotationPresent(PermissionCheck.class))
-                     {
-                        PermissionCheck permissionCheck = annotation.annotationType().getAnnotation(
-                              PermissionCheck.class);
-                        if (restriction == null) restriction = new Restriction();
-                        restriction.addParameterRestriction(i,
-                              getPermissionAction(permissionCheck, annotation));
-                     }
-                  }
-               }
                
                restrictions.put(interfaceMethod, restriction);
                return restriction;
@@ -289,16 +201,4 @@ public class SecurityInterceptor implements Serializable
       return restrictions.get(interfaceMethod);
    }
 
-   
-   private String getPermissionAction(PermissionCheck check, Annotation annotation)
-   {
-      if (!"".equals(check.value()))
-      {
-         return check.value();
-      }
-      else
-      {
-         return annotation.annotationType().getSimpleName().toLowerCase();
-      }
-   }
 }

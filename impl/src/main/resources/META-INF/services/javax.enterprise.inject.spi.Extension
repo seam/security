@@ -1,1 +1,2 @@
 org.jboss.seam.security.contexts.AuthenticationScopedExtension
+org.jboss.seam.security.extension.SecurityExtension
