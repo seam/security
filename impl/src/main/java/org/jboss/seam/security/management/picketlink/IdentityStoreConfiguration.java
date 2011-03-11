@@ -45,4 +45,5 @@ public abstract class IdentityStoreConfiguration
    }
    
    public abstract void doConfigure(IdentityStoreConfigurationMetaDataImpl store);
+   public abstract boolean isConfigured();
 }

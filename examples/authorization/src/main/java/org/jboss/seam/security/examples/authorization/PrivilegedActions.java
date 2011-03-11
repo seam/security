@@ -1,5 +1,7 @@
 package org.jboss.seam.security.examples.authorization;
 
+import javax.enterprise.inject.Model;
+
 import org.jboss.seam.security.examples.authorization.annotations.Admin;
 
 /**
@@ -7,7 +9,7 @@ import org.jboss.seam.security.examples.authorization.annotations.Admin;
  * @author Shane Bryzak
  *
  */
-public class PrivilegedActions
+public @Model class PrivilegedActions
 {
    @Admin
    public void doSomethingRestricted()

@@ -35,6 +35,8 @@ public class SecurityInterceptor implements Serializable
    @Inject BeanManager manager;
    @Inject Identity identity;
    
+   @Inject SecurityExtension extension;
+   
    private class Restriction
    {
       @SuppressWarnings("unused")
@@ -154,6 +156,8 @@ public class SecurityInterceptor implements Serializable
    @AroundInvoke
    public Object aroundInvoke(InvocationContext invocation) throws Exception
    {
+      System.out.println("SecurityInterceptor invoked");
+      
       Method interfaceMethod = invocation.getMethod();
       
       if (!"hashCode".equals(interfaceMethod.getName()))

@@ -9,6 +9,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
+import org.jboss.seam.security.annotations.Secures;
 import org.jboss.seam.security.annotations.SecurityBindingType;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
 
@@ -43,7 +44,9 @@ public class SecurityExtension implements Extension
       {
          for (AnnotatedMethod<? super X> m : type.getMethods())
          {
-            for (final Annotation annotation : type.getAnnotations())
+            if (m.isAnnotationPresent(Secures.class)) continue;
+            
+            for (final Annotation annotation : m.getAnnotations())
             {
                if (annotation.annotationType().isAnnotationPresent(SecurityBindingType.class))
                {

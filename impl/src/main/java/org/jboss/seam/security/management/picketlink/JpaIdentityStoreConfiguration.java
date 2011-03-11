@@ -123,6 +123,11 @@ public class JpaIdentityStoreConfiguration extends IdentityStoreConfiguration
       
       store.setOptions(options);      
    }
+   
+   public boolean isConfigured()
+   {
+      return identityClass != null;
+   }
       
    private List<String> createOptionList(String... values)
    {

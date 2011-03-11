@@ -4,7 +4,7 @@
    xmlns:h="http://java.sun.com/jsf/html"
    xmlns:ui="http://java.sun.com/jsf/facelets">
   <h:head>
-    <title>Java EE 6 Starter Application</title>
+    <title>Seam Security - Authorization example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="style/default.css" type="text/css" media="screen" />
   </h:head>
@@ -12,24 +12,19 @@
     <div id="container">
       <div id="header">
         <div id="title">
-          Identity Management Console
+          Authorization example
         </div>
         
         <div id="headerMenu">
           <h:form>
             <ui:fragment rendered="#{identity.loggedIn}">
               Welcome, #{identity.user.id}!<br/>
-              <a href="changepassword.jsf">Change password</a><span> | </span>
               <h:commandLink value="Log out" action="#{identity.logout}"/>
             </ui:fragment>
           </h:form>
         </div>
       </div>
     
-      <div id="sidebar">
-        <ui:insert name="sidebar"/>
-      </div>
-      
       <div id="content">
         <ui:insert name="content"/>
       </div>

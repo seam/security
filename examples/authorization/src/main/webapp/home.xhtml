@@ -21,11 +21,6 @@
       </div>
 
       <div class="loginRow">
-        <h:outputLabel for="password" value="Password" styleClass="loginLabel"/>
-        <h:inputSecret id="password" value="#{credentials.password}" redisplay="true"/>
-      </div>
-
-      <div class="loginRow">
         
       </div>
 
@@ -36,6 +31,13 @@
       Tip: you can login with a username/password of demo/demo.
        
     </h:form>    
+    
+    <h:form rendered="#{identity.loggedIn}">
+    
+       <div class="buttons">
+          <h:commandButton value="Invoke privileged operation" action="#{privilegedActions.doSomethingRestricted}"/>
+       </div>
+    </h:form>
     
     <br style="clear:both"/>
      

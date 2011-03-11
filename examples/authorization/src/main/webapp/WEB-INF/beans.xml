@@ -13,26 +13,13 @@
       http://java.sun.com/xml/ns/javaee 
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
       
-   <!--p:SeSynchronizations>
-     <s:modifies/>
-   </p:SeSynchronizations-->
-      
-  <!--interceptors>
-    <class>org.jboss.seam.persistence.transaction.TransactionInterceptor</class>
-  </interceptors-->
-  
+  <interceptors>
+    <class>org.jboss.seam.security.extension.SecurityInterceptor</class>
+  </interceptors> 
   
    <!--security:JpaPermissionStore>
       <s:replaces/>      
       <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
-   </security:JpaPermissionStore>  
-  
-   <plidm:JpaIdentityStoreConfiguration>
-      <s:replaces/>
-      <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
-      <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
-      <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
-      <plidm:roleTypeClass>org.jboss.seam.security.examples.idmconsole.model.IdentityRoleName</plidm:roleTypeClass>
-   </plidm:JpaIdentityStoreConfiguration-->
-         
+   </security:JpaPermissionStore-->  
+           
 </beans>

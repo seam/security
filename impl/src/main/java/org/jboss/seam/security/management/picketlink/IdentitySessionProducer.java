@@ -65,15 +65,16 @@ public class IdentitySessionProducer implements EventListener
             .getReference(storeBean, IdentityStoreConfiguration.class, 
                   manager.createCreationalContext(storeBean));
          
-         IdentityStoreConfigurationMetaDataImpl store = new IdentityStoreConfigurationMetaDataImpl();
-         config.configure(store);
-      
-         if (defaultStoreId == null && store.getId() != null)
+         if (config.isConfigured())
          {
-            defaultStoreId = store.getId();
-         }
+            IdentityStoreConfigurationMetaDataImpl storeConfig = new IdentityStoreConfigurationMetaDataImpl();
+            config.configure(storeConfig);
          
-         stores.add(store);
+            if (defaultStoreId == null && storeConfig.getId() != null)
+            {
+               defaultStoreId = storeConfig.getId();
+            }
+         }
       }     
       
       metadata.setIdentityStores(stores);
@@ -88,27 +89,30 @@ public class IdentitySessionProducer implements EventListener
       realms.add(realm);
       metadata.setRealms(realms);
       
-      List<IdentityRepositoryConfigurationMetaData> repositories = new ArrayList<IdentityRepositoryConfigurationMetaData>();
-      
-      IdentityRepositoryConfigurationMetaDataImpl repository = new IdentityRepositoryConfigurationMetaDataImpl();
-      repository.setClassName(WrapperIdentityStoreRepository.class.getName());
-      repository.setDefaultAttributeStoreId(defaultAttributeStoreId != null ? defaultAttributeStoreId : defaultStoreId);
-      repository.setDefaultIdentityStoreId(defaultIdentityStoreId != null ? defaultIdentityStoreId : defaultStoreId);
-      
-      List<IdentityStoreMappingMetaData> mappings = new ArrayList<IdentityStoreMappingMetaData>();
-      
-      IdentityStoreMappingMetaDataImpl mapping = new IdentityStoreMappingMetaDataImpl();
-      List<String> identityObjectTypes = new ArrayList<String>();
-      identityObjectTypes.add("USER");
-      identityObjectTypes.add("GROUP");
-      mapping.setIdentityObjectTypeMappings(identityObjectTypes);
-      mapping.setIdentityStoreId(defaultIdentityStoreId != null ? defaultIdentityStoreId : defaultStoreId);
-      mappings.add(mapping);
-      
-      repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);
-           
-      repositories.add(repository);
-      metadata.setRepositories(repositories);
+      if (stores.size() > 0)
+      {
+         List<IdentityRepositoryConfigurationMetaData> repositories = new ArrayList<IdentityRepositoryConfigurationMetaData>();
+         
+         IdentityRepositoryConfigurationMetaDataImpl repository = new IdentityRepositoryConfigurationMetaDataImpl();
+         repository.setClassName(WrapperIdentityStoreRepository.class.getName());
+         repository.setDefaultAttributeStoreId(defaultAttributeStoreId != null ? defaultAttributeStoreId : defaultStoreId);
+         repository.setDefaultIdentityStoreId(defaultIdentityStoreId != null ? defaultIdentityStoreId : defaultStoreId);
+         
+         List<IdentityStoreMappingMetaData> mappings = new ArrayList<IdentityStoreMappingMetaData>();
+         
+         IdentityStoreMappingMetaDataImpl mapping = new IdentityStoreMappingMetaDataImpl();
+         List<String> identityObjectTypes = new ArrayList<String>();
+         identityObjectTypes.add("USER");
+         identityObjectTypes.add("GROUP");
+         mapping.setIdentityObjectTypeMappings(identityObjectTypes);
+         mapping.setIdentityStoreId(defaultIdentityStoreId != null ? defaultIdentityStoreId : defaultStoreId);
+         mappings.add(mapping);
+         
+         repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);
+              
+         repositories.add(repository);
+         metadata.setRepositories(repositories);
+      }
             
       IdentityConfigurationImpl config = new IdentityConfigurationImpl();
       config.configure(metadata);
@@ -120,9 +124,13 @@ public class IdentitySessionProducer implements EventListener
       
    @Produces @RequestScoped IdentitySession createIdentitySession()
       throws IdentityException
-   {
+   {      
       Map<String,Object> sessionOptions = new HashMap<String,Object>();
-      sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());   
+      
+      if (!entityManagerInstance.isUnsatisfied() && !entityManagerInstance.isAmbiguous())
+      {
+         sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());
+      }
       
       IdentitySession session = factory.createIdentitySession(getDefaultRealm(), sessionOptions);
       session.registerListener(this);
