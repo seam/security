@@ -17,9 +17,7 @@ import org.jboss.seam.security.events.PostAuthenticateEvent;
  * 
  * @author Shane Bryzak
  */
-public
-@ApplicationScoped
-class SecurityEventMessages
+public @ApplicationScoped class SecurityEventMessages
 {
    private static final String LOGIN_FAILED_MESSAGE_KEY = "org.jboss.seam.loginFailed";
    private static final String LOGIN_SUCCESSFUL_MESSAGE_KEY = "org.jboss.seam.loginSuccessful";
@@ -33,30 +31,42 @@ class SecurityEventMessages
    
    @Inject Messages messages;
    @Inject Identity identity;
+   
+   private boolean enabled = true;
+   
+   public boolean isEnabled()
+   {
+      return enabled;
+   }
+   
+   public void setEnabled(boolean value)
+   {
+      this.enabled = value;
+   }      
 
    public void postAuthenticate(@Observes PostAuthenticateEvent event)
    {
-      messages.info(DEFAULT_LOGIN_SUCCESSFUL_MESSAGE, identity.getUser().getId());
+      if (enabled) messages.info(DEFAULT_LOGIN_SUCCESSFUL_MESSAGE, identity.getUser().getId());
    }
 
    public void addLoginFailedMessage(@Observes LoginFailedEvent event)
    {
-      //statusMessages.addFromResourceBundleOrDefault(getLoginFailedMessageSeverity(), getLoginFailedMessageKey(), getDefaultLoginFailedMessage(), event.getLoginException());
+      //if (enabled) statusMessages.addFromResourceBundleOrDefault(getLoginFailedMessageSeverity(), getLoginFailedMessageKey(), getDefaultLoginFailedMessage(), event.getLoginException());
    }
    
    public void addLoginSuccessMessage(@Observes LoggedInEvent event)
    {
-   //   statusMessages.addFromResourceBundleOrDefault(getLoginSuccessfulMessageSeverity(), getLoginSuccessfulMessageKey(), getDefaultLoginSuccessfulMessage(), credentials.getUsername());
+   //   if (enabled) statusMessages.addFromResourceBundleOrDefault(getLoginSuccessfulMessageSeverity(), getLoginSuccessfulMessageKey(), getDefaultLoginSuccessfulMessage(), credentials.getUsername());
    }
    
    public void addAlreadyLoggedInMessage(@Observes AlreadyLoggedInEvent event)
    {
-      //statusMessages.addFromResourceBundleOrDefault(getAlreadyLoggedInMessageSeverity(), getAlreadyLoggedInMessageKey(), getDefaultAlreadyLoggedInMessage());
+      //if (enabled) statusMessages.addFromResourceBundleOrDefault(getAlreadyLoggedInMessageSeverity(), getAlreadyLoggedInMessageKey(), getDefaultAlreadyLoggedInMessage());
    }
    
    public void addNotLoggedInMessage(@Observes NotLoggedInEvent event)
    {
-      //statusMessages.addFromResourceBundleOrDefault(getNotLoggedInMessageSeverity(), getNotLoggedInMessageKey(), getDefaultNotLoggedInMessage());
+      //if (enabled) statusMessages.addFromResourceBundleOrDefault(getNotLoggedInMessageSeverity(), getNotLoggedInMessageKey(), getDefaultNotLoggedInMessage());
    }
    
    // TODO the following methods should probably be moved to the seam-jsf module,
