@@ -31,6 +31,8 @@ public class SecurityInterceptor implements Serializable
    @AroundInvoke
    public Object aroundInvoke(InvocationContext invocation) throws Exception
    {
+      System.out.println("SecurityInterceptor invoked");
+      
       Method method = invocation.getMethod();
       
       for (Authorizer authorizer : extension.lookupAuthorizerStack(method))

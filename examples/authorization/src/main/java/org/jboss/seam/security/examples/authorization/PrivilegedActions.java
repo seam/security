@@ -2,6 +2,7 @@ package org.jboss.seam.security.examples.authorization;
 
 import javax.enterprise.inject.Model;
 
+import org.jboss.seam.security.annotations.LoggedIn;
 import org.jboss.seam.security.examples.authorization.annotations.Admin;
 import org.jboss.seam.security.examples.authorization.annotations.Foo;
 
@@ -28,5 +29,11 @@ public @Model class PrivilegedActions
    public void doFooDef()
    {
       System.out.println("doFooDef() invoked");
+   }
+   
+   @LoggedIn
+   public void doLoggedIn()
+   {
+      System.out.println("doLoggedIn() invoked");
    }
 }

@@ -234,9 +234,10 @@ public class SecurityExtension implements Extension
                   if (builder == null)
                   {
                      builder = new AnnotatedTypeBuilder<X>().readFromType(type);
-                     builder.addToMethod(m, SecurityInterceptorBindingLiteral.INSTANCE);
-                     isSecured = true;
-                  }                  
+                  }
+                  builder.addToMethod(m, SecurityInterceptorBindingLiteral.INSTANCE);
+                  isSecured = true;
+                  break;
                }
             }
          }         

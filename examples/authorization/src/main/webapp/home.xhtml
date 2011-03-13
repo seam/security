@@ -28,7 +28,7 @@
         <h:commandButton id="login" value="LOGIN" action="#{identity.login}" styleClass="loginButton"/>
       </div>     
       
-      Tip: you can login with a username/password of demo/demo.
+      <span>Tip: you can login with a username of <i>demo</i> (no password is required).</span>
        
     </h:form>    
     
@@ -37,10 +37,22 @@
     
     </p>
     
-    <h:form rendered="#{identity.loggedIn}">
+    <h:form>
     
        <div class="buttons">
-          <h:commandButton value="Invoke PrivilegedActions.doSomethingRestricted()" action="#{privilegedActions.doSomethingRestricted}"/>
+          <h:commandButton value="Invoke doSomethingRestricted()" action="#{privilegedActions.doSomethingRestricted}"/>
+       </div>
+       
+       <div class="buttons">
+          <h:commandButton value="Invoke doFooAbc()" action="#{privilegedActions.doFooAbc}"/>
+       </div>
+       
+       <div class="buttons">
+          <h:commandButton value="Invoke doFooDef()" action="#{privilegedActions.doFooDef}"/>
+       </div>       
+       
+       <div class="buttons">
+          <h:commandButton value="Invoke doLoggedIn()" action="#{privilegedActions.doLoggedIn}"/>
        </div>
     </h:form>
     
