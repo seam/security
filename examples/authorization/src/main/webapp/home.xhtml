@@ -32,10 +32,15 @@
        
     </h:form>    
     
+    <p>
+    
+    
+    </p>
+    
     <h:form rendered="#{identity.loggedIn}">
     
        <div class="buttons">
-          <h:commandButton value="Invoke privileged operation" action="#{privilegedActions.doSomethingRestricted}"/>
+          <h:commandButton value="Invoke PrivilegedActions.doSomethingRestricted()" action="#{privilegedActions.doSomethingRestricted}"/>
        </div>
     </h:form>
     

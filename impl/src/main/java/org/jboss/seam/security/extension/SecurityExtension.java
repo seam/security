@@ -8,19 +8,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.util.Nonbinding;
 
+import org.jboss.seam.security.AuthorizationException;
 import org.jboss.seam.security.SecurityDefinitionException;
 import org.jboss.seam.security.annotations.Secures;
 import org.jboss.seam.security.annotations.SecurityBindingType;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
+import org.jboss.seam.solder.reflection.annotated.InjectableMethod;
 
 /**
  * Extension for typesafe security annotations
@@ -30,14 +34,19 @@ import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
  */
 public class SecurityExtension implements Extension
 {
+   private BeanManager beanManager;
+   
    class Authorizer
    {
       private Annotation binding;
       private Map<Method,Object> memberValues = new HashMap<Method,Object>();
       
-      private Method implementationMethod;
+      private AnnotatedMethod<?> implementationMethod;
+      private Bean<?> targetBean;
       
-      public Authorizer(Annotation binding, Method implementationMethod)
+      private InjectableMethod<?> injectableMethod;
+      
+      public Authorizer(Annotation binding, AnnotatedMethod<?> implementationMethod)
       {
          this.binding = binding;
          this.implementationMethod = implementationMethod;
@@ -57,6 +66,55 @@ public class SecurityExtension implements Extension
          catch (IllegalAccessException ex)
          {
             throw new SecurityDefinitionException("Error reading security binding members", ex);
+         }
+      }
+      
+      public void authorize()
+      {
+         if (targetBean == null) 
+         {
+            lookupTargetBean();
+         }         
+         
+         CreationalContext<?> cc = beanManager.createCreationalContext(targetBean);
+         
+         Object reference = beanManager.getReference(targetBean, 
+               implementationMethod.getJavaMember().getDeclaringClass(), cc);         
+
+         Object result = injectableMethod.invoke(reference, cc, null);
+         
+         if (result.equals(Boolean.FALSE))
+         {
+            throw new AuthorizationException("Authorization check failed");
+         }
+      }
+      
+      @SuppressWarnings({ "unchecked", "rawtypes" })
+      private synchronized void lookupTargetBean()
+      {
+         if (targetBean == null)
+         {
+            Method m = implementationMethod.getJavaMember();
+            
+            Set<Bean<?>> beans = beanManager.getBeans(m.getDeclaringClass());
+            if (beans.size() == 1)
+            {
+               targetBean = beans.iterator().next();
+            }
+            else if (beans.isEmpty())
+            {
+               throw new IllegalStateException("Exception looking up authorizer method bean - " +
+               "no beans found for method [" + m.getDeclaringClass() + "." +
+               m.getName() + "]");
+            }
+            else if (beans.size() > 1)
+            {
+               throw new IllegalStateException("Exception looking up authorizer method bean - " +
+                     "multiple beans found for method [" + m.getDeclaringClass().getName() + "." +
+                     m.getName() + "]");
+            }            
+            
+            injectableMethod = new InjectableMethod(implementationMethod, targetBean, beanManager);
          }
       }
       
@@ -99,7 +157,7 @@ public class SecurityExtension implements Extension
       
       public Method getImplementationMethod()
       {
-         return implementationMethod;
+         return implementationMethod.getJavaMember();
       }
       
       @Override
@@ -130,6 +188,12 @@ public class SecurityExtension implements Extension
     */
    private Map<Method,Set<Authorizer>> methodAuthorizers = new HashMap<Method,Set<Authorizer>>();
    
+   /**
+    * 
+    * @param <X>
+    * @param event
+    * @param beanManager
+    */
    public <X> void processAnnotatedType(@Observes ProcessAnnotatedType<X> event, 
          final BeanManager beanManager)
    {
@@ -187,12 +251,13 @@ public class SecurityExtension implements Extension
       if (builder != null)
       {
          event.setAnnotatedType(builder.create());
-      }
-      
+      }      
    }
    
-   public void validateBindings(@Observes AfterBeanDiscovery event) 
+   public void validateBindings(@Observes AfterBeanDiscovery event, BeanManager beanManager) 
    {
+      this.beanManager = beanManager;
+      
       for (final AnnotatedType<?> type : securedTypes)
       {
          // Here we simply want to validate that each type that is annotated with
@@ -241,6 +306,23 @@ public class SecurityExtension implements Extension
       securedTypes.clear();
       securedTypes = null;
    }
+   
+   /**
+    * This method is invoked by the security interceptor to obtain the
+    * authorizer stack for a secured method
+    * 
+    * @param m
+    * @return
+    */
+   public Set<Authorizer> lookupAuthorizerStack(Method m)
+   {
+      if (!methodAuthorizers.containsKey(m))
+      {
+         registerSecuredMethod(m);
+      }
+      
+      return methodAuthorizers.get(m);
+   }   
    
    protected void registerSecuredMethod(Method method) 
    {
@@ -358,7 +440,7 @@ public class SecurityExtension implements Extension
          }
       }
       
-      Authorizer authorizer = new Authorizer(binding, m.getJavaMember());
+      Authorizer authorizer = new Authorizer(binding, m);
       authorizers.add(authorizer);
    }
 }

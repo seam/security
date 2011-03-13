@@ -14,6 +14,7 @@ public class Restrictions
 {
    public @Secures @Admin boolean isAdmin(Identity identity)
    {
+      System.out.println("isAdmin() invoked");
       return identity.hasRole("admin", "USERS", "USER");
    }
    
