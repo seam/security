@@ -3,6 +3,8 @@ package org.jboss.seam.security;
 import java.util.Collection;
 import java.util.Set;
 
+import org.jboss.seam.security.annotations.LoggedIn;
+import org.jboss.seam.security.annotations.Secures;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
@@ -19,7 +21,7 @@ public interface Identity
     * 
     * @return true if the user is logged in
     */
-   boolean isLoggedIn();
+   @Secures @LoggedIn boolean isLoggedIn();
    
    /**
     * Returns true if the currently authenticated user has provided their correct credentials

@@ -3,6 +3,7 @@ package org.jboss.seam.security.examples.authorization;
 import javax.enterprise.inject.Model;
 
 import org.jboss.seam.security.examples.authorization.annotations.Admin;
+import org.jboss.seam.security.examples.authorization.annotations.Foo;
 
 /**
  * 
@@ -15,5 +16,17 @@ public @Model class PrivilegedActions
    public void doSomethingRestricted()
    {
       System.out.println("doSomethingRestricted() invoked");
+   }
+   
+   @Foo(bar = "abc", zzz="nonbindingvalue")
+   public void doFooAbc()
+   {
+      System.out.println("doFooAbc() invoked");
+   }
+   
+   @Foo(bar = "def")
+   public void doFooDef()
+   {
+      System.out.println("doFooDef() invoked");
    }
 }
