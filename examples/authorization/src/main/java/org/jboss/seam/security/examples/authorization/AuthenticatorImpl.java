@@ -23,8 +23,13 @@ public class AuthenticatorImpl extends BaseAuthenticator implements Authenticato
    {
       if ("demo".equals(credentials.getUsername()))
       {
-         identity.addRole("admin", "USERS", "USER");
+         identity.addRole("admin", "USERS", "GROUP");
       }      
+      
+      if ("user".equals(credentials.getUsername()))
+      {
+         identity.addGroup("USERS", "GROUP");
+      }
       
       // Let any user log in
       setStatus(AuthenticationStatus.SUCCESS);

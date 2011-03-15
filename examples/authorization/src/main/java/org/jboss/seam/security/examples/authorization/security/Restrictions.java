@@ -4,6 +4,7 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.annotations.Secures;
 import org.jboss.seam.security.examples.authorization.annotations.Admin;
 import org.jboss.seam.security.examples.authorization.annotations.Foo;
+import org.jboss.seam.security.examples.authorization.annotations.User;
 
 /**
  * 
@@ -14,19 +15,21 @@ public class Restrictions
 {
    public @Secures @Admin boolean isAdmin(Identity identity)
    {
-      System.out.println("isAdmin() invoked");
-      return identity.hasRole("admin", "USERS", "USER");
+      return identity.hasRole("admin", "USERS", "GROUP");
    }
    
    public @Secures @Foo(bar = "abc") boolean isFooAbc()
    {
-      System.out.println("isFooAbc() invoked");
       return true;
    }
    
    public @Secures @Foo(bar = "def") boolean isFooDef()
    {
-      System.out.println("isFooDef() invoked");
-      return true;
+      return false;
+   }
+   
+   public @Secures @User boolean isUser(Identity identity)
+   {
+      return identity.inGroup("USERS", "GROUP");
    }
 }
