@@ -60,12 +60,12 @@
 
       <dependency>
          <groupId>org.jboss.seam.faces</groupId>
-         <artifactId>seam-faces-api</artifactId>
+         <artifactId>seam-faces</artifactId>
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.faces</groupId>
-         <artifactId>seam-faces-impl</artifactId>
+         <groupId>joda-time</groupId>
+         <artifactId>joda-time</artifactId>
       </dependency>
 
       <!-- CDI (JSR-299) -->

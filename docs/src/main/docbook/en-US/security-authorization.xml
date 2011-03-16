@@ -8,13 +8,13 @@
     <title>Basic Concepts</title>
     
     <para>
-      Seam Security provides a number of options for restricting access to certain parts of your application. As mentioned
+      Seam Security provides a number of facilities for restricting access to certain parts of your application. As mentioned
       previously, the security API is centered around the <code>Identity</code> bean, which is a session-scoped bean used to represent 
       the <emphasis>identity</emphasis> of the current user.
     </para>
     
     <para>
-      To be able to restrict the sensitive parts of your code, you must first inject the <code>Identity</code> bean into your class:
+      To be able to restrict the sensitive parts of your code, you may inject the <code>Identity</code> bean into your class:
     </para>
     
     <programlisting><![CDATA[@Inject Identity identity;]]></programlisting>
@@ -25,28 +25,68 @@
     </para>
     
     <para>
-       The security model in Seam Security is based upon the PicketLink API.  Let's examine a few of the core classes provided by
-       PicketLink that are used in Seam.
+       The security model in Seam Security is based upon the PicketLink API.  Let's briefly examine a few of the core interfaces 
+       provided by PicketLink that are used in Seam.
     </para>
+    
+    <mediaobject>
+      <imageobject role="fo">
+        <imagedata fileref="images/security-picketlink-api.png" align="center" scalefit="1"/>
+      </imageobject>
+      <imageobject role="html">
+        <imagedata fileref="images/security-picketlink-api.png" align="center"/>
+      </imageobject>
+    </mediaobject>
     
     <section>
        <title>IdentityType</title>
        
        <para>
-          Fully qualified class: <code>org.picketlink.idm.api.IdentityType</code>
+          This is the common base interface for both <code>User</code> and <code>Group</code>.  The <code>getKey()</code>
+          method should return a unique identifying value for the identity type.
        </para>
+       
+    </section>
+    
+    <section>
+       <title>User</title>
        
        <para>
-          This is the common base interface for both <code>User</code> and <code>Group</code>.  It declares a single method
-          called <code>getKey()</code>:
+          Represents a user.  The <code>getId()</code> method should return a unique value for each user.
        </para>
+    </section>
+    
+    <section>
+       <title>Group</title>
        
-       <programlisting><![CDATA[public interface IdentityType
-{
-   String getKey();
-}]]></programlisting>
-
-
+       <para>
+          Represents a group.  The <code>getName()</code> method should return the name of the group, while the 
+          <code>getGroupType()</code> method should return the group type.
+       </para>
+    
+    </section>
+    
+    <section>
+       <title>Role</title>
+       
+       <para>
+          Represents a role, which is a direct one-to-one typed relationship between a User and a Group.  The
+          <code>getRoleType()</code> method should return the role type.  The <code>getUser()</code> method
+          should return the User for which the role is assigned, and the <code>getGroup()</code> method should
+          return the Group that the user is associated with.
+       </para>
+    
+    </section>
+    
+    <section>
+       <title>RoleType</title>
+       
+       <para>
+          Represents a role type.  The <code>getName()</code> method should return the name of the role type.
+          Some examples of role types might be <literal>admin</literal>, <literal>superuser</literal>, 
+          <literal>manager</literal>, etc.
+       </para>
+    
     </section>
     
     
@@ -64,15 +104,74 @@
     <note>
        <para>
           The concept of a <emphasis>role</emphasis> in Seam Security is based upon the model defined by PicketLink.  I.e, a role
-          membership consists of three aspects - a member, a role name and a group.  For example, user <emphasis>Bob</emphasis> 
-          (the member) may be an <emphasis>admin</emphasis> (the role name) user in the <emphasis>HEAD OFFICE</emphasis> group.
+          is a direct relationship between a user and a group, which consists of three aspects - a member, a role name and a 
+          group (see the class diagram above).
+          For example, user <emphasis>Bob</emphasis> (the member) may be an <emphasis>admin</emphasis> (the role name) 
+          user in the <emphasis>HEAD OFFICE</emphasis> group.
        </para>
     </note>
     
     <para>
-       To perform a role-check, inject
+       The <code>Identity</code> bean provides the following two methods for checking role membership:    
+    </para>
+    
+    <programlisting><![CDATA[boolean hasRole(String role, String group, String groupType);
+void checkRole(String role, String group, String groupType);]]></programlisting>    
+  
+    <para>
+       These two methods are similar in function, and both accept the same parameter values.  Their behaviour differs
+       when an authorization check fails.  The <code>hasRole()</code> returns a value of <code>false</code> when the
+       current user is not a member of the specified role.  The <code>checkRole()</code> method on the other hand,
+       will throw an <code>AuthorizationException</code>.  Which of the two methods you use will depend on your 
+       requirements.
+    </para>  
+    
+    <para>
+       The following code listing contains a usage example for the <code>hasRole()</code> method:
+    </para>
+    
+    <programlisting><![CDATA[   if (identity.hasRole("manager", "Head Office", "OFFICE")) {
+      report.addManagementSummary();
+   }]]></programlisting>
+    
+    <para>
+       Groups can be used to define a collection of users that meet some common criteria.  For example, an
+       application might use groups to define users in different geographical locations, their role in the company,
+       their department or division or some other criteria which may be significant from a security point of view.  
+       As can be seen in the above class diagram, groups consist of a unique combination of group name and group type.  
+       Some examples of group types may be "OFFICE", "DEPARTMENT", "SECURITY_LEVEL", etc.  An individual user may 
+       belong to many different groups.
+    </para>
+    
+    <para>
+       The <code>Identity</code> bean provides the following methods for checking group membership:
+    </para>
+    
+    <programlisting><![CDATA[boolean inGroup(String name, String groupType);
+void checkGroup(String group, String groupType);]]></programlisting>
+
+    <para>
+       These methods are similar in behaviour to the role-specific methods above.  The <code>inGroup()</code> method 
+       returns a value of <code>false</code> when the current user isn't in the specified group, and the
+       <code>checkGroup()</code> method will throw an exception.
+    </para>
+  
+  </section>
+  
+  <section>
+    <title>Rule-based permissions</title>
+    
+    <para>
+    
     
     </para>
+  
+  </section>
+  
+  <section>
+    <title>Typesafe authorization</title>
+    
+    
   
   </section>
     
