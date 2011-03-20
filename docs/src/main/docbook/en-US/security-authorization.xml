@@ -158,7 +158,7 @@ void checkGroup(String group, String groupType);]]></programlisting>
   
   </section>
   
-  <section>
+  <!--section>
     <title>Rule-based permissions</title>
     
     <para>
@@ -166,11 +166,139 @@ void checkGroup(String group, String groupType);]]></programlisting>
     
     </para>
   
-  </section>
+  </section-->
   
   <section>
     <title>Typesafe authorization</title>
     
+    <para>
+      Seam Security provides a way to secure your bean classes and methods by annotating them with
+      a <emphasis>typesafe security binding</emphasis>.  Each security binding must have a matching
+      authorizer method, which is responsible for performing the business logic required to determine
+      whether a user has the necessary privileges to invoke a bean method. Creating and applying a 
+      security binding is quite simple, and is described in the following steps.
+    </para>
+    
+    <section>
+      <title>Creating a typesafe security binding</title>
+      
+      <para>
+        A typesafe security binding is an annotation, meta-annotated with the <code>SecurityBindingType</code>
+        annotation:
+      </para>
+      
+      <programlisting><![CDATA[import org.jboss.seam.security.annotations.SecurityBindingType;
+
+@SecurityBindingType
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface Admin { }]]></programlisting>
+
+      <para>
+        The security binding annotation may also define member values, which are taken into account when matching
+        the annotated bean class or method with an authorizer method.  All member values are taken into consideration,
+        except for those annotated with <code>@Nonbinding</code>, in much the same way as a qualifier binding type.
+      </para>
+      
+      <programlisting><![CDATA[import javax.enterprise.util.Nonbinding;
+import org.jboss.seam.security.annotations.SecurityBindingType;
+
+@SecurityBindingType
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface Foo {
+   String bar();
+   @Nonbinding String other() default "";
+}]]></programlisting>
+
+    </section>    
+    
+    <section>
+      <title>Creating an authorizer method</title>
+      
+      <para>
+        The next step after creating the security binding type is to create a matching authorizer method.  This 
+        method must contain the business logic required to perform the required authorization check, and return
+        a <code>boolean</code> value indicating whether the authorization check passed or failed.
+      </para>
+      
+      <para>
+        An authorizer method must be annotated with the <code>@Secures</code> annotation, and the security binding
+        types for which it is performing the authorization check.  An authorizer method may declare zero or more 
+        method parameters.  Any parameters defined by the authorizer method are treated as injection points, and 
+        are automatically injected by the Seam Security extension.  The following example demonstrates an authorizer
+        method that injects the <code>Identity</code> bean, which is then used to perform the authorization check.
+      </para>
+
+      <programlisting><![CDATA[import org.jboss.seam.security.annotations.Secures;
+
+public class Restrictions {      
+  public @Secures @Admin boolean isAdmin(Identity identity) {
+    return identity.hasRole("admin", "USERS", "GROUP");
+  }
+}]]></programlisting>            
+
+      <note>
+        <para>
+          Authorizer methods will generally make use of the security API to perform their security check, however
+          this is not a hard restriction.
+        </para>
+      </note>
+    
+    </section>
+    
+    <section>
+      <title>Applying the binding to your business methods</title>
+      
+      <para>
+        Once the security binding annotation and the matching authorizer method have been created, the security
+        binding type may be applied to a bean class or method.  If applied at the class level, every method of
+        the bean class will have the security restriction applied.  Methods annotated with a security binding type
+        also inherit any security bindings on their declaring class.  Both bean classes and methods may be annotated
+        with multiple security bindings.
+      </para>
+      
+      <programlisting><![CDATA[public @ConversationScoped class UserAction {
+  public @Admin void deleteUser(String userId) {
+    // code
+  }
+}]]></programlisting>
+      
+      <para>
+        If a security check fails when invoking a method annotated with a security binding type, an 
+        <literal>AuthorizationException</literal> is thrown.  The Seam Catch module can be used to handle
+        this exception gracefully, for example by redirecting them to an error page or displaying an error
+        message.  Here's an example of an exception handler that creates a JSF error message:
+      </para>
+      
+      <programlisting><![CDATA[@HandlesExceptions
+public class ExceptionHandler {
+   @Inject FacesContext facesContext;
+   public void handleAuthorizationException(@Handles CaughtException<AuthorizationException> evt) {
+      facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+            "You do not have the necessary permissions to perform that operation", ""));
+      evt.handled();      
+   }
+}]]></programlisting>
+    
+    </section>
+    
+    <section>
+      <title>Built-in security binding annotations</title>
+    
+      <para>
+        Seam Security provides one security binding annotation out of the box, <code>@LoggedIn</code>.  This annotation
+        may be applied to a bean to restrict its methods to only those users that are currently authenticated.
+      </para>
+      
+      <programlisting><![CDATA[import org.jboss.seam.security.annotations.LoggedIn;
+      
+public @LoggedIn class CustomerAction {
+  public void createCustomer() {
+    // code 
+  }
+}]]></programlisting>
+    </section>
     
   
   </section>
