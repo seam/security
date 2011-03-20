@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.persistence.transaction.Transactional;
+import org.jboss.seam.transaction.Transactional;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.api.Credential;
 import org.picketlink.idm.api.IdentitySession;

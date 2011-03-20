@@ -5,7 +5,7 @@ import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
-import org.jboss.seam.persistence.SeamManaged;
+import org.jboss.seam.solder.core.ExtensionManaged;
 
 /**
  * 
@@ -15,7 +15,7 @@ import org.jboss.seam.persistence.SeamManaged;
 public class EntityManagerProducer
 {
    @Produces
-   @SeamManaged
+   @ExtensionManaged
    @ConversationScoped
    @PersistenceUnit
    EntityManagerFactory emf;

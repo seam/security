@@ -8,7 +8,7 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.persistence.transaction.Transactional;
+import org.jboss.seam.transaction.Transactional;
 import org.jboss.seam.security.GroupImpl;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
