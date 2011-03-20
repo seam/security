@@ -89,8 +89,8 @@
             <module>examples/idmconsole</module>
             <module>examples/openid-op</module>
             <module>examples/openid-rp</module>
-            <module>examples/saml-idp</module>
-            <module>examples/saml-sp</module>            
+            <!--module>examples/saml-idp</module>
+            <module>examples/saml-sp</module-->            
          </modules>
       </profile>
       <profile>
