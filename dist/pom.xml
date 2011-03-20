@@ -113,7 +113,7 @@
       
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-simple-example</artifactId>
+         <artifactId>seam-security-example-simple</artifactId>
          <version>${project.version}</version>
          <type>zip</type>
          <optional>true</optional>
@@ -121,7 +121,7 @@
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-idmconsole-example</artifactId>
+         <artifactId>seam-security-example-idmconsole</artifactId>
          <version>${project.version}</version>
          <type>zip</type>
          <optional>true</optional>
@@ -129,11 +129,19 @@
       
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>openid-rp</artifactId>
+         <artifactId>seam-security-example-openid-rp</artifactId>
          <version>${project.version}</version>
          <type>zip</type>
          <optional>true</optional>
       </dependency>  
+
+      <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-example-openid-op</artifactId>
+         <version>${project.version}</version>
+         <type>zip</type>
+         <optional>true</optional>
+      </dependency>
       
       <!--dependency>
          <groupId>org.jboss.seam.security</groupId>

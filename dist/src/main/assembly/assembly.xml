@@ -82,10 +82,10 @@
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
-            <include>org.jboss.seam.security:seam-security-simple-example</include>
-            <include>org.jboss.seam.security:seam-security-idmconsole-example</include>
-            <include>org.jboss.seam.security:openid-op</include>
-            <include>org.jboss.seam.security:openid-rp</include>
+            <include>org.jboss.seam.security:seam-security-example-simple</include>
+            <include>org.jboss.seam.security:seam-security-example-idmconsole</include>
+            <include>org.jboss.seam.security:seam-security-example-openid-op</include>
+            <include>org.jboss.seam.security:seam-security-example-openid-rp</include>
             <!--include>org.jboss.seam.security:saml-idp</include>
             <include>org.jboss.seam.security:saml-sp</include-->
          </includes>
