@@ -29,16 +29,9 @@ public @ApplicationScoped class SecurityEventMessages
    private static final String DEFAULT_ALREADY_LOGGED_IN_MESSAGE = "You're already logged in. Please log out first if you wish to log in again.";
    private static final String DEFAULT_NOT_LOGGED_IN_MESSAGE = "Please log in first.";
    
-   Messages messages;
    @Inject Identity identity;
    
    private boolean enabled = true;
-   
-   @Inject
-   public SecurityEventMessages(Messages messages)
-   {
-      this.messages = messages;
-   }
    
    public boolean isEnabled()
    {
@@ -50,7 +43,7 @@ public @ApplicationScoped class SecurityEventMessages
       this.enabled = value;
    }      
 
-   public void postAuthenticate(@Observes PostAuthenticateEvent event)
+   public void postAuthenticate(@Observes PostAuthenticateEvent event, Messages messages)
    {
       if (enabled) messages.info(DEFAULT_LOGIN_SUCCESSFUL_MESSAGE, identity.getUser().getId());
    }
