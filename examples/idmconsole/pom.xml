@@ -9,7 +9,7 @@
    <parent>
       <groupId>org.jboss.seam.security</groupId>
       <artifactId>seam-security-parent</artifactId>
-      <version>3.0.0.CR3</version>
+      <version>3.0.0-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
    </parent>
  
