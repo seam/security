@@ -52,12 +52,6 @@
          <scope>provided</scope>
       </dependency>
 
-      <!--
-         <dependency> <groupId>org.jboss.seam.faces</groupId>
-         <artifactId>seam-faces</artifactId>
-         <version>${project.version}</version> </dependency>
-      -->
-
       <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
@@ -179,5 +173,22 @@
 				</testResources>
 			</build>
 		</profile>
+		
+    <profile>
+       <id>distribution</id>
+       <activation>
+          <property>
+             <name>release</name>
+          </property>
+       </activation>
+       <build>
+          <plugins>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+             </plugin>
+          </plugins>
+       </build>
+    </profile> 
 	</profiles>
 </project>
