@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.jboss.seam.security</groupId>
-   <artifactId>openid-op</artifactId>
+   <artifactId>seam-security-example-openid-op</artifactId>
    <packaging>war</packaging>
    <name>OpenID Relying Party</name>
    
@@ -17,7 +17,7 @@
    </parent>
 
    <build>
-      <finalName>openid-op</finalName>
+      <finalName>security-openid-op</finalName>
    </build>
 
    <dependencies>
@@ -122,31 +122,6 @@
 						<version>2.4.3</version>
 						<configuration>
 							<skip>true</skip>
-						</configuration>
-					</plugin>
-					<!--
-						Optional JBoss deployer plugin will deploy your war to a local
-						JBoss AS container if you've declared $JBOSS_HOME in your OS
-					-->
-					<!--
-						To use, set the JBOSS_HOME environment variable (or jboss.home in
-						$HOME/.m2/settings.xml) and run 'mvn package jboss:hard-deploy'
-					-->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>jboss-maven-plugin</artifactId>
-						<version>1.4.1</version>
-						<configuration>
-							<jbossHome>${jboss.home}</jbossHome>
-							<serverName>${jboss.domain}</serverName>
-							<fileNames>
-								<fileName>${project.build.directory}/${project.build.finalName}.war</fileName>
-								<!--
-									JNDI Datasource that connects to in-memory HSQLDB to
-									demonstrate JPA
-								-->
-								<fileName>src/main/resources-jbossas/default-ds.xml</fileName>
-							</fileNames>
 						</configuration>
 					</plugin>
 				</plugins>
