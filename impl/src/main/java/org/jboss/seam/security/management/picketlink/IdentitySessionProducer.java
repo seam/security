@@ -69,6 +69,7 @@ public class IdentitySessionProducer implements EventListener
          {
             IdentityStoreConfigurationMetaDataImpl storeConfig = new IdentityStoreConfigurationMetaDataImpl();
             config.configure(storeConfig);
+            stores.add(storeConfig);
          
             if (defaultStoreId == null && storeConfig.getId() != null)
             {
