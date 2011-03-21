@@ -82,6 +82,7 @@
          <unpack>true</unpack>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
+            <include>org.jboss.seam.security:seam-security-example-authorization</include>
             <include>org.jboss.seam.security:seam-security-example-simple</include>
             <include>org.jboss.seam.security:seam-security-example-idmconsole</include>
             <include>org.jboss.seam.security:seam-security-example-openid-op</include>
