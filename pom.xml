@@ -85,6 +85,7 @@
          <modules>
             <module>dist</module>
             <module>docs</module>
+            <module>examples/authorization</module>
             <module>examples/simple</module>
             <module>examples/idmconsole</module>
             <module>examples/openid-op</module>
