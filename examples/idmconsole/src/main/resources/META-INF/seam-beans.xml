@@ -2,7 +2,6 @@
 <beans xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:s="urn:java:ee" 
-   xmlns:p="urn:java:org.jboss.seam.persistence.transaction"
    xmlns:drools="urn:java:org.jboss.seam.drools:org.jboss.seam.drools.config"   
    xmlns:security="urn:java:org.jboss.seam.security.permission"
    xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"

@@ -5,7 +5,6 @@
 -->
 <beans xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:p="urn:java:org.jboss.seam.persistence.transaction"
    xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"   
    xmlns:security="urn:java:org.jboss.seam.security.permission"
    xmlns:s="urn:java:ee"    
@@ -16,10 +15,5 @@
   <interceptors>
     <class>org.jboss.seam.security.extension.SecurityInterceptor</class>
   </interceptors> 
-  
-   <!--security:JpaPermissionStore>
-      <s:replaces/>      
-      <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
-   </security:JpaPermissionStore-->  
            
 </beans>
