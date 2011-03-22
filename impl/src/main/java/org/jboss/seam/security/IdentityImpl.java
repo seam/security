@@ -1,19 +1,23 @@
 package org.jboss.seam.security;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +38,7 @@ import org.jboss.seam.security.jaas.JaasAuthenticator;
 import org.jboss.seam.security.management.IdmAuthenticator;
 import org.jboss.seam.security.permission.PermissionMapper;
 import org.jboss.seam.security.util.Strings;
+import org.jboss.seam.solder.beanManager.BeanManagerLocator;
 import org.jboss.seam.solder.literal.NamedLiteral;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
@@ -443,8 +448,12 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
             
       Authenticator selectedAuth = null;
+
+      // Hack to workaround glassfish visibility issue
+      BeanManager bm = new BeanManagerLocator().getBeanManager();
       
-      for (Authenticator auth : authenticators)
+//    for (Authenticator auth : authenticators)
+      for (Authenticator auth : getReferences(bm, Authenticator.class)) 
       {
          // If the user has provided their own custom authenticator then use it -
          // a custom authenticator is one that isn't one of the known authenticators;
@@ -464,6 +473,27 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
       }
       
       return selectedAuth;
+   }
+   
+   @SuppressWarnings("unchecked")
+   private <T> Set<T> getReferences(final BeanManager manager, final Class<T> type, Annotation... qualifiers)
+   {
+      Set<Bean<?>> resolverBeans = manager.getBeans(type, qualifiers);
+      if (resolverBeans.size() == 0)
+      {
+         return Collections.emptySet();
+      }
+      Set<T> refs = new LinkedHashSet<T>();
+      for (Bean<?> bean : resolverBeans)
+      {
+         // FIXME when should the dependent context be cleaned up?
+         CreationalContext<T> context = (CreationalContext<T>) manager.createCreationalContext(bean);
+         if (context != null)
+         {
+            refs.add((T) manager.getReference(bean, type, context));
+         }
+      }
+      return refs;
    }   
    
    /**
