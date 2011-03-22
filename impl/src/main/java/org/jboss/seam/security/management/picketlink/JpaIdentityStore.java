@@ -1150,16 +1150,19 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                (id != null ? id.toString() : null),
                name, identityObjectType);
          
-         List<IdentityObjectAttribute> attribs = new ArrayList<IdentityObjectAttribute>();
-         for (String key : attributes.keySet())
+         if (attributes != null)
          {
-            for (String value : attributes.get(key))
+            List<IdentityObjectAttribute> attribs = new ArrayList<IdentityObjectAttribute>();
+            for (String key : attributes.keySet())
             {
-               attribs.add(new SimpleAttribute(key, value));
+               for (String value : attributes.get(key))
+               {
+                  attribs.add(new SimpleAttribute(key, value));
+               }
             }
+            
+            updateAttributes(ctx, obj, attribs.toArray(new IdentityObjectAttribute[attribs.size()]));
          }
-         
-         updateAttributes(ctx, obj, attribs.toArray(new IdentityObjectAttribute[attribs.size()]));         
 
          return obj;
       }
