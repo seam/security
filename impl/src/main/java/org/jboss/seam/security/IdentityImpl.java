@@ -309,6 +309,11 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
          
          activeAuthenticator.authenticate();
          
+         if (activeAuthenticator.getStatus() == null)
+         {
+            throw new AuthenticationException("Authenticator must return a valid authentication status");
+         }
+         
          switch (activeAuthenticator.getStatus())
          {
             case SUCCESS:
@@ -317,8 +322,8 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
             case FAILURE:
                authenticating = false;
                return false;
-         }                 
-         
+         }
+
          return false;
       }
       catch (Exception ex)
