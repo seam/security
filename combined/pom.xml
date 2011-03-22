@@ -45,9 +45,25 @@
                   </goals>
                   <configuration>
                      <createSourcesJar>true</createSourcesJar>
+                     <filters>
+                       <filter>
+                         <artifact>org.jboss.seam.security:seam-security-api</artifact>
+                         <excludes>
+                           <exclude>META-INF/beans.xml</exclude>
+                           <exclude>META-INF/maven/**</exclude>
+                         </excludes>
+                       </filter>
+                       <filter>
+                         <artifact>org.jboss.seam.security:seam-security-impl</artifact>
+                         <excludes>
+                           <exclude>META-INF/maven/**</exclude>
+                         </excludes>
+                       </filter>
+                     </filters>
                      <artifactSet>
-                        <includes>
-                           <include>org.jboss.seam.security:*</include>
+                        <includes>                                                   
+                           <include>org.jboss.seam.security:seam-security-impl</include>
+                           <include>org.jboss.seam.security:seam-security-api</include>
                         </includes>
                      </artifactSet>
                   </configuration>
@@ -71,7 +87,7 @@
          <optional>true</optional>
       </dependency>
 
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.seam.persistence</groupId>
          <artifactId>seam-persistence</artifactId>
       </dependency>
@@ -84,7 +100,7 @@
       <dependency>
          <groupId>org.picketlink.idm</groupId>
          <artifactId>picketlink-idm-core</artifactId>
-      </dependency>
+      </dependency-->
 
    </dependencies>
 
