@@ -87,7 +87,7 @@
          <optional>true</optional>
       </dependency>
 
-      <!--dependency>
+      <dependency>
          <groupId>org.jboss.seam.persistence</groupId>
          <artifactId>seam-persistence</artifactId>
       </dependency>
@@ -100,7 +100,7 @@
       <dependency>
          <groupId>org.picketlink.idm</groupId>
          <artifactId>picketlink-idm-core</artifactId>
-      </dependency-->
+      </dependency>
 
    </dependencies>
 
