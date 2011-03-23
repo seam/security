@@ -1,7 +1,6 @@
 package org.jboss.seam.security.events;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -10,6 +9,9 @@ import java.util.List;
  * security binding types to be checked.  After firing the event, the isPassed()
  * method should be used to determine whether the authorization check was 
  * successful.
+ * 
+ * WARNING - This event should only be fired and observed synchronously.  
+ * Unpredictable results may occur otherwise.
  * 
  * @author Shane Bryzak
  *

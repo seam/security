@@ -325,6 +325,27 @@ public class SecurityExtension implements Extension
       return methodAuthorizers.get(m);
    }   
    
+   void checkAuthorization(Annotation binding)
+   {
+      boolean authorized = false;
+      
+      for (Authorizer authorizer : authorizers)
+      {
+         if (authorizer.matchesBinding(binding))
+         {
+            authorizer.authorize();
+            authorized = true;
+         }
+      }
+      
+      if (!authorized)
+      {
+         throw new AuthorizationException(
+               "Failed to process authorization request - no matching authorizer " +
+               "method for specified binding type [" + binding.annotationType().getClass().getName() + "]");
+      }
+   }
+   
    protected void registerSecuredMethod(Method method) 
    {
       if (!methodAuthorizers.containsKey(method))
