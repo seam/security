@@ -2,6 +2,7 @@ package org.jboss.seam.security.events;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This event may be used to perform an authorization check.  The constructor
@@ -16,14 +17,14 @@ import java.util.Collection;
 public class AuthorizationCheckEvent
 {
    private boolean passed;
-   private Collection<Annotation> bindings;
+   private List<? extends Annotation> bindings;
    
-   public AuthorizationCheckEvent(Collection<Annotation> bindings)
+   public AuthorizationCheckEvent(List<? extends Annotation> bindings)
    {
       this.bindings = bindings;
    }
    
-   public Collection<Annotation> getBindings()
+   public List<? extends Annotation> getBindings()
    {
       return bindings;
    }
