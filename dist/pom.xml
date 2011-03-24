@@ -143,13 +143,13 @@
          <optional>true</optional>
       </dependency>  
 
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-example-openid-op</artifactId>
          <version>${project.version}</version>
          <type>zip</type>
          <optional>true</optional>
-      </dependency>
+      </dependency-->
       
       <!--dependency>
          <groupId>org.jboss.seam.security</groupId>
