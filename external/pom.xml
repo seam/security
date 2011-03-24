@@ -63,14 +63,7 @@
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-impl</artifactId>
-         <scope>provided</scope>
+         <artifactId>seam-security</artifactId>
       </dependency>
 
       <dependency>
@@ -82,12 +75,6 @@
          <groupId>org.jboss.seam.solder</groupId>
          <artifactId>seam-solder</artifactId>
       </dependency>
-
-      <!--dependency>
-         <groupId>javax.el</groupId>
-         <artifactId>el-api</artifactId>
-         <scope>provided</scope>
-      </dependency-->
 
       <dependency>
          <groupId>javax.validation</groupId>
