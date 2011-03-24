@@ -38,6 +38,12 @@
          <artifactId>seam-faces</artifactId>
       </dependency>
 
+      <!-- Required for Glassfish -->
+      <dependency>
+         <groupId>joda-time</groupId>
+         <artifactId>joda-time</artifactId>
+      </dependency>
+
       <!-- CDI (JSR-299) -->
       <dependency>
          <groupId>javax.enterprise</groupId>

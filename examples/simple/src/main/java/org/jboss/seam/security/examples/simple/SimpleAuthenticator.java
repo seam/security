@@ -28,6 +28,10 @@ public class SimpleAuthenticator extends BaseAuthenticator implements Authentica
          setStatus(AuthenticationStatus.SUCCESS);
          setUser(new SimpleUser("demo"));
       }
+      else
+      {
+         setStatus(AuthenticationStatus.FAILURE);
+      }
    }
 
 }
