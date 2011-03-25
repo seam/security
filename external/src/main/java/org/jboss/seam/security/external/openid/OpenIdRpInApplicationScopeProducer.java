@@ -9,13 +9,13 @@ import javax.enterprise.inject.Produces;
  * @author Marcel Kolsteren
  * 
  */
-@Alternative
+//@Alternative
 public class OpenIdRpInApplicationScopeProducer
 {
-   @Produces
+   /*@Produces
    @ApplicationScoped
    public OpenIdRpBean produce(@New OpenIdRpBean rp)
    {
       return rp;
-   }
+   }*/
 }

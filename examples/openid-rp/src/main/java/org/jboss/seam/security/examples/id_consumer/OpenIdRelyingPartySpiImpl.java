@@ -12,6 +12,13 @@ import org.jboss.seam.security.external.openid.OpenIdAuthenticator;
 import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
 
+/**
+ * This bean processes the login succeeded and failed events and takes care
+ * of redirecting the user to the appropriate page.
+ * 
+ * @author Shane Bryzak
+ *
+ */
 public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi
 {
    @Inject

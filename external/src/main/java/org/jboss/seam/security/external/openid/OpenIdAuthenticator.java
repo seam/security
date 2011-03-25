@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Instance;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,7 +29,7 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
 {
    private static final long serialVersionUID = 4669651866032932651L;
    
-   @Inject private OpenIdRelyingPartyApi openIdApi;
+   @Inject Instance<OpenIdRelyingPartyApi> openIdApiInstance;
    
    @Inject List<OpenIdProvider> providers;
    
@@ -61,6 +61,8 @@ public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator
    
    public void authenticate()
    {
+      OpenIdRelyingPartyApi openIdApi = openIdApiInstance.get();
+      
       List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
       attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
       

@@ -8,11 +8,11 @@ import org.jboss.seam.servlet.event.Initialized;
 
 public class OpenIdRelyingPartyCustomizer
 {
-   public void servletInitialized(@Observes @Initialized final ServletContext context, OpenIdRelyingPartyConfigurationApi rp)
+   /*public void servletInitialized(@Observes @Initialized final ServletContext context, OpenIdRelyingPartyConfigurationApi rp)
    {
       rp.setHostName("www.openid-rp.com");
       rp.setPort(8080);
       rp.setProtocol("http");
-   }
+   }*/
 
 }

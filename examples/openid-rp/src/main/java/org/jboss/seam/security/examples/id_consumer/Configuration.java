@@ -5,6 +5,11 @@ import javax.inject.Inject;
 
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
 
+/**
+ * 
+ * This bean is used purely to provide information to the view layer
+ *
+ */
 @Model
 public class Configuration
 {
