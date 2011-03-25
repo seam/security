@@ -20,12 +20,6 @@
 
    <dependencies>
 
-      <!--dependency>
-         <groupId>javax.el</groupId>
-         <artifactId>el-api</artifactId>
-         <scope>provided</scope>
-      </dependency-->
-
       <dependency>
          <groupId>javax.validation</groupId>
          <artifactId>validation-api</artifactId>
@@ -41,12 +35,6 @@
       <dependency>
          <groupId>org.jboss.spec.javax.interceptor</groupId>
          <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.slf4j</groupId>
-         <artifactId>slf4j-api</artifactId>
          <scope>provided</scope>
       </dependency>
 

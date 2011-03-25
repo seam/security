@@ -95,12 +95,6 @@
       </dependency>
 
       <dependency>
-         <groupId>org.slf4j</groupId>
-         <artifactId>slf4j-api</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
          <!-- Required until the Servlet 3.0 API can be resolved in Central -->
          <groupId>org.jboss.spec.javax.servlet</groupId>
          <artifactId>jboss-servlet-api_3.0_spec</artifactId>

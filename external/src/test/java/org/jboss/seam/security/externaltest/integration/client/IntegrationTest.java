@@ -33,12 +33,11 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // TODO test is broken
 
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 //@Run(RunModeType.AS_CLIENT)
 public class IntegrationTest
 {
-   private static final Logger log = LoggerFactory.getLogger(IntegrationTest.class);
+   private static final Logger log = Logger.getLogger(IntegrationTest.class);
 
    private HttpClient httpClient;
 

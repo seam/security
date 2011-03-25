@@ -15,13 +15,12 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.impl.api.PasswordCredential;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An authenticator for authenticating with JAAS.  The jaasConfigName property
@@ -33,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public @Named @RequestScoped class JaasAuthenticator extends BaseAuthenticator implements Authenticator
 {  
-   Logger log = LoggerFactory.getLogger(JaasAuthenticator.class);
+   private static final Logger log = Logger.getLogger(JaasAuthenticator.class);
    
    @Inject Identity identity;
    @Inject Credentials credentials;

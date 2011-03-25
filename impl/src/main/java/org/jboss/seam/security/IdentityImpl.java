@@ -22,6 +22,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;
@@ -46,8 +47,6 @@ import org.picketlink.idm.api.User;
 import org.picketlink.idm.impl.api.model.SimpleGroup;
 import org.picketlink.idm.impl.api.model.SimpleRole;
 import org.picketlink.idm.impl.api.model.SimpleRoleType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Identity implementation for authentication and authorization 
@@ -64,7 +63,7 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
    
    protected static boolean securityEnabled = true;
    
-   Logger log = LoggerFactory.getLogger(IdentityImpl.class);
+   private static final Logger log = Logger.getLogger(IdentityImpl.class);
   
    @Inject BeanManager beanManager;
    

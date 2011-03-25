@@ -32,9 +32,8 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -45,7 +44,7 @@ import org.w3c.dom.NodeList;
 @SuppressWarnings("restriction")
 public class SamlSignatureUtilForPostBinding
 {
-   private final static Logger log = LoggerFactory.getLogger(SamlSignatureUtilForPostBinding.class);
+   private final static Logger log = Logger.getLogger(SamlSignatureUtilForPostBinding.class);
 
    private XMLSignatureFactory fac;
 

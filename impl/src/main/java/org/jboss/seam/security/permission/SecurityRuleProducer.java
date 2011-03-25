@@ -16,10 +16,9 @@ import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.qualifiers.Security;
 import org.jboss.seam.solder.resourceLoader.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Workaround until we have a seam-drools release
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SecurityRuleProducer
 {
-   private static final Logger log = LoggerFactory.getLogger(SecurityRuleProducer.class);
+   private static final Logger log = Logger.getLogger(SecurityRuleProducer.class);
    
    @Inject @Resource("security.drl") InputStream securityRules;
    

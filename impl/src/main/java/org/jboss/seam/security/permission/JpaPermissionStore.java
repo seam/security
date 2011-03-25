@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.jboss.logging.Logger;
 import org.jboss.seam.security.annotations.permission.PermissionProperty;
 import org.jboss.seam.security.annotations.permission.PermissionPropertyType;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;
@@ -24,8 +25,6 @@ import org.jboss.seam.solder.properties.Property;
 import org.jboss.seam.solder.properties.query.PropertyCriteria;
 import org.jboss.seam.solder.properties.query.PropertyQueries;
 import org.picketlink.idm.spi.model.IdentityObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A permission store implementation that uses JPA as its persistence mechanism.
@@ -37,7 +36,7 @@ public class JpaPermissionStore implements PermissionStore, Serializable
 {
    private static final long serialVersionUID = 4764590939669047915L;
    
-   private Logger log = LoggerFactory.getLogger(JpaPermissionStore.class);
+   private static final Logger log = Logger.getLogger(JpaPermissionStore.class);
    
    private class PropertyTypeCriteria implements PropertyCriteria
    {
