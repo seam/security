@@ -57,10 +57,6 @@ public @Named("identity") @SessionScoped class IdentityImpl implements Identity,
 {
    private static final long serialVersionUID = 3751659008033189259L;
    
-   private static final String RESPONSE_LOGIN_SUCCESS = "success";
-   private static final String RESPONSE_LOGIN_FAILED = "failed";
-   private static final String RESPONSE_LOGIN_EXCEPTION = "exception";
-   
    protected static boolean securityEnabled = true;
    
    private static final Logger log = Logger.getLogger(IdentityImpl.class);

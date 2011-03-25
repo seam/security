@@ -15,7 +15,11 @@ import org.picketlink.idm.api.User;
  * @author Shane Bryzak
  */
 public interface Identity
-{   
+{      
+   public static final String RESPONSE_LOGIN_SUCCESS = "success";
+   public static final String RESPONSE_LOGIN_FAILED = "failed";
+   public static final String RESPONSE_LOGIN_EXCEPTION = "exception";
+   
    /**
     * Simple check that returns true if the user is logged in, without attempting to authenticate
     * 
