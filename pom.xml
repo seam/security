@@ -21,10 +21,6 @@
       <module>external</module>
    </modules>
    
-   <prerequisites>
-      <maven>3.0</maven>
-   </prerequisites>
-
    <properties>
       <seam.version>3.0.0.CR9</seam.version>
    </properties>
