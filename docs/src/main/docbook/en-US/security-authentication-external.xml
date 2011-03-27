@@ -4,12 +4,313 @@
 <chapter id="security-authentication-external">
   <title>Security - External Authentication</title>
 
-  <sect1>
-    <title>TO DO</title>
+  <section>
+    <title>Introduction</title>
     
     <para>
-      This chapter coming soon.
+      The external authentication module is an optional add-on to the core Seam Security module, which provides a number of 
+      features that enable your application to authenticate against third party identity services, via a number of supported protocols.
     </para>
-  </sect1>
+    
+    <warning>
+      <para>
+        The features described in this chapter are a <emphasis>preview</emphasis> only.  The APIs described may change
+        in a subsequent version of Seam, and may not be backwards-compatible with previous versions.
+      </para>
+    </warning>
+    
+    <para>
+      Currently this module supports authentication via OpenID, and other protocols (such as SAML and OAuth) are currently under 
+      development for the next version of Seam.
+    </para>
+    
+    <section>
+      <title>Configuration</title>
+      
+      <para>
+        If your project is Maven-based, then add the following dependency to your project:
+      </para>
+      
+      <programlisting><![CDATA[<dependency>
+  <groupId>org.jboss.seam.security</groupId>
+  <artifactId>seam-security-external</artifactId>
+</dependency>]]></programlisting>
+
+      <para>
+        If you are not using Maven, you must add the <literal>seam-security-external.jar</literal> library to your project, which
+        can be found in the Seam Security downloadable distribution.
+      </para>
+      
+    </section>
+  </section>
+  
+  <section>
+    <title>OpenID</title>
+    
+    <para>
+      OpenID allows the users of your application to authenticate without requiring them to create an account.  When using OpenID, your user
+      is temporarily redirected to the web site of their OpenID provider so that they can enter their password, after which they are redirected
+      back to your application.  The OpenID authentication process is safe - at no time is the user's password seen by any site besides their
+      OpenID provider.
+    </para>
+    
+    <section>
+      <title>Overview</title>
+      
+      <para>
+        The external authentication module provides support for OpenID based on <ulink url="http://code.google.com/p/openid4java/">OpenID4Java</ulink>,
+        an open source OpenID library (licensed under the Apache v2 license) with both Relying Party and Identity Provider capabilities.  This feature
+        allows your application to authenticate its users against an external OpenID provider, such as Google or Yahoo, or to turn your application
+        into an OpenID provider itself.
+      </para>
+      
+      <note>
+        <para>
+          To see the OpenID features in action, take a look at the <literal>openid-rp</literal> example included in the Seam Security distribution.
+        </para>
+      </note>
+    </section>
+    
+    <section>
+      <title>Enabling OpenID for your application</title>
+      
+      <para>
+        To use OpenID in your own application, you must configure Seam Security to use <code>OpenIdAuthenticator</code>, an 
+        <code>Authenticator</code> implementation that performs authentication against an OpenID provider.  This authenticator
+        is a named, session-scoped bean, with the following declaration:      
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[public @Named("openIdAuthenticator") @SessionScoped class OpenIdAuthenticator]]></programlisting>
+      
+      <section>
+        <title>Using OpenID as your only authentication method</title>
+        
+        <para>
+          If your application only uses OpenID to provide authentication services, then it is recommended that <code>OpenIdAuthenticator</code>
+          is selected by configuring the <code>authenticatorClass</code> property of the <code>Identity</code> bean.  The following code sample
+          demonstrates how this might be done by using Seam Config:
+        </para>
+        
+        <programlisting role="XML"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:ee" 
+   xmlns:security="urn:java:org.jboss.seam.security"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+
+   <security:Identity>
+      <s:modifies/>
+      <security:authenticatorClass>org.jboss.seam.security.external.openid.OpenIdAuthenticator</security:authenticator>
+   </security:Identity>]]></programlisting>
+      </section>
+      
+      <section>
+        <title>Using OpenID as one of many possible authentication methods</title>
+        
+        <para>
+          If your application gives the user a choice of which authentication method to use, then it is not possible to
+          pre-configure which <code>Authenticator</code> implementation is used to authenticate.  In these circumstances,
+          it is recommended that you configure the authenticator by specifying a value for the <code>authenticatorName</code> 
+          property of the <code>Identity</code> bean.  This can be done by binding a view-layer control such as a radio group
+          directly to this property, to allow the user to select the method of authentication they wish to use.  See the 
+          following JSF code as an example:
+        </para>        
+        
+        <programlisting role="XML"><![CDATA[<h:outputLabel value="Authenticate using:"/>
+<h:selectOneRadio id="authenticator" value="#{identity.authenticatorName}">
+  <f:selectItem itemLabel="OpenID" itemValue="openIdAuthenticator" />
+  <f:selectItem itemLabel="Custom" itemValue="customAuthenticator" />
+</h:selectOneRadio>]]></programlisting>
+      </section>
+      
+    </section>
+    
+    <section>
+      <title>Choosing which OpenID provider to use</title>
+      
+      <para>
+        Seam provides built-in support for a number of well-known OpenID providers.  The <code>OpenIdAuthenticator</code> bean
+        may be configured to select which OpenID provider will be used to process an authentication request.  Each concrete
+        provider implements the following interface:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[public interface OpenIdProvider {
+   String getCode();
+   String getName();
+   String getUrl();
+}]]></programlisting>
+        
+      <para>        
+        The following table lists the providers that come pre-packaged in Seam:      
+      </para>
+      
+      <informaltable>
+        <tgroup cols="4">
+          <thead>
+            <row>
+              <entry>Provider</entry>
+              <entry>Code</entry>
+              <entry>Name</entry>
+              <entry>URL</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>CustomeOpenIdProvider</entry>
+              <entry>custom</entry>
+              <entry>Coogle</entry>
+              <entry></entry>
+            </row>          
+            <row>
+              <entry>GoogleOpenIdProvider</entry>
+              <entry>google</entry>
+              <entry>Google</entry>
+              <entry>https://www.google.com/accounts/o8/id</entry>
+            </row>
+            <row>
+              <entry>MyOpenIdProvider</entry>
+              <entry>myopenid</entry>
+              <entry>MyOpenID</entry>
+              <entry>https://myopenid.com</entry>
+            </row>     
+            <row>
+              <entry>YahooOpenIdProvider</entry>
+              <entry>yahoo</entry>
+              <entry>Yahoo</entry>
+              <entry>https://me.yahoo.com</entry>
+            </row>        
+          </tbody>        
+        </tgroup>      
+      </informaltable>
+      
+      <para>
+        To select one of the built-in providers to use for an authentication request, the <code>providerCode</code> property
+        of the <code>OpenIdAuthenticator</code> bean should be set to one of the Code values from the above table.  The
+        <code>OpenIdAuthenticator</code> bean provides a convenience method called <code>getProviders()</code> that returns
+        a list of all known providers.  This may be used in conjunction with a radio group to allow the user to select which
+        OpenID provider they wish to authenticate with - see the following JSF snippet for an example:
+      </para>
+      
+      <programlisting role="XML"><![CDATA[<h:selectOneRadio value="#{openIdAuthenticator.providerCode}">
+  <f:selectItems value="#{openIdAuthenticator.providers}" var="p" itemValue="#{p.code}" itemLabel="#{p.name}"/>
+</h:selectOneRadio>]]></programlisting>
+
+      <section>
+        <title>Using a custom OpenID provider</title>
+        
+        <para>
+          If you would like to allow your users to specify an OpenID provider that is not supported out of the box by Seam, then
+          the <code>CustomOpenIdProvider</code> may be used.  As it is a <code>@Named</code> bean, it can be accessed directly
+          from the view layer via EL.  The following JSF code shows how you might allow the user to specify their own
+          OpenID provider:
+        </para>
+        
+        <programlisting role="XML"><![CDATA[<h:outputLabel value="If you have selected the Custom OpenID provider, please provide a URL:"/>
+<h:inputText value="#{customOpenIdProvider.url}"/>]]></programlisting>
+      
+      </section>
+      
+    
+    </section>
+    
+    <section>
+      <title>Managing the OpenID authentication process</title>
+      
+      <note>
+        <para>
+          The API described in this section will likely be changed in a future version of Seam to allow for easier handling of
+          the OpenID authentication lifecycle.
+        </para>
+      </note>
+      
+      <para>
+        Your application must provide an implementation of the <code>OpenIdRelyingPartySpi</code> interface to process 
+        OpenID callback events.  This interface declares the following methods:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[public interface OpenIdRelyingPartySpi {
+   void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder);
+   void loginFailed(String message, ResponseHolder responseHolder);      
+      ]]></programlisting>
+      
+      <para>
+        The implementation is responsible for processing the response of the OpenID authentication, and is typically used to
+        redirect the user to an appropriate page depending on whether authentication was successful or not.
+      </para>
+      
+      <para>
+        There are two API calls that <emphasis>must</emphasis> be made in the case of a successful authentication.  The first one
+        should notify the <code>OpenIdAuthenticator</code> that the authentication attempt was successful, and pass it the 
+        <code>OpenIdPrincipal</code> object:
+      </para>
+      
+      <warning>
+        <para>
+          If the following two API calls are omitted, unpredictable results may occur!
+        </para>
+      </warning>
+      
+      <programlisting role="JAVA"><![CDATA[openIdAuthenticator.success(principal);]]></programlisting>
+      
+      <para>
+        Secondly, a <code>DeferredAuthenticationEvent</code> must be fired to signify that a deferred authentication attempt has
+        been completed:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[deferredAuthentication.fire(new DeferredAuthenticationEvent());]]></programlisting>
+      
+      <para>
+        After making these two API calls, the implementation may perform whatever additional logic is required.  The following code
+        shows a complete example:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[import java.io.IOException;
+
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+
+import org.jboss.seam.security.events.DeferredAuthenticationEvent;
+import org.jboss.seam.security.external.api.ResponseHolder;
+import org.jboss.seam.security.external.openid.OpenIdAuthenticator;
+import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
+import org.jboss.seam.security.external.spi.OpenIdRelyingPartySpi;
+
+public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi {
+   @Inject private ServletContext servletContext;
+   @Inject OpenIdAuthenticator openIdAuthenticator;   
+   @Inject Event<DeferredAuthenticationEvent> deferredAuthentication;
+
+   public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder) {
+      try {
+         openIdAuthenticator.success(principal);
+         deferredAuthentication.fire(new DeferredAuthenticationEvent());
+         
+         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/UserInfo.jsf");
+      } catch (IOException e) {
+         throw new RuntimeException(e);
+      }
+   }
+
+   public void loginFailed(String message, ResponseHolder responseHolder) {
+      try {
+         responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/AuthenticationFailed.jsf");
+      } catch (IOException e) {
+         throw new RuntimeException(e);
+      }
+   }
+}]]></programlisting>
+
+      <note>
+        <para>
+          The above example assumes that the Seam Servlet module is used to allow injection of the <code>ServletContext</code>.
+        </para>
+      </note>
+    
+    </section>  
+  
+  </section>
+  
+  
     
 </chapter>
