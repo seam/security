@@ -4,12 +4,486 @@
 <chapter id="security-identitymanagement">
   <title>Security - Identity Management</title>
 
-  <sect1>
-    <title>TO DO</title>
+  <section>
+    <title>Overview</title>
     
     <para>
-      This chapter coming soon.
+      Identity Management is a feature that allows you to manage the users, groups and roles in your application.
+      The Identity Management features in Seam Security are provided by <ulink url="http://www.jboss.org/picketlink/IDM">PicketLink IDM</ulink>.
+      The best place to find more information about PicketLink IDM is the reference documentation, available 
+      <ulink url="http://anonsvn.jboss.org/repos/picketlink/idm/downloads/docs/1.0.0.GA/ReferenceGuide/en-US/html_single/index.html">here</ulink>.
     </para>
-  </sect1>
+    
+    <para>
+      PicketLink provides two identity store implementations to allow you to use Hibernate or LDAP to store identity-related data (please refer
+      to the PicketLink IDM documentation for details on configuring these).  Seam Security provides an additional implementation called
+      <code>JpaIdentityStore</code>, which allows you to store your identity data using JPA.
+    </para>
+    
+    <note>
+      <para>
+        In a Seam-based application it probably makes more sense to use the standards-based <code>JpaIdentityStore</code> rather than 
+        <code>HibernateIdentityStore</code>, as you will most likely be running in an Java EE container that supports JPA.
+      </para>
+    </note>
+
+  </section>
+  
+  <section>
+    <title>Configuring Seam to use Identity Management</title>
+    
+    <para>
+      Like all authentication providers in Seam, Identity Management is supported via a concrete <code>Authenticator</code> 
+      implementation called <code>IdmAuthenticator</code>.  If you don't provide your own <code>Authenticator</code>
+      implementation then the <code>IdmAuthenticator</code> will be used automatically, however it is also possible (and doesn't hurt) to
+      configure it explicitly. For example, the following XML shows how it would be configured with the Seam Config module:
+    </para>    
+    
+        <programlisting role="XML"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:ee" 
+   xmlns:security="urn:java:org.jboss.seam.security"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+
+   <security:Identity>
+      <s:modifies/>
+      <security:authenticatorClass>org.jboss.seam.security.management.IdmAuthenticator</security:authenticator>
+   </security:Identity>]]></programlisting>
+   
+    <para>
+      Besides configuring the <code>authenticatorClass</code> property, you must also configure the identity store.
+      See the sections later in this chapter to find out how to configure the identity store for your application.
+    </para>
+   
+  </section>  
+  
+  <section>
+    <title>Using the Identity Management Features</title>
+    
+    <para>
+      The Identity Management features are provided by a number of manager objects, which can be access from an
+      <code>IdentitySession</code>.  The <code>IdentitySession</code> may be injected directly into your beans
+      like so:
+    </para>
+    
+    <programlisting role="JAVA"><![CDATA[import org.picketlink.idm.api.IdentitySession;
+
+public @Model class IdentityAction {
+  @Inject IdentitySession identitySession;
+  
+  // code goes here...
+}]]></programlisting>
+
+    <para>
+      Once you have the <code>IdentitySession</code> object, you can use it to perform various identity management
+      operations.  You should refer to the PicketLink documentation for a complete description of the available features, 
+      however the following sections contain a brief overview.
+    </para>
+    
+    <section>
+      <title>Managing Users and Groups</title>
+      
+      <para>
+        Users and groups are managed by a <code>PersistenceManager</code>, which can be obtained by calling
+        <code>getPersistenceManager()</code> on the <code>IdentitySession</code> object:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[PersistenceManager pm = identitySession.getPersistenceManager();]]></programlisting>
+      
+      <para>
+        Once you have the <code>PersistenceManager</code> object, you can create <code>User</code> objects with the
+        <code>createUser()</code> method:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[User user = pm.createUser("john");]]></programlisting>
+      
+      <para>
+        Similarly, you can create <code>Group</code> objects with the <code>createGroup()</code> method:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[Group headOffice = pm.createGroup("Head Office", "OFFICE");]]></programlisting>
+      
+      <para>
+        You can also remove users and groups by calling the <code>removeUser()</code> or <code>removeGroup()</code> method.
+      </para>     
+    </section>
+    
+    <section>
+      <title>Managing Relationships</title>
+      
+      <para>
+        Relationships are used to associate <code>User</code> objects with <code>Group</code> objects.  Relationships can
+        be managed with the <code>RelationshipManager</code> object, which can be obtained by calling 
+        <code>getRelationshipManager()</code> on the <code>IdentitySession</code>:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[RelationshipManager rm = identitySession.getRelationshipManager();]]></programlisting>
+      
+      <para>
+        Relationships are created by invoking the <code>associateUser()</code> method, and passing in the group and user
+        objects that should be associated:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[rm.associateUser(headOffice, user);]]></programlisting>      
+    </section>
+    
+    <section>
+      <title>Managing Roles</title>
+      
+      <para>
+        Roles are managed via the <code>RoleManager</code> object, which can be obtained by invoke the
+        <code>getRoleManager()</code> method on the <code>IdentitySession</code> object:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[RoleManager roleManager = identitySession.getRoleManager();]]></programlisting>
+      
+      <para>
+        Roles are an association between a user and a group, however they are slightly more complex than a simple
+        group membership as the association also has a <emphasis>role type</emphasis>.  The role type is generally
+        used to describe a particular function of the user within the group.  Role types are represented by the
+        <code>RoleType</code> object, and can be created with the <code>createRoleType()</code> method:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[RoleType manager = roleManager.createRoleType("manager");]]></programlisting>
+      
+      <para>
+        Roles can be assigned to users by invoking the <code>createRole()</code> method, and passing in the
+        <code>RoleType</code>, <code>User</code> and <code>Group</code>:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[Role r = roleManager.createRole(manager, user, headOffice);]]></programlisting>
+    </section>
+  </section>
+  
+  <section>
+    <title>JpaIdentityStore</title>
+    
+    <note>
+      <para>
+        See the idmconsole example application (included in the Seam distribution) for a demonstration of Seam's Identity Management
+        features.
+      </para>
+    </note>
+    
+    <para>
+      <code>JpaIdentityStore</code> is an implementation of the PicketLink <code>IdentityStore</code> interface, provided by Seam Security.  
+      This identity store allows you to store your identity model inside a relational database, accessible via JPA.  It provides an immense 
+      amount of flexibility in the way you define your identity model, and in most cases should be compatible with existing database schemas.
+    </para>
+    
+    <section>
+      <title>Recommended database schema</title>
+      
+      <para>
+        While <code>JpaIdentityStore</code> should be compatible with a large range of database schemas, the following diagram displays 
+        the recommended database schema to use:
+      </para>
+      
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata fileref="images/jpa_db_model_full.png" align="center" scalefit="1"/>
+        </imageobject>
+        <imageobject role="html">
+          <imagedata fileref="images/jpa_db_model_full.png" align="center"/>
+        </imageobject>
+      </mediaobject>    
+    </section>
+    
+    <section>
+      <title>Configuring JpaIdentityStore</title>
+      
+      <para>
+        Seam provides a configuration bean called <code>JpaIdentityStoreConfiguration</code>, which can be used
+        to configure which entity bean classes will be used by <code>JpaIdentityStore</code> to store identity-related
+        data.
+      </para>
+      
+      <informaltable>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry>Property</entry>
+              <entry>Description</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>identityClass</entry>
+              <entry>Entity class that contains identity objects such as users and groups</entry>
+            </row>
+            <row>
+              <entry>credentialClass</entry>
+              <entry>Entity class that contains credentials, such as passwords</entry>
+            </row>
+            <row>
+              <entry>relationshipClass</entry>
+              <entry>Entity class that contains relationships between identity objects</entry>
+            </row>
+            <row>
+              <entry>roleTypeClass</entry>
+              <entry>Entity class that contains the names of all role types</entry>
+            </row>
+            <row>
+              <entry>attributeClass</entry>
+              <entry>Entity class that contains additional identity object attributes</entry>
+            </row>            
+          </tbody>
+        </tgroup>
+      </informaltable>
+      
+      <para>
+        The following example shows how <code>JpaIdentityStoreConfiguration</code> may be configured using
+        the Seam Config module:
+      </para>
+      
+      <programlisting role="XML"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:s="urn:java:ee" 
+   xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+      
+   <plidm:JpaIdentityStoreConfiguration>
+      <s:replaces/>
+      <plidm:identityClass>com.acme.model.IdentityObject</plidm:identityClass>
+      <plidm:credentialClass>com.acme.model.IdentityObjectCredential</plidm:credentialClass>
+      <plidm:relationshipClass>com.acme.model.IdentityObjectRelationship</plidm:relationshipClass>
+      <plidm:roleTypeClass>com.acme.model.IdentityRoleName</plidm:roleTypeClass>
+      <plidm:attributeClass>com.acme.model.IdentityObjectAttribute</plidm:attributeClass>
+   </plidm:JpaIdentityStoreConfiguration>]]></programlisting>
+    </section>
+    
+    <section>
+      <title>Configuring your Entities</title>
+      
+      <para>
+        Seam Security provides a single annotation, <code>IdentityProperty</code>, which can be used to configure your
+        entity beans for use with <code>JpaIdentityStore</code>.  This annotation declares two values, <code>value</code>
+        and <code>attributeName</code>:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[package org.jboss.seam.security.annotations.management;
+
+public @interface IdentityProperty {
+   PropertyType value();
+   String attributeName() default "";
+}]]></programlisting>
+
+      <para>
+        The <code>value()</code> member is of type <code>PropertyType</code>, which is an enum that defines the following values:
+      </para>
+      
+      <programlisting role="JAVA"><![CDATA[public enum PropertyType {
+  NAME, TYPE, VALUE, RELATIONSHIP_FROM, RELATIONSHIP_TO, CREDENTIAL, 
+  CREDENTIAL_TYPE, ATTRIBUTE }]]></programlisting>
+   
+      <para>
+        By placing the <code>IdentityProperty</code> annotation on various fields of your entity beans, <code>JpaIdentityStore</code>
+        can determine how identity-related data must be stored within your database tables.
+      </para>
+      
+      <para>
+        In the following sections we'll look at how each of the main entities are configured.
+      </para>
+      
+      <section>
+        <title>Identity Object</title>
+        <para>
+          Let's start by looking at identity object.  This entity class is configured as the <code>identityClass</code> property
+          of <code>JpaIdentityStoreConfiguration</code>.  In the recommended database schema, the <code>IDENTITY_OBJECT</code> table
+          is responsible for storing objects such as users and groups.  This table may be represented by the following entity
+          bean:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+  public class IdentityObject implements Serializable {  
+     @Id @GeneratedValue private Long id;
+     
+     @IdentityProperty(PropertyType.NAME)
+     private String name;
+     
+     @ManyToOne @IdentityProperty(PropertyType.TYPE)
+     @JoinColumn(name = "IDENTITY_OBJECT_TYPE_ID")
+     private IdentityObjectType type;
+
+     // snip getter and setter methods
+  }]]></programlisting>
+
+        <para>
+          In the above code both the <code>name</code> and <code>type</code> fields are annotated with <code>@IdentityProperty</code>.
+          This tells <code>JpaIdentityStore</code> that these two fields are significant in terms of identity management-related
+          state.  By annotating the <code>name</code> field with <code>@IdentityProperty(PropertyType.NAME)</code>, <code>JpaIdentityStore</code>
+          knows that this field is used to store the <emphasis>name</emphasis> of the identity object.  Likewise, the 
+          <code>@IdentityProperty(PropertyType.TYPE)</code> annotation on the <code>type</code> field indicates that the value of this
+          field is used to represent the <emphasis>type</emphasis> of identity object.
+        </para>
+        
+        <para>
+          The <code>IdentityObjectType</code> entity is simply a lookup table containing the names of the valid identity types. The 
+          field representing the actual name of the type itself should be annotated with <code>@IdentityProperty(PropertyType.NAME)</code>:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectType implements Serializable {   
+
+   @Id @GeneratedValue private Long id;
+   @IdentityProperty(PropertyType.NAME) private String name;        
+   
+   // snip getter and setter methods
+}]]></programlisting>
+        
+      </section>
+      
+      <section>
+        <title>Credential</title>
+        
+        <para>
+          The credentials table is used to store user credentials, such as passwords, and is configured as the <code>credentialClass</code>
+          property of <code>JpaIdentityStoreConfiguration</code>.  Here's an example of an entity bean configured to store identity object
+          credentials:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectCredential implements Serializable {   
+   @Id @GeneratedValue private Long id;
+   private IdentityObject identityObject;
+   
+   @ManyToOne @IdentityProperty(PropertyType.TYPE)
+   @JoinColumn(name = "CREDENTIAL_TYPE_ID")
+   private IdentityObjectCredentialType type;
+   
+   @IdentityProperty(PropertyType.VALUE)
+   private String value;        
+   
+   // snip getter and setter methods
+}]]></programlisting>
+
+        <para>
+          The <code>IdentityObjectCredentialType</code> entity is used to store a list of valid credential types.  Like
+          <code>IdentityObjectType</code>, it is a simple lookup table with the field representing the credential type
+          name annotated with <code>@IdentityProperty(PropertyType.NAME)</code>:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectCredentialType implements Serializable
+{  
+   @Id @GeneratedValue private Long id;
+   
+   @IdentityProperty(PropertyType.NAME)
+   private String name;        
+   
+   // snip getter and setter methods
+}]]></programlisting>
+
+      </section>
+      
+      <section>
+        <title>Identity Object Relationship</title>
+      
+        <para>
+          The relationship table stores associations between identity objects, and is configured as the <code>relationshipClass</code>
+          property of <code>JpaIdentityStoreConfiguration</code>.  Here's an example of an entity bean that has been configured to
+          store identity object relationships:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectRelationship implements Serializable
+{   
+   @Id @GeneratedValue private Long id;
+   
+   @IdentityProperty(PropertyType.NAME)
+   private String name;
+   
+   @ManyToOne @IdentityProperty(PropertyType.TYPE) @JoinColumn(name = "RELATIONSHIP_TYPE_ID")
+   private IdentityObjectRelationshipType relationshipType;
+   
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_FROM) @JoinColumn(name = "FROM_IDENTITY_ID")
+   private IdentityObject from;
+   
+   @ManyToOne @IdentityProperty(PropertyType.RELATIONSHIP_TO) @JoinColumn(name = "TO_IDENTITY_ID")
+   private IdentityObject to;        
+   
+   // snip getter and setter methods
+}]]></programlisting>
+
+        <para>
+          The <code>name</code> property is annotated with <code>@IdentityProperty(PropertyType.NAME)</code> to indicate that this
+          field contains the name value for named relationships.  An example of a named relationship is a role, which uses the
+          <code>name</code> property to store the role type name.
+        </para>
+        
+        <para>
+          The <code>relationshipType</code> property is annotated with <code>@IdentityProperty(PropertyType.TYPE)</code> to indicate
+          that this field represents the type of relationship.  This is typically a value in a lookup table.
+        </para>
+        
+        <para>
+          The <code>from</code> property is annotated with <code>@IdentityProperty(PropertyType.RELATIONSHIP_FROM)</code> to indicate
+          that this field represents the <code>IdentityObject</code> on the <emphasis>from</emphasis> side of the relationship.
+        </para>
+        
+        <para>
+          The <code>to</code> property is annotated with <code>@IdentityProperty(PropertyType.RELATIONSHIP_TO)</code> to indicate
+          that this field represents the <code>IdentityObject</code> on the <emphasis>to</emphasis> side of the relationship.
+        </para>
+        
+        <para>
+          The <code>IdentityObjectRelationshipType</code> entity is a lookup table containing the valid relationship types. The
+          <code>@IdentityProperty(PropertyType.NAME)</code> annotation is used to indicate the field containing the relationship
+          type names:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectRelationshipType implements Serializable {   
+   @Id @GeneratedValue private Long id;
+   
+   @IdentityProperty(PropertyType.NAME)
+   private String name;
+   
+   // snip getter and setter methods
+}]]></programlisting>
+      
+      </section>
+      
+      <section>
+        <title>Attributes</title>
+        
+        <para>
+          The attribute table is used to store any additional information that is to be associated with identity objects. It is configured
+          as the <code>attributeClass</code> property of <code>JpaIdentityStoreConfiguration</code>.  Here's an example of an entity bean
+          used to store attributes:
+        </para>
+        
+        <programlisting role="JAVA"><![CDATA[@Entity
+public class IdentityObjectAttribute implements Serializable {
+   
+   @Id @GeneratedValue private Integer attributeId;
+   
+   @ManyToOne 
+   @JoinColumn(name = "IDENTITY_OBJECT_ID")
+   private IdentityObject identityObject;
+   
+   @IdentityProperty(PropertyType.NAME)
+   private String name;
+   
+   @IdentityProperty(PropertyType.VALUE)
+   private String value;
+   
+   // snip getter and setter methods
+}]]></programlisting>
+
+        <para>
+          The <code>name</code> field is annotated with <code>@IdentityProperty(PropertyType.NAME)</code> to indicate that this field
+          contains the attribute name.  The <code>value</code> field is annotated with <code>@IdentityProperty(PropertyType.VALUE)</code>
+          to indicate that this field contains the attribute value.
+        </para>
+      </section>
+    </section>
+        
+    
+    
+  
+  </section>
     
 </chapter>
