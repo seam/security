@@ -36,6 +36,7 @@ public class IdentityObject implements Serializable
       this.id = id;
    }
    
+   @IdentityProperty(PropertyType.NAME)
    public String getName()
    {
       return name;
