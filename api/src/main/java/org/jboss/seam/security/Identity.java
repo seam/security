@@ -199,4 +199,12 @@ public interface Identity
     * @return
     */
    Set<Group> getGroups();
+   
+   Class<Authenticator> getAuthenticatorClass();
+   
+   void setAuthenticatorClass(Class<Authenticator> authenticatorClass);
+   
+   String getAuthenticatorName();
+   
+   void setAuthenticatorName(String authenticatorName);   
 }
