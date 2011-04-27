@@ -1106,7 +1106,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
          if (typeNameProp == null) return identityType;
          
          Object val = em.createQuery(
-               "select t from " + typeNameProp.getDeclaringClass().getName() + 
+               "select t from " + typeNameProp.getDeclaringClass().getSimpleName() + 
                " t where t." + typeNameProp.getName() +
                 " = :identityType")
                .setParameter("identityType", identityType)
