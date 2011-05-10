@@ -7,21 +7,17 @@ import javax.enterprise.inject.spi.Extension;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class VirtualApplicationContextExtension implements Extension
-{
-   private VirtualApplicationContext virtualApplicationContext;
+public class VirtualApplicationContextExtension implements Extension {
+    private VirtualApplicationContext virtualApplicationContext;
 
-   public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager)
-   {
-      virtualApplicationContext = new VirtualApplicationContext();
-      event.addContext(virtualApplicationContext);
-   }
+    public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
+        virtualApplicationContext = new VirtualApplicationContext();
+        event.addContext(virtualApplicationContext);
+    }
 
-   public VirtualApplicationContext getVirtualApplicationContext()
-   {
-      return virtualApplicationContext;
-   }
+    public VirtualApplicationContext getVirtualApplicationContext() {
+        return virtualApplicationContext;
+    }
 
 }

@@ -8,15 +8,12 @@ import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicati
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @Alternative
-public class OpenIdRpInVirtualApplicationScopeProducer
-{
-   @Produces
-   @VirtualApplicationScoped
-   public OpenIdRpBean produce(@New OpenIdRpBean rp)
-   {
-      return rp;
-   }
+public class OpenIdRpInVirtualApplicationScopeProducer {
+    @Produces
+    @VirtualApplicationScoped
+    public OpenIdRpBean produce(@New OpenIdRpBean rp) {
+        return rp;
+    }
 }

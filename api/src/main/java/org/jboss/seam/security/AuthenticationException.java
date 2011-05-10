@@ -2,21 +2,17 @@ package org.jboss.seam.security;
 
 /**
  * Thrown if there is an error during the authentication process
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
-public class AuthenticationException extends SecurityException
-{
-   private static final long serialVersionUID = -7486433031372506270L;
-   
-   public AuthenticationException(String message)
-   {
-      super(message);
-   }
+public class AuthenticationException extends SecurityException {
+    private static final long serialVersionUID = -7486433031372506270L;
 
-   public AuthenticationException(String message, Throwable cause)
-   {
-      super(message, cause);
-   }
+    public AuthenticationException(String message) {
+        super(message);
+    }
+
+    public AuthenticationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

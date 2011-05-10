@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <arquillian xmlns="http://jboss.com/arquillian"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jbossr="urn:arq:org.jboss.arquillian.container.jbossas.remote_6"
-      xmlns:jbossm="urn:arq:org.jboss.arquillian.container.jbossas.managed_6">
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:jbossr="urn:arq:org.jboss.arquillian.container.jbossas.remote_6"
+            xmlns:jbossm="urn:arq:org.jboss.arquillian.container.jbossas.managed_6">
 
-   <engine>
-      <maxDeploymentsBeforeRestart>20</maxDeploymentsBeforeRestart>
-   </engine>
-   
-   <jbossm:container>
-<!--     <jboss:jbossHome>/home/aslak/dev/servers/jboss-6.0.0.M3/</jboss:jbossHome> --> <!-- default %JBOSS_HOME% -->
-<!--     <jboss:javaHome>/usr/lib/jvm/java-6-openjdk</jboss:javaHome> -->  <!-- default %JAVA_HOME% -->
-      <!-- Increase the permgen space by default, heap space is default -->
-      <jbossm:javaVmArguments>-Xmx512m -XX:MaxPermSize=256m -Djboss.i18n.generate-proxies=true -Dsun.net.http.allowRestrictedHeaders=true</jbossm:javaVmArguments>
-   </jbossm:container>
+    <engine>
+        <maxDeploymentsBeforeRestart>20</maxDeploymentsBeforeRestart>
+    </engine>
 
-   <jbossr:container>
-      <jbossr:profileName>default</jbossr:profileName>
-   </jbossr:container>   
+    <jbossm:container>
+        <!--     <jboss:jbossHome>/home/aslak/dev/servers/jboss-6.0.0.M3/</jboss:jbossHome> --> <!-- default %JBOSS_HOME% -->
+        <!--     <jboss:javaHome>/usr/lib/jvm/java-6-openjdk</jboss:javaHome> -->  <!-- default %JAVA_HOME% -->
+        <!-- Increase the permgen space by default, heap space is default -->
+        <jbossm:javaVmArguments>-Xmx512m -XX:MaxPermSize=256m -Djboss.i18n.generate-proxies=true
+            -Dsun.net.http.allowRestrictedHeaders=true
+        </jbossm:javaVmArguments>
+    </jbossm:container>
+
+    <jbossr:container>
+        <jbossr:profileName>default</jbossr:profileName>
+    </jbossr:container>
 
 </arquillian>

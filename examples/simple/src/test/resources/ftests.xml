@@ -1,9 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 <suite name="Seam Simple Example" verbose="2" parallel="false">
-   <test name="simple_ftest">
-      <parameter name="example.context.path" value="/simple" />
-      <packages>
-         <package name="org.jboss.seam.security.examples.simple.ftest" />
-      </packages>
-   </test>
+    <test name="simple_ftest">
+        <parameter name="example.context.path" value="/simple"/>
+        <packages>
+            <package name="org.jboss.seam.security.examples.simple.ftest"/>
+        </packages>
+    </test>
 </suite>

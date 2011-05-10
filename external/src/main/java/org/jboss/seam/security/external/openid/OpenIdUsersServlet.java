@@ -14,39 +14,32 @@ import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class OpenIdUsersServlet extends HttpServlet
-{
-   private static final long serialVersionUID = 1476698956314628568L;
+public class OpenIdUsersServlet extends HttpServlet {
+    private static final long serialVersionUID = 1476698956314628568L;
 
-   @Inject
-   private Instance<OpenIdProviderBean> opBean;
+    @Inject
+    private Instance<OpenIdProviderBean> opBean;
 
-   @Inject
-   private Instance<OpenIdProviderSpi> providerSpi;
+    @Inject
+    private Instance<OpenIdProviderSpi> providerSpi;
 
-   @Override
-   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-   {
-      String prefix = opBean.get().getUsersUrlPrefix();
-      if (!request.getRequestURL().toString().startsWith(prefix))
-      {
-         response.sendError(HttpServletResponse.SC_NOT_FOUND, "Only accepting requests for URLs starting with " + prefix);
-         return;
-      }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String prefix = opBean.get().getUsersUrlPrefix();
+        if (!request.getRequestURL().toString().startsWith(prefix)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Only accepting requests for URLs starting with " + prefix);
+            return;
+        }
 
-      String userNamePart = request.getRequestURL().substring(prefix.length());
-      String userName = URLDecoder.decode(userNamePart, "UTF-8");
+        String userNamePart = request.getRequestURL().substring(prefix.length());
+        String userName = URLDecoder.decode(userNamePart, "UTF-8");
 
-      if (providerSpi.get().userExists(userName))
-      {
-         response.setContentType("application/xrds+xml");
-         opBean.get().writeClaimedIdentifierXrds(response.getWriter(), opBean.get().getOpLocalIdentifierForUserName(userName));
-      }
-      else
-      {
-         response.sendError(HttpServletResponse.SC_NOT_FOUND, "User " + userName + " does not exist.");
-      }
-   }
+        if (providerSpi.get().userExists(userName)) {
+            response.setContentType("application/xrds+xml");
+            opBean.get().writeClaimedIdentifierXrds(response.getWriter(), opBean.get().getOpLocalIdentifierForUserName(userName));
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User " + userName + " does not exist.");
+        }
+    }
 }

@@ -11,23 +11,21 @@ import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public interface SamlMultiUserIdentityProviderApi
-{
-   void authenticationSucceeded(SamlIdpSession session, HttpServletResponse response);
+public interface SamlMultiUserIdentityProviderApi {
+    void authenticationSucceeded(SamlIdpSession session, HttpServletResponse response);
 
-   void authenticationFailed(HttpServletResponse response);
+    void authenticationFailed(HttpServletResponse response);
 
-   Set<SamlIdpSession> getSessions();
+    Set<SamlIdpSession> getSessions();
 
-   SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes);
+    SamlIdpSession localLogin(SamlNameId nameId, List<AttributeType> attributes);
 
-   SamlNameId createNameId(String value, String format, String qualifier);
+    SamlNameId createNameId(String value, String format, String qualifier);
 
-   void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl, HttpServletResponse response);
+    void remoteLogin(String spEntityId, SamlIdpSession session, String remoteUrl, HttpServletResponse response);
 
-   void localLogout(SamlIdpSession session);
+    void localLogout(SamlIdpSession session);
 
-   void globalLogout(SamlIdpSession session, HttpServletResponse response);
+    void globalLogout(SamlIdpSession session, HttpServletResponse response);
 }

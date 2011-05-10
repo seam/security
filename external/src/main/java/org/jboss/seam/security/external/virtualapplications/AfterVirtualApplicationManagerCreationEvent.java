@@ -7,20 +7,16 @@ import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualAppl
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class AfterVirtualApplicationManagerCreationEvent implements AfterVirtualApplicationManagerCreation
-{
-   private Set<String> hostNames = new HashSet<String>();
+public class AfterVirtualApplicationManagerCreationEvent implements AfterVirtualApplicationManagerCreation {
+    private Set<String> hostNames = new HashSet<String>();
 
-   public void addVirtualApplication(String hostName)
-   {
-      hostNames.add(hostName);
-   }
+    public void addVirtualApplication(String hostName) {
+        hostNames.add(hostName);
+    }
 
-   public Set<String> getHostNames()
-   {
-      return hostNames;
-   }
+    public Set<String> getHostNames() {
+        return hostNames;
+    }
 
 }

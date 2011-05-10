@@ -9,19 +9,15 @@ import org.jboss.seam.security.AuthenticationScoped;
 
 /**
  * An extension that enables @AuthenticationScoped beans
- *  
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
-public class AuthenticationScopedExtension implements Extension
-{
-   public void addScope(@Observes final BeforeBeanDiscovery event)
-   {
-      event.addScope(AuthenticationScoped.class, true, false);
-   }
-   
-   public void registerContext(@Observes final AfterBeanDiscovery event)
-   {
-      event.addContext(new AuthenticationContext());
-   }
+public class AuthenticationScopedExtension implements Extension {
+    public void addScope(@Observes final BeforeBeanDiscovery event) {
+        event.addScope(AuthenticationScoped.class, true, false);
+    }
+
+    public void registerContext(@Observes final AfterBeanDiscovery event) {
+        event.addContext(new AuthenticationContext());
+    }
 }

@@ -7,14 +7,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Built-in security binding type, used to restrict a method invocation to 
+ * Built-in security binding type, used to restrict a method invocation to
  * users that are logged in
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
 @SecurityBindingType
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-public @interface LoggedIn { }
+public @interface LoggedIn {
+}

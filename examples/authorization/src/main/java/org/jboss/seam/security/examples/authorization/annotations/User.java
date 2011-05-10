@@ -8,11 +8,10 @@ import java.lang.annotation.Target;
 import org.jboss.seam.security.annotations.SecurityBindingType;
 
 /**
- * 
  * @author Shane Bryzak
- *
  */
 @SecurityBindingType
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface User { }
+public @interface User {
+}

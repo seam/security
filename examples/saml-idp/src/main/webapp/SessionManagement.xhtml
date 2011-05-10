@@ -1,45 +1,45 @@
 <f:view xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:f="http://java.sun.com/jsf/core">
-	<f:metadata>
-		<f:event type="preRenderView"
-			listener="#{identity.redirectToLoginIfNotLoggedIn}" />
-	</f:metadata>
-	<ui:composition template="/PageTemplate.xhtml">
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:f="http://java.sun.com/jsf/core">
+    <f:metadata>
+        <f:event type="preRenderView"
+                 listener="#{identity.redirectToLoginIfNotLoggedIn}"/>
+    </f:metadata>
+    <ui:composition template="/PageTemplate.xhtml">
 
-		<h1>Session Info</h1>
+        <h1>Session Info</h1>
 
-		<h2>Logged in user</h2>
+        <h2>Logged in user</h2>
 
-		<h:outputText
-			value="#{identity.samlIdpSession.principal.nameId.value}" />
+        <h:outputText
+                value="#{identity.samlIdpSession.principal.nameId.value}"/>
 
-		<h2>Session participants</h2>
+        <h2>Session participants</h2>
 
-		<h:dataTable
-			value="#{sessionManagement.participatingServiceProviders}" var="sp"
-			columnClasses="dataTableColumn">
-			<h:column>
-				<h:outputText value="#{sp}" />
-			</h:column>
-		</h:dataTable>
+        <h:dataTable
+                value="#{sessionManagement.participatingServiceProviders}" var="sp"
+                columnClasses="dataTableColumn">
+            <h:column>
+                <h:outputText value="#{sp}"/>
+            </h:column>
+        </h:dataTable>
 
-		<h2>Login to Other Service Providers</h2>
+        <h2>Login to Other Service Providers</h2>
 
-		<h:form>
-			<h:dataTable
-				value="#{sessionManagement.nonParticipatingServiceProviders}"
-				var="sp" columnClasses="dataTableColumn">
-				<h:column>
-					<h:outputText value="#{sp}" />
-				</h:column>
-				<h:column>
-					<h:commandLink action="#{identity.remoteLogin(sp)}" value="Login" target="_blank"/>
-				</h:column>
-			</h:dataTable>
-		</h:form>
+        <h:form>
+            <h:dataTable
+                    value="#{sessionManagement.nonParticipatingServiceProviders}"
+                    var="sp" columnClasses="dataTableColumn">
+                <h:column>
+                    <h:outputText value="#{sp}"/>
+                </h:column>
+                <h:column>
+                    <h:commandLink action="#{identity.remoteLogin(sp)}" value="Login" target="_blank"/>
+                </h:column>
+            </h:dataTable>
+        </h:form>
 
-	</ui:composition>
+    </ui:composition>
 </f:view>

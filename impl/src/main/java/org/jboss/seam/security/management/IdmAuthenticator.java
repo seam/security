@@ -21,57 +21,50 @@ import org.picketlink.idm.common.exception.IdentityException;
 
 /**
  * Authenticates using Identity Management
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
-public @Model class IdmAuthenticator extends BaseAuthenticator implements Authenticator
-{
-   private static final Logger log = Logger.getLogger(IdmAuthenticator.class);
-   
-   @Inject IdentitySession identitySession;
-   @Inject Credentials credentials;
-   @Inject Identity identity;
-   
-   public void authenticate()
-   {
-      if (identitySession != null)
-      {            
-         User u = new UserImpl(credentials.getUsername()); 
-         
-         try
-         {
-            boolean success = identitySession.getAttributesManager().validateCredentials(
-                  u, new Credential[] {credentials.getCredential()});
-            
-            if (success)
-            {
-               Collection<RoleType> roleTypes = identitySession.getRoleManager()
-                   .findUserRoleTypes(u);
-               
-               for (RoleType roleType : roleTypes)
-               {
-                  for (Role role : identitySession.getRoleManager().findRoles(u, roleType))
-                  {
-                     identity.addRole(role.getRoleType().getName(), 
-                           role.getGroup().getName(), role.getGroup().getGroupType());   
-                  }
-               }
-               setUser(u);
-               setStatus(AuthenticationStatus.SUCCESS);               
-               return;
+public
+@Model
+class IdmAuthenticator extends BaseAuthenticator implements Authenticator {
+    private static final Logger log = Logger.getLogger(IdmAuthenticator.class);
+
+    @Inject
+    IdentitySession identitySession;
+    @Inject
+    Credentials credentials;
+    @Inject
+    Identity identity;
+
+    public void authenticate() {
+        if (identitySession != null) {
+            User u = new UserImpl(credentials.getUsername());
+
+            try {
+                boolean success = identitySession.getAttributesManager().validateCredentials(
+                        u, new Credential[]{credentials.getCredential()});
+
+                if (success) {
+                    Collection<RoleType> roleTypes = identitySession.getRoleManager()
+                            .findUserRoleTypes(u);
+
+                    for (RoleType roleType : roleTypes) {
+                        for (Role role : identitySession.getRoleManager().findRoles(u, roleType)) {
+                            identity.addRole(role.getRoleType().getName(),
+                                    role.getGroup().getName(), role.getGroup().getGroupType());
+                        }
+                    }
+                    setUser(u);
+                    setStatus(AuthenticationStatus.SUCCESS);
+                    return;
+                }
+            } catch (IdentityException ex) {
+                log.error("Authentication error", ex);
+            } catch (FeatureNotSupportedException ex) {
+                log.error("Authentication error", ex);
             }
-         }
-         catch (IdentityException ex)
-         {
-            log.error("Authentication error", ex);
-         }
-         catch (FeatureNotSupportedException ex)
-         {
-            log.error("Authentication error", ex);
-         }         
-      }
-      
-      setStatus(AuthenticationStatus.FAILURE);
-   }
+        }
+
+        setStatus(AuthenticationStatus.FAILURE);
+    }
 }

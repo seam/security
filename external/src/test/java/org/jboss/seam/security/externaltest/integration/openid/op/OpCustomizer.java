@@ -6,12 +6,10 @@ import javax.servlet.ServletContext;
 import org.jboss.seam.security.external.openid.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.servlet.event.Initialized;
 
-public class OpCustomizer
-{
-   public void servletInitialized(@Observes @Initialized final ServletContext context, OpenIdProviderConfigurationApi op)
-   {
-      op.setHostName("localhost");
-      op.setProtocol("http");
-      op.setPort(8080);
-   }
+public class OpCustomizer {
+    public void servletInitialized(@Observes @Initialized final ServletContext context, OpenIdProviderConfigurationApi op) {
+        op.setHostName("localhost");
+        op.setProtocol("http");
+        op.setPort(8080);
+    }
 }

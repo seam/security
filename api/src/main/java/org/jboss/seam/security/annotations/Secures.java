@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Used to delegate a method as the provider for a specific authorization check
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Secures { }
+public @interface Secures {
+}

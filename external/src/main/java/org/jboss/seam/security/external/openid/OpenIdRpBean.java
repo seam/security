@@ -3,7 +3,6 @@ package org.jboss.seam.security.external.openid;
 import java.io.Writer;
 import java.util.List;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -28,80 +27,69 @@ import org.openid4java.discovery.DiscoveryInformation;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 //@Typed(OpenIdRpBean.class)
 @SuppressWarnings("restriction")
-public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi
-{
-   @Inject
-   private OpenIdRpAuthenticationService openIdSingleLoginSender;
+public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi {
+    @Inject
+    private OpenIdRpAuthenticationService openIdSingleLoginSender;
 
-   @Inject
-   private ServletContext servletContext;
+    @Inject
+    private ServletContext servletContext;
 
-   @Inject
-   @JaxbContext(ObjectFactory.class)
-   private JAXBContext jaxbContext;
+    @Inject
+    @JaxbContext(ObjectFactory.class)
+    private JAXBContext jaxbContext;
 
-   @Dialogued(join = true)
-   public void login(String identifier, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response)
-   {
-      openIdSingleLoginSender.sendAuthRequest(identifier, attributes, response);
-   }
+    @Dialogued(join = true)
+    public void login(String identifier, List<OpenIdRequestedAttribute> attributes, HttpServletResponse response) {
+        openIdSingleLoginSender.sendAuthRequest(identifier, attributes, response);
+    }
 
-   public String getServiceURL(OpenIdService service)
-   {
-      String path = servletContext.getContextPath() + "/openid/RP/" + service.getName();
-      return createURL(path);
-   }
+    public String getServiceURL(OpenIdService service) {
+        String path = servletContext.getContextPath() + "/openid/RP/" + service.getName();
+        return createURL(path);
+    }
 
-   public String getRealm()
-   {
-      return createURL("");
-   }
+    public String getRealm() {
+        return createURL("");
+    }
 
-   public String getXrdsURL()
-   {
-      return getServiceURL(OpenIdService.XRDS_SERVICE);
-   }
+    public String getXrdsURL() {
+        return getServiceURL(OpenIdService.XRDS_SERVICE);
+    }
 
-   public void writeRpXrds(Writer writer)
-   {
-      try
-      {
-         ObjectFactory objectFactory = new ObjectFactory();
+    public void writeRpXrds(Writer writer) {
+        try {
+            ObjectFactory objectFactory = new ObjectFactory();
 
-         XRDS xrds = objectFactory.createXRDS();
+            XRDS xrds = objectFactory.createXRDS();
 
-         XRD xrd = objectFactory.createXRD();
+            XRD xrd = objectFactory.createXRD();
 
-         Type type = objectFactory.createType();
-         type.setValue(DiscoveryInformation.OPENID2_RP);
-         URIPriorityAppendPattern uri = objectFactory.createURIPriorityAppendPattern();
-         uri.setValue(getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+            Type type = objectFactory.createType();
+            type.setValue(DiscoveryInformation.OPENID2_RP);
+            URIPriorityAppendPattern uri = objectFactory.createURIPriorityAppendPattern();
+            uri.setValue(getServiceURL(OpenIdService.OPEN_ID_SERVICE));
 
-         Service service = objectFactory.createService();
-         service.getType().add(type);
-         service.getURI().add(uri);
+            Service service = objectFactory.createService();
+            service.getType().add(type);
+            service.getURI().add(uri);
 
-         xrd.getService().add(service);
+            xrd.getService().add(service);
 
-         xrds.getOtherelement().add(xrd);
+            xrds.getOtherelement().add(xrd);
 
-         Marshaller marshaller = jaxbContext.createMarshaller();
-         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-         marshaller.marshal(xrds, writer);
-      }
-      catch (JAXBException e)
-      {
-         throw new RuntimeException(e);
-      }
-   }
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(xrds, writer);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-   public OpenIdRequestedAttribute createOpenIdRequestedAttribute(String alias, String typeUri, boolean required, Integer count)
-   {
-      return new OpenIdRequestedAttributeImpl(alias, typeUri, required, count);
-   }
+    public OpenIdRequestedAttribute createOpenIdRequestedAttribute(String alias, String typeUri, boolean required, Integer count) {
+        return new OpenIdRequestedAttributeImpl(alias, typeUri, required, count);
+    }
 }

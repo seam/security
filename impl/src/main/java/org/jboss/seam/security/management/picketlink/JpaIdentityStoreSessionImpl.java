@@ -6,73 +6,59 @@ import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.spi.store.IdentityStoreSession;
 
 /**
- * JPA-specific implementation of IdentityStoreSession, based on an EntityManager. 
- * 
- * @author Shane Bryzak
+ * JPA-specific implementation of IdentityStoreSession, based on an EntityManager.
  *
+ * @author Shane Bryzak
  */
-public class JpaIdentityStoreSessionImpl implements IdentityStoreSession
-{
-   private EntityManager em;
-   
-   public JpaIdentityStoreSessionImpl(EntityManager em)
-   {
-      this.em = em;
-   }
-   
-   public EntityManager getEntityManager()
-   {
-      return em;
-   }
-   
-   public void clear() throws IdentityException
-   {
-      em.clear();      
-   }
+public class JpaIdentityStoreSessionImpl implements IdentityStoreSession {
+    private EntityManager em;
 
-   public void close() throws IdentityException
-   {
-      em.close();
-   }
+    public JpaIdentityStoreSessionImpl(EntityManager em) {
+        this.em = em;
+    }
 
-   public void commitTransaction()
-   {
-      em.getTransaction().commit();
-   }
+    public EntityManager getEntityManager() {
+        return em;
+    }
 
-   public Object getSessionContext() throws IdentityException
-   {
-      return em;
-   }
+    public void clear() throws IdentityException {
+        em.clear();
+    }
 
-   public boolean isOpen()
-   {
-      return em.isOpen();
-   }
+    public void close() throws IdentityException {
+        em.close();
+    }
 
-   public boolean isTransactionActive()
-   {
-      return em.getTransaction().isActive();
-   }
+    public void commitTransaction() {
+        em.getTransaction().commit();
+    }
 
-   public boolean isTransactionSupported()
-   {
-      return true;
-   }
+    public Object getSessionContext() throws IdentityException {
+        return em;
+    }
 
-   public void rollbackTransaction()
-   {
-      em.getTransaction().rollback();
-   }
+    public boolean isOpen() {
+        return em.isOpen();
+    }
 
-   public void save() throws IdentityException
-   {
-      em.flush();
-   }
+    public boolean isTransactionActive() {
+        return em.getTransaction().isActive();
+    }
 
-   public void startTransaction()
-   {
-      em.getTransaction().begin();
-   }
+    public boolean isTransactionSupported() {
+        return true;
+    }
+
+    public void rollbackTransaction() {
+        em.getTransaction().rollback();
+    }
+
+    public void save() throws IdentityException {
+        em.flush();
+    }
+
+    public void startTransaction() {
+        em.getTransaction().begin();
+    }
 
 }

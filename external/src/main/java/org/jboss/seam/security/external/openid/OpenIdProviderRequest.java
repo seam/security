@@ -10,70 +10,58 @@ import org.openid4java.message.ax.FetchRequest;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @DialogueScoped
-public class OpenIdProviderRequest implements Serializable
-{
-   private static final long serialVersionUID = -6701058408595984106L;
+public class OpenIdProviderRequest implements Serializable {
+    private static final long serialVersionUID = -6701058408595984106L;
 
-   private ParameterList parameterList;
+    private ParameterList parameterList;
 
-   private String claimedIdentifier;
+    private String claimedIdentifier;
 
-   private List<OpenIdRequestedAttribute> requestedAttributes;
+    private List<OpenIdRequestedAttribute> requestedAttributes;
 
-   private FetchRequest fetchRequest;
+    private FetchRequest fetchRequest;
 
-   private String userName;
+    private String userName;
 
-   public ParameterList getParameterList()
-   {
-      return parameterList;
-   }
+    public ParameterList getParameterList() {
+        return parameterList;
+    }
 
-   public void setParameterList(ParameterList parameterList)
-   {
-      this.parameterList = parameterList;
-   }
+    public void setParameterList(ParameterList parameterList) {
+        this.parameterList = parameterList;
+    }
 
-   public String getClaimedIdentifier()
-   {
-      return claimedIdentifier;
-   }
+    public String getClaimedIdentifier() {
+        return claimedIdentifier;
+    }
 
-   public void setClaimedIdentifier(String claimedIdentifier)
-   {
-      this.claimedIdentifier = claimedIdentifier;
-   }
+    public void setClaimedIdentifier(String claimedIdentifier) {
+        this.claimedIdentifier = claimedIdentifier;
+    }
 
-   public List<OpenIdRequestedAttribute> getRequestedAttributes()
-   {
-      return requestedAttributes;
-   }
+    public List<OpenIdRequestedAttribute> getRequestedAttributes() {
+        return requestedAttributes;
+    }
 
-   public void setRequestedAttributes(List<OpenIdRequestedAttribute> requestedAttributes)
-   {
-      this.requestedAttributes = requestedAttributes;
-   }
+    public void setRequestedAttributes(List<OpenIdRequestedAttribute> requestedAttributes) {
+        this.requestedAttributes = requestedAttributes;
+    }
 
-   public FetchRequest getFetchRequest()
-   {
-      return fetchRequest;
-   }
+    public FetchRequest getFetchRequest() {
+        return fetchRequest;
+    }
 
-   public void setFetchRequest(FetchRequest fetchRequest)
-   {
-      this.fetchRequest = fetchRequest;
-   }
+    public void setFetchRequest(FetchRequest fetchRequest) {
+        this.fetchRequest = fetchRequest;
+    }
 
-   public String getUserName()
-   {
-      return userName;
-   }
+    public String getUserName() {
+        return userName;
+    }
 
-   public void setUserName(String userName)
-   {
-      this.userName = userName;
-   }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

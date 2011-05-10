@@ -10,9 +10,9 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Copied from Matthias Gartner's PKCS#5 implementation - see
  * http://rtner.de/software/PBKDF2.html
- * 
+ * <p/>
  * Default PRF implementation based on standard javax.crypt.Mac mechanisms.
- * 
+ * <p/>
  * <hr />
  * <p>
  * A free Java implementation of Password Based Key Derivation Function 2 as
@@ -39,12 +39,11 @@ import javax.crypto.spec.SecretKeySpec;
  * For Details, see <a
  * href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</a>.
  * </p>
- * 
+ *
  * @author Matthias G&auml;rtner
  * @version 1.0
  */
-public class MacBasedPRF implements PRF
-{
+public class MacBasedPRF implements PRF {
     protected Mac mac;
 
     protected int hLen;
@@ -53,61 +52,44 @@ public class MacBasedPRF implements PRF
 
     /**
      * Create Mac-based Pseudo Random Function.
-     * 
-     * @param macAlgorithm
-     *            Mac algorithm to use, i.e. HMacSHA1 or HMacMD5.
+     *
+     * @param macAlgorithm Mac algorithm to use, i.e. HMacSHA1 or HMacMD5.
      */
-    public MacBasedPRF(String macAlgorithm)
-    {
+    public MacBasedPRF(String macAlgorithm) {
         this.macAlgorithm = macAlgorithm;
-        try
-        {
+        try {
             mac = Mac.getInstance(macAlgorithm);
             hLen = mac.getMacLength();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public MacBasedPRF(String macAlgorithm, String provider)
-    {
+    public MacBasedPRF(String macAlgorithm, String provider) {
         this.macAlgorithm = macAlgorithm;
-        try
-        {
+        try {
             mac = Mac.getInstance(macAlgorithm, provider);
             hLen = mac.getMacLength();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        }
-        catch (NoSuchProviderException e)
-        {
+        } catch (NoSuchProviderException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public byte[] doFinal(byte[] M)
-    {
+    public byte[] doFinal(byte[] M) {
         byte[] r = mac.doFinal(M);
         return r;
     }
 
-    public int getHLen()
-    {
+    public int getHLen() {
         return hLen;
     }
 
-    public void init(byte[] P)
-    {
-        try
-        {
+    public void init(byte[] P) {
+        try {
             mac.init(new SecretKeySpec(P, macAlgorithm));
-        }
-        catch (InvalidKeyException e)
-        {
+        } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }

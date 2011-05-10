@@ -33,138 +33,122 @@ import org.openid4java.message.ax.FetchResponse;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public @ApplicationScoped class OpenIdRpAuthenticationService
-{
-   @Inject
-   private OpenIdRequest openIdRequest;
+public
+@ApplicationScoped
+class OpenIdRpAuthenticationService {
+    @Inject
+    private OpenIdRequest openIdRequest;
 
-   @Inject
-   private ConsumerManager openIdConsumerManager;
+    @Inject
+    private ConsumerManager openIdConsumerManager;
 
-   @Inject
-   private Instance<OpenIdRelyingPartySpi> openIdRelyingPartySpi;
+    @Inject
+    private Instance<OpenIdRelyingPartySpi> openIdRelyingPartySpi;
 
-   @Inject
-   private OpenIdRpBean relyingPartyBean;
+    @Inject
+    private OpenIdRpBean relyingPartyBean;
 
-   @Inject
-   private ResponseHandler responseHandler;
+    @Inject
+    private ResponseHandler responseHandler;
 
-   @Inject
-   private Logger log;
+    @Inject
+    private Logger log;
 
-   @Inject
-   private Instance<DialogueBean> dialogue;
+    @Inject
+    private Instance<DialogueBean> dialogue;
 
-   public void handleIncomingMessage(HttpServletRequest httpRequest, 
-         HttpServletResponse httpResponse) throws InvalidRequestException
-   {
-      try
-      {
-         // extract the parameters from the authentication response
-         // (which comes in as a HTTP request from the OpenID provider)
-         ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
+    public void handleIncomingMessage(HttpServletRequest httpRequest,
+                                      HttpServletResponse httpResponse) throws InvalidRequestException {
+        try {
+            // extract the parameters from the authentication response
+            // (which comes in as a HTTP request from the OpenID provider)
+            ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
 
-         // retrieve the previously stored discovery information
-         DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
-         if (discovered == null)
-         {
-            throw new IllegalStateException("No discovery information found in OpenID request");
-         }         
-
-         // extract the receiving URL from the HTTP request
-         StringBuffer receivingURL = httpRequest.getRequestURL();
-         String queryString = httpRequest.getQueryString();
-         if (queryString != null && queryString.length() > 0)
-            receivingURL.append("?").append(httpRequest.getQueryString());
-
-         // verify the response; ConsumerManager needs to be the same
-         // (static) instance used to place the authentication request
-         VerificationResult verification = openIdConsumerManager.verify(
-               receivingURL.toString(), parameterList, discovered);
-
-         // examine the verification result and extract the verified identifier
-         Identifier identifier = verification.getVerifiedId();
-
-         if (identifier != null)
-         {
-            AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
-
-            Map<String, List<String>> attributeValues = null;
-            if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
-            {
-               FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
-               @SuppressWarnings("unchecked")
-               Map<String, List<String>> attrValues = fetchResp.getAttributes();
-               attributeValues = attrValues;
+            // retrieve the previously stored discovery information
+            DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
+            if (discovered == null) {
+                throw new IllegalStateException("No discovery information found in OpenID request");
             }
 
-            OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(), 
-                  discovered.getOPEndpoint(), attributeValues);
+            // extract the receiving URL from the HTTP request
+            StringBuffer receivingURL = httpRequest.getRequestURL();
+            String queryString = httpRequest.getQueryString();
+            if (queryString != null && queryString.length() > 0)
+                receivingURL.append("?").append(httpRequest.getQueryString());
 
-            openIdRelyingPartySpi.get().loginSucceeded(principal, 
-                  responseHandler.createResponseHolder(httpResponse));
-         }
-         else
-         {
-            openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg(), 
-                  responseHandler.createResponseHolder(httpResponse));
-         }
-      }
-      catch (OpenIDException e)
-      {
-         responseHandler.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), httpResponse);
-         return;
-      }
+            // verify the response; ConsumerManager needs to be the same
+            // (static) instance used to place the authentication request
+            VerificationResult verification = openIdConsumerManager.verify(
+                    receivingURL.toString(), parameterList, discovered);
 
-      dialogue.get().setFinished(true);
-   }
+            // examine the verification result and extract the verified identifier
+            Identifier identifier = verification.getVerifiedId();
 
-   @Dialogued(join = true)
-   public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes, 
-         HttpServletResponse response)
-   {
-      try
-      {
-         @SuppressWarnings("unchecked")
-         List<DiscoveryInformation> discoveries = openIdConsumerManager.discover(openId);
+            if (identifier != null) {
+                AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
 
-         DiscoveryInformation discovered = openIdConsumerManager.associate(discoveries);
+                Map<String, List<String>> attributeValues = null;
+                if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
+                    FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+                    @SuppressWarnings("unchecked")
+                    Map<String, List<String>> attrValues = fetchResp.getAttributes();
+                    attributeValues = attrValues;
+                }
 
-         openIdRequest.setDiscoveryInformation(discovered);
+                OpenIdPrincipal principal = createPrincipal(identifier.getIdentifier(),
+                        discovered.getOPEndpoint(), attributeValues);
 
-         String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
-         String realm = relyingPartyBean.getRealm();
-         String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getId();
-         AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
-
-         if (attributes != null && attributes.size() > 0)
-         {
-            FetchRequest fetch = FetchRequest.createFetchRequest();
-            for (OpenIdRequestedAttribute attribute : attributes)
-            {
-               fetch.addAttribute(attribute.getAlias(), attribute.getTypeUri(), attribute.isRequired());
+                openIdRelyingPartySpi.get().loginSucceeded(principal,
+                        responseHandler.createResponseHolder(httpResponse));
+            } else {
+                openIdRelyingPartySpi.get().loginFailed(verification.getStatusMsg(),
+                        responseHandler.createResponseHolder(httpResponse));
             }
-            // attach the extension to the authentication request
-            authReq.addExtension(fetch);
-         }
+        } catch (OpenIDException e) {
+            responseHandler.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), httpResponse);
+            return;
+        }
 
-         String url = authReq.getDestinationUrl(true);
+        dialogue.get().setFinished(true);
+    }
 
-         responseHandler.sendHttpRedirectToUserAgent(url, response);
-      }
-      catch (OpenIDException e)
-      {
-         log.warn("Authentication failed", e);
-         openIdRelyingPartySpi.get().loginFailed(e.getMessage(), 
-               responseHandler.createResponseHolder(response));
-      }
-   }
+    @Dialogued(join = true)
+    public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes,
+                                HttpServletResponse response) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<DiscoveryInformation> discoveries = openIdConsumerManager.discover(openId);
 
-   private OpenIdPrincipal createPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributeValues)
-   {
-      return new OpenIdPrincipalImpl(identifier, openIdProvider, attributeValues);
-   }
+            DiscoveryInformation discovered = openIdConsumerManager.associate(discoveries);
+
+            openIdRequest.setDiscoveryInformation(discovered);
+
+            String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
+            String realm = relyingPartyBean.getRealm();
+            String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getId();
+            AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
+
+            if (attributes != null && attributes.size() > 0) {
+                FetchRequest fetch = FetchRequest.createFetchRequest();
+                for (OpenIdRequestedAttribute attribute : attributes) {
+                    fetch.addAttribute(attribute.getAlias(), attribute.getTypeUri(), attribute.isRequired());
+                }
+                // attach the extension to the authentication request
+                authReq.addExtension(fetch);
+            }
+
+            String url = authReq.getDestinationUrl(true);
+
+            responseHandler.sendHttpRedirectToUserAgent(url, response);
+        } catch (OpenIDException e) {
+            log.warn("Authentication failed", e);
+            openIdRelyingPartySpi.get().loginFailed(e.getMessage(),
+                    responseHandler.createResponseHolder(response));
+        }
+    }
+
+    private OpenIdPrincipal createPrincipal(String identifier, URL openIdProvider, Map<String, List<String>> attributeValues) {
+        return new OpenIdPrincipalImpl(identifier, openIdProvider, attributeValues);
+    }
 }

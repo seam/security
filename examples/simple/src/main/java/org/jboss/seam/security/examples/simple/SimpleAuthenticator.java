@@ -10,28 +10,23 @@ import org.picketlink.idm.impl.api.model.SimpleUser;
 
 /**
  * This is the simplest possible example of a custom authenticator.
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
-public class SimpleAuthenticator extends BaseAuthenticator implements Authenticator
-{
-   @Inject Credentials credentials;
-   
-   @Override
-   public void authenticate()
-   {
-      if ("demo".equals(credentials.getUsername()) && 
-            credentials.getCredential() instanceof PasswordCredential &&
-            "demo".equals(((PasswordCredential) credentials.getCredential()).getValue()))
-      {
-         setStatus(AuthenticationStatus.SUCCESS);
-         setUser(new SimpleUser("demo"));
-      }
-      else
-      {
-         setStatus(AuthenticationStatus.FAILURE);
-      }
-   }
+public class SimpleAuthenticator extends BaseAuthenticator implements Authenticator {
+    @Inject
+    Credentials credentials;
+
+    @Override
+    public void authenticate() {
+        if ("demo".equals(credentials.getUsername()) &&
+                credentials.getCredential() instanceof PasswordCredential &&
+                "demo".equals(((PasswordCredential) credentials.getCredential()).getValue())) {
+            setStatus(AuthenticationStatus.SUCCESS);
+            setUser(new SimpleUser("demo"));
+        } else {
+            setStatus(AuthenticationStatus.FAILURE);
+        }
+    }
 
 }

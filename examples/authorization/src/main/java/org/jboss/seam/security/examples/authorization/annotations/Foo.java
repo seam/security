@@ -10,14 +10,13 @@ import javax.enterprise.util.Nonbinding;
 import org.jboss.seam.security.annotations.SecurityBindingType;
 
 /**
- * 
  * @author Shane Bryzak
- *
  */
 @SecurityBindingType
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Foo {
-   String bar();
-   @Nonbinding String zzz() default "";
+    String bar();
+
+    @Nonbinding String zzz() default "";
 }

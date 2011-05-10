@@ -7,25 +7,19 @@ import javax.xml.bind.JAXBException;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @SuppressWarnings("restriction")
-public class JaxbContextProducer
-{
-   @Produces
-   @JaxbContext(Object.class)
-   public JAXBContext getContext(InjectionPoint ip)
-   {
-      JAXBContext jaxbContext;
-      try
-      {
-         Class<?>[] classes = ip.getAnnotated().getAnnotation(JaxbContext.class).value();
-         jaxbContext = JAXBContext.newInstance(classes);
-      }
-      catch (JAXBException e)
-      {
-         throw new RuntimeException(e);
-      }
-      return jaxbContext;
-   }
+public class JaxbContextProducer {
+    @Produces
+    @JaxbContext(Object.class)
+    public JAXBContext getContext(InjectionPoint ip) {
+        JAXBContext jaxbContext;
+        try {
+            Class<?>[] classes = ip.getAnnotated().getAnnotation(JaxbContext.class).value();
+            jaxbContext = JAXBContext.newInstance(classes);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+        return jaxbContext;
+    }
 }

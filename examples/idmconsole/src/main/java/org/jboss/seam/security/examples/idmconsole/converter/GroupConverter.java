@@ -9,19 +9,16 @@ import org.picketlink.idm.api.Group;
 import org.picketlink.idm.impl.api.model.SimpleGroup;
 
 @FacesConverter("groupConverter")
-public class GroupConverter implements Converter
-{
+public class GroupConverter implements Converter {
 
-   @Override
-   public Object getAsObject(FacesContext arg0, UIComponent arg1, String arg2)
-   {
-      return new SimpleGroup(arg2, "GROUP");
-   }
+    @Override
+    public Object getAsObject(FacesContext arg0, UIComponent arg1, String arg2) {
+        return new SimpleGroup(arg2, "GROUP");
+    }
 
-   @Override
-   public String getAsString(FacesContext arg0, UIComponent arg1, Object arg2)
-   {
-      return ((Group) arg2).getName();
-   }
+    @Override
+    public String getAsString(FacesContext arg0, UIComponent arg1, Object arg2) {
+        return ((Group) arg2).getName();
+    }
 
 }

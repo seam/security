@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-fragment version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
 
-   <servlet>
-      <servlet-name>SamlServlet</servlet-name>
-      <servlet-class>org.jboss.seam.security.external.saml.SamlServlet</servlet-class>
-   </servlet>
+    <servlet>
+        <servlet-name>SamlServlet</servlet-name>
+        <servlet-class>org.jboss.seam.security.external.saml.SamlServlet</servlet-class>
+    </servlet>
 
-   <servlet>
-      <servlet-name>OpenIdServlet</servlet-name>
-      <servlet-class>org.jboss.seam.security.external.openid.OpenIdServlet</servlet-class>
-   </servlet>
+    <servlet>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <servlet-class>org.jboss.seam.security.external.openid.OpenIdServlet</servlet-class>
+    </servlet>
 
-   <servlet>
-      <servlet-name>OpenIdUsersServlet</servlet-name>
-      <servlet-class>org.jboss.seam.security.external.openid.OpenIdUsersServlet</servlet-class>
-   </servlet>
+    <servlet>
+        <servlet-name>OpenIdUsersServlet</servlet-name>
+        <servlet-class>org.jboss.seam.security.external.openid.OpenIdUsersServlet</servlet-class>
+    </servlet>
 
-   <servlet-mapping>
-      <servlet-name>SamlServlet</servlet-name>
-      <url-pattern>/saml/*</url-pattern>
-   </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SamlServlet</servlet-name>
+        <url-pattern>/saml/*</url-pattern>
+    </servlet-mapping>
 
-   <servlet-mapping>
-      <servlet-name>OpenIdServlet</servlet-name>
-      <url-pattern>/openid/*</url-pattern>
-   </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenIdServlet</servlet-name>
+        <url-pattern>/openid/*</url-pattern>
+    </servlet-mapping>
 
-   <servlet-mapping>
-      <servlet-name>OpenIdUsersServlet</servlet-name>
-      <url-pattern>/users/*</url-pattern>
-   </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenIdUsersServlet</servlet-name>
+        <url-pattern>/users/*</url-pattern>
+    </servlet-mapping>
 
 </web-fragment>

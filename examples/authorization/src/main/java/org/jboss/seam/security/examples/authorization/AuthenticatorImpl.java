@@ -9,30 +9,26 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.UserImpl;
 
 /**
- * 
  * @author Shane Bryzak
- *
  */
-public class AuthenticatorImpl extends BaseAuthenticator implements Authenticator 
-{
-   @Inject Identity identity;
-   @Inject Credentials credentials;
-   
-   @Override
-   public void authenticate()
-   {
-      if ("demo".equals(credentials.getUsername()))
-      {
-         identity.addRole("admin", "USERS", "GROUP");
-      }      
-      
-      if ("user".equals(credentials.getUsername()))
-      {
-         identity.addGroup("USERS", "GROUP");
-      }
-      
-      // Let any user log in
-      setStatus(AuthenticationStatus.SUCCESS);
-      setUser(new UserImpl(credentials.getUsername()));
-   }
+public class AuthenticatorImpl extends BaseAuthenticator implements Authenticator {
+    @Inject
+    Identity identity;
+    @Inject
+    Credentials credentials;
+
+    @Override
+    public void authenticate() {
+        if ("demo".equals(credentials.getUsername())) {
+            identity.addRole("admin", "USERS", "GROUP");
+        }
+
+        if ("user".equals(credentials.getUsername())) {
+            identity.addGroup("USERS", "GROUP");
+        }
+
+        // Let any user log in
+        setStatus(AuthenticationStatus.SUCCESS);
+        setUser(new UserImpl(credentials.getUsername()));
+    }
 }

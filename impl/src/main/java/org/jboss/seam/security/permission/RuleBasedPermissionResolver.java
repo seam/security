@@ -25,263 +25,224 @@ import org.picketlink.idm.api.Role;
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
- * 
+ *
  * @author Shane Bryzak
  */
 @Requires("org.drools.KnowledgeBase")
 @SessionScoped
-public class RuleBasedPermissionResolver implements PermissionResolver, Serializable
-{
-   private static final long serialVersionUID = -7572627522601793024L;
-   
-   private StatefulKnowledgeSession securityContext;
-   
-   @Inject @Security KnowledgeBase securityRules;
-   
-   @Inject BeanManager manager;
-   @Inject Identity identity;
-   
-   @Inject
-   public void init()
-   {
-      if (getSecurityRules() != null)
-      {
-         setSecurityContext(getSecurityRules().newStatefulKnowledgeSession());
-         //getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
-      }
-   }
-   
-   /**
-    * Performs a permission check for the specified name and action
-    * 
-    * @param target Object The target of the permission check
-    * @param action String The action to be performed on the target
-    * @return boolean True if the user has the specified permission
-    */
-   public boolean hasPermission(Object resource, String permission)
-   {
-      StatefulKnowledgeSession securityContext = getSecurityContext();
-      
-      if (securityContext == null) return false;
-      
-      List<FactHandle> handles = new ArrayList<FactHandle>();
+public class RuleBasedPermissionResolver implements PermissionResolver, Serializable {
+    private static final long serialVersionUID = -7572627522601793024L;
 
-      PermissionCheck check;
-      
-      synchronized( securityContext )
-      {
-         if (!(resource instanceof String) && !(resource instanceof Class<?>))
-         {
-            handles.add( securityContext.insert(resource) );
-         }
-         else if (resource instanceof Class<?>)
-         {
-            // TODO fix
-            String componentName = null; // manager. Seam.getComponentName((Class) target);
-            resource = componentName != null ? componentName : ((Class<?>) resource).getName();
-         }
-         
-         check = new PermissionCheck(resource, permission);
-         
-         try
-         {
-            synchronizeContext();
-            
-            handles.add( securityContext.insert(check) );
-   
-            securityContext.fireAllRules();
-         }
-         finally
-         {
-            for (FactHandle handle : handles)
-            {
-               securityContext.retract(handle);
-            }
-         }
-      }
-      
-      return check.isGranted();
-   }
-   
-   public void filterSetByAction(Set<Object> targets, String action)
-   {
-      Iterator<?> iter = targets.iterator();
-      while (iter.hasNext())
-      {
-         Object target = iter.next();
-         if (hasPermission(target, action)) iter.remove();
-      }
-   }
-   
-   public boolean checkConditionalRole(String roleName, Object target, String action)
-   {
-      StatefulKnowledgeSession securityContext = getSecurityContext();
-      if (securityContext == null) return false;
-      
-      RoleCheck roleCheck = new RoleCheck(roleName);
-      
-      List<FactHandle> handles = new ArrayList<FactHandle>();
-      PermissionCheck check = new PermissionCheck(target, action);
-      
-      synchronized( securityContext )
-      {
-         if (!(target instanceof String) && !(target instanceof Class<?>))
-         {
-            handles.add( securityContext.insert(target) );
-         }
-         else if (target instanceof Class<?>)
-         {
-            // TODO fix
-            String componentName = null; //Seam.getComponentName((Class) target);
-            target = componentName != null ? componentName : ((Class<?>) target).getName();
-         }
-         
-         try
-         {
-            handles.add( securityContext.insert(check));
-            
-            // Check if there are any additional requirements
-            securityContext.fireAllRules();
-            /*
-            if (check.hasRequirements())
-            {
-               for (String requirement : check.getRequirements())
-               {
-                  // TODO fix
-                  Object value = null; // Contexts.lookupInStatefulContexts(requirement);
-                  if (value != null)
-                  {
-                     handles.add (securityContext.insert(value));
-                  }
-               }
-            }*/
-            
-            synchronizeContext();
+    private StatefulKnowledgeSession securityContext;
 
-            handles.add( securityContext.insert(roleCheck));
-            handles.add( securityContext.insert(check));
-            
-            securityContext.fireAllRules();
-         }
-         finally
-         {
-            for (FactHandle handle : handles)
-            {
-               securityContext.retract(handle);
+    @Inject
+    @Security
+    KnowledgeBase securityRules;
+
+    @Inject
+    BeanManager manager;
+    @Inject
+    Identity identity;
+
+    @Inject
+    public void init() {
+        if (getSecurityRules() != null) {
+            setSecurityContext(getSecurityRules().newStatefulKnowledgeSession());
+            //getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
+        }
+    }
+
+    /**
+     * Performs a permission check for the specified name and action
+     *
+     * @param target Object The target of the permission check
+     * @param action String The action to be performed on the target
+     * @return boolean True if the user has the specified permission
+     */
+    public boolean hasPermission(Object resource, String permission) {
+        StatefulKnowledgeSession securityContext = getSecurityContext();
+
+        if (securityContext == null) return false;
+
+        List<FactHandle> handles = new ArrayList<FactHandle>();
+
+        PermissionCheck check;
+
+        synchronized (securityContext) {
+            if (!(resource instanceof String) && !(resource instanceof Class<?>)) {
+                handles.add(securityContext.insert(resource));
+            } else if (resource instanceof Class<?>) {
+                // TODO fix
+                String componentName = null; // manager. Seam.getComponentName((Class) target);
+                resource = componentName != null ? componentName : ((Class<?>) resource).getName();
             }
-         }
-      }
-      
-      return roleCheck.isGranted();
-   }
-   
-   public void unAuthenticate(@Observes PostLoggedOutEvent event)
-   {
-      if (getSecurityContext() != null)
-      {
-         getSecurityContext().dispose();
-         setSecurityContext(null);
-      }
-      init();
-   }
-   
-   /**
-    *  Synchronises the state of the security context with that of the subject
-    */
-   private void synchronizeContext()
-   {
-      if (getSecurityContext() != null)
-      {         
-         getSecurityContext().insert(identity.getUser());
-         
-         for (Role role : identity.getRoles())
-         {
+
+            check = new PermissionCheck(resource, permission);
+
+            try {
+                synchronizeContext();
+
+                handles.add(securityContext.insert(check));
+
+                securityContext.fireAllRules();
+            } finally {
+                for (FactHandle handle : handles) {
+                    securityContext.retract(handle);
+                }
+            }
+        }
+
+        return check.isGranted();
+    }
+
+    public void filterSetByAction(Set<Object> targets, String action) {
+        Iterator<?> iter = targets.iterator();
+        while (iter.hasNext()) {
+            Object target = iter.next();
+            if (hasPermission(target, action)) iter.remove();
+        }
+    }
+
+    public boolean checkConditionalRole(String roleName, Object target, String action) {
+        StatefulKnowledgeSession securityContext = getSecurityContext();
+        if (securityContext == null) return false;
+
+        RoleCheck roleCheck = new RoleCheck(roleName);
+
+        List<FactHandle> handles = new ArrayList<FactHandle>();
+        PermissionCheck check = new PermissionCheck(target, action);
+
+        synchronized (securityContext) {
+            if (!(target instanceof String) && !(target instanceof Class<?>)) {
+                handles.add(securityContext.insert(target));
+            } else if (target instanceof Class<?>) {
+                // TODO fix
+                String componentName = null; //Seam.getComponentName((Class) target);
+                target = componentName != null ? componentName : ((Class<?>) target).getName();
+            }
+
+            try {
+                handles.add(securityContext.insert(check));
+
+                // Check if there are any additional requirements
+                securityContext.fireAllRules();
+                /*
+                if (check.hasRequirements())
+                {
+                   for (String requirement : check.getRequirements())
+                   {
+                      // TODO fix
+                      Object value = null; // Contexts.lookupInStatefulContexts(requirement);
+                      if (value != null)
+                      {
+                         handles.add (securityContext.insert(value));
+                      }
+                   }
+                }*/
+
+                synchronizeContext();
+
+                handles.add(securityContext.insert(roleCheck));
+                handles.add(securityContext.insert(check));
+
+                securityContext.fireAllRules();
+            } finally {
+                for (FactHandle handle : handles) {
+                    securityContext.retract(handle);
+                }
+            }
+        }
+
+        return roleCheck.isGranted();
+    }
+
+    public void unAuthenticate(@Observes PostLoggedOutEvent event) {
+        if (getSecurityContext() != null) {
+            getSecurityContext().dispose();
+            setSecurityContext(null);
+        }
+        init();
+    }
+
+    /**
+     * Synchronises the state of the security context with that of the subject
+     */
+    private void synchronizeContext() {
+        if (getSecurityContext() != null) {
+            getSecurityContext().insert(identity.getUser());
+
+            for (Role role : identity.getRoles()) {
+                Iterator<?> iter = getSecurityContext().getObjects(
+                        new ClassObjectFilter(Role.class)).iterator();
+
+                boolean found = false;
+                while (iter.hasNext()) {
+                    Role r = (Role) iter.next();
+                    if (r.equals(role)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    getSecurityContext().insert(role);
+                }
+            }
+
+            for (Group group : identity.getGroups()) {
+                Iterator<?> iter = getSecurityContext().getObjects(
+                        new ClassObjectFilter(Group.class)).iterator();
+
+                boolean found = false;
+                while (iter.hasNext()) {
+                    Group g = (Group) iter.next();
+                    if (g.equals(group)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    getSecurityContext().insert(group);
+                }
+            }
+
             Iterator<?> iter = getSecurityContext().getObjects(
-                  new ClassObjectFilter(Role.class)).iterator();
+                    new ClassObjectFilter(Role.class)).iterator();
+            while (iter.hasNext()) {
+                Role r = (Role) iter.next();
 
-            boolean found = false;
-            while (iter.hasNext())
-            {
-               Role r = (Role) iter.next();
-               if (r.equals(role))
-               {
-                  found = true;
-                  break;
-               }
+                if (!identity.hasRole(r.getRoleType().getName(),
+                        r.getGroup().getName(), r.getGroup().getGroupType())) {
+                    FactHandle fh = getSecurityContext().getFactHandle(r);
+                    getSecurityContext().retract(fh);
+                }
             }
-            
-            if (!found)
-            {
-               getSecurityContext().insert(role);
-            }
-         }
-         
-         for (Group group : identity.getGroups())
-         {
-            Iterator<?> iter = getSecurityContext().getObjects(
-                  new ClassObjectFilter(Group.class)).iterator();
+        }
+    }
 
-            boolean found = false;
-            while (iter.hasNext())
-            {
-               Group g = (Group) iter.next();
-               if (g.equals(group))
-               {
-                  found = true;
-                  break;
-               }
-            }
-            
-            if (!found)
-            {
-               getSecurityContext().insert(group);
-            }
-         }
-         
-         Iterator<?> iter = getSecurityContext().getObjects(
-               new ClassObjectFilter(Role.class)).iterator();
-         while (iter.hasNext())
-         {
-            Role r = (Role) iter.next();
-            
-            if (!identity.hasRole(r.getRoleType().getName(), 
-                  r.getGroup().getName(), r.getGroup().getGroupType()))
-            {
-               FactHandle fh = getSecurityContext().getFactHandle(r);
-               getSecurityContext().retract(fh);
-            }
-         }
-      }
-   }
-   
-   public StatefulKnowledgeSession getSecurityContext()
-   {
-      return securityContext;
-   }
-   
-   public void setSecurityContext(StatefulKnowledgeSession securityContext)
-   {
-      this.securityContext = securityContext;
-   }
-   
-   public KnowledgeBase getSecurityRules()
-   {
-      return securityRules;
-   }
+    public StatefulKnowledgeSession getSecurityContext() {
+        return securityContext;
+    }
 
-   public void setSecurityRules(KnowledgeBase securityRules)
-   {
-      this.securityRules = securityRules;
-   }
-   
-   /**
-    * Post-authentication event observer
-    */
-   public void setUserAccountInSecurityContext(@Observes PostAuthenticateEvent event)
-   {
-      if (getSecurityContext() != null)
-      {
-         getSecurityContext().insert(identity.getUser());
-      }
-   }
+    public void setSecurityContext(StatefulKnowledgeSession securityContext) {
+        this.securityContext = securityContext;
+    }
+
+    public KnowledgeBase getSecurityRules() {
+        return securityRules;
+    }
+
+    public void setSecurityRules(KnowledgeBase securityRules) {
+        this.securityRules = securityRules;
+    }
+
+    /**
+     * Post-authentication event observer
+     */
+    public void setUserAccountInSecurityContext(@Observes PostAuthenticateEvent event) {
+        if (getSecurityContext() != null) {
+            getSecurityContext().insert(identity.getUser());
+        }
+    }
 }

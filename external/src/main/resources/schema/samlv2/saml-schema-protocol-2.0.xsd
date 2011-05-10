@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
-    targetNamespace="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns="http://www.w3.org/2001/XMLSchema"
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
-    elementFormDefault="unqualified"
-    attributeFormDefault="unqualified"
-    blockDefault="substitution"
-    version="2.0">
+        targetNamespace="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified"
+        blockDefault="substitution"
+        version="2.0">
     <import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
-        schemaLocation="saml-schema-assertion-2.0.xsd"/>
+            schemaLocation="saml-schema-assertion-2.0.xsd"/>
     <import namespace="http://www.w3.org/2000/09/xmldsig#"
-        schemaLocation="xmldsig-core-schema.xsd"/>
+            schemaLocation="xmldsig-core-schema.xsd"/>
     <annotation>
         <documentation>
             Document identifier: saml-schema-protocol-2.0
             Location: http://docs.oasis-open.org/security/saml/v2.0/
             Revision history:
             V1.0 (November, 2002):
-              Initial Standard Schema.
+            Initial Standard Schema.
             V1.1 (September, 2003):
-              Updates within the same V1.0 namespace.
+            Updates within the same V1.0 namespace.
             V2.0 (March, 2005):
-              New protocol schema based in a SAML V2.0 namespace.
-     </documentation>
+            New protocol schema based in a SAML V2.0 namespace.
+        </documentation>
     </annotation>
     <complexType name="RequestAbstractType" abstract="true">
         <sequence>
@@ -36,7 +36,7 @@
         <attribute name="Version" type="string" use="required"/>
         <attribute name="IssueInstant" type="dateTime" use="required"/>
         <attribute name="Destination" type="anyURI" use="optional"/>
-    	<attribute name="Consent" type="anyURI" use="optional"/>
+        <attribute name="Consent" type="anyURI" use="optional"/>
     </complexType>
     <element name="Extensions" type="samlp:ExtensionsType"/>
     <complexType name="ExtensionsType">
@@ -45,18 +45,18 @@
         </sequence>
     </complexType>
     <complexType name="StatusResponseType">
-    	<sequence>
+        <sequence>
             <element ref="saml:Issuer" minOccurs="0"/>
             <element ref="ds:Signature" minOccurs="0"/>
             <element ref="samlp:Extensions" minOccurs="0"/>
             <element ref="samlp:Status"/>
-    	</sequence>
-    	<attribute name="ID" type="ID" use="required"/>
-    	<attribute name="InResponseTo" type="NCName" use="optional"/>
-    	<attribute name="Version" type="string" use="required"/>
-    	<attribute name="IssueInstant" type="dateTime" use="required"/>
-    	<attribute name="Destination" type="anyURI" use="optional"/>
-    	<attribute name="Consent" type="anyURI" use="optional"/>
+        </sequence>
+        <attribute name="ID" type="ID" use="required"/>
+        <attribute name="InResponseTo" type="NCName" use="optional"/>
+        <attribute name="Version" type="string" use="required"/>
+        <attribute name="IssueInstant" type="dateTime" use="required"/>
+        <attribute name="Destination" type="anyURI" use="optional"/>
+        <attribute name="Consent" type="anyURI" use="optional"/>
     </complexType>
     <element name="Status" type="samlp:StatusType"/>
     <complexType name="StatusType">
@@ -82,23 +82,23 @@
     </complexType>
     <element name="AssertionIDRequest" type="samlp:AssertionIDRequestType"/>
     <complexType name="AssertionIDRequestType">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:RequestAbstractType">
                 <sequence>
                     <element ref="saml:AssertionIDRef" maxOccurs="unbounded"/>
                 </sequence>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="SubjectQuery" type="samlp:SubjectQueryAbstractType"/>
     <complexType name="SubjectQueryAbstractType" abstract="true">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:RequestAbstractType">
                 <sequence>
                     <element ref="saml:Subject"/>
                 </sequence>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="AuthnQuery" type="samlp:AuthnQueryType"/>
     <complexType name="AuthnQueryType">
@@ -201,39 +201,39 @@
     <element name="GetComplete" type="anyURI"/>
     <element name="Response" type="samlp:ResponseType"/>
     <complexType name="ResponseType">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:StatusResponseType">
                 <choice minOccurs="0" maxOccurs="unbounded">
                     <element ref="saml:Assertion"/>
                     <element ref="saml:EncryptedAssertion"/>
                 </choice>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="ArtifactResolve" type="samlp:ArtifactResolveType"/>
     <complexType name="ArtifactResolveType">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:RequestAbstractType">
                 <sequence>
                     <element ref="samlp:Artifact"/>
                 </sequence>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="Artifact" type="string"/>
     <element name="ArtifactResponse" type="samlp:ArtifactResponseType"/>
     <complexType name="ArtifactResponseType">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:StatusResponseType">
                 <sequence>
                     <any namespace="##any" processContents="lax" minOccurs="0"/>
                 </sequence>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="ManageNameIDRequest" type="samlp:ManageNameIDRequestType"/>
     <complexType name="ManageNameIDRequestType">
-    	<complexContent>
+        <complexContent>
             <extension base="samlp:RequestAbstractType">
                 <sequence>
                     <choice>
@@ -247,7 +247,7 @@
                     </choice>
                 </sequence>
             </extension>
-    	</complexContent>
+        </complexContent>
     </complexType>
     <element name="NewID" type="string"/>
     <element name="NewEncryptedID" type="saml:EncryptedElementType"/>

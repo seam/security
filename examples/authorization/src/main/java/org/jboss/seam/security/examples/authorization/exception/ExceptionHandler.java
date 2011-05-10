@@ -1,7 +1,6 @@
 package org.jboss.seam.security.examples.authorization.exception;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 
@@ -12,19 +11,17 @@ import org.jboss.seam.security.AuthorizationException;
 
 /**
  * Handles user authorization exceptions
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
 @HandlesExceptions
-public class ExceptionHandler
-{
-   @Inject FacesContext facesContext;
-   
-   public void handleAuthorizationException(@Handles CaughtException<AuthorizationException> evt)
-   {
-      facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-            "You do not have the necessary permissions to perform that operation", ""));
-      evt.handled();      
-   }
+public class ExceptionHandler {
+    @Inject
+    FacesContext facesContext;
+
+    public void handleAuthorizationException(@Handles CaughtException<AuthorizationException> evt) {
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "You do not have the necessary permissions to perform that operation", ""));
+        evt.handled();
+    }
 }

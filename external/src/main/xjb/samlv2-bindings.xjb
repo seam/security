@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jaxb:bindings version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+               xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<jaxb:bindings
-		schemaLocation="../resources/schema/samlv2/saml-schema-assertion-2.0.xsd">
-		<jaxb:bindings node="/xs:schema">
-			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.assertion" />
-			</jaxb:schemaBindings>
-		</jaxb:bindings>
-	</jaxb:bindings>
+    <jaxb:bindings
+            schemaLocation="../resources/schema/samlv2/saml-schema-assertion-2.0.xsd">
+        <jaxb:bindings node="/xs:schema">
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.assertion"/>
+            </jaxb:schemaBindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
 
-	<jaxb:bindings
-		schemaLocation="../resources/schema/samlv2/saml-schema-protocol-2.0.xsd">
-		<jaxb:bindings node="/xs:schema">
-			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.protocol" />
-			</jaxb:schemaBindings>
-		</jaxb:bindings>
-	</jaxb:bindings>
+    <jaxb:bindings
+            schemaLocation="../resources/schema/samlv2/saml-schema-protocol-2.0.xsd">
+        <jaxb:bindings node="/xs:schema">
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.protocol"/>
+            </jaxb:schemaBindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
 
-	<jaxb:bindings
-		schemaLocation="../resources/schema/samlv2/saml-schema-metadata-2.0.xsd">
-		<jaxb:bindings node="/xs:schema">
-			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.metadata" />
-			</jaxb:schemaBindings>
-		</jaxb:bindings>
-	</jaxb:bindings>
+    <jaxb:bindings
+            schemaLocation="../resources/schema/samlv2/saml-schema-metadata-2.0.xsd">
+        <jaxb:bindings node="/xs:schema">
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.jboss.seam.security.external.jaxb.samlv2.metadata"/>
+            </jaxb:schemaBindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
 
-	<jaxb:bindings schemaLocation="../resources/schema/samlv2/xenc-schema.xsd">
-		<jaxb:bindings node="/xs:schema">
-			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.security.external.jaxb.xenc" />
-			</jaxb:schemaBindings>
-		</jaxb:bindings>
-	</jaxb:bindings>
+    <jaxb:bindings schemaLocation="../resources/schema/samlv2/xenc-schema.xsd">
+        <jaxb:bindings node="/xs:schema">
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.jboss.seam.security.external.jaxb.xenc"/>
+            </jaxb:schemaBindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
 
-	<jaxb:bindings schemaLocation="../resources/schema/samlv2/xmldsig-core-schema.xsd">
-		<jaxb:bindings node="/xs:schema">
-			<jaxb:schemaBindings>
-				<jaxb:package name="org.jboss.seam.security.external.jaxb.xmldsig" />
-			</jaxb:schemaBindings>
-		</jaxb:bindings>
-	</jaxb:bindings>
+    <jaxb:bindings schemaLocation="../resources/schema/samlv2/xmldsig-core-schema.xsd">
+        <jaxb:bindings node="/xs:schema">
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.jboss.seam.security.external.jaxb.xmldsig"/>
+            </jaxb:schemaBindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
 
 </jaxb:bindings>

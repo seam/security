@@ -17,86 +17,71 @@ import org.jboss.seam.servlet.event.Initialized;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @ApplicationScoped
-public class VirtualApplicationManager
-{
-   @Inject
-   private VirtualApplicationContextExtension virtualApplicationContextExtension;
+public class VirtualApplicationManager {
+    @Inject
+    private VirtualApplicationContextExtension virtualApplicationContextExtension;
 
-   @Inject
-   private Instance<VirtualApplicationBean> virtualApplication;
+    @Inject
+    private Instance<VirtualApplicationBean> virtualApplication;
 
-   @Inject
-   private BeanManager beanManager;
+    @Inject
+    private BeanManager beanManager;
 
-   private Set<String> hostNames = new HashSet<String>();
+    private Set<String> hostNames = new HashSet<String>();
 
-   protected void servletInitialized(@Observes @Initialized final ServletContext context)
-   {
-      getVirtualApplicationContext().initialize(context);
+    protected void servletInitialized(@Observes @Initialized final ServletContext context) {
+        getVirtualApplicationContext().initialize(context);
 
-      AfterVirtualApplicationManagerCreationEvent afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreationEvent();
-      beanManager.fireEvent(afterVirtualApplicationManagerCreation);
+        AfterVirtualApplicationManagerCreationEvent afterVirtualApplicationManagerCreation = new AfterVirtualApplicationManagerCreationEvent();
+        beanManager.fireEvent(afterVirtualApplicationManagerCreation);
 
-      for (String hostName : afterVirtualApplicationManagerCreation.getHostNames())
-      {
-         hostNames.add(hostName);
-         getVirtualApplicationContext().create(hostName);
-         virtualApplication.get().setHostName(hostName);
-         beanManager.fireEvent(new AfterVirtualApplicationCreation());
-         getVirtualApplicationContext().detach();
-      }
-   }
+        for (String hostName : afterVirtualApplicationManagerCreation.getHostNames()) {
+            hostNames.add(hostName);
+            getVirtualApplicationContext().create(hostName);
+            virtualApplication.get().setHostName(hostName);
+            beanManager.fireEvent(new AfterVirtualApplicationCreation());
+            getVirtualApplicationContext().detach();
+        }
+    }
 
-   protected void servletDestroyed(@Observes @Destroyed final ServletContext context)
-   {
-      for (String hostName : hostNames)
-      {
-         if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
-         {
+    protected void servletDestroyed(@Observes @Destroyed final ServletContext context) {
+        for (String hostName : hostNames) {
+            if (getVirtualApplicationContext().isExistingVirtualApplication(hostName)) {
+                attach(hostName);
+                getVirtualApplicationContext().destroy();
+            }
+        }
+    }
+
+    protected void requestInitialized(@Observes @Initialized final ServletRequest request) {
+        String hostName = request.getServerName();
+        if (getVirtualApplicationContext().isExistingVirtualApplication(hostName)) {
             attach(hostName);
-            getVirtualApplicationContext().destroy();
-         }
-      }
-   }
+        }
+    }
 
-   protected void requestInitialized(@Observes @Initialized final ServletRequest request)
-   {
-      String hostName = request.getServerName();
-      if (getVirtualApplicationContext().isExistingVirtualApplication(hostName))
-      {
-         attach(hostName);
-      }
-   }
+    protected void requestDestroyed(@Observes @Destroyed final ServletRequest request) {
+        if (getVirtualApplicationContext().isActive()) {
+            detach();
+        }
+    }
 
-   protected void requestDestroyed(@Observes @Destroyed final ServletRequest request)
-   {
-      if (getVirtualApplicationContext().isActive())
-      {
-         detach();
-      }
-   }
+    public void attach(String hostName) {
+        getVirtualApplicationContext().attach(hostName);
+        virtualApplication.get().setHostName(hostName);
+    }
 
-   public void attach(String hostName)
-   {
-      getVirtualApplicationContext().attach(hostName);
-      virtualApplication.get().setHostName(hostName);
-   }
+    public void detach() {
+        getVirtualApplicationContext().detach();
+    }
 
-   public void detach()
-   {
-      getVirtualApplicationContext().detach();
-   }
+    public Set<String> getHostNames() {
+        return hostNames;
+    }
 
-   public Set<String> getHostNames()
-   {
-      return hostNames;
-   }
-
-   private VirtualApplicationContext getVirtualApplicationContext()
-   {
-      return virtualApplicationContextExtension.getVirtualApplicationContext();
-   }
+    private VirtualApplicationContext getVirtualApplicationContext() {
+        return virtualApplicationContextExtension.getVirtualApplicationContext();
+    }
 }

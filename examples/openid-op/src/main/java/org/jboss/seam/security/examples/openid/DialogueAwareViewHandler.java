@@ -12,41 +12,33 @@ import org.jboss.seam.security.external.dialogues.DialogueBeanProvider;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class DialogueAwareViewHandler extends ViewHandlerWrapper
-{
-   private ViewHandler delegate;
+public class DialogueAwareViewHandler extends ViewHandlerWrapper {
+    private ViewHandler delegate;
 
-   public DialogueAwareViewHandler(ViewHandler delegate)
-   {
-      this.delegate = delegate;
-   }
+    public DialogueAwareViewHandler(ViewHandler delegate) {
+        this.delegate = delegate;
+    }
 
-   @Override
-   public String getActionURL(FacesContext facesContext, String viewId)
-   {
-      String actionUrl = super.getActionURL(facesContext, viewId);
-      ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
-      if (DialogueBeanProvider.dialogueManager(servletContext).isAttached())
-      {
-         String dialogueId = DialogueBeanProvider.dialogue(servletContext).getId();
-         ResponseHolder responseHolder = new ResponseHolderImpl((HttpServletResponse) facesContext.getExternalContext().getResponse(), dialogueId);
-         return responseHolder.addDialogueIdToUrl(actionUrl);
-      }
-      else
-      {
-         return actionUrl;
-      }
-   }
+    @Override
+    public String getActionURL(FacesContext facesContext, String viewId) {
+        String actionUrl = super.getActionURL(facesContext, viewId);
+        ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+        if (DialogueBeanProvider.dialogueManager(servletContext).isAttached()) {
+            String dialogueId = DialogueBeanProvider.dialogue(servletContext).getId();
+            ResponseHolder responseHolder = new ResponseHolderImpl((HttpServletResponse) facesContext.getExternalContext().getResponse(), dialogueId);
+            return responseHolder.addDialogueIdToUrl(actionUrl);
+        } else {
+            return actionUrl;
+        }
+    }
 
-   /**
-    * @see {@link ViewHandlerWrapper#getWrapped()}
-    */
-   @Override
-   public ViewHandler getWrapped()
-   {
-      return delegate;
-   }
+    /**
+     * @see {@link ViewHandlerWrapper#getWrapped()}
+     */
+    @Override
+    public ViewHandler getWrapped() {
+        return delegate;
+    }
 
 }

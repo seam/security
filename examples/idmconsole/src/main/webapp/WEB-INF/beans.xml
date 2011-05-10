@@ -4,26 +4,26 @@
    The schema definition is provided for your convenience.
 -->
 <beans xmlns="http://java.sun.com/xml/ns/javaee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"   
-   xmlns:security="urn:java:org.jboss.seam.security.permission"
-   xmlns:s="urn:java:ee"    
-   xsi:schemaLocation="
-      http://java.sun.com/xml/ns/javaee 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:plidm="urn:java:org.jboss.seam.security.management.picketlink"
+       xmlns:security="urn:java:org.jboss.seam.security.permission"
+       xmlns:s="urn:java:ee"
+       xsi:schemaLocation="
+      http://java.sun.com/xml/ns/javaee
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
-      
- 
-   <!--security:JpaPermissionStore>
-      <s:replaces/>      
-      <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
-   </security:JpaPermissionStore>  
-  
-   <plidm:JpaIdentityStoreConfiguration>
-      <s:replaces/>
-      <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
-      <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
-      <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
-      <plidm:roleTypeClass>org.jboss.seam.security.examples.idmconsole.model.IdentityRoleName</plidm:roleTypeClass>
-   </plidm:JpaIdentityStoreConfiguration-->
-         
+
+
+    <!--security:JpaPermissionStore>
+       <s:replaces/>
+       <security:identityPermissionClass>org.jboss.seam.security.examples.idmconsole.model.IdentityPermission</security:identityPermissionClass>
+    </security:JpaPermissionStore>
+
+    <plidm:JpaIdentityStoreConfiguration>
+       <s:replaces/>
+       <plidm:identityClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObject</plidm:identityClass>
+       <plidm:credentialClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectCredential</plidm:credentialClass>
+       <plidm:relationshipClass>org.jboss.seam.security.examples.idmconsole.model.IdentityObjectRelationship</plidm:relationshipClass>
+       <plidm:roleTypeClass>org.jboss.seam.security.examples.idmconsole.model.IdentityRoleName</plidm:roleTypeClass>
+    </plidm:JpaIdentityStoreConfiguration-->
+
 </beans>

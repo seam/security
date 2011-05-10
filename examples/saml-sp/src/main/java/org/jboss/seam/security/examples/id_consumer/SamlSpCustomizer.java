@@ -6,14 +6,12 @@ import org.jboss.seam.security.external.saml.api.SamlServiceProviderConfiguratio
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
 
-public class SamlSpCustomizer
-{
-   public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication)
-   {
-      sp.setEntityId("http://" + virtualApplication.getHostName());
-      sp.setProtocol("http");
-      sp.setPort(8080);
-      sp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
-   }
+public class SamlSpCustomizer {
+    public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication) {
+        sp.setEntityId("http://" + virtualApplication.getHostName());
+        sp.setProtocol("http");
+        sp.setPort(8080);
+        sp.setSigningKey("classpath:/test_keystore.jks", "store456", "servercert", "pass456");
+    }
 
 }

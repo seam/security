@@ -5,21 +5,17 @@ import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @DialogueScoped
-public class SamlSpLogoutDialogue
-{
-   private SamlSpSession session;
+public class SamlSpLogoutDialogue {
+    private SamlSpSession session;
 
-   public SamlSpSession getSession()
-   {
-      return session;
-   }
+    public SamlSpSession getSession() {
+        return session;
+    }
 
-   public void setSession(SamlSpSession session)
-   {
-      this.session = session;
-   }
+    public void setSession(SamlSpSession session) {
+        this.session = session;
+    }
 
 }

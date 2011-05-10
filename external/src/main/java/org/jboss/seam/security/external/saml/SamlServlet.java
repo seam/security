@@ -17,73 +17,62 @@ import org.jboss.seam.security.external.ResponseHandler;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class SamlServlet extends HttpServlet
-{
-   private static final long serialVersionUID = -6125510783395424719L;
+public class SamlServlet extends HttpServlet {
+    private static final long serialVersionUID = -6125510783395424719L;
 
-   // TODO: use injection as soon as Jira issue SOLDER-63 has been solved
-   // @Inject
-   private Logger log = Logger.getLogger(SamlServlet.class);
+    // TODO: use injection as soon as Jira issue SOLDER-63 has been solved
+    // @Inject
+    private Logger log = Logger.getLogger(SamlServlet.class);
 
-   @Inject
-   private SamlMessageReceiver samlMessageReceiver;
+    @Inject
+    private SamlMessageReceiver samlMessageReceiver;
 
-   @Inject
-   private ResponseHandler responseHandler;
+    @Inject
+    private ResponseHandler responseHandler;
 
-   @Inject
-   private Instance<SamlEntityBean> samlEntityBean;
+    @Inject
+    private Instance<SamlEntityBean> samlEntityBean;
 
-   @Override
-   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-   {
-      doGetOrPost(request, response);
-   }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGetOrPost(request, response);
+    }
 
-   @Override
-   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-   {
-      doGetOrPost(request, response);
-   }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGetOrPost(request, response);
+    }
 
-   private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) throws IOException
-   {
-      try
-      {
-         handleMessage(request, response);
-      }
-      catch (InvalidRequestException e)
-      {
-         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getDescription());
-         log.infof("Bad request received from %s: %s", request.getRemoteHost(), e.getDescription());
-      }
-   }
+    private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            handleMessage(request, response);
+        } catch (InvalidRequestException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getDescription());
+            log.infof("Bad request received from %s: %s", request.getRemoteHost(), e.getDescription());
+        }
+    }
 
-   private void handleMessage(HttpServletRequest httpRequest, HttpServletResponse response) throws InvalidRequestException
-   {
-      Matcher matcher = Pattern.compile("/(IDP|SP)/(.*?)$").matcher(httpRequest.getRequestURI());
-      boolean found = matcher.find();
-      if (!found)
-      {
-         responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.", response);
-      }
-      SamlIdpOrSp idpOrSp = SamlIdpOrSp.valueOf(matcher.group(1));
-      SamlServiceType service = SamlServiceType.getByName(matcher.group(2));
+    private void handleMessage(HttpServletRequest httpRequest, HttpServletResponse response) throws InvalidRequestException {
+        Matcher matcher = Pattern.compile("/(IDP|SP)/(.*?)$").matcher(httpRequest.getRequestURI());
+        boolean found = matcher.find();
+        if (!found) {
+            responseHandler.sendError(HttpServletResponse.SC_NOT_FOUND, "No service endpoint exists for this URL.", response);
+        }
+        SamlIdpOrSp idpOrSp = SamlIdpOrSp.valueOf(matcher.group(1));
+        SamlServiceType service = SamlServiceType.getByName(matcher.group(2));
 
-      switch (service)
-      {
-      case SAML_SINGLE_LOGOUT_SERVICE:
-      case SAML_SINGLE_SIGN_ON_SERVICE:
-      case SAML_ASSERTION_CONSUMER_SERVICE:
-         samlMessageReceiver.handleIncomingSamlMessage(service, httpRequest, response, idpOrSp);
-         break;
-      case SAML_META_DATA_SERVICE:
-         samlEntityBean.get().writeMetaData(responseHandler.getWriter("application/xml", response));
-         break;
-      default:
-         throw new RuntimeException("Unsupported service " + service);
-      }
-   }
+        switch (service) {
+            case SAML_SINGLE_LOGOUT_SERVICE:
+            case SAML_SINGLE_SIGN_ON_SERVICE:
+            case SAML_ASSERTION_CONSUMER_SERVICE:
+                samlMessageReceiver.handleIncomingSamlMessage(service, httpRequest, response, idpOrSp);
+                break;
+            case SAML_META_DATA_SERVICE:
+                samlEntityBean.get().writeMetaData(responseHandler.getWriter("application/xml", response));
+                break;
+            default:
+                throw new RuntimeException("Unsupported service " + service);
+        }
+    }
 }

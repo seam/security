@@ -8,15 +8,12 @@ import javax.persistence.PersistenceUnit;
 import org.jboss.seam.solder.core.ExtensionManaged;
 
 /**
- * 
  * @author Shane Bryzak
- *
  */
-public class EntityManagerProducer
-{
-   @Produces
-   @ExtensionManaged
-   @ConversationScoped
-   @PersistenceUnit
-   EntityManagerFactory emf;
+public class EntityManagerProducer {
+    @Produces
+    @ExtensionManaged
+    @ConversationScoped
+    @PersistenceUnit
+    EntityManagerFactory emf;
 }

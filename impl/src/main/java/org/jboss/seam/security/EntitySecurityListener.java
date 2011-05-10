@@ -13,34 +13,33 @@ import javax.persistence.PreUpdate;
 
 /**
  * Facilitates security checks for entity beans.
- * 
+ *
  * @author Shane Bryzak
  */
-public class EntitySecurityListener
-{
-   /*
-   @PostLoad
-   public void postLoad(Object entity)
-   {
-      EntityPermissionChecker.instance().checkEntityPermission(entity, READ);
-   }
-   
-   @PrePersist
-   public void prePersist(Object entity)
-   { 
-      EntityPermissionChecker.instance().checkEntityPermission(entity, INSERT);
-   }
-   
-   @PreUpdate
-   public void preUpdate(Object entity)
-   {
-      EntityPermissionChecker.instance().checkEntityPermission(entity, UPDATE);
-   }
-   
-   @PreRemove
-   public void preRemove(Object entity)
-   {
-      EntityPermissionChecker.instance().checkEntityPermission(entity, DELETE);
-   }
-   */
+public class EntitySecurityListener {
+    /*
+    @PostLoad
+    public void postLoad(Object entity)
+    {
+       EntityPermissionChecker.instance().checkEntityPermission(entity, READ);
+    }
+
+    @PrePersist
+    public void prePersist(Object entity)
+    {
+       EntityPermissionChecker.instance().checkEntityPermission(entity, INSERT);
+    }
+
+    @PreUpdate
+    public void preUpdate(Object entity)
+    {
+       EntityPermissionChecker.instance().checkEntityPermission(entity, UPDATE);
+    }
+
+    @PreRemove
+    public void preRemove(Object entity)
+    {
+       EntityPermissionChecker.instance().checkEntityPermission(entity, DELETE);
+    }
+    */
 }

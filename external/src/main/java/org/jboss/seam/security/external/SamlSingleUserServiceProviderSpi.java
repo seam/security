@@ -1,6 +1,5 @@
 package org.jboss.seam.security.external;
 
-public class SamlSingleUserServiceProviderSpi
-{
+public class SamlSingleUserServiceProviderSpi {
 
 }

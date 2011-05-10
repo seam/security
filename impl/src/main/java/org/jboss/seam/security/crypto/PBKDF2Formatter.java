@@ -3,7 +3,7 @@ package org.jboss.seam.security.crypto;
 /**
  * Copied from Matthias Gartner's PKCS#5 implementation - see
  * http://rtner.de/software/PBKDF2.html
- * 
+ * <p/>
  * <p>
  * A free Java implementation of Password Based Key Derivation Function 2 as
  * defined by RFC 2898. Copyright (c) 2007 Matthias G&auml;rtner
@@ -29,17 +29,15 @@ package org.jboss.seam.security.crypto;
  * For Details, see <a
  * href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</a>.
  * </p>
- * 
+ *
  * @author Matthias G&auml;rtner
  * @version 1.0
  */
-public interface PBKDF2Formatter
-{
+public interface PBKDF2Formatter {
     /**
      * Convert parameters to String.
-     * 
-     * @param p
-     *            Parameters object to output.
+     *
+     * @param p Parameters object to output.
      * @return String representation
      */
     public abstract String toString(PBKDF2Parameters p);
@@ -47,9 +45,8 @@ public interface PBKDF2Formatter
     /**
      * Convert String to parameters. Depending on actual implementation, it may
      * be required to set further fields externally.
-     * 
-     * @param s
-     *            String representation of parameters to decode.
+     *
+     * @param s String representation of parameters to decode.
      * @return <code>false</code> syntax OK, <code>true</code> some syntax
      *         issue.
      */

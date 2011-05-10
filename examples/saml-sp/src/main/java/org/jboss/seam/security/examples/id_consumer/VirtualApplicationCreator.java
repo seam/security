@@ -6,13 +6,10 @@ import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualAppl
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class VirtualApplicationCreator
-{
-   public void virtualApplicationManagerCreated(@Observes final AfterVirtualApplicationManagerCreation event)
-   {
-      event.addVirtualApplication("www.saml-sp1.com");
-      event.addVirtualApplication("www.saml-sp2.com");
-   }
+public class VirtualApplicationCreator {
+    public void virtualApplicationManagerCreated(@Observes final AfterVirtualApplicationManagerCreation event) {
+        event.addVirtualApplication("www.saml-sp1.com");
+        event.addVirtualApplication("www.saml-sp2.com");
+    }
 }

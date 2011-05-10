@@ -30,173 +30,148 @@ import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @Typed(SamlSpBean.class)
 @SuppressWarnings("restriction")
-public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi
-{
-   private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();
+public class SamlSpBean extends SamlEntityBean implements SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi {
+    private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();
 
-   @Inject
-   private SamlSpSingleSignOnService samlSpSingleSignOnService;
+    @Inject
+    private SamlSpSingleSignOnService samlSpSingleSignOnService;
 
-   @Inject
-   private SamlSpSingleLogoutService samlSpSingleLogoutService;
+    @Inject
+    private SamlSpSingleLogoutService samlSpSingleLogoutService;
 
-   @Inject
-   private SamlSpSessions samlSpSessions;
+    @Inject
+    private SamlSpSessions samlSpSessions;
 
-   private boolean authnRequestsSigned = false;
+    private boolean authnRequestsSigned = false;
 
-   private boolean wantAssertionsSigned = false;
+    private boolean wantAssertionsSigned = false;
 
-   public SamlExternalIdentityProvider addExternalIdentityProvider(String entityId, IDPSSODescriptorType idpSsoDescriptor)
-   {
-      SamlExternalIdentityProvider samlIdentityProvider = new SamlExternalIdentityProvider(entityId, idpSsoDescriptor);
-      identityProviders.add(samlIdentityProvider);
-      return samlIdentityProvider;
-   }
+    public SamlExternalIdentityProvider addExternalIdentityProvider(String entityId, IDPSSODescriptorType idpSsoDescriptor) {
+        SamlExternalIdentityProvider samlIdentityProvider = new SamlExternalIdentityProvider(entityId, idpSsoDescriptor);
+        identityProviders.add(samlIdentityProvider);
+        return samlIdentityProvider;
+    }
 
-   public SamlExternalIdentityProvider addExternalSamlEntity(Reader reader)
-   {
-      EntityDescriptorType entityDescriptor = readEntityDescriptor(reader);
-      String entityId = entityDescriptor.getEntityID();
-      IDPSSODescriptorType IDPSSODescriptor = (IDPSSODescriptorType) entityDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor().get(0);
-      return addExternalIdentityProvider(entityId, IDPSSODescriptor);
-   }
+    public SamlExternalIdentityProvider addExternalSamlEntity(Reader reader) {
+        EntityDescriptorType entityDescriptor = readEntityDescriptor(reader);
+        String entityId = entityDescriptor.getEntityID();
+        IDPSSODescriptorType IDPSSODescriptor = (IDPSSODescriptorType) entityDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor().get(0);
+        return addExternalIdentityProvider(entityId, IDPSSODescriptor);
+    }
 
-   @Override
-   public List<SamlExternalEntity> getExternalSamlEntities()
-   {
-      List<SamlExternalEntity> samlEntities = new LinkedList<SamlExternalEntity>();
-      for (SamlExternalIdentityProvider idp : identityProviders)
-      {
-         samlEntities.add(idp);
-      }
-      return samlEntities;
-   }
+    @Override
+    public List<SamlExternalEntity> getExternalSamlEntities() {
+        List<SamlExternalEntity> samlEntities = new LinkedList<SamlExternalEntity>();
+        for (SamlExternalIdentityProvider idp : identityProviders) {
+            samlEntities.add(idp);
+        }
+        return samlEntities;
+    }
 
-   public List<SamlExternalIdentityProvider> getIdentityProviders()
-   {
-      return identityProviders;
-   }
+    public List<SamlExternalIdentityProvider> getIdentityProviders() {
+        return identityProviders;
+    }
 
-   public boolean isAuthnRequestsSigned()
-   {
-      return authnRequestsSigned;
-   }
+    public boolean isAuthnRequestsSigned() {
+        return authnRequestsSigned;
+    }
 
-   public void setAuthnRequestsSigned(boolean authnRequestsSigned)
-   {
-      this.authnRequestsSigned = authnRequestsSigned;
-   }
+    public void setAuthnRequestsSigned(boolean authnRequestsSigned) {
+        this.authnRequestsSigned = authnRequestsSigned;
+    }
 
-   public boolean isWantAssertionsSigned()
-   {
-      return wantAssertionsSigned;
-   }
+    public boolean isWantAssertionsSigned() {
+        return wantAssertionsSigned;
+    }
 
-   public void setWantAssertionsSigned(boolean wantAssertionsSigned)
-   {
-      this.wantAssertionsSigned = wantAssertionsSigned;
-   }
+    public void setWantAssertionsSigned(boolean wantAssertionsSigned) {
+        this.wantAssertionsSigned = wantAssertionsSigned;
+    }
 
-   public SamlExternalIdentityProvider getExternalSamlEntityByEntityId(String entityId)
-   {
-      for (SamlExternalEntity identityProvider : identityProviders)
-      {
-         SamlExternalIdentityProvider samlIdentityProvider = (SamlExternalIdentityProvider) identityProvider;
-         if (samlIdentityProvider.getEntityId().equals(entityId))
-         {
-            return samlIdentityProvider;
-         }
-      }
-      return null;
-   }
+    public SamlExternalIdentityProvider getExternalSamlEntityByEntityId(String entityId) {
+        for (SamlExternalEntity identityProvider : identityProviders) {
+            SamlExternalIdentityProvider samlIdentityProvider = (SamlExternalIdentityProvider) identityProvider;
+            if (samlIdentityProvider.getEntityId().equals(entityId)) {
+                return samlIdentityProvider;
+            }
+        }
+        return null;
+    }
 
-   public void writeMetaData(Writer writer)
-   {
-      try
-      {
-         ObjectFactory metaDataFactory = new ObjectFactory();
+    public void writeMetaData(Writer writer) {
+        try {
+            ObjectFactory metaDataFactory = new ObjectFactory();
 
-         IndexedEndpointType acsRedirectEndpoint = metaDataFactory.createIndexedEndpointType();
-         acsRedirectEndpoint.setBinding(SamlConstants.HTTP_REDIRECT_BINDING);
-         acsRedirectEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_ASSERTION_CONSUMER_SERVICE));
+            IndexedEndpointType acsRedirectEndpoint = metaDataFactory.createIndexedEndpointType();
+            acsRedirectEndpoint.setBinding(SamlConstants.HTTP_REDIRECT_BINDING);
+            acsRedirectEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_ASSERTION_CONSUMER_SERVICE));
 
-         IndexedEndpointType acsPostEndpoint = metaDataFactory.createIndexedEndpointType();
-         acsPostEndpoint.setBinding(SamlConstants.HTTP_POST_BINDING);
-         acsPostEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_ASSERTION_CONSUMER_SERVICE));
+            IndexedEndpointType acsPostEndpoint = metaDataFactory.createIndexedEndpointType();
+            acsPostEndpoint.setBinding(SamlConstants.HTTP_POST_BINDING);
+            acsPostEndpoint.setLocation(getServiceURL(SamlServiceType.SAML_ASSERTION_CONSUMER_SERVICE));
 
-         SPSSODescriptorType spSsoDescriptor = metaDataFactory.createSPSSODescriptorType();
+            SPSSODescriptorType spSsoDescriptor = metaDataFactory.createSPSSODescriptorType();
 
-         spSsoDescriptor.getAssertionConsumerService().add(acsRedirectEndpoint);
-         spSsoDescriptor.getAssertionConsumerService().add(acsPostEndpoint);
-         addSloEndpointsToMetaData(spSsoDescriptor);
+            spSsoDescriptor.getAssertionConsumerService().add(acsRedirectEndpoint);
+            spSsoDescriptor.getAssertionConsumerService().add(acsPostEndpoint);
+            addSloEndpointsToMetaData(spSsoDescriptor);
 
-         spSsoDescriptor.setAuthnRequestsSigned(isAuthnRequestsSigned());
-         spSsoDescriptor.setWantAssertionsSigned(isWantAssertionsSigned());
+            spSsoDescriptor.setAuthnRequestsSigned(isAuthnRequestsSigned());
+            spSsoDescriptor.setWantAssertionsSigned(isWantAssertionsSigned());
 
-         spSsoDescriptor.getProtocolSupportEnumeration().add(SamlConstants.PROTOCOL_NSURI);
+            spSsoDescriptor.getProtocolSupportEnumeration().add(SamlConstants.PROTOCOL_NSURI);
 
-         addNameIDFormatsToMetaData(spSsoDescriptor);
+            addNameIDFormatsToMetaData(spSsoDescriptor);
 
-         if (getSigningKey() != null)
-         {
-            addKeyDescriptorToMetaData(spSsoDescriptor);
-         }
+            if (getSigningKey() != null) {
+                addKeyDescriptorToMetaData(spSsoDescriptor);
+            }
 
-         EntityDescriptorType entityDescriptor = metaDataFactory.createEntityDescriptorType();
-         entityDescriptor.setEntityID(getEntityId());
-         entityDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor().add(spSsoDescriptor);
+            EntityDescriptorType entityDescriptor = metaDataFactory.createEntityDescriptorType();
+            entityDescriptor.setEntityID(getEntityId());
+            entityDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor().add(spSsoDescriptor);
 
-         Marshaller marshaller = metaDataJaxbContext.createMarshaller();
-         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-         marshaller.marshal(metaDataFactory.createEntityDescriptor(entityDescriptor), writer);
-      }
-      catch (JAXBException e)
-      {
-         throw new RuntimeException(e);
-      }
-   }
+            Marshaller marshaller = metaDataJaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(metaDataFactory.createEntityDescriptor(entityDescriptor), writer);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-   @Dialogued(join = true)
-   public void login(String idpEntityId, HttpServletResponse response)
-   {
-      SamlExternalIdentityProvider idp = getExternalSamlEntityByEntityId(idpEntityId);
-      if (idp == null)
-      {
-         throw new RuntimeException("Identity provider " + idpEntityId + " not found");
-      }
+    @Dialogued(join = true)
+    public void login(String idpEntityId, HttpServletResponse response) {
+        SamlExternalIdentityProvider idp = getExternalSamlEntityByEntityId(idpEntityId);
+        if (idp == null) {
+            throw new RuntimeException("Identity provider " + idpEntityId + " not found");
+        }
 
-      samlSpSingleSignOnService.sendAuthenticationRequestToIDP(idp, response);
-   }
+        samlSpSingleSignOnService.sendAuthenticationRequestToIDP(idp, response);
+    }
 
-   @Dialogued(join = true)
-   public void localLogout(SamlSpSession session)
-   {
-      samlSpSessions.removeSession((SamlSpSessionImpl) session);
-   }
+    @Dialogued(join = true)
+    public void localLogout(SamlSpSession session) {
+        samlSpSessions.removeSession((SamlSpSessionImpl) session);
+    }
 
-   @Dialogued(join = true)
-   public void globalLogout(SamlSpSession session, HttpServletResponse response)
-   {
-      localLogout(session);
-      samlSpSingleLogoutService.sendSingleLogoutRequestToIDP((SamlSpSessionImpl) session, response);
-   }
+    @Dialogued(join = true)
+    public void globalLogout(SamlSpSession session, HttpServletResponse response) {
+        localLogout(session);
+        samlSpSingleLogoutService.sendSingleLogoutRequestToIDP((SamlSpSessionImpl) session, response);
+    }
 
-   public Set<SamlSpSession> getSessions()
-   {
-      Set<SamlSpSession> sessions = new HashSet<SamlSpSession>();
-      sessions.addAll(samlSpSessions.getSessions());
-      return sessions;
-   }
+    public Set<SamlSpSession> getSessions() {
+        Set<SamlSpSession> sessions = new HashSet<SamlSpSession>();
+        sessions.addAll(samlSpSessions.getSessions());
+        return sessions;
+    }
 
-   @Override
-   public SamlIdpOrSp getIdpOrSp()
-   {
-      return SamlIdpOrSp.SP;
-   }
+    @Override
+    public SamlIdpOrSp getIdpOrSp() {
+        return SamlIdpOrSp.SP;
+    }
 }

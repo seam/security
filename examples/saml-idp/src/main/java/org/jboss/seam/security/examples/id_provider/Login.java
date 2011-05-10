@@ -9,68 +9,55 @@ import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
 
 @Model
-public class Login
-{
-   @Inject
-   private SamlIdentityProviderApi samlIdentityProviderApi;
+public class Login {
+    @Inject
+    private SamlIdentityProviderApi samlIdentityProviderApi;
 
-   private String userName;
+    private String userName;
 
-   private String dialogueId;
+    private String dialogueId;
 
-   @Inject
-   private DialogueManager dialogueManager;
+    @Inject
+    private DialogueManager dialogueManager;
 
-   @Inject
-   private Identity identity;
+    @Inject
+    private Identity identity;
 
-   public String getUserName()
-   {
-      return userName;
-   }
+    public String getUserName() {
+        return userName;
+    }
 
-   public void setUserName(String userName)
-   {
-      this.userName = userName;
-   }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-   public String getDialogueId()
-   {
-      return dialogueId;
-   }
+    public String getDialogueId() {
+        return dialogueId;
+    }
 
-   public void setDialogueId(String dialogueId)
-   {
-      this.dialogueId = dialogueId;
-   }
+    public void setDialogueId(String dialogueId) {
+        this.dialogueId = dialogueId;
+    }
 
-   public String login()
-   {
-      identity.localLogin(userName);
-      if (dialogueId != null)
-      {
-         dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationSucceeded((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
-         dialogueManager.detachDialogue();
-         return "SAML_LOGIN";
-      }
-      else
-      {
-         return "LOCAL_LOGIN";
-      }
-   }
+    public String login() {
+        identity.localLogin(userName);
+        if (dialogueId != null) {
+            dialogueManager.attachDialogue(dialogueId);
+            samlIdentityProviderApi.authenticationSucceeded((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+            dialogueManager.detachDialogue();
+            return "SAML_LOGIN";
+        } else {
+            return "LOCAL_LOGIN";
+        }
+    }
 
-   public void cancel()
-   {
-      if (dialogueId != null)
-      {
-         dialogueManager.attachDialogue(dialogueId);
-         samlIdentityProviderApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
-         dialogueManager.detachDialogue();
-      }
-      else
-      {
-         throw new IllegalStateException("cancel method can only be called during a SAML login");
-      }
-   }
+    public void cancel() {
+        if (dialogueId != null) {
+            dialogueManager.attachDialogue(dialogueId);
+            samlIdentityProviderApi.authenticationFailed((HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+            dialogueManager.detachDialogue();
+        } else {
+            throw new IllegalStateException("cancel method can only be called during a SAML login");
+        }
+    }
 }

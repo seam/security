@@ -7,29 +7,34 @@ import org.jboss.seam.security.examples.authorization.annotations.Foo;
 import org.jboss.seam.security.examples.authorization.annotations.User;
 
 /**
- * 
  * @author Shane Bryzak
- *
  */
-public class Restrictions
-{
-   public @Secures @Admin boolean isAdmin(Identity identity)
-   {
-      return identity.hasRole("admin", "USERS", "GROUP");
-   }
-   
-   public @Secures @Foo(bar = "abc") boolean isFooAbc()
-   {
-      return true;
-   }
-   
-   public @Secures @Foo(bar = "def") boolean isFooDef()
-   {
-      return false;
-   }
-   
-   public @Secures @User boolean isUser(Identity identity)
-   {
-      return identity.inGroup("USERS", "GROUP");
-   }
+public class Restrictions {
+    public
+    @Secures
+    @Admin
+    boolean isAdmin(Identity identity) {
+        return identity.hasRole("admin", "USERS", "GROUP");
+    }
+
+    public
+    @Secures
+    @Foo(bar = "abc")
+    boolean isFooAbc() {
+        return true;
+    }
+
+    public
+    @Secures
+    @Foo(bar = "def")
+    boolean isFooDef() {
+        return false;
+    }
+
+    public
+    @Secures
+    @User
+    boolean isUser(Identity identity) {
+        return identity.inGroup("USERS", "GROUP");
+    }
 }

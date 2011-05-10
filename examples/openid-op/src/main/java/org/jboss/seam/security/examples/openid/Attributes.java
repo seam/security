@@ -18,42 +18,35 @@ import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 @Model
 @DialogueScoped
-public class Attributes implements Serializable
-{
-   private static final long serialVersionUID = -6945192710223411921L;
+public class Attributes implements Serializable {
+    private static final long serialVersionUID = -6945192710223411921L;
 
-   private List<AttributeVO> attributeVOs;
+    private List<AttributeVO> attributeVOs;
 
-   @Inject
-   private OpenIdProviderApi providerApi;
+    @Inject
+    private OpenIdProviderApi providerApi;
 
-   public void setRequestedAttributes(List<OpenIdRequestedAttribute> requestedAttributes)
-   {
-      attributeVOs = new LinkedList<AttributeVO>();
+    public void setRequestedAttributes(List<OpenIdRequestedAttribute> requestedAttributes) {
+        attributeVOs = new LinkedList<AttributeVO>();
 
-      for (OpenIdRequestedAttribute requestedAttribute : requestedAttributes)
-      {
-         AttributeVO attributeVO = new AttributeVO();
-         attributeVO.setRequestedAttribute(requestedAttribute);
-         attributeVOs.add(attributeVO);
-      }
-   }
+        for (OpenIdRequestedAttribute requestedAttribute : requestedAttributes) {
+            AttributeVO attributeVO = new AttributeVO();
+            attributeVO.setRequestedAttribute(requestedAttribute);
+            attributeVOs.add(attributeVO);
+        }
+    }
 
-   public List<AttributeVO> getAttributeVOs()
-   {
-      return attributeVOs;
-   }
+    public List<AttributeVO> getAttributeVOs() {
+        return attributeVOs;
+    }
 
-   public void confirm()
-   {
-      Map<String, List<String>> attributeValues = new HashMap<String, List<String>>();
-      for (AttributeVO attributeVO : attributeVOs)
-      {
-         if (attributeVO.getAttributeValue() != null)
-         {
-            attributeValues.put(attributeVO.getRequestedAttribute().getAlias(), Arrays.asList(attributeVO.getAttributeValue()));
-         }
-      }
-      providerApi.setAttributes(attributeValues, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
-   }
+    public void confirm() {
+        Map<String, List<String>> attributeValues = new HashMap<String, List<String>>();
+        for (AttributeVO attributeVO : attributeVOs) {
+            if (attributeVO.getAttributeValue() != null) {
+                attributeValues.put(attributeVO.getRequestedAttribute().getAlias(), Arrays.asList(attributeVO.getAttributeValue()));
+            }
+        }
+        providerApi.setAttributes(attributeValues, (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+    }
 }

@@ -7,21 +7,17 @@ import javax.enterprise.inject.spi.Extension;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
-public class DialogueContextExtension implements Extension
-{
-   private DialogueContext dialogueContext;
+public class DialogueContextExtension implements Extension {
+    private DialogueContext dialogueContext;
 
-   public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager)
-   {
-      dialogueContext = new DialogueContext();
-      event.addContext(dialogueContext);
-   }
+    public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
+        dialogueContext = new DialogueContext();
+        event.addContext(dialogueContext);
+    }
 
-   public DialogueContext getDialogueContext()
-   {
-      return dialogueContext;
-   }
+    public DialogueContext getDialogueContext() {
+        return dialogueContext;
+    }
 
 }

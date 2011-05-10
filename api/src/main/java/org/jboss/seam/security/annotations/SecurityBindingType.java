@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 
 /**
  * Applied to an annotation to indicate that it is a security binding type
- * 
- * @author Shane Bryzak
  *
+ * @author Shane Bryzak
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SecurityBindingType { }
+public @interface SecurityBindingType {
+}

@@ -15,7 +15,7 @@ import javax.enterprise.context.NormalScope;
  * application is used by different companies, each accessing the application
  * using a host name that is part of the company's internet domain name.
  * </p>
- * 
+ * <p/>
  * <p>
  * The virtual application scope is intented to be used in a multi-tenant
  * software architecture. Wikipedia describes this architecture as follows:
@@ -28,7 +28,7 @@ import javax.enterprise.context.NormalScope;
  * configuration thus each client organization works with a customized virtual
  * application instance."
  * </p>
- * 
+ * <p/>
  * <p>
  * In the application context, one stores the configuration or data that is
  * specific for one company using the application. In the context of Seam
@@ -36,11 +36,11 @@ import javax.enterprise.context.NormalScope;
  * configuration of an OpenID or SAML entity that is specific for one
  * hostName/company.
  * </p>
- * 
+ * <p/>
  * <p>
  * Virtual applications need to be configured by adding the following observer
  * to your application:
- * 
+ * <p/>
  * <pre>
  * public void virtualApplicationManagerCreated(@Observes final AfterVirtualApplicationManagerCreation event)
  * {
@@ -48,16 +48,16 @@ import javax.enterprise.context.NormalScope;
  *    event.addVirtualApplication(&quot;www.company2.com&quot;);
  * }
  * </pre>
- * 
+ * <p/>
  * </p>
- * 
+ * <p/>
  * <p>
  * If you need to configure an application scoped bean, for example a SAML
  * service provider bean that is scoped to the virtual application context, you
  * should do that by reacting on the {@link VirtualApplicationCreated} event,
  * which is fired for each configured virtual application at application startup
  * time. For example:
- * 
+ * <p/>
  * <pre>
  * public void customize(@Observes AfterVirtualApplicationCreation event, SamlServiceProviderConfigurationApi sp, VirtualApplication virtualApplication)
  * {
@@ -70,17 +70,15 @@ import javax.enterprise.context.NormalScope;
  *    sp.setPort(8080);
  * }
  * </pre>
- * 
+ * <p/>
  * </p>
- * 
+ *
  * @author Marcel Kolsteren
- * 
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @NormalScope(passivating = false)
-public @interface VirtualApplicationScoped
-{
+public @interface VirtualApplicationScoped {
 
 }

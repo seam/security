@@ -8,22 +8,18 @@ import org.openid4java.consumer.ConsumerManager;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @ApplicationScoped
-public class OpenIdConsumerManagerFactory
-{
-   private ConsumerManager consumerManager;
+public class OpenIdConsumerManagerFactory {
+    private ConsumerManager consumerManager;
 
-   @Produces
-   public ConsumerManager getConsumerManager()
-   {
-      return consumerManager;
-   }
+    @Produces
+    public ConsumerManager getConsumerManager() {
+        return consumerManager;
+    }
 
-   @Inject
-   public void startup() throws Exception
-   {
-      consumerManager = new ConsumerManager();
-   }
+    @Inject
+    public void startup() throws Exception {
+        consumerManager = new ConsumerManager();
+    }
 }

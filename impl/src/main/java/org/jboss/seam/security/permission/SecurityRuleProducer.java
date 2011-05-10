@@ -22,38 +22,38 @@ import org.jboss.seam.solder.resourceLoader.Resource;
 
 /**
  * Workaround until we have a seam-drools release
- * 
+ *
  * @author Shane Bryzak
  */
-public class SecurityRuleProducer
-{
-   private static final Logger log = Logger.getLogger(SecurityRuleProducer.class);
-   
-   @Inject @Resource("security.drl") InputStream securityRules;
-   
-   @Produces @ApplicationScoped @Security
-   public KnowledgeBase createSecurityKnowledgeBase()
-   {
-      KnowledgeBuilderConfiguration config = KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
-      KnowledgeBaseConfiguration kBaseConfig = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
-      
-      KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(config);
-      
-      org.drools.io.Resource resource = ResourceFactory.newInputStreamResource(securityRules);
-      kbuilder.add(resource, ResourceType.DRL);
+public class SecurityRuleProducer {
+    private static final Logger log = Logger.getLogger(SecurityRuleProducer.class);
 
-      KnowledgeBuilderErrors kbuildererrors = kbuilder.getErrors();
-      if (kbuildererrors.size() > 0)
-      {
-         for (KnowledgeBuilderError kbuildererror : kbuildererrors)
-         {
-            log.error(kbuildererror.getMessage());
-         }
-      }
+    @Inject
+    @Resource("security.drl")
+    InputStream securityRules;
 
-      KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
-      kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+    @Produces
+    @ApplicationScoped
+    @Security
+    public KnowledgeBase createSecurityKnowledgeBase() {
+        KnowledgeBuilderConfiguration config = KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+        KnowledgeBaseConfiguration kBaseConfig = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
 
-      return kbase;
-   }
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(config);
+
+        org.drools.io.Resource resource = ResourceFactory.newInputStreamResource(securityRules);
+        kbuilder.add(resource, ResourceType.DRL);
+
+        KnowledgeBuilderErrors kbuildererrors = kbuilder.getErrors();
+        if (kbuildererrors.size() > 0) {
+            for (KnowledgeBuilderError kbuildererror : kbuildererrors) {
+                log.error(kbuildererror.getMessage());
+            }
+        }
+
+        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
+        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+
+        return kbase;
+    }
 }

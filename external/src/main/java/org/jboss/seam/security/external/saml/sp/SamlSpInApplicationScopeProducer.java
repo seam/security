@@ -7,15 +7,12 @@ import javax.enterprise.inject.Produces;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @Alternative
-public class SamlSpInApplicationScopeProducer
-{
-   @Produces
-   @ApplicationScoped
-   public SamlSpBean produceSp(@New SamlSpBean sp)
-   {
-      return sp;
-   }
+public class SamlSpInApplicationScopeProducer {
+    @Produces
+    @ApplicationScoped
+    public SamlSpBean produceSp(@New SamlSpBean sp) {
+        return sp;
+    }
 }

@@ -9,19 +9,16 @@ import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicati
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @Alternative
-public class SamlSpInVirtualApplicationScopeProducer
-{
-   @Produces
-   @VirtualApplicationScoped
-   public SamlSpBean produceSp(@New SamlSpBean sp, VirtualApplication virtualApplication)
-   {
-      String hostName = virtualApplication.getHostName();
-      sp.setHostName(hostName);
-      sp.setEntityId("https://" + hostName);
+public class SamlSpInVirtualApplicationScopeProducer {
+    @Produces
+    @VirtualApplicationScoped
+    public SamlSpBean produceSp(@New SamlSpBean sp, VirtualApplication virtualApplication) {
+        String hostName = virtualApplication.getHostName();
+        sp.setHostName(hostName);
+        sp.setEntityId("https://" + hostName);
 
-      return sp;
-   }
+        return sp;
+    }
 }

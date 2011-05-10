@@ -7,45 +7,37 @@ import org.jboss.seam.security.external.saml.api.SamlNameId;
 
 /**
  * @author Marcel Kolsteren
- * 
  */
 @DialogueScoped
-public class SamlIdpIncomingLogoutDialogue
-{
-   private SamlNameId nameId;
+public class SamlIdpIncomingLogoutDialogue {
+    private SamlNameId nameId;
 
-   private List<String> sessionIndexes;
+    private List<String> sessionIndexes;
 
-   private boolean failed;
+    private boolean failed;
 
-   public SamlNameId getNameId()
-   {
-      return nameId;
-   }
+    public SamlNameId getNameId() {
+        return nameId;
+    }
 
-   public void setNameId(SamlNameId nameId)
-   {
-      this.nameId = nameId;
-   }
+    public void setNameId(SamlNameId nameId) {
+        this.nameId = nameId;
+    }
 
-   public List<String> getSessionIndexes()
-   {
-      return sessionIndexes;
-   }
+    public List<String> getSessionIndexes() {
+        return sessionIndexes;
+    }
 
-   public void setSessionIndexes(List<String> sessionIndexes)
-   {
-      this.sessionIndexes = sessionIndexes;
-   }
+    public void setSessionIndexes(List<String> sessionIndexes) {
+        this.sessionIndexes = sessionIndexes;
+    }
 
-   public boolean isFailed()
-   {
-      return failed;
-   }
+    public boolean isFailed() {
+        return failed;
+    }
 
-   public void setFailed(boolean failure)
-   {
-      this.failed = failure;
-   }
+    public void setFailed(boolean failure) {
+        this.failed = failure;
+    }
 
 }

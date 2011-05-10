@@ -31,19 +31,16 @@ import org.openid4java.message.sreg.SRegResponse;
  * Sample Consumer (Relying Party) implementation.
  */
 
-public class OpenIdTestClient
-{
+public class OpenIdTestClient {
     private ConsumerManager manager;
     private String returnToUrl;
-    private Map<String,DiscoveryInformation> sessionMap = new HashMap<String,DiscoveryInformation>();
+    private Map<String, DiscoveryInformation> sessionMap = new HashMap<String, DiscoveryInformation>();
 
-    public OpenIdTestClient() throws ConsumerException
-    {
+    public OpenIdTestClient() throws ConsumerException {
         this("http://example.com/openid");
     }
 
-    public OpenIdTestClient(String returnToUrl) throws ConsumerException
-    {
+    public OpenIdTestClient(String returnToUrl) throws ConsumerException {
         // configure the return_to URL where your application will receive
         // the authentication responses from the OpenID provider
         this.returnToUrl = returnToUrl;
@@ -60,10 +57,8 @@ public class OpenIdTestClient
 
     // --- placing the authentication request ---
     public String authRequest(String userSuppliedString)
-            throws IOException
-    {
-        try
-        {
+            throws IOException {
+        try {
 
             // --- Forward proxy setup (only if needed) ---
             // ProxyProperties proxyProps = new ProxyProperties();
@@ -87,8 +82,8 @@ public class OpenIdTestClient
             // Attribute Exchange example: fetching the 'email' attribute
             FetchRequest fetch = FetchRequest.createFetchRequest();
             fetch.addAttribute("email", // attribute alias
-                "http://schema.openid.net/contact/email", // type URI
-                true); // required
+                    "http://schema.openid.net/contact/email", // type URI
+                    true); // required
             // attach the extension to the authentication request
             authReq.addExtension(fetch);
 
@@ -97,15 +92,12 @@ public class OpenIdTestClient
             sregReq.addAttribute("email", true);
             authReq.addExtension(sregReq);
 
-            if (! discovered.isVersion2() )
-            {
+            if (!discovered.isVersion2()) {
                 // Option 1: GET HTTP-redirect to the OpenID Provider endpoint
                 // The only method supported in OpenID 1.x
                 // redirect-URL usually limited ~2048 bytes
                 return authReq.getDestinationUrl(true);
-            }
-            else
-            {
+            } else {
                 // Option 2: HTML FORM Redirection (Allows payloads >2048 bytes)
 
                 //RequestDispatcher dispatcher =
@@ -115,19 +107,15 @@ public class OpenIdTestClient
                 //dispatcher.forward(request, response);
                 return authReq.getDestinationUrl(true);
             }
-        }
-        catch (OpenIDException e)
-        {
+        } catch (OpenIDException e) {
             // present error to the user
             throw new RuntimeException("wrap:" + e.getMessage(), e);
         }
     }
 
     // --- processing the authentication response ---
-    public Identifier verifyResponse(HttpServletRequest httpReq)
-    {
-        try
-        {
+    public Identifier verifyResponse(HttpServletRequest httpReq) {
+        try {
             // extract the parameters from the authentication response
             // (which comes in as a HTTP request from the OpenID provider)
             ParameterList response =
@@ -151,28 +139,23 @@ public class OpenIdTestClient
 
             // examine the verification result and extract the verified identifier
             Identifier verified = verification.getVerifiedId();
-            if (verified != null)
-            {
+            if (verified != null) {
                 AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
 
                 HttpSession session = httpReq.getSession(true);
                 session.setAttribute("openid_identifier", authSuccess.getIdentity());
 
-                if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX))
-                {
+                if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
                     FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
                     session.setAttribute("emailFromFetch", fetchResp.getAttributeValues("email").get(0));
                 }
-                if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG))
-                {
+                if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
                     SRegResponse sregResp = (SRegResponse) authSuccess.getExtension(SRegMessage.OPENID_NS_SREG);
                     session.setAttribute("emailFromSReg", sregResp.getAttributeValue("email"));
                 }
                 return verified;  // success
             }
-        }
-        catch (OpenIDException e)
-        {
+        } catch (OpenIDException e) {
             // present error to the user
             throw new RuntimeException("wrap:" + e.getMessage(), e);
         }

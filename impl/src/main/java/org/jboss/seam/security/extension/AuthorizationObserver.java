@@ -10,34 +10,29 @@ import org.jboss.seam.security.AuthorizationException;
 import org.jboss.seam.security.events.AuthorizationCheckEvent;
 
 /**
- * This event observer 
- * 
- * @author Shane Bryzak
+ * This event observer
  *
+ * @author Shane Bryzak
  */
-public @ApplicationScoped class AuthorizationObserver
-{
-   @Inject SecurityExtension extension;
-   
-   public void observeAuthorizationCheckEvent(@Observes AuthorizationCheckEvent event)
-   {
-      boolean failed = false;
-      
-      for (Annotation binding : event.getBindings())
-      {
-         try
-         {
-            extension.checkAuthorization(binding);
-         }
-         catch (AuthorizationException ex)
-         {
-            failed = true;
-         }
-      }
-      
-      if (!failed)
-      {
-         event.setPassed(true);
-      }
-   }
+public
+@ApplicationScoped
+class AuthorizationObserver {
+    @Inject
+    SecurityExtension extension;
+
+    public void observeAuthorizationCheckEvent(@Observes AuthorizationCheckEvent event) {
+        boolean failed = false;
+
+        for (Annotation binding : event.getBindings()) {
+            try {
+                extension.checkAuthorization(binding);
+            } catch (AuthorizationException ex) {
+                failed = true;
+            }
+        }
+
+        if (!failed) {
+            event.setPassed(true);
+        }
+    }
 }

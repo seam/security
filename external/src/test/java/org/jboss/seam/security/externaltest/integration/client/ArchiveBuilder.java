@@ -18,75 +18,63 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-class ArchiveBuilder
-{
-   static WebArchive idpArchive;
+class ArchiveBuilder {
+    static WebArchive idpArchive;
 
-   static WebArchive spArchive;
+    static WebArchive spArchive;
 
-   static Map<String, WebArchive> webArchives = new HashMap<String, WebArchive>();
+    static Map<String, WebArchive> webArchives = new HashMap<String, WebArchive>();
 
-   static WebArchive getArchive(String entity)
-   {
-      WebArchive webArchive = webArchives.get(entity);
-      if (webArchive == null)
-      {
-         webArchive = createTestArchive(entity);
-         webArchives.put(entity, webArchive);
-      }
-      return webArchive;
-   }
+    static WebArchive getArchive(String entity) {
+        WebArchive webArchive = webArchives.get(entity);
+        if (webArchive == null) {
+            webArchive = createTestArchive(entity);
+            webArchives.put(entity, webArchive);
+        }
+        return webArchive;
+    }
 
-   static private WebArchive createTestArchive(String entity)
-   {
-      WebArchive war = ShrinkWrap.create(WebArchive.class, entity + ".war");
+    static private WebArchive createTestArchive(String entity) {
+        WebArchive war = ShrinkWrap.create(WebArchive.class, entity + ".war");
 
-      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet"));
-      war.addLibraries(MavenArtifactResolver.resolve("org.openid4java", "openid4java"));
-      war.addLibraries(MavenArtifactResolver.resolve("nekohtml", "nekohtml"));
-      war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.solder:seam-solder"));
-      war.addLibraries(MavenArtifactResolver.resolve("commons-httpclient:commons-httpclient"));
+        war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.servlet:seam-servlet"));
+        war.addLibraries(MavenArtifactResolver.resolve("org.openid4java", "openid4java"));
+        war.addLibraries(MavenArtifactResolver.resolve("nekohtml", "nekohtml"));
+        war.addLibraries(MavenArtifactResolver.resolve("org.jboss.seam.solder:seam-solder"));
+        war.addLibraries(MavenArtifactResolver.resolve("commons-httpclient:commons-httpclient"));
 
-      war.addWebResource("WEB-INF/" + entity + "-beans.xml", "beans.xml");
-      war.addWebResource("WEB-INF/context.xml", "context.xml");
+        war.addWebResource("WEB-INF/" + entity + "-beans.xml", "beans.xml");
+        war.addWebResource("WEB-INF/context.xml", "context.xml");
 
-      war.addPackage(MetaDataLoader.class.getPackage());
-      if (entity.equals("sp"))
-      {
-         war.addPackage(SpCustomizer.class.getPackage());
-         war.addWebResource("test_keystore.jks");
-      }
-      else if (entity.equals("idp"))
-      {
-         war.addPackage(IdpCustomizer.class.getPackage());
-         war.addWebResource("test_keystore.jks");
-      }
-      else if (entity.equals("op"))
-      {
-         war.addPackage(OpCustomizer.class.getPackage());
-      }
-      else if (entity.equals("rp"))
-      {
-         war.addPackage(RpCustomizer.class.getPackage());
-      }
+        war.addPackage(MetaDataLoader.class.getPackage());
+        if (entity.equals("sp")) {
+            war.addPackage(SpCustomizer.class.getPackage());
+            war.addWebResource("test_keystore.jks");
+        } else if (entity.equals("idp")) {
+            war.addPackage(IdpCustomizer.class.getPackage());
+            war.addWebResource("test_keystore.jks");
+        } else if (entity.equals("op")) {
+            war.addPackage(OpCustomizer.class.getPackage());
+        } else if (entity.equals("rp")) {
+            war.addPackage(RpCustomizer.class.getPackage());
+        }
 
-      war.addLibrary(createJarModule());
+        war.addLibrary(createJarModule());
 
-      return war;
-   }
+        return war;
+    }
 
-   private static JavaArchive createJarModule()
-   {
-      JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "test.jar");
+    private static JavaArchive createJarModule() {
+        JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "test.jar");
 
-      // Add the package "org.jboss.seam.security.external" and all its
-      // subpackages.
-      jar.addPackages(true, ResponseHandler.class.getPackage());
+        // Add the package "org.jboss.seam.security.external" and all its
+        // subpackages.
+        jar.addPackages(true, ResponseHandler.class.getPackage());
 
-      jar.addResource("META-INF/beans.xml", "META-INF/beans.xml");
-      jar.addResource("META-INF/web-fragment.xml", "META-INF/web-fragment.xml");
-      jar.addServiceProvider(Extension.class, VirtualApplicationContextExtension.class, DialogueContextExtension.class);
+        jar.addResource("META-INF/beans.xml", "META-INF/beans.xml");
+        jar.addResource("META-INF/web-fragment.xml", "META-INF/web-fragment.xml");
+        jar.addServiceProvider(Extension.class, VirtualApplicationContextExtension.class, DialogueContextExtension.class);
 
-      return jar;
-   }
+        return jar;
+    }
 }

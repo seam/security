@@ -5,35 +5,29 @@ import org.picketlink.idm.api.User;
 
 /**
  * Represents a user authenticated using OpenID
- * 
+ *
  * @author Shane Bryzak
  */
-public class OpenIdUser implements User
-{
-   private OpenIdPrincipal principal;
-   
-   public OpenIdUser(OpenIdPrincipal principal)
-   {
-      this.principal = principal;
-   }
-   
-   public String getId()
-   {
-      return principal.getIdentifier();
-   }
-   
-   public String getKey()
-   {
-      return principal.getOpenIdProvider().toString() + ":" + principal.getIdentifier();
-   }
-   
-   public String getAttribute(String alias)
-   {
-      return principal.getAttribute(alias);
-   }
-   
-   public String getProvider()
-   {
-      return principal.getOpenIdProvider().toString();
-   }
+public class OpenIdUser implements User {
+    private OpenIdPrincipal principal;
+
+    public OpenIdUser(OpenIdPrincipal principal) {
+        this.principal = principal;
+    }
+
+    public String getId() {
+        return principal.getIdentifier();
+    }
+
+    public String getKey() {
+        return principal.getOpenIdProvider().toString() + ":" + principal.getIdentifier();
+    }
+
+    public String getAttribute(String alias) {
+        return principal.getAttribute(alias);
+    }
+
+    public String getProvider() {
+        return principal.getOpenIdProvider().toString();
+    }
 }
