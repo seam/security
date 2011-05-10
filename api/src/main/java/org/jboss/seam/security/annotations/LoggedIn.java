@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @SecurityBindingType
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Documented
 public @interface LoggedIn {
 }
