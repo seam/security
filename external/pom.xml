@@ -67,6 +67,12 @@
       </dependency>
 
       <dependency>
+         <groupId>org.jboss.seam.security</groupId>
+         <artifactId>seam-security-api</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
          <artifactId>seam-servlet</artifactId>
       </dependency>
