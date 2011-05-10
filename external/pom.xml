@@ -116,8 +116,9 @@
 
       <dependency>
          <groupId>org.openid4java</groupId>
-         <artifactId>openid4java</artifactId>
-         <version>0.9.5</version>
+         <artifactId>openid4java-consumer</artifactId>
+         <version>0.9.6</version>
+         <type>pom</type>
          <exclusions>
             <exclusion>
                <groupId>xerces</groupId>
