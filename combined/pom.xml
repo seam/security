@@ -78,13 +78,13 @@
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
-         <optional>true</optional>
+         <!--optional>true</optional-->
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-impl</artifactId>
-         <optional>true</optional>
+         <!--optional>true</optional-->
       </dependency>
 
       <dependency>

@@ -66,11 +66,11 @@
          <artifactId>seam-security</artifactId>
       </dependency>
 
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
          <scope>test</scope>
-      </dependency>
+      </dependency-->
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
