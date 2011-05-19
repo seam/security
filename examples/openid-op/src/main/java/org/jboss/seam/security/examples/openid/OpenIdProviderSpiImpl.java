@@ -17,7 +17,7 @@ public class OpenIdProviderSpiImpl implements OpenIdProviderSpi {
     private ServletContext servletContext;
 
     @Inject
-    private Identity identity;
+    private OpIdentity identity;
 
     @Inject
     private OpenIdProviderApi opApi;
