@@ -3,6 +3,7 @@ package org.jboss.seam.security.external.openid;
 import java.io.Writer;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ import org.openid4java.discovery.DiscoveryInformation;
  * @author Marcel Kolsteren
  */
 //@Typed(OpenIdRpBean.class)
+@ApplicationScoped
 @SuppressWarnings("restriction")
 public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi {
     @Inject
