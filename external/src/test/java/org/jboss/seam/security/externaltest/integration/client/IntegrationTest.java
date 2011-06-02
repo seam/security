@@ -28,13 +28,18 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.OperateOnDeployment;
+import org.jboss.arquillian.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.logging.Logger;
+import org.jboss.shrinkwrap.api.Archive;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-// TODO test is broken
-
-//@RunWith(Arquillian.class)
-//@Run(RunModeType.AS_CLIENT)
+@RunWith(Arquillian.class)
+@RunAsClient
 public class IntegrationTest {
     private static final Logger log = Logger.getLogger(IntegrationTest.class);
 
@@ -52,32 +57,40 @@ public class IntegrationTest {
         SAML_MESSAGE_REDIRECT_BOUND, SAML_MESSAGE_POST_BOUND, APPLICATION_MESSAGE, ERROR
     }
 
-    //@Deployment
-    //public static Archive<?> createTestArchive()
-    //{
-    /*
-    * We need to deploy 4 war files. Current version of Arquillian
-    * (1.0.0.Alpha3) doesn't support multiple archives. See ARQ-67. For the
-    * time being, we add the first war here, and we add the other war files
-    * using a listener that is registered through the Arquillian SPI (see
-    * {@Link AfterDeployEventHandler}).
-    */
-    // return ArchiveBuilder.getArchive("sp");
-    //}
+    @Deployment(order = 1, name = "sp")
+    public static Archive<?> createSpArchive()
+    {
+     return ArchiveBuilder.getArchive("sp");
+    }
+    
+    @Deployment(order = 2, name = "idp")
+    public static Archive<?> createIdpArchive()
+    {
+     return ArchiveBuilder.getArchive("idp");
+    }
+    
+    @Deployment(order = 3, name = "rp")
+    public static Archive<?> createRpArchive()
+    {
+     return ArchiveBuilder.getArchive("rp");
+    }
+    
+    @Deployment(order = 4, name = "op")
+    public static Archive<?> createOpArchive()
+    {
+     return ArchiveBuilder.getArchive("op");
+    }    
 
-    //   @Before
+    // Seems broken in ARQ Alpha5
+    //@Before
     public void init() {
         httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(ClientPNames.HANDLE_REDIRECTS, false);
     }
 
-    // empty test to make junit happy
-    @Test
-    public void noOp() {
-    }
-
-    //@Test
+    @Test @OperateOnDeployment("sp")
     public void samlTest() {
+        init();
         Map<String, String> params = new HashMap<String, String>();
         params.put("command", "loadMetaData");
         sendMessageToApplication("www.sp1.com", "sp", params);
@@ -123,8 +136,9 @@ public class IntegrationTest {
         checkDialogueTermination("www.sp2.com", "sp");
     }
 
-    //@Test
+    @Test @OperateOnDeployment("sp")
     public void openIdLoginWithOpIdentifierTest() {
+        init();
         String opIdentifier = "http://localhost:8080/op/openid/OP/XrdsService";
         String userName = "john_doe";
 
@@ -148,8 +162,9 @@ public class IntegrationTest {
         checkDialogueTermination("www.rp.com", "rp");
     }
 
-    //@Test
+    @Test @OperateOnDeployment("sp")
     public void openIdLoginWithClaimedIdentifierAndAttributeExchangeTest() {
+        init();
         String userName = "jane_doe";
         String claimedId = "http://localhost:8080/op/users/" + userName;
 
