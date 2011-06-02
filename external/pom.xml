@@ -15,9 +15,7 @@
    <url>${project.parent.url}</url>
 
    <properties>
-      <arquillian.version>1.0.0.Alpha4</arquillian.version>
-      <jbossas.server.manager.version>1.0.3.GA</jbossas.server.manager.version>
-      <jbossas.client.version>6.0.0.20100911-M5</jbossas.client.version>
+      <arquillian.version>1.0.0.Alpha5</arquillian.version>
    </properties>
 
    <build>
@@ -211,14 +209,12 @@
             <dependency>
                <groupId>org.jboss.jbossas</groupId>
                <artifactId>jboss-server-manager</artifactId>
-               <version>${jbossas.server.manager.version}</version>
                <scope>test</scope>
             </dependency>
             <dependency>
                <groupId>org.jboss.jbossas</groupId>
                <artifactId>jboss-as-client</artifactId>
                <type>pom</type>
-               <version>${jbossas.client.version}</version>
                <scope>test</scope>
             </dependency>
          </dependencies>
@@ -237,7 +233,6 @@
                <groupId>org.jboss.jbossas</groupId>
                <artifactId>jboss-as-client</artifactId>
                <type>pom</type>
-               <version>${jbossas.client.version}</version>
                <scope>test</scope>
             </dependency>
          </dependencies>
