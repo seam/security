@@ -33,6 +33,8 @@
                      <clearOutputDir>true</clearOutputDir>
                      <staleFile>${project.build.directory}/classes/.staleFlag_saml</staleFile>
                      <bindingFiles>samlv2-bindings.xjb</bindingFiles>
+                     <catalog>${basedir}/src/main/resources/schema/catalog/catalog.xml</catalog>
+                     <nv>true</nv>
                   </configuration>
                   <goals>
                      <goal>xjc</goal>
