@@ -6,12 +6,12 @@
 
     <h:form>
         <h:commandLink value="Login" action="/Login.xhtml"
-                       disabled="#{identity.loggedIn}"/> |
+                       disabled="#{opIdentity.loggedIn}"/> |
         <h:commandLink value="Configuration" action="/Configuration.xhtml"/> |
         <h:commandLink value="Session Management"
-                       action="/SessionManagement.xhtml" disabled="#{!identity.loggedIn}"/> |
-        <h:commandLink value="Logout" action="#{identity.logout}"
-                       disabled="#{!identity.loggedIn}"/>
+                       action="/SessionManagement.xhtml" disabled="#{!opIdentity.loggedIn}"/> |
+        <h:commandLink value="Logout" action="#{opIdentity.logout}"
+                       disabled="#{!opIdentity.loggedIn}"/>
     </h:form>
 
 </ui:composition>
