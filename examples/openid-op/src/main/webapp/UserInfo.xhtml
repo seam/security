@@ -5,7 +5,7 @@
         xmlns:f="http://java.sun.com/jsf/core">
     <f:metadata>
         <f:event type="preRenderView"
-                 listener="#{identity.redirectToLoginIfNotLoggedIn}"/>
+                 listener="#{opIdentity.redirectToLoginIfNotLoggedIn}"/>
     </f:metadata>
     <ui:composition template="/PageTemplate.xhtml">
 
@@ -13,11 +13,11 @@
 
         <h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
             <h:outputText value="Verified User Identifier"/>
-            <h:outputText value="#{identity.openIdPrincipal.identifier}"/>
+            <h:outputText value="#{opIdentity.openIdPrincipal.identifier}"/>
             <h:outputText value="OpenID Provider"/>
-            <h:outputText value="#{identity.openIdPrincipal.openIdProvider}"/>
+            <h:outputText value="#{opIdentity.openIdPrincipal.openIdProvider}"/>
             <h:outputText value="Email"/>
-            <h:outputText value="#{identity.openIdPrincipal.attributes.email}"/>
+            <h:outputText value="#{opIdentity.openIdPrincipal.attributes.email}"/>
         </h:panelGrid>
 
     </ui:composition>

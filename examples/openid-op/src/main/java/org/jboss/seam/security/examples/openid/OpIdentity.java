@@ -12,7 +12,7 @@ import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
 
 @SessionScoped
 @Named
-public class Identity implements Serializable {
+public class OpIdentity implements Serializable {
     private static final long serialVersionUID = -7096110154986991513L;
 
     private String userName;
