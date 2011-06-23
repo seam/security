@@ -39,7 +39,7 @@ public class OpenIdPrincipalImpl implements OpenIdPrincipal {
         if (attributeValues == null) return null;
 
         List<String> values = attributeValues.get(alias);
-        if (values.size() == 0) {
+        if (values!=null&&values.size() == 0) {
             return null;
         } else if (values.size() == 1) {
             return (String) attributeValues.get(alias).get(0);
