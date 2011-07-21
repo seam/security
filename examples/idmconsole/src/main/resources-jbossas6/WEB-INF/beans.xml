@@ -9,8 +9,14 @@
       http://java.sun.com/xml/ns/javaee
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
       
+    <!-- Workaround for a JBoss AS 6 bug JBAS-8849, the interceptor is already declared in 
+         seam-security-impl.jar and AS6 incorrectly treats it as declared in all 
+         bean archives in the application -->
+
+<!--    
     <interceptors>
         <class>org.jboss.seam.transaction.TransactionInterceptor</class>
     </interceptors>
+-->
 
 </beans>
