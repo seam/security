@@ -146,65 +146,6 @@ class IdentityImpl implements Identity, Serializable {
         return isLoggedIn();
     }
 
-    /**
-     * Performs an authorization check, based on the specified security expression.
-     *
-     * @param expr The security expression to evaluate
-     * @throws NotLoggedInException Thrown if the authorization check fails and
-     * the user is not authenticated
-     * @throws AuthorizationException Thrown if the authorization check fails and
-     * the user is authenticated
-     */
-    // QUESTION should we add the dependency on el-api for the sake of avoiding reinstantiating the VE?
-
-    // TODO redesign restrictions system to be typesafe
-    /*
-    public void checkRestriction(ValueExpression expression)
-    {
-       if (!securityEnabled)
-       {
-          return;
-       }
-
-       if (!expressions.getValue(expression, Boolean.class))
-       {
-          if (!isLoggedIn())
-          {
-             manager.fireEvent(new NotLoggedInEvent());
-
-             log.debug(String.format(
-                "Error evaluating expression [%s] - User not logged in", expression.getExpressionString()));
-             throw new NotLoggedInException();
-          }
-          else
-          {
-             manager.fireEvent(new NotAuthorizedEvent());
-             throw new AuthorizationException(String.format(
-                "Authorization check failed for expression [%s]", expression.getExpressionString()));
-          }
-       }
-    }*/
-
-    /**
-     * Performs an authorization check, based on the specified security expression string.
-     *
-     * @param expr The security expression string to evaluate
-     * @throws NotLoggedInException   Thrown if the authorization check fails and
-     *                                the user is not authenticated
-     * @throws AuthorizationException Thrown if the authorization check fails and
-     *                                the user is authenticated
-     */
-
-    /*
-    public void checkRestriction(String expr)
-    {
-       if (!securityEnabled)
-       {
-          return;
-       }
-
-       checkRestriction(expressions.createValueExpression(expr, Boolean.class).toUnifiedValueExpression());
-    }*/
     public String login() {
         try {
             if (isLoggedIn()) {
