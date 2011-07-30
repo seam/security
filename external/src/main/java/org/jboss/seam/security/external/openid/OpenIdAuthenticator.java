@@ -20,6 +20,9 @@ import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
 
 /**
+ * An Authenticator implementation that uses OpenID to authenticate the user.
+ * This implementation assumes that JSF is being used for the view layer.
+ * 
  * @author Shane Bryzak
  */
 public
@@ -70,10 +73,13 @@ class OpenIdAuthenticator
 
         if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + selectedProvider.getUrl());
 
-        openIdApi.login(selectedProvider.getUrl(), attributes,
-                (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+        openIdApi.login(selectedProvider.getUrl(), attributes, getResponse());
 
         setStatus(AuthenticationStatus.DEFERRED);
+    }
+    
+    protected HttpServletResponse getResponse() {
+        return (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
     }
 
     public List<OpenIdProvider> getProviders() {
