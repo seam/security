@@ -81,7 +81,7 @@ class IdentityImpl implements Identity, Serializable {
 
     private User user;
 
-    private Class<Authenticator> authenticatorClass;
+    private Class<? extends Authenticator> authenticatorClass;
     private String authenticatorName;
 
     /**
@@ -120,11 +120,11 @@ class IdentityImpl implements Identity, Serializable {
         return user != null;
     }
 
-    public Class<Authenticator> getAuthenticatorClass() {
+    public Class<? extends Authenticator> getAuthenticatorClass() {
         return authenticatorClass;
     }
 
-    public void setAuthenticatorClass(Class<Authenticator> authenticatorClass) {
+    public void setAuthenticatorClass(Class<? extends Authenticator> authenticatorClass) {
         this.authenticatorClass = authenticatorClass;
     }
 

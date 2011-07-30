@@ -200,9 +200,9 @@ public interface Identity {
      */
     Set<Group> getGroups();
 
-    Class<Authenticator> getAuthenticatorClass();
+    Class<? extends Authenticator> getAuthenticatorClass();
 
-    void setAuthenticatorClass(Class<Authenticator> authenticatorClass);
+    void setAuthenticatorClass(Class<? extends Authenticator> authenticatorClass);
 
     String getAuthenticatorName();
 
