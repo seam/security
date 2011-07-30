@@ -499,6 +499,23 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                         "password", "passwordHash", "credential", "value");
                 if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_VALUE, p);
             }
+
+            // If Credential is on Identity, it's see if Credential Type is too
+            props = PropertyQueries.createQuery(identityClass)
+                    .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL_TYPE))
+                    .getResultList();
+
+            if (props.size() == 1) {
+                modelProperties.put(PROPERTY_CREDENTIAL_TYPE, props.get(0));
+            } else if (props.size() > 1) {
+                throw new IdentityException(
+                        "Ambiguous credential type property in identity class " +
+                                identityClass.getName());
+            } else {
+                Property<Object> p = findNamedProperty(identityClass, "credentialType",
+                        "identityObjectCredentialType", "type");
+                if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
+            }
         }
 
         if (!modelProperties.containsKey(PROPERTY_CREDENTIAL_VALUE)) {
@@ -506,19 +523,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         }
 
         // Scan for a credential type property
-        List<Property<Object>> props = PropertyQueries.createQuery(credentialClass)
-                .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
-                .getResultList();
-
-        if (props.size() == 1) {
-            modelProperties.put(PROPERTY_CREDENTIAL_TYPE, props.get(0));
-        } else if (props.size() > 1) {
-            throw new IdentityException(
-                    "Ambiguous credential type property in credential class " +
-                            credentialClass.getName());
-        } else {
-            props = PropertyQueries.createQuery(credentialClass)
-                    .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL_TYPE))
+        if (modelProperties.get(PROPERTY_CREDENTIAL_TYPE) == null) { // We may have found it on identity
+            List<Property<Object>> props = PropertyQueries.createQuery(credentialClass)
+                    .addCriteria(new PropertyTypeCriteria(PropertyType.TYPE))
                     .getResultList();
 
             if (props.size() == 1) {
@@ -528,9 +535,21 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                         "Ambiguous credential type property in credential class " +
                                 credentialClass.getName());
             } else {
-                Property<Object> p = findNamedProperty(credentialClass, "credentialType",
-                        "identityObjectCredentialType", "type");
-                if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
+                props = PropertyQueries.createQuery(credentialClass)
+                        .addCriteria(new PropertyTypeCriteria(PropertyType.CREDENTIAL_TYPE))
+                        .getResultList();
+
+                if (props.size() == 1) {
+                    modelProperties.put(PROPERTY_CREDENTIAL_TYPE, props.get(0));
+                } else if (props.size() > 1) {
+                    throw new IdentityException(
+                            "Ambiguous credential type property in credential class " +
+                                    credentialClass.getName());
+                } else {
+                    Property<Object> p = findNamedProperty(credentialClass, "credentialType",
+                            "identityObjectCredentialType", "type");
+                    if (p != null) modelProperties.put(PROPERTY_CREDENTIAL_TYPE, p);
+                }
             }
         }
 
