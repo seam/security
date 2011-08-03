@@ -7,8 +7,10 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.jboss.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
@@ -37,6 +39,7 @@ import org.openid4java.message.ax.FetchResponse;
 public
 @ApplicationScoped
 class OpenIdRpAuthenticationService {
+    
     @Inject
     private OpenIdRequest openIdRequest;
 
@@ -112,7 +115,7 @@ class OpenIdRpAuthenticationService {
 
         dialogue.get().setFinished(true);
     }
-
+    
     @Dialogued(join = true)
     public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes,
                                 HttpServletResponse response) {
@@ -124,9 +127,9 @@ class OpenIdRpAuthenticationService {
 
             openIdRequest.setDiscoveryInformation(discovered);
 
-            String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
             String realm = relyingPartyBean.getRealm();
-            String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getId();
+            String returnTo = relyingPartyBean.getServiceURL(
+                    OpenIdService.OPEN_ID_SERVICE) + "?dialogueId=" + dialogue.get().getId();
             AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
 
             if (attributes != null && attributes.size() > 0) {

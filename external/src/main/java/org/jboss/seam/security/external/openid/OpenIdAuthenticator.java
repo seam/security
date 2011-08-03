@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +20,6 @@ import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
 
 /**
  * An Authenticator implementation that uses OpenID to authenticate the user.
- * This implementation assumes that JSF is being used for the view layer.
  * 
  * @author Shane Bryzak
  */
@@ -40,6 +38,8 @@ class OpenIdAuthenticator
 
     @Inject
     Logger log;
+    
+    @Inject HttpServletResponse response;
 
     private String providerCode;
 
@@ -79,7 +79,7 @@ class OpenIdAuthenticator
     }
     
     protected HttpServletResponse getResponse() {
-        return (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        return response;
     }
 
     public List<OpenIdProvider> getProviders() {

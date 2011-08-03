@@ -37,7 +37,17 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, O
     private OpenIdRpAuthenticationService openIdSingleLoginSender;
 
     @Inject
-    private ServletContext servletContext;
+    private ServletContext servletContext;      
+    
+    private String returnToPath;
+    
+    public String getReturnToPath() {
+        return returnToPath;
+    }
+    
+    public void setReturnToPath(String value) {
+        this.returnToPath = value;
+    }
 
     @Inject
     @JaxbContext(ObjectFactory.class)
@@ -49,7 +59,7 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, O
     }
 
     public String getServiceURL(OpenIdService service) {
-        String path = servletContext.getContextPath() + "/openid/RP/" + service.getName();
+        String path = servletContext.getContextPath() + (returnToPath != null ? returnToPath : "/openid/RP/" + service.getName());
         return createURL(path);
     }
 
