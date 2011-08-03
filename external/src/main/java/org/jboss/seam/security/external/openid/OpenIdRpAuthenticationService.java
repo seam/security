@@ -57,28 +57,30 @@ class OpenIdRpAuthenticationService {
 
     @Inject
     private Logger log;
+    
+    @Inject HttpSession session;
 
     @Inject
     private Instance<DialogueBean> dialogue;
 
     public void handleIncomingMessage(HttpServletRequest httpRequest,
                                       HttpServletResponse httpResponse) throws InvalidRequestException {
-        try {
-            // extract the parameters from the authentication response
-            // (which comes in as a HTTP request from the OpenID provider)
-            ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
+        processIncomingMessage(new ParameterList(httpRequest.getParameterMap()), httpRequest.getQueryString(), httpResponse);
+    }    
 
+    public void processIncomingMessage(ParameterList parameterList, String queryString, HttpServletResponse httpResponse) {
+        try {
             // retrieve the previously stored discovery information
             DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
             if (discovered == null) {
                 throw new IllegalStateException("No discovery information found in OpenID request");
             }
 
-            // extract the receiving URL from the HTTP request
-            StringBuffer receivingURL = httpRequest.getRequestURL();
-            String queryString = httpRequest.getQueryString();
+            // extract the receiving URL from the HTTP request            
+            StringBuffer receivingURL = new StringBuffer(relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+            
             if (queryString != null && queryString.length() > 0)
-                receivingURL.append("?").append(httpRequest.getQueryString());
+                receivingURL.append("?").append(queryString);
 
             // verify the response; ConsumerManager needs to be the same
             // (static) instance used to place the authentication request
