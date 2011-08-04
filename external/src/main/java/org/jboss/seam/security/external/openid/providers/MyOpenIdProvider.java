@@ -1,5 +1,10 @@
 package org.jboss.seam.security.external.openid.providers;
 
+import java.util.List;
+
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
+
 /**
  * Open ID provider for myopenid.com
  *
@@ -20,4 +25,7 @@ public class MyOpenIdProvider implements OpenIdProvider {
         return "https://myopenid.com";
     }
 
+    public void requestAttributes(OpenIdRelyingPartyApi openIdApi, List<OpenIdRequestedAttribute> attributes) {
+        
+    }
 }

@@ -1,6 +1,11 @@
 package org.jboss.seam.security.external.openid.providers;
 
+import java.util.List;
+
 import javax.enterprise.inject.Model;
+
+import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
+import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 
 /**
  * @author Shane Bryzak
@@ -26,5 +31,9 @@ class CustomOpenIdProvider implements OpenIdProvider {
 
     public String getUrl() {
         return url;
+    }
+    
+    public void requestAttributes(OpenIdRelyingPartyApi openIdApi, List<OpenIdRequestedAttribute> attributes) {
+        
     }
 }

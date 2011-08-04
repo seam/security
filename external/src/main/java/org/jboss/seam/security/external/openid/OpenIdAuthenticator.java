@@ -40,9 +40,9 @@ class OpenIdAuthenticator
     Logger log;
     
     @Inject HttpServletResponse response;
-
+       
     private String providerCode;
-
+    
     public String getProviderCode() {
         return providerCode;
     }
@@ -60,18 +60,17 @@ class OpenIdAuthenticator
         return null;
     }
 
-    public void authenticate() {
-        OpenIdRelyingPartyApi openIdApi = openIdApiInstance.get();
-
-        List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-        attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
-
+    public void authenticate() {        
         OpenIdProvider selectedProvider = getSelectedProvider();
         if (selectedProvider == null) {
             throw new IllegalStateException("No OpenID provider has been selected");
         }
+        
+        OpenIdRelyingPartyApi openIdApi = openIdApiInstance.get();
 
-        if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + selectedProvider.getUrl());
+        List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();        
+                
+        selectedProvider.requestAttributes(openIdApi, attributes);   
 
         openIdApi.login(selectedProvider.getUrl(), attributes, getResponse());
 

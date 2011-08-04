@@ -257,7 +257,12 @@ class IdentityImpl implements Identity, Serializable {
     }
 
     protected void deferredAuthenticationObserver(@Observes DeferredAuthenticationEvent event) {
-        postAuthenticate();
+        if (event.isSuccess()) {        
+            postAuthenticate();
+        } else {
+            authenticating = false;
+            activeAuthenticator = null;
+        }
     }
 
     protected void postAuthenticate() {
@@ -302,6 +307,7 @@ class IdentityImpl implements Identity, Serializable {
             beanManager.fireEvent(new PostAuthenticateEvent());
         } finally {
             // Set credential to null whether authentication is successful or not
+            activeAuthenticator = null;
             credentials.setCredential(null);
             authenticating = false;
         }
@@ -354,7 +360,7 @@ class IdentityImpl implements Identity, Serializable {
             // JaasAuthenticator, IdmAuthenticator, or any external authenticator, etc
             if (!JaasAuthenticator.class.isAssignableFrom(auth.getClass()) &&
                     !IdmAuthenticator.class.isAssignableFrom(auth.getClass()) &&
-                    !auth.getClass().getName().startsWith("org.jboss.seam.security.external.")) {
+                    !isExternalAuthenticator(auth.getClass())) {
                 selectedAuth = auth;
                 break;
             }
@@ -365,6 +371,20 @@ class IdentityImpl implements Identity, Serializable {
         }
 
         return selectedAuth;
+    }
+    
+    
+    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {        
+        Class<?> cls = authClass;
+        
+        while (cls != Object.class) {
+            if (cls.getName().startsWith("org.jboss.seam.security.external.")) {
+                return true;
+            }
+            cls = cls.getSuperclass();
+        }
+
+        return false;
     }
 
     @SuppressWarnings("unchecked")
