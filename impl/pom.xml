@@ -9,7 +9,7 @@
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
-   <artifactId>seam-security-impl</artifactId>
+   <artifactId>seam-security</artifactId>
    <packaging>jar</packaging>
    <name>Seam Security Implementation</name>
    <url>${project.parent.url}</url>
