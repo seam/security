@@ -6,14 +6,14 @@
 
     <h:form>
         <h:commandLink value="Login" action="/Login.xhtml"
-                       disabled="#{identity.loggedIn}"/> |
+                       disabled="#{samlIdentity.loggedIn}"/> |
         <h:commandLink value="Configuration" action="/Configuration.xhtml"/> |
         <h:commandLink value="User Info" action="/UserInfo.xhtml"
-                       disabled="#{!identity.loggedIn}"/> |
-        <h:commandLink value="Local Logout" action="#{identity.localLogout}"
-                       disabled="#{!identity.loggedIn}"/> |
-        <h:commandLink value="Global Logout" action="#{identity.globalLogout}"
-                       disabled="#{!identity.loggedIn}"/>
+                       disabled="#{!samlIdentity.loggedIn}"/> |
+        <h:commandLink value="Local Logout" action="#{samlIdentity.localLogout}"
+                       disabled="#{!samlIdentity.loggedIn}"/> |
+        <h:commandLink value="Global Logout" action="#{samlIdentity.globalLogout}"
+                       disabled="#{!samlIdentity.loggedIn}"/>
     </h:form>
 
 </ui:composition>

@@ -11,7 +11,7 @@ import org.jboss.seam.security.external.saml.api.SamlServiceProviderApi;
 import org.jboss.seam.security.external.saml.api.SamlSpSession;
 
 @Model
-public class Identity {
+public class SamlIdentity {
     @Inject
     private SamlServiceProviderApi samlSpApi;
 

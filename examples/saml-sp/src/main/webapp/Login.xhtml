@@ -12,7 +12,7 @@
                     <h:outputText value="#{idpEntityId}"/>
                 </h:column>
                 <h:column>
-                    <h:commandLink action="#{identity.login(idpEntityId)}"
+                    <h:commandLink action="#{samlIdentity.login(idpEntityId)}"
                                    value="Login"/>
                 </h:column>
             </h:dataTable>
