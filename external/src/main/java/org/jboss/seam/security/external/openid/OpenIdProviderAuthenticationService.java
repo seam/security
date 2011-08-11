@@ -52,7 +52,7 @@ public class OpenIdProviderAuthenticationService {
     private Instance<DialogueBean> dialogue;
 
     @Inject
-    private Instance<OpenIdProviderBean> opBean;
+    private Instance<OpenIdProviderBeanApi> opBean;
 
     public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException {
         ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());

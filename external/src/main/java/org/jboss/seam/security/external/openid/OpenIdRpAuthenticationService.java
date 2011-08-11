@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -50,7 +49,7 @@ class OpenIdRpAuthenticationService {
     private Instance<OpenIdRelyingPartySpi> openIdRelyingPartySpi;
 
     @Inject
-    private OpenIdRpBean relyingPartyBean;
+    private Instance<OpenIdRpBeanApi> relyingPartyBean;
 
     @Inject
     private ResponseHandler responseHandler;
@@ -77,7 +76,7 @@ class OpenIdRpAuthenticationService {
             }
 
             // extract the receiving URL from the HTTP request            
-            StringBuffer receivingURL = new StringBuffer(relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+            StringBuffer receivingURL = new StringBuffer(relyingPartyBean.get().getServiceURL(OpenIdService.OPEN_ID_SERVICE));
             
             if (queryString != null && queryString.length() > 0)
                 receivingURL.append("?").append(queryString);
@@ -129,8 +128,8 @@ class OpenIdRpAuthenticationService {
 
             openIdRequest.setDiscoveryInformation(discovered);
 
-            String realm = relyingPartyBean.getRealm();
-            String returnTo = relyingPartyBean.getServiceURL(
+            String realm = relyingPartyBean.get().getRealm();
+            String returnTo = relyingPartyBean.get().getServiceURL(
                     OpenIdService.OPEN_ID_SERVICE) + "?dialogueId=" + dialogue.get().getId();
             AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
 

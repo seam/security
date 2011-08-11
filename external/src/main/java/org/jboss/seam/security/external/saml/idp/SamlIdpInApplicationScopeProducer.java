@@ -1,14 +1,15 @@
 package org.jboss.seam.security.external.saml.idp;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;
+
+import org.jboss.seam.solder.core.Veto;
 
 /**
  * @author Marcel Kolsteren
  */
-@Alternative
+@Veto
 public class SamlIdpInApplicationScopeProducer {
     @Produces
     @ApplicationScoped
