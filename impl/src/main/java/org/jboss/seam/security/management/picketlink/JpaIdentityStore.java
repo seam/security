@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -1203,6 +1204,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         List<Predicate> predicates = new ArrayList<Predicate>();
         predicates.add(builder.equal(root.get(identityToProperty.getName()),
                 lookupIdentity(identity, em)));
+        
+        Path<String> rolesOnly = root.get(relationshipNameProperty.getName());
+        predicates.add(builder.like(rolesOnly, "%"));
 
         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
 
@@ -1905,15 +1909,88 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         return createIdentityStoreSession(null);
     }
 
-    public Collection<IdentityObject> findIdentityObject(
-            IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
-            IdentityObjectRelationshipType relationshipType, boolean parent,
-            IdentityObjectSearchCriteria criteria) throws IdentityException {
+    public Collection<IdentityObject> findIdentityObject(IdentityStoreInvocationContext invocationCxt, IdentityObject identity,
+            IdentityObjectRelationshipType relationshipType, boolean parent, IdentityObjectSearchCriteria criteria)
+            throws IdentityException {
         List<IdentityObject> objs = new ArrayList<IdentityObject>();
 
-        System.out.println("*** Invoked unimplemented method findIdentityObject()");
+        EntityManager em = getEntityManager(invocationCxt);
+        javax.persistence.Query q = null;
 
-        // TODO Auto-generated method stub
+        boolean orderByName = false;
+        boolean ascending = true;
+
+        if (criteria != null && criteria.isSorted()) {
+            orderByName = true;
+            ascending = criteria.isAscending();
+        }
+
+        StringBuilder queryString = new StringBuilder();
+
+        IdentityObjectType identityType = identity.getIdentityType();
+
+        Object identType = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ? lookupIdentityType(
+                identityType.getName(), getEntityManager(invocationCxt)) : identityType.getName();
+
+        Object ident = getEntityManager(invocationCxt).createQuery(
+                        "select i from " + identityClass.getName() + " i where i."
+                                + modelProperties.get(PROPERTY_IDENTITY_NAME).getName() + " = :name and i."
+                                + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() + " = :type")
+                .setParameter("name", identity.getName()).setParameter("type", identType).getSingleResult();
+
+        if (parent) {
+            if (relationshipType != null) {
+                queryString.append("select distinct ior.to from IdentityObjectRelationship ior where "
+                        + "ior.to.name like :nameFilter and ior.relationshipType.name = :relType and ior.from = :identity");
+            } else {
+                queryString.append("select distinct ior.to from IdentityObjectRelationship ior where "
+                        + "ior.to.name like :nameFilter and ior.from = :identity");
+            }
+            if (orderByName) {
+                queryString.append(" order by ior.to.name" + (ascending ? " asc" : ""));
+            }
+        } else {
+            if (relationshipType != null) {
+                queryString.append("select distinct ior.from from IdentityObjectRelationship ior where "
+                        + "ior.from.name like :nameFilter and ior.relationshipType.name = :relType and ior.to = :identity");
+            } else {
+                queryString.append("select distinct ior.from from IdentityObjectRelationship ior where "
+                        + "ior.from.name like :nameFilter and ior.to = :identity");
+            }
+
+            if (orderByName) {
+                queryString.append(" order by ior.to.name" + (ascending ? " asc" : ""));
+            }
+
+        }
+
+        q = em.createQuery(queryString.toString()).setParameter("identity", ident);
+
+        if (relationshipType != null) {
+            q.setParameter("relType", relationshipType.getName());
+        }
+
+        if (criteria != null && criteria.getFilter() != null) {
+            q.setParameter("nameFilter", criteria.getFilter().replaceAll("\\*", "%"));
+        } else {
+            q.setParameter("nameFilter", "%");
+        }
+
+        if (criteria != null && criteria.isPaged() && !criteria.isFiltered()) {
+            q.setFirstResult(criteria.getFirstResult());
+            if (criteria.getMaxResults() > 0) {
+                q.setMaxResults(criteria.getMaxResults());
+            }
+        }
+
+        List<?> results = q.getResultList();
+
+        EntityToSpiConverter converter = new EntityToSpiConverter();
+
+        for (Object result : results) {
+            objs.add(converter.convertToIdentityObject(result));
+        }
+
         return objs;
     }
 
