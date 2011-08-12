@@ -1,5 +1,6 @@
 package org.jboss.seam.security.management.picketlink;
 
+import javax.enterprise.event.Event;
 import javax.persistence.EntityManager;
 
 import org.picketlink.idm.common.exception.IdentityException;
@@ -11,14 +12,21 @@ import org.picketlink.idm.spi.store.IdentityStoreSession;
  * @author Shane Bryzak
  */
 public class JpaIdentityStoreSessionImpl implements IdentityStoreSession {
+    
+    private Event<IdentityObjectCreatedEvent> identityObjectCreatedEvent;
     private EntityManager em;
 
-    public JpaIdentityStoreSessionImpl(EntityManager em) {
+    public JpaIdentityStoreSessionImpl(EntityManager em, Event<IdentityObjectCreatedEvent> identityObjectCreatedEvent) {
         this.em = em;
+        this.identityObjectCreatedEvent = identityObjectCreatedEvent;
     }
 
     public EntityManager getEntityManager() {
         return em;
+    }
+    
+    public Event<IdentityObjectCreatedEvent> getIdentityObjectCreatedEvent() {
+        return identityObjectCreatedEvent;
     }
 
     public void clear() throws IdentityException {
