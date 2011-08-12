@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.event.Event;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -21,6 +22,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
@@ -890,11 +892,13 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         this.relationshipTypeRole = relationshipTypeRole;
     }
 
+    @SuppressWarnings("unchecked")
     public IdentityStoreSession createIdentityStoreSession(
             Map<String, Object> sessionOptions) throws IdentityException {
-        EntityManager em = (EntityManager) sessionOptions.get("ENTITY_MANAGER");
+        EntityManager em = (EntityManager) sessionOptions.get(IdentitySessionProducer.SESSION_OPTION_ENTITY_MANAGER);
+        Event<IdentityObjectCreatedEvent> event = (Event<IdentityObjectCreatedEvent>) sessionOptions.get(IdentitySessionProducer.SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT)
 
-        return new JpaIdentityStoreSessionImpl(em);
+        return new JpaIdentityStoreSessionImpl(em, event);
     }
 
     public IdentityObject createIdentityObject(
@@ -942,7 +946,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             EntityManager em = getEntityManager(ctx);
 
             em.persist(identityInstance);
-
+            
+            // Fire an event that contains the new identity object
+            ((JpaIdentityStoreSessionImpl) ctx.getIdentityStoreSession()).getIdentityObjectCreatedEvent().fire(
+                    new IdentityObjectCreatedEvent(identityInstance));
+                        
             Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
             IdentityObject obj = new IdentityObjectImpl(
                     (id != null ? id.toString() : null),
@@ -1004,7 +1012,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         Property<?> identityTypeProp = modelProperties.get(PROPERTY_IDENTITY_TYPE);
 
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<?> criteria = builder.createQuery(identityClass);
+        CriteriaQuery<?> criteria = builder.createQuery(identityClass);        
         Root<?> root = criteria.from(identityClass);
 
         List<Predicate> predicates = new ArrayList<Predicate>();

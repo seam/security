@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Bean;
@@ -40,6 +41,9 @@ import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
 @ApplicationScoped
 public class IdentitySessionProducer implements EventListener {
     private IdentitySessionFactory factory;
+    
+    public static final String SESSION_OPTION_ENTITY_MANAGER = "ENTITY_MANAGER";
+    public static final String SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT = "IDENTITY_OBJECT_CREATED_EVENT";
 
     private String defaultRealm = "default";
     private String defaultAttributeStoreId;
@@ -118,6 +122,9 @@ public class IdentitySessionProducer implements EventListener {
 
     @Inject
     Instance<EntityManager> entityManagerInstance;
+    
+    @Inject
+    Event<IdentityObjectCreatedEvent> identityObjectCreatedEvent;
 
     @Produces
     @RequestScoped
@@ -126,7 +133,8 @@ public class IdentitySessionProducer implements EventListener {
         Map<String, Object> sessionOptions = new HashMap<String, Object>();
 
         if (!entityManagerInstance.isUnsatisfied() && !entityManagerInstance.isAmbiguous()) {
-            sessionOptions.put("ENTITY_MANAGER", entityManagerInstance.get());
+            sessionOptions.put(SESSION_OPTION_ENTITY_MANAGER, entityManagerInstance.get());
+            sessionOptions.put(SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT, identityObjectCreatedEvent);
         }
 
         IdentitySession session = factory.createIdentitySession(getDefaultRealm(), sessionOptions);
