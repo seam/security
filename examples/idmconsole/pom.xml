@@ -90,10 +90,10 @@
 
         <!-- JSF -->
         <dependency>
-            <groupId>javax.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
         <!-- Optional, but highly recommended. -->
         <dependency>
