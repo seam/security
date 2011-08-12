@@ -28,9 +28,10 @@ import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
 import org.jboss.seam.security.external.saml.idp.SamlIdpBean;
+import org.jboss.seam.security.external.saml.idp.SamlIdpBeanApi;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSingleLogoutService;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSingleSignOnService;
-import org.jboss.seam.security.external.saml.sp.SamlSpBean;
+import org.jboss.seam.security.external.saml.sp.SamlSpBeanApi;
 import org.jboss.seam.security.external.saml.sp.SamlSpSingleLogoutService;
 import org.jboss.seam.security.external.saml.sp.SamlSpSingleSignOnService;
 import org.w3c.dom.Document;
@@ -67,10 +68,10 @@ public class SamlMessageReceiver {
     private Instance<SamlEntityBean> samlEntityBean;
 
     @Inject
-    private Instance<SamlSpBean> samlSpBean;
+    private Instance<SamlSpBeanApi> samlSpBean;
 
     @Inject
-    private Instance<SamlIdpBean> samlIdpBean;
+    private Instance<SamlIdpBeanApi> samlIdpBean;
 
     @Inject
     private SamlSignatureUtilForPostBinding signatureUtilForPostBinding;

@@ -83,6 +83,12 @@
       </dependency>
 
       <dependency>
+         <groupId>org.jboss.seam.config</groupId>
+         <artifactId>seam-config-xml</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
          <groupId>javax.validation</groupId>
          <artifactId>validation-api</artifactId>
          <scope>provided</scope>

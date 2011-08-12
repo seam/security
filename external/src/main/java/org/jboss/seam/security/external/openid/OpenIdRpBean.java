@@ -3,7 +3,7 @@ package org.jboss.seam.security.external.openid;
 import java.io.Writer;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -21,18 +21,15 @@ import org.jboss.seam.security.external.jaxb.xrds.Type;
 import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
 import org.jboss.seam.security.external.jaxb.xrds.XRD;
 import org.jboss.seam.security.external.jaxb.xrds.XRDS;
-import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
-import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.openid4java.discovery.DiscoveryInformation;
 
 /**
  * @author Marcel Kolsteren
  */
-//@Typed(OpenIdRpBean.class)
-@ApplicationScoped
+@Typed(OpenIdRpBean.class)
 @SuppressWarnings("restriction")
-public class OpenIdRpBean extends EntityBean implements OpenIdRelyingPartyApi, OpenIdRelyingPartyConfigurationApi {
+public class OpenIdRpBean extends EntityBean implements OpenIdRpBeanApi {
     @Inject
     private OpenIdRpAuthenticationService openIdSingleLoginSender;
 

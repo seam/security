@@ -35,10 +35,10 @@ public class OpenIdServlet extends HttpServlet {
     private OpenIdRpAuthenticationService openIdRpAuthenticationService;
 
     @Inject
-    private Instance<OpenIdRpBean> rpBean;
+    private Instance<OpenIdRpBeanApi> rpBean;
 
     @Inject
-    private Instance<OpenIdProviderBean> opBean;
+    private Instance<OpenIdProviderBeanApi> opBean;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
