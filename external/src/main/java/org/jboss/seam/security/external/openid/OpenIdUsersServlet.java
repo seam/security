@@ -19,7 +19,7 @@ public class OpenIdUsersServlet extends HttpServlet {
     private static final long serialVersionUID = 1476698956314628568L;
 
     @Inject
-    private Instance<OpenIdProviderBean> opBean;
+    private Instance<OpenIdProviderBeanApi> opBean;
 
     @Inject
     private Instance<OpenIdProviderSpi> providerSpi;

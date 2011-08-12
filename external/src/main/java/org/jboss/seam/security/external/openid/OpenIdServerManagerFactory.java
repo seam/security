@@ -1,6 +1,7 @@
 package org.jboss.seam.security.external.openid;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
@@ -14,7 +15,7 @@ public class OpenIdServerManagerFactory {
     private ServerManager serverManager;
 
     @Inject
-    private OpenIdProviderBean providerBean;
+    private Instance<OpenIdProviderBeanApi> providerBean;
 
     @Produces
     public ServerManager getServerManager() {
@@ -24,6 +25,6 @@ public class OpenIdServerManagerFactory {
     @Inject
     public void startup() throws Exception {
         serverManager = new ServerManager();
-        serverManager.setOPEndpointUrl(providerBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+        serverManager.setOPEndpointUrl(providerBean.get().getServiceURL(OpenIdService.OPEN_ID_SERVICE));
     }
 }
