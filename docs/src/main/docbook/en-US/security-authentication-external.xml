@@ -156,9 +156,9 @@
           </thead>
           <tbody>
             <row>
-              <entry>CustomeOpenIdProvider</entry>
+              <entry>CustomOpenIdProvider</entry>
               <entry>custom</entry>
-              <entry>Coogle</entry>
+              <entry>Google</entry>
               <entry></entry>
             </row>          
             <row>
