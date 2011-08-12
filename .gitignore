@@ -4,3 +4,4 @@ target
 .settings
 external/src/main/generated-source/
 *.sw?
+.DS_Store
