@@ -896,7 +896,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
     public IdentityStoreSession createIdentityStoreSession(
             Map<String, Object> sessionOptions) throws IdentityException {
         EntityManager em = (EntityManager) sessionOptions.get(IdentitySessionProducer.SESSION_OPTION_ENTITY_MANAGER);
-        Event<IdentityObjectCreatedEvent> event = (Event<IdentityObjectCreatedEvent>) sessionOptions.get(IdentitySessionProducer.SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT)
+        Event<IdentityObjectCreatedEvent> event = (Event<IdentityObjectCreatedEvent>) sessionOptions.get(IdentitySessionProducer.SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT);
 
         return new JpaIdentityStoreSessionImpl(em, event);
     }
