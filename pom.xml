@@ -4,7 +4,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>10</version>
+      <version>12</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -21,7 +21,7 @@
    </modules>
    
    <properties>
-      <seam.version>3.0.0.Final</seam.version>
+      <seam.version>3.1.0.Beta1</seam.version>
    </properties>
 
    <dependencyManagement>
@@ -39,12 +39,6 @@
          <dependency>
             <groupId>org.jboss.seam.security</groupId>
             <artifactId>seam-security-api</artifactId>
-            <version>${project.version}</version>
-         </dependency>
-
-         <dependency>
-            <groupId>org.jboss.seam.security</groupId>
-            <artifactId>seam-security-impl</artifactId>
             <version>${project.version}</version>
          </dependency>
 
@@ -69,7 +63,7 @@
          <dependency>
             <groupId>org.jboss.seam.faces</groupId>
             <artifactId>seam-faces</artifactId>
-            <version>3.0.0.CR2</version>
+            <version>3.0.0.Final</version>
          </dependency>
 
       </dependencies>

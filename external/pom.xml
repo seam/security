@@ -14,9 +14,9 @@
    <name>Seam Security External Authentication Services</name>
    <url>${project.parent.url}</url>
 
-   <properties>
+   <!--properties>
       <arquillian.version>1.0.0.Alpha5</arquillian.version>
-   </properties>
+   </properties-->
 
    <build>
       <plugins>
@@ -186,11 +186,11 @@
          <version>1.9.12</version>
       </dependency>
 
-      <dependency>
+      <!--dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-junit</artifactId>
          <scope>test</scope>
-      </dependency>
+      </dependency-->
 
       <dependency>
          <groupId>org.apache.httpcomponents</groupId>
