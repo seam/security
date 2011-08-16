@@ -16,7 +16,7 @@ import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.qualifiers.Security;
 import org.jboss.seam.solder.resourceLoader.Resource;
 
@@ -32,6 +32,10 @@ public class SecurityRuleProducer {
     @Resource("security.drl")
     InputStream securityRules;
 
+    @Inject
+    @Resource("WEB-INF/security.drl")
+    InputStream webInfSecurityRules;
+
     @Produces
     @ApplicationScoped
     @Security
@@ -41,7 +45,9 @@ public class SecurityRuleProducer {
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(config);
 
-        org.drools.io.Resource resource = ResourceFactory.newInputStreamResource(securityRules);
+        org.drools.io.Resource resource = ResourceFactory.newInputStreamResource(
+            securityRules != null ? securityRules : webInfSecurityRules);
+
         kbuilder.add(resource, ResourceType.DRL);
 
         KnowledgeBuilderErrors kbuildererrors = kbuilder.getErrors();

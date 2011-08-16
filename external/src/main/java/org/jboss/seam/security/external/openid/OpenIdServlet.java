@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
 
@@ -35,10 +35,10 @@ public class OpenIdServlet extends HttpServlet {
     private OpenIdRpAuthenticationService openIdRpAuthenticationService;
 
     @Inject
-    private Instance<OpenIdRpBean> rpBean;
+    private Instance<OpenIdRpBeanApi> rpBean;
 
     @Inject
-    private Instance<OpenIdProviderBean> opBean;
+    private Instance<OpenIdProviderBeanApi> opBean;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

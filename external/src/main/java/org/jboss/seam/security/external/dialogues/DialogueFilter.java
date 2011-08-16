@@ -3,7 +3,6 @@ package org.jboss.seam.security.external.dialogues;
 import java.io.IOException;
 import java.net.URLDecoder;
 
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,9 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
-import org.jboss.seam.servlet.http.RequestParam;
 
-@WebFilter(filterName = "DialogueFilter", urlPatterns = "/*")
+@WebFilter(filterName = "DialogueFilter", urlPatterns = "/openid/*")
 public class DialogueFilter implements Filter {
     public final static String DIALOGUE_ID_PARAM = "dialogueId";
 

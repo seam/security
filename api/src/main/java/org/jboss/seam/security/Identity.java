@@ -64,16 +64,23 @@ public interface Identity {
     void checkRestriction(String expr);
 
     /**
-     * Attempts to authenticate the user.  This method is distinct to the
-     * authenticate() method in that it raises events in response to whether
-     * authentication is successful or not.  The following events may be raised
-     * by calling login():
+     * Attempts to authenticate the user.  This method raises the following events in response 
+     * to whether authentication is successful or not.  The following events may be raised
+     * during the call to login():
      * <p/>
      * org.jboss.seam.security.events.LoggedInEvent - raised when authentication is successful
      * org.jboss.seam.security.events.LoginFailedEvent - raised when authentication fails
      * org.jboss.seam.security.events.AlreadyLoggedInEvent - raised if the user is already authenticated
      *
-     * @return String returns "loggedIn" if user is authenticated, or null if not.
+     * @return String returns RESPONSE_LOGIN_SUCCESS if user is authenticated, 
+     * RESPONSE_LOGIN_FAILED if authentication failed, or
+     * RESPONSE_LOGIN_EXCEPTION if an exception occurred during authentication. These response
+     * codes may be used to control user navigation.  For deferred authentication methods, such as Open ID
+     * the login() method will return an immediate result of RESPONSE_LOGIN_FAILED (and subsequently fire
+     * a LoginFailedEvent) however in these conditions it is the responsibility of the Authenticator
+     * implementation to take over the authentication process, for example by redirecting the user to
+     * another authentication service.
+     * 
      */
     String login();
 
@@ -200,9 +207,9 @@ public interface Identity {
      */
     Set<Group> getGroups();
 
-    Class<Authenticator> getAuthenticatorClass();
+    Class<? extends Authenticator> getAuthenticatorClass();
 
-    void setAuthenticatorClass(Class<Authenticator> authenticatorClass);
+    void setAuthenticatorClass(Class<? extends Authenticator> authenticatorClass);
 
     String getAuthenticatorName();
 

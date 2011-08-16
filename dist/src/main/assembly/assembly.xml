@@ -29,6 +29,7 @@
          <outputDirectory>artifacts</outputDirectory>
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
+            <include>org.jboss.seam.security:seam-security-api</include>
             <include>org.jboss.seam.security:seam-security</include>
             <include>org.jboss.seam.security:seam-security-external</include>
          </includes>

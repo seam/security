@@ -19,7 +19,7 @@ public class SamlIdentityProviderSpiImpl implements SamlIdentityProviderSpi {
     private ServletContext servletContext;
 
     @Inject
-    private Identity identity;
+    private SamlIdentity identity;
 
     @Inject
     private SamlIdentityProviderApi idpApi;

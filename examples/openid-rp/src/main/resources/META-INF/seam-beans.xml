@@ -7,12 +7,20 @@
        xsi:schemaLocation="
       http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
 
+    
+    <!-- This doesn't seem to work -->
+    <!--
     <openid:OpenIdRpBean>
         <s:modifies/>
         <openid:hostName>www.openid-rp.com</openid:hostName>
         <openid:port>8080</openid:port>
         <openid:protocol>http</openid:protocol>
     </openid:OpenIdRpBean>
+    -->
+
+    <openid:OpenIdRpInApplicationScopeProducer>
+        <s:modifies/>
+    </openid:OpenIdRpInApplicationScopeProducer>
 
     <security:IdentityImpl>
         <s:modifies/>

@@ -4,7 +4,7 @@
    <parent>
       <groupId>org.jboss.seam.security</groupId>
       <artifactId>seam-security-parent</artifactId>
-      <version>3.0.1-SNAPSHOT</version>
+      <version>3.1.0-SNAPSHOT</version>
       <relativePath>../pom.xml</relativePath>
    </parent>
 
@@ -14,9 +14,9 @@
    <name>Seam Security External Authentication Services</name>
    <url>${project.parent.url}</url>
 
-   <properties>
+   <!--properties>
       <arquillian.version>1.0.0.Alpha5</arquillian.version>
-   </properties>
+   </properties-->
 
    <build>
       <plugins>
@@ -74,12 +74,18 @@
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet</artifactId>
+         <artifactId>seam-servlet-api</artifactId>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.solder</groupId>
          <artifactId>seam-solder</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.seam.config</groupId>
+         <artifactId>seam-config-xml</artifactId>
+         <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -183,6 +189,7 @@
       <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-junit</artifactId>
+         <version>1.0.0.Alpha5</version>
          <scope>test</scope>
       </dependency>
 
@@ -205,7 +212,7 @@
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
                <artifactId>arquillian-jbossas-managed-6</artifactId>
-               <version>${arquillian.version}</version>
+               <version>1.0.0.Alpha5</version>
                <scope>test</scope>
             </dependency>
             <dependency>

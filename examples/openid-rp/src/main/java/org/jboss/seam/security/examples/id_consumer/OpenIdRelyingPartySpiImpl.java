@@ -31,7 +31,7 @@ public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi {
     public void loginSucceeded(OpenIdPrincipal principal, ResponseHolder responseHolder) {
         try {
             openIdAuthenticator.success(principal);
-            deferredAuthentication.fire(new DeferredAuthenticationEvent());
+            deferredAuthentication.fire(new DeferredAuthenticationEvent(true));
 
             responseHolder.getResponse().sendRedirect(servletContext.getContextPath() + "/UserInfo.jsf");
         } catch (IOException e) {

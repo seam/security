@@ -5,7 +5,7 @@
         xmlns:f="http://java.sun.com/jsf/core">
     <f:metadata>
         <f:event type="preRenderView"
-                 listener="#{identity.redirectToLoginIfNotLoggedIn}"/>
+                 listener="#{samlIdentity.redirectToLoginIfNotLoggedIn}"/>
     </f:metadata>
     <ui:composition template="/PageTemplate.xhtml">
 
@@ -14,15 +14,15 @@
         <h:panelGrid columns="2" columnClasses="propertyName, propertyValue">
             <h:outputText value="NameID"/>
             <h:outputText
-                    value="#{identity.samlSpSession.principal.nameId.value}"/>
+                    value="#{samlIdentity.samlSpSession.principal.nameId.value}"/>
             <h:outputText value="NameID format"/>
             <h:outputText
-                    value="#{identity.samlSpSession.principal.nameId.format}"/>
+                    value="#{samlIdentity.samlSpSession.principal.nameId.format}"/>
             <h:outputText value="Identity provider"/>
             <h:outputText
-                    value="#{identity.samlSpSession.identityProvider.entityId}"/>
+                    value="#{samlIdentity.samlSpSession.identityProvider.entityId}"/>
             <h:outputText value="Attributes"/>
-            <h:dataTable value="#{identity.samlSpSession.principal.attributes}"
+            <h:dataTable value="#{samlIdentity.samlSpSession.principal.attributes}"
                          var="attribute">
                 <h:column>
                     <f:facet name="header">Name</f:facet>

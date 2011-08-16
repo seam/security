@@ -11,7 +11,7 @@ import org.jboss.seam.security.external.saml.api.SamlIdentityProviderApi;
 import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 
 @Named
-public class Identity implements Serializable {
+public class SamlIdentity implements Serializable {
     private static final long serialVersionUID = 3739296115750412807L;
 
     @Inject

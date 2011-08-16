@@ -22,7 +22,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;
@@ -81,7 +81,7 @@ class IdentityImpl implements Identity, Serializable {
 
     private User user;
 
-    private Class<Authenticator> authenticatorClass;
+    private Class<? extends Authenticator> authenticatorClass;
     private String authenticatorName;
 
     /**
@@ -120,11 +120,11 @@ class IdentityImpl implements Identity, Serializable {
         return user != null;
     }
 
-    public Class<Authenticator> getAuthenticatorClass() {
+    public Class<? extends Authenticator> getAuthenticatorClass() {
         return authenticatorClass;
     }
 
-    public void setAuthenticatorClass(Class<Authenticator> authenticatorClass) {
+    public void setAuthenticatorClass(Class<? extends Authenticator> authenticatorClass) {
         this.authenticatorClass = authenticatorClass;
     }
 
@@ -146,65 +146,6 @@ class IdentityImpl implements Identity, Serializable {
         return isLoggedIn();
     }
 
-    /**
-     * Performs an authorization check, based on the specified security expression.
-     *
-     * @param expr The security expression to evaluate
-     * @throws NotLoggedInException Thrown if the authorization check fails and
-     * the user is not authenticated
-     * @throws AuthorizationException Thrown if the authorization check fails and
-     * the user is authenticated
-     */
-    // QUESTION should we add the dependency on el-api for the sake of avoiding reinstantiating the VE?
-
-    // TODO redesign restrictions system to be typesafe
-    /*
-    public void checkRestriction(ValueExpression expression)
-    {
-       if (!securityEnabled)
-       {
-          return;
-       }
-
-       if (!expressions.getValue(expression, Boolean.class))
-       {
-          if (!isLoggedIn())
-          {
-             manager.fireEvent(new NotLoggedInEvent());
-
-             log.debug(String.format(
-                "Error evaluating expression [%s] - User not logged in", expression.getExpressionString()));
-             throw new NotLoggedInException();
-          }
-          else
-          {
-             manager.fireEvent(new NotAuthorizedEvent());
-             throw new AuthorizationException(String.format(
-                "Authorization check failed for expression [%s]", expression.getExpressionString()));
-          }
-       }
-    }*/
-
-    /**
-     * Performs an authorization check, based on the specified security expression string.
-     *
-     * @param expr The security expression string to evaluate
-     * @throws NotLoggedInException   Thrown if the authorization check fails and
-     *                                the user is not authenticated
-     * @throws AuthorizationException Thrown if the authorization check fails and
-     *                                the user is authenticated
-     */
-
-    /*
-    public void checkRestriction(String expr)
-    {
-       if (!securityEnabled)
-       {
-          return;
-       }
-
-       checkRestriction(expressions.createValueExpression(expr, Boolean.class).toUnifiedValueExpression());
-    }*/
     public String login() {
         try {
             if (isLoggedIn()) {
@@ -316,7 +257,12 @@ class IdentityImpl implements Identity, Serializable {
     }
 
     protected void deferredAuthenticationObserver(@Observes DeferredAuthenticationEvent event) {
-        postAuthenticate();
+        if (event.isSuccess()) {        
+            postAuthenticate();
+        } else {
+            authenticating = false;
+            activeAuthenticator = null;
+        }
     }
 
     protected void postAuthenticate() {
@@ -361,6 +307,7 @@ class IdentityImpl implements Identity, Serializable {
             beanManager.fireEvent(new PostAuthenticateEvent());
         } finally {
             // Set credential to null whether authentication is successful or not
+            activeAuthenticator = null;
             credentials.setCredential(null);
             authenticating = false;
         }
@@ -413,7 +360,7 @@ class IdentityImpl implements Identity, Serializable {
             // JaasAuthenticator, IdmAuthenticator, or any external authenticator, etc
             if (!JaasAuthenticator.class.isAssignableFrom(auth.getClass()) &&
                     !IdmAuthenticator.class.isAssignableFrom(auth.getClass()) &&
-                    !auth.getClass().getName().startsWith("org.jboss.seam.security.external.")) {
+                    !isExternalAuthenticator(auth.getClass())) {
                 selectedAuth = auth;
                 break;
             }
@@ -424,6 +371,20 @@ class IdentityImpl implements Identity, Serializable {
         }
 
         return selectedAuth;
+    }
+    
+    
+    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {        
+        Class<?> cls = authClass;
+        
+        while (cls != Object.class) {
+            if (cls.getName().startsWith("org.jboss.seam.security.external.")) {
+                return true;
+            }
+            cls = cls.getSuperclass();
+        }
+
+        return false;
     }
 
     @SuppressWarnings("unchecked")

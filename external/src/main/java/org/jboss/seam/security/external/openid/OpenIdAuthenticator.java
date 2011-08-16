@@ -6,12 +6,11 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
@@ -20,6 +19,8 @@ import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
 
 /**
+ * An Authenticator implementation that uses OpenID to authenticate the user.
+ * 
  * @author Shane Bryzak
  */
 public
@@ -37,9 +38,11 @@ class OpenIdAuthenticator
 
     @Inject
     Logger log;
-
+    
+    @Inject HttpServletResponse response;
+       
     private String providerCode;
-
+    
     public String getProviderCode() {
         return providerCode;
     }
@@ -57,23 +60,25 @@ class OpenIdAuthenticator
         return null;
     }
 
-    public void authenticate() {
-        OpenIdRelyingPartyApi openIdApi = openIdApiInstance.get();
-
-        List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();
-        attributes.add(openIdApi.createOpenIdRequestedAttribute("email", "http://schema.openid.net/contact/email", true, 1));
-
+    public void authenticate() {        
         OpenIdProvider selectedProvider = getSelectedProvider();
         if (selectedProvider == null) {
             throw new IllegalStateException("No OpenID provider has been selected");
         }
+        
+        OpenIdRelyingPartyApi openIdApi = openIdApiInstance.get();
 
-        if (log.isDebugEnabled()) log.debug("Logging in using OpenID url: " + selectedProvider.getUrl());
+        List<OpenIdRequestedAttribute> attributes = new LinkedList<OpenIdRequestedAttribute>();        
+                
+        selectedProvider.requestAttributes(openIdApi, attributes);   
 
-        openIdApi.login(selectedProvider.getUrl(), attributes,
-                (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse());
+        openIdApi.login(selectedProvider.getUrl(), attributes, getResponse());
 
         setStatus(AuthenticationStatus.DEFERRED);
+    }
+    
+    protected HttpServletResponse getResponse() {
+        return response;
     }
 
     public List<OpenIdProvider> getProviders() {

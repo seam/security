@@ -5,7 +5,7 @@
         xmlns:f="http://java.sun.com/jsf/core">
     <f:metadata>
         <f:event type="preRenderView"
-                 listener="#{identity.redirectToLoginIfNotLoggedIn}"/>
+                 listener="#{samlIdentity.redirectToLoginIfNotLoggedIn}"/>
     </f:metadata>
     <ui:composition template="/PageTemplate.xhtml">
 
@@ -14,7 +14,7 @@
         <h2>Logged in user</h2>
 
         <h:outputText
-                value="#{identity.samlIdpSession.principal.nameId.value}"/>
+                value="#{samlIdentity.samlIdpSession.principal.nameId.value}"/>
 
         <h2>Session participants</h2>
 
@@ -36,7 +36,7 @@
                     <h:outputText value="#{sp}"/>
                 </h:column>
                 <h:column>
-                    <h:commandLink action="#{identity.remoteLogin(sp)}" value="Login" target="_blank"/>
+                    <h:commandLink action="#{samlIdentity.remoteLogin(sp)}" value="Login" target="_blank"/>
                 </h:column>
             </h:dataTable>
         </h:form>

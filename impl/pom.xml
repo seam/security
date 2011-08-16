@@ -4,12 +4,12 @@
    <parent>
       <groupId>org.jboss.seam.security</groupId>
       <artifactId>seam-security-parent</artifactId>
-      <version>3.0.1-SNAPSHOT</version>
+      <version>3.1.0-SNAPSHOT</version>
       <relativePath>../pom.xml</relativePath>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
-   <artifactId>seam-security-impl</artifactId>
+   <artifactId>seam-security</artifactId>
    <packaging>jar</packaging>
    <name>Seam Security Implementation</name>
    <url>${project.parent.url}</url>
@@ -70,13 +70,19 @@
       </dependency>
 
       <dependency>
+         <groupId>org.jboss.seam.transaction</groupId>
+         <artifactId>seam-transaction-api</artifactId>
+      </dependency>
+
+      <dependency>
          <groupId>org.jboss.seam.international</groupId>
-         <artifactId>seam-international</artifactId>
+         <artifactId>seam-international-api</artifactId>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.solder</groupId>
          <artifactId>seam-solder</artifactId>
+         <scope>compile</scope>
       </dependency>
 
       <dependency>

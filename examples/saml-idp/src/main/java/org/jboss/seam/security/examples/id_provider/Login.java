@@ -21,7 +21,7 @@ public class Login {
     private DialogueManager dialogueManager;
 
     @Inject
-    private Identity identity;
+    private SamlIdentity identity;
 
     public String getUserName() {
         return userName;

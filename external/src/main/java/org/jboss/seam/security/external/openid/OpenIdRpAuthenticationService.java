@@ -9,8 +9,9 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.OpenIdPrincipalImpl;
 import org.jboss.seam.security.external.ResponseHandler;
@@ -37,6 +38,7 @@ import org.openid4java.message.ax.FetchResponse;
 public
 @ApplicationScoped
 class OpenIdRpAuthenticationService {
+    
     @Inject
     private OpenIdRequest openIdRequest;
 
@@ -47,35 +49,37 @@ class OpenIdRpAuthenticationService {
     private Instance<OpenIdRelyingPartySpi> openIdRelyingPartySpi;
 
     @Inject
-    private OpenIdRpBean relyingPartyBean;
+    private Instance<OpenIdRpBeanApi> relyingPartyBean;
 
     @Inject
     private ResponseHandler responseHandler;
 
     @Inject
     private Logger log;
+    
+    @Inject HttpSession session;
 
     @Inject
     private Instance<DialogueBean> dialogue;
 
     public void handleIncomingMessage(HttpServletRequest httpRequest,
                                       HttpServletResponse httpResponse) throws InvalidRequestException {
-        try {
-            // extract the parameters from the authentication response
-            // (which comes in as a HTTP request from the OpenID provider)
-            ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
+        processIncomingMessage(new ParameterList(httpRequest.getParameterMap()), httpRequest.getQueryString(), httpResponse);
+    }    
 
+    public void processIncomingMessage(ParameterList parameterList, String queryString, HttpServletResponse httpResponse) {
+        try {
             // retrieve the previously stored discovery information
             DiscoveryInformation discovered = openIdRequest.getDiscoveryInformation();
             if (discovered == null) {
                 throw new IllegalStateException("No discovery information found in OpenID request");
             }
 
-            // extract the receiving URL from the HTTP request
-            StringBuffer receivingURL = httpRequest.getRequestURL();
-            String queryString = httpRequest.getQueryString();
+            // extract the receiving URL from the HTTP request            
+            StringBuffer receivingURL = new StringBuffer(relyingPartyBean.get().getServiceURL(OpenIdService.OPEN_ID_SERVICE));
+            
             if (queryString != null && queryString.length() > 0)
-                receivingURL.append("?").append(httpRequest.getQueryString());
+                receivingURL.append("?").append(queryString);
 
             // verify the response; ConsumerManager needs to be the same
             // (static) instance used to place the authentication request
@@ -112,7 +116,7 @@ class OpenIdRpAuthenticationService {
 
         dialogue.get().setFinished(true);
     }
-
+    
     @Dialogued(join = true)
     public void sendAuthRequest(String openId, List<OpenIdRequestedAttribute> attributes,
                                 HttpServletResponse response) {
@@ -124,9 +128,9 @@ class OpenIdRpAuthenticationService {
 
             openIdRequest.setDiscoveryInformation(discovered);
 
-            String openIdServiceUrl = relyingPartyBean.getServiceURL(OpenIdService.OPEN_ID_SERVICE);
-            String realm = relyingPartyBean.getRealm();
-            String returnTo = openIdServiceUrl + "?dialogueId=" + dialogue.get().getId();
+            String realm = relyingPartyBean.get().getRealm();
+            String returnTo = relyingPartyBean.get().getServiceURL(
+                    OpenIdService.OPEN_ID_SERVICE) + "?dialogueId=" + dialogue.get().getId();
             AuthRequest authReq = openIdConsumerManager.authenticate(discovered, returnTo, realm);
 
             if (attributes != null && attributes.size() > 0) {

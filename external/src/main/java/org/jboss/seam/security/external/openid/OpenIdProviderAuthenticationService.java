@@ -18,7 +18,9 @@ import org.jboss.seam.security.external.dialogues.DialogueBean;
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
+import org.openid4java.association.AssociationException;
 import org.openid4java.message.AuthRequest;
+import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.DirectError;
 import org.openid4java.message.Message;
 import org.openid4java.message.MessageException;
@@ -27,6 +29,7 @@ import org.openid4java.message.ParameterList;
 import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
+import org.openid4java.server.ServerException;
 import org.openid4java.server.ServerManager;
 
 /**
@@ -52,7 +55,7 @@ public class OpenIdProviderAuthenticationService {
     private Instance<DialogueBean> dialogue;
 
     @Inject
-    private Instance<OpenIdProviderBean> opBean;
+    private Instance<OpenIdProviderBeanApi> opBean;
 
     public void handleIncomingMessage(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws InvalidRequestException {
         ParameterList parameterList = new ParameterList(httpRequest.getParameterMap());
@@ -142,11 +145,15 @@ public class OpenIdProviderAuthenticationService {
             claimedIdentifier = opLocalIdentifier;
         }
 
-        Message authResponse = openIdServerManager.get().authResponse(parameterList, opLocalIdentifier, claimedIdentifier, authenticationSuccesful);
+        Message authResponse;
 
         if (response instanceof DirectError) {
+            authResponse = openIdServerManager.get().authResponse(parameterList, opLocalIdentifier, claimedIdentifier, authenticationSuccesful, true);                     
             writeMessageToResponse(authResponse, response);
         } else {
+            // We cannot sign the message before we add the extension
+            authResponse = openIdServerManager.get().authResponse(parameterList, opLocalIdentifier, claimedIdentifier, authenticationSuccesful, false);
+            
             if (openIdProviderRequest.get().getRequestedAttributes() != null) {
                 try {
                     FetchResponse fetchResponse = FetchResponse.createFetchResponse(openIdProviderRequest.get().getFetchRequest(), attributeValues);
@@ -154,6 +161,14 @@ public class OpenIdProviderAuthenticationService {
                 } catch (MessageException e) {
                     throw new RuntimeException(e);
                 }
+            }
+            
+            try {
+                openIdServerManager.get().sign((AuthSuccess)authResponse);
+            } catch (ServerException e) {
+                throw new RuntimeException(e);
+            } catch (AssociationException e) {
+                throw new RuntimeException(e);
             }
 
             // caller will need to decide which of the following to use:
