@@ -74,7 +74,7 @@
 
       <dependency>
          <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet</artifactId>
+         <artifactId>seam-servlet-api</artifactId>
       </dependency>
 
       <dependency>
@@ -186,11 +186,12 @@
          <version>1.9.12</version>
       </dependency>
 
-      <!--dependency>
+      <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-junit</artifactId>
+         <version>1.0.0.Alpha5</version>
          <scope>test</scope>
-      </dependency-->
+      </dependency>
 
       <dependency>
          <groupId>org.apache.httpcomponents</groupId>
@@ -211,7 +212,7 @@
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
                <artifactId>arquillian-jbossas-managed-6</artifactId>
-               <version>${arquillian.version}</version>
+               <version>1.0.0.Alpha5</version>
                <scope>test</scope>
             </dependency>
             <dependency>

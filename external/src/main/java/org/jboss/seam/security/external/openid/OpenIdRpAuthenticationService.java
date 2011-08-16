@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.OpenIdPrincipalImpl;
 import org.jboss.seam.security.external.ResponseHandler;

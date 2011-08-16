@@ -16,7 +16,7 @@ import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
-import org.jboss.logging.Logger;
+import org.jboss.seam.solder.logging.Logger;
 import org.jboss.seam.security.qualifiers.Security;
 import org.jboss.seam.solder.resourceLoader.Resource;
 

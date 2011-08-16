@@ -28,7 +28,7 @@
         <!-- Seam Security -->
         <dependency>
             <groupId>org.jboss.seam.security</groupId>
-            <artifactId>seam-security-impl</artifactId>
+            <artifactId>seam-security</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -48,9 +48,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.seam.servlet</groupId>
+            <artifactId>seam-servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.seam.persistence</groupId>
             <artifactId>seam-persistence</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.seam.transaction</groupId>
+            <artifactId>seam-transaction</artifactId>
         </dependency>
 
         <dependency>
