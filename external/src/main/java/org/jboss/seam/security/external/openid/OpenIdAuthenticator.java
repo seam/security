@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.seam.solder.logging.Logger;
+import org.jboss.seam.logging.Logger;
 import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;

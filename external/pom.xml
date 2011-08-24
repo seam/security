@@ -14,10 +14,6 @@
    <name>Seam Security External Authentication Services</name>
    <url>${project.parent.url}</url>
 
-   <!--properties>
-      <arquillian.version>1.0.0.Alpha5</arquillian.version>
-   </properties-->
-
    <build>
       <plugins>
          <plugin>
@@ -187,9 +183,14 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-junit</artifactId>
-         <version>1.0.0.Alpha5</version>
+         <groupId>org.jboss.arquillian.junit</groupId>
+         <artifactId>arquillian-junit-container</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap.resolver</groupId>
+         <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
          <scope>test</scope>
       </dependency>
 
