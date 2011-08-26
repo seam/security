@@ -22,7 +22,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.solder.logging.Logger;
+import org.jboss.seam.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;

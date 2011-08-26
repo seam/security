@@ -19,7 +19,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jboss.seam.solder.logging.Logger;
+import org.jboss.seam.logging.Logger;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.JaxbContext;
