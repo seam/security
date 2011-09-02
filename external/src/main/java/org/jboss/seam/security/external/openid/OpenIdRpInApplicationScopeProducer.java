@@ -7,6 +7,9 @@ import javax.enterprise.inject.Produces;
 import org.jboss.seam.solder.core.Veto;
 
 /**
+ * Either this producer bean or OpenIdRpInVirtualApplicationScopeProducer MUST be enabled via
+ * seam-config to allow OpenID authentication.
+ * 
  * @author Marcel Kolsteren
  */
 @Veto

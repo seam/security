@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
@@ -30,14 +31,11 @@ class OpenIdAuthenticator
         extends BaseAuthenticator implements Authenticator, Serializable {
     private static final long serialVersionUID = 4669651866032932651L;
 
-    @Inject
-    Instance<OpenIdRelyingPartyApi> openIdApiInstance;
+    @Inject Instance<OpenIdRelyingPartyApi> openIdApiInstance;   
 
-    @Inject
-    List<OpenIdProvider> providers;
+    @Inject List<OpenIdProvider> providers;
 
-    @Inject
-    Logger log;
+    @Inject Logger log;
     
     @Inject HttpServletResponse response;
        

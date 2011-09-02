@@ -38,6 +38,14 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRpBeanApi {
     
     private String returnToPath;
     
+    @Inject public void init(OpenIdConfiguration config) {
+        setHostName(config.getHostName());
+        setPort(config.getPort());
+        setProtocol(config.getProtocol());
+        setReturnToPath(config.getReturnToPath());
+    }
+    
+    
     public String getReturnToPath() {
         return returnToPath;
     }
