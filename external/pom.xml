@@ -264,12 +264,7 @@
                <artifactId>jboss-server-manager</artifactId>
                <scope>test</scope>
             </dependency>
-            <dependency>
-               <groupId>org.jboss.jbossas</groupId>
-               <artifactId>jboss-as-client</artifactId>
-               <type>pom</type>
-               <scope>test</scope>
-            </dependency>
+            
          </dependencies>
       </profile>
 
