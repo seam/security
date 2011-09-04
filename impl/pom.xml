@@ -8,15 +8,10 @@
       <relativePath>../pom.xml</relativePath>
    </parent>
 
-   <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security</artifactId>
    <packaging>jar</packaging>
    <name>Seam Security Implementation</name>
    <url>${project.parent.url}</url>
-
-   <properties>
-      <drools.version>5.1.1</drools.version>
-   </properties>
 
    <dependencies>
 
@@ -47,21 +42,18 @@
       <dependency>
          <groupId>org.drools</groupId>
          <artifactId>drools-core</artifactId>
-         <version>${drools.version}</version>
          <optional>true</optional>
       </dependency>
 
       <dependency>
          <groupId>org.drools</groupId>
          <artifactId>drools-compiler</artifactId>
-         <version>${drools.version}</version>
          <optional>true</optional>
       </dependency>
 
       <dependency>
          <groupId>org.jboss.seam.security</groupId>
          <artifactId>seam-security-api</artifactId>
-         <version>${project.version}</version>
       </dependency>
 
       <dependency>
