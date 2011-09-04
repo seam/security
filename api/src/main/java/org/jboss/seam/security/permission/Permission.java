@@ -10,6 +10,8 @@ import org.picketlink.idm.spi.model.IdentityObject;
  * @author Shane Bryzak
  */
 public class Permission implements Serializable {
+    private static final long serialVersionUID = 8998625911493711034L;
+    
     private Object resource;
     private String permission;
     private IdentityObject identity;
