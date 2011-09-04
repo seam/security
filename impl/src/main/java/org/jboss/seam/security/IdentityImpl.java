@@ -63,19 +63,15 @@ class IdentityImpl implements Identity, Serializable {
 
     private static final Logger log = Logger.getLogger(IdentityImpl.class);
 
-    @Inject
-    BeanManager beanManager;
+    @Inject BeanManager beanManager;
 
-    @Inject
-    private Credentials credentials;
-    @Inject
-    private PermissionMapper permissionMapper;
+    @Inject private Credentials credentials;
+    
+    @Inject private PermissionMapper permissionMapper;
 
-    @Inject
-    Instance<RequestSecurityState> requestSecurityState;
-    @Inject
-    @Any
-    Instance<Authenticator> authenticators;
+    @Inject Instance<RequestSecurityState> requestSecurityState;
+    
+    @Inject @Any Instance<Authenticator> authenticators;
 
     private Authenticator activeAuthenticator;
 
