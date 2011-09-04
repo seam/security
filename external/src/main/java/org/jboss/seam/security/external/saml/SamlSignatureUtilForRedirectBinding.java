@@ -17,7 +17,6 @@ import org.jboss.seam.security.external.InvalidRequestException;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public class SamlSignatureUtilForRedirectBinding {
     public void sign(SamlRedirectMessage urlEncodedRedirectMessage, PrivateKey signingKey) throws IOException, GeneralSecurityException {
         urlEncodedRedirectMessage.setSignatureAlgorithm(getXMLSignatureAlgorithmURI(signingKey.getAlgorithm()));

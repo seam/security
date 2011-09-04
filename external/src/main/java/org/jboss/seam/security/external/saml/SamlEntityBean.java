@@ -33,7 +33,6 @@ import org.jboss.seam.security.external.saml.api.SamlEntityConfigurationApi;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public abstract class SamlEntityBean extends EntityBean implements SamlEntityConfigurationApi {
     private Map<String, SSODescriptorType> metaInfo = new HashMap<String, SSODescriptorType>();
 

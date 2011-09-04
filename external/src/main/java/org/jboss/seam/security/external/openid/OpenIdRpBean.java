@@ -28,7 +28,6 @@ import org.openid4java.discovery.DiscoveryInformation;
  * @author Marcel Kolsteren
  */
 @Typed(OpenIdRpBean.class)
-@SuppressWarnings("restriction")
 public class OpenIdRpBean extends EntityBean implements OpenIdRpBeanApi {
     @Inject
     private OpenIdRpAuthenticationService openIdSingleLoginSender;

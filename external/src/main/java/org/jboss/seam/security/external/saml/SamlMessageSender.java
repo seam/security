@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
  * @author Marcel Kolsteren
  */
 @ApplicationScoped
-@SuppressWarnings("restriction")
 public class SamlMessageSender {
     @Inject
     private Logger log;

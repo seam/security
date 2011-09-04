@@ -40,7 +40,6 @@ import org.w3c.dom.NodeList;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public class SamlSignatureUtilForPostBinding {
     private final static Logger log = Logger.getLogger(SamlSignatureUtilForPostBinding.class);
 

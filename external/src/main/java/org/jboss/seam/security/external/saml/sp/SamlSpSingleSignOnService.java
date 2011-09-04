@@ -42,7 +42,6 @@ import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public class SamlSpSingleSignOnService {
     @Inject
     private Logger log;

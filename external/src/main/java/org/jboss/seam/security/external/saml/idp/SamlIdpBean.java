@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.jboss.seam.security.external.SamlMultiUserIdentityProviderApi;
 import org.jboss.seam.security.external.SamlNameIdImpl;
 import org.jboss.seam.security.external.SamlPrincipalImpl;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;
@@ -31,7 +30,6 @@ import org.jboss.seam.security.external.saml.SamlEntityBean;
 import org.jboss.seam.security.external.saml.SamlExternalEntity;
 import org.jboss.seam.security.external.saml.SamlIdpOrSp;
 import org.jboss.seam.security.external.saml.SamlServiceType;
-import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
 import org.jboss.seam.security.external.saml.api.SamlIdpSession;
 import org.jboss.seam.security.external.saml.api.SamlNameId;
 import org.jboss.seam.security.external.saml.api.SamlPrincipal;
@@ -40,7 +38,6 @@ import org.jboss.seam.security.external.saml.api.SamlPrincipal;
  * @author Marcel Kolsteren
  */
 @Typed(SamlIdpBean.class)
-@SuppressWarnings("restriction")
 public class SamlIdpBean extends SamlEntityBean implements SamlIdpBeanApi {
     @Inject
     private SamlIdpSingleSignOnService samlIdpSingleSignOnService;
