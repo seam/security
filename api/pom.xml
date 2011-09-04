@@ -8,7 +8,6 @@
       <relativePath>../pom.xml</relativePath>
    </parent>
 
-   <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security-api</artifactId>
    <packaging>jar</packaging>   
    <name>Seam Security API</name>
