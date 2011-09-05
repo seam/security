@@ -908,9 +908,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
     }
 
     protected Object lookupIdentityType(String identityType, EntityManager em) {
+        Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+        
         try {
-            Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
-
             // If there is no identity type table, just return the name
             if (typeNameProp == null) return identityType;
 
@@ -922,7 +922,15 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     .getSingleResult();
             return val;
         } catch (NoResultException ex) {
-            return null;
+            try {
+                // The identity type wasn't found, so create it
+                Object instance = typeNameProp.getDeclaringClass().newInstance();
+                typeNameProp.setValue(instance, identityType);
+                em.persist(instance);
+                return instance;
+            } catch (Exception ex2) {
+                throw new RuntimeException("Error creating identity type", ex2);
+            }
         }
     }
 
@@ -938,7 +946,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
             if (String.class.equals(typeProp.getJavaClass())) {
                 typeProp.setValue(identityInstance, identityObjectType.getName());
-            } else {
+            } else {               
                 typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName(),
                         getEntityManager(ctx)));
             }
