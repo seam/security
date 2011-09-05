@@ -10,7 +10,6 @@ import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.security.UserImpl;
 import org.jboss.seam.transaction.Transactional;
 import org.picketlink.idm.api.Attribute;
 import org.picketlink.idm.api.Group;
@@ -22,6 +21,7 @@ import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.api.model.SimpleRole;
+import org.picketlink.idm.impl.api.model.SimpleUser;
 
 /**
  * A conversation-scoped component for creating and managing user accounts
@@ -69,7 +69,7 @@ class UserAction implements Serializable {
 
         roles = new ArrayList<Role>();
 
-        Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new UserImpl(username));
+        Collection<RoleType> roleTypes = identitySession.getRoleManager().findUserRoleTypes(new SimpleUser(username));
 
         for (RoleType roleType : roleTypes) {
             roles.addAll(identitySession.getRoleManager().findRoles(username, roleType.getName()));
@@ -113,7 +113,7 @@ class UserAction implements Serializable {
     public
     @Transactional
     void deleteUser(String username) throws IdentityException {
-        identitySession.getPersistenceManager().removeUser(new UserImpl(username), true);
+        identitySession.getPersistenceManager().removeUser(new SimpleUser(username), true);
     }
 
     public

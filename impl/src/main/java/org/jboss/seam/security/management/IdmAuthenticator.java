@@ -10,14 +10,15 @@ import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.UserImpl;
 import org.picketlink.idm.api.Credential;
+import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.RoleType;
 import org.picketlink.idm.api.User;
 import org.picketlink.idm.common.exception.FeatureNotSupportedException;
 import org.picketlink.idm.common.exception.IdentityException;
+import org.picketlink.idm.impl.api.model.SimpleUser;
 
 /**
  * Authenticates using Identity Management
@@ -38,7 +39,7 @@ class IdmAuthenticator extends BaseAuthenticator implements Authenticator {
 
     public void authenticate() {
         if (identitySession != null) {
-            User u = new UserImpl(credentials.getUsername());
+            User u = new SimpleUser(credentials.getUsername());
 
             try {
                 boolean success = identitySession.getAttributesManager().validateCredentials(
@@ -54,6 +55,11 @@ class IdmAuthenticator extends BaseAuthenticator implements Authenticator {
                                     role.getGroup().getName(), role.getGroup().getGroupType());
                         }
                     }
+                    
+                    for (Group g : identitySession.getRelationshipManager().findAssociatedGroups(u)) {
+                        identity.addGroup(g.getName(), g.getGroupType());
+                    }
+                    
                     setUser(u);
                     setStatus(AuthenticationStatus.SUCCESS);
                     return;

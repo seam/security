@@ -966,6 +966,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
                 updateAttributes(ctx, obj, attribs.toArray(new IdentityObjectAttribute[attribs.size()]));
             }
+            
+            em.flush();
 
             return obj;
         } catch (Exception ex) {
