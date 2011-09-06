@@ -12,8 +12,6 @@ public interface SessionManager
 
    public Session unregister(String id);
 
-   public boolean isSessionRegistered(String id);
-
    public boolean isSessionValid(String sessionId);
 
    public void invalidateSession(String sessionId);

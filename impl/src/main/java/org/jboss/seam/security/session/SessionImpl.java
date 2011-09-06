@@ -16,6 +16,14 @@ public class SessionImpl implements Session
       return id;
    }
 
+   public SessionImpl(HttpSession httpSession, InetAddress userAddress)
+   {
+      this.id = httpSession.getId();
+      this.creationTime = httpSession.getCreationTime();
+      this.lastAccessedTime = httpSession.getLastAccessedTime();
+      this.userAddress = userAddress;
+   }
+
    public long getCreationTime()
    {
       return creationTime;
@@ -41,7 +49,6 @@ public class SessionImpl implements Session
    @Override
    public boolean isValid()
    {
-      // TODO Auto-generated method stub
       return false;
    }
 

@@ -1,5 +1,8 @@
 package org.jboss.seam.security.session;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
@@ -9,7 +12,6 @@ import javax.servlet.http.HttpSession;
 import org.jboss.seam.security.events.SessionInvalidatedEvent;
 import org.jboss.seam.servlet.event.Destroyed;
 import org.jboss.seam.servlet.event.Initialized;
-import org.jboss.seam.transaction.Transactional;
 
 public class SessionManagerImpl implements SessionManager
 {
@@ -38,12 +40,6 @@ public class SessionManagerImpl implements SessionManager
    }
 
    @Override
-   public boolean isSessionRegistered(String id)
-   {
-      return sessionStore.sessionExists(id);
-   }
-
-   @Override
    public void invalidateSession(String sessionId)
    {
       Session session = sessionStore.findById(sessionId);
@@ -65,9 +61,17 @@ public class SessionManagerImpl implements SessionManager
       return false;
    }
 
-   void sessionInit(@Observes @Initialized HttpSession session)
+   /**
+    * Registering a new session
+    * 
+    * @param session
+    * @throws UnknownHostException
+    */
+   void sessionInit(@Observes @Initialized HttpSession httpSession, HttpServletRequest request)
+            throws UnknownHostException
    {
-      // TODO
+      Session session = new SessionImpl(httpSession, InetAddress.getByName(request.getRemoteAddr()));
+      register(session);
    }
 
    void sessionDestroyed(@Observes @Destroyed HttpSession session)
@@ -75,7 +79,6 @@ public class SessionManagerImpl implements SessionManager
       unregister(session.getId());
    }
 
-   @Transactional
    void requestInit(@Observes @Initialized HttpServletRequest request)
    {
       HttpSession httpSession = request.getSession(false);

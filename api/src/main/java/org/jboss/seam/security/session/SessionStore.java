@@ -1,6 +1,6 @@
 package org.jboss.seam.security.session;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Store where {@link Session} objects are stored/retrieved.
@@ -37,13 +37,6 @@ public interface SessionStore
     * 
     * @return
     */
-   public List<Session> findAllSessions();
+   public Collection<Session> findAllSessions();
 
-   /**
-    * Checks whether the informed session ID exists
-    * 
-    * @param sessionId
-    * @return
-    */
-   public boolean sessionExists(String sessionId);
 }
