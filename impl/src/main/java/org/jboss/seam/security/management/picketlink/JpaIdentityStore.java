@@ -1726,14 +1726,30 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
             Object identity = lookupIdentity(identityObject, em);
 
-            // TODO support for attributeProperties
+            Set<IdentityObjectAttribute> filteredAttribs = new HashSet<IdentityObjectAttribute>();
+            
+            // Filter out the mapped attributes, and update their values
+            for (IdentityObjectAttribute attrib : attributes) {
+                if (attributeProperties.containsKey(attrib.getName())) {
+                    MappedAttribute mappedAttribute = attributeProperties.get(attrib.getName());
+                    if (mappedAttribute.getIdentityProperty() == null) {
+                        mappedAttribute.getAttributeProperty().setValue(identity, attrib.getValue());
+                    } else {
+                        mappedAttribute.getAttributeProperty().setValue(mappedAttribute.getIdentityProperty().getValue(identity), 
+                                attrib.getValue());
+                    }
+                    
+                } else {
+                    filteredAttribs.add(attrib);
+                }
+            }
 
             if (attributeClass != null) {
                 Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
                 Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
                 Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
 
-                for (IdentityObjectAttribute attrib : attributes) {
+                for (IdentityObjectAttribute attrib : filteredAttribs) {
                     if (attrib.getSize() == 1) {
                         Object attribute = attributeClass.newInstance();
                         attributeIdentityProp.setValue(attribute, identity);
@@ -1760,13 +1776,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                                                 IdentityObject identity, String name) throws IdentityException {
         EntityManager em = getEntityManager(ctx);
 
-        MappedAttribute mappedAttribute = attributeProperties.get(name);
-        if (mappedAttribute != null) {
-            // TODO implement attribute search for attributes scattered across the model
-            
-            
-
-            return new SimpleAttribute(name);
+        if (attributeProperties.containsKey(name)) {
+            return getMappedAttribute(ctx, identity, name);
         } else {
             // If there is no attributeClass set, we have nowhere else to look - return an empty attribute
             if (attributeClass == null) return new SimpleAttribute(name);
@@ -1804,17 +1815,45 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             }
         }
     }
+    
+    /**
+     * Returns an attribute value stored elsewhere than the IDENTITY_ATTRIBUTES table
+     * 
+     * @param ctx
+     * @param identity
+     * @param name
+     * @return
+     * @throws IdentityException
+     */
+    private IdentityObjectAttribute getMappedAttribute(IdentityStoreInvocationContext ctx,
+            IdentityObject identity, String name) throws IdentityException {
+        MappedAttribute mappedAttribute = attributeProperties.get(name);
+        
+        EntityManager em = getEntityManager(ctx);
+        
+        if (mappedAttribute.getIdentityProperty() == null) {
+            // The attribute value is stored in the identity object itself
+            return new SimpleAttribute(name, mappedAttribute.getAttributeProperty().getValue(lookupIdentity(identity, em)));
+        } else {
+            // The attribute value is stored in an object referenced by the identity object
+            return new SimpleAttribute(name, mappedAttribute.getAttributeProperty().getValue(
+                    mappedAttribute.getIdentityProperty().getValue(lookupIdentity(identity, em))));    
+        }                
+    }
 
     public Map<String, IdentityObjectAttribute> getAttributes(
             IdentityStoreInvocationContext ctx,
             IdentityObject identityObject) throws IdentityException {
+        
         Map<String, IdentityObjectAttribute> attributes = new HashMap<String, IdentityObjectAttribute>();
 
         EntityManager em = getEntityManager(ctx);
 
         Object identity = lookupIdentity(identityObject, em);
 
-        // TODO iterate through attributeProperties
+        for (String name : attributeProperties.keySet()) {
+            attributes.put(name, getMappedAttribute(ctx, identityObject, name));
+        }
 
         if (attributeClass != null) {
             Property<?> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
@@ -1849,6 +1888,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         return attributes;
     }
 
+    /**
+     * Removes the attributes specified by the attributeNames property.  Mapped attributes cannot be 
+     * removed via this method, instead their values must be overwritten using updateAttributes()
+     */
     public void removeAttributes(IdentityStoreInvocationContext ctx,
                                  IdentityObject identityObject, String[] attributeNames)
             throws IdentityException {
@@ -1891,14 +1934,33 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             EntityManager em = getEntityManager(ctx);
 
             Object identity = lookupIdentity(identityObject, em);
+            
+            Set<IdentityObjectAttribute> filteredAttribs = new HashSet<IdentityObjectAttribute>();
+            
+            // First we need to filter out the mapped attributes, and while we're at it we'll update their values
+            for (IdentityObjectAttribute attrib : attributes) {
+                if (attributeProperties.containsKey(attrib.getName())) {
+                    MappedAttribute mappedAttribute = attributeProperties.get(attrib.getName());
+                    if (mappedAttribute.getIdentityProperty() == null) {
+                        mappedAttribute.getAttributeProperty().setValue(identity, attrib.getValue());
+                    } else {
+                        mappedAttribute.getAttributeProperty().setValue(mappedAttribute.getIdentityProperty().getValue(identity), 
+                                attrib.getValue());
+                    }
+                    
+                } else {
+                    filteredAttribs.add(attrib);
+                }
+            }
 
+            // Now we'll update the remaining, non-mapped attribute values
             if (attributeClass != null) {
                 Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
                 Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
                 Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
                 Property<Object> attributeTypeProp = modelProperties.get(PROPERTY_ATTRIBUTE_TYPE);
 
-                for (IdentityObjectAttribute attrib : attributes) {
+                for (IdentityObjectAttribute attrib : filteredAttribs) {
                     CriteriaBuilder builder = em.getCriteriaBuilder();
                     CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
                     Root<?> root = criteria.from(attributeClass);
