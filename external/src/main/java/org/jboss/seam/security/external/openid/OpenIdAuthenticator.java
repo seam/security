@@ -180,7 +180,6 @@ class OpenIdAuthenticator extends BaseAuthenticator implements Authenticator, Se
                     throw new AuthenticationException("Error loading user's roles and groups", ex);
                 }          
                 
-                session.getTransaction().commit();
             }
         } catch (IdentityException ex) {
             throw new AuthenticationException("Error locating User record for OpenID user", ex);
