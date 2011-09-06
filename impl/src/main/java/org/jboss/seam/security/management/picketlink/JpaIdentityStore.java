@@ -996,7 +996,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                         getEntityManager(ctx)));
             }
 
-            EntityManager em = getEntityManager(ctx);
+            EntityManager em = getEntityManager(ctx);            
+            
+            for (String attribName : attributeProperties.keySet()) {
+                MappedAttribute attrib = attributeProperties.get(attribName);
+                if (attrib.getIdentityProperty() != null && attrib.getIdentityProperty().getValue(identityInstance) == null) {
+                    Object instance = attrib.getIdentityProperty().getJavaClass().newInstance();                    
+                    attrib.getIdentityProperty().setValue(identityInstance, instance);
+                    
+                    em.persist(instance);
+                }
+            }
 
             em.persist(identityInstance);
             
@@ -1744,7 +1754,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                 }
             }
 
-            if (attributeClass != null) {
+            if (!filteredAttribs.isEmpty() && attributeClass != null) {
                 Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
                 Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
                 Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);

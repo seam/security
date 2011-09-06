@@ -153,12 +153,12 @@ class OpenIdAuthenticator extends BaseAuthenticator implements Authenticator, Se
                 
                 User user = session.getPersistenceManager().createUser(principal.getIdentifier());
                 
-                // FIXME allow the OpenID -> IDM attribute mapping to be configured
+                // TODO allow the OpenID -> IDM attribute mapping to be configured
                 
                 // Map fetched attributes to identity-managed attributes for new users 
-                //for (String alias : principal.getAttributeValues().keySet()) {
-                    //session.getAttributesManager().addAttribute(user, alias, principal.getAttribute(alias));    
-                //}               
+                for (String alias : principal.getAttributeValues().keySet()) {
+                    session.getAttributesManager().addAttribute(user, alias, principal.getAttribute(alias));    
+                }               
                 
                 // Load the user's roles and groups        
                 try {            
