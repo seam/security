@@ -1,5 +1,11 @@
 package org.jboss.seam.security.session;
 
+/**
+ * Session Manager
+ * 
+ * @author George Gastaldi
+ * 
+ */
 public interface SessionManager
 {
    public void register(Session session);
@@ -8,4 +14,7 @@ public interface SessionManager
 
    public boolean isSessionRegistered(String id);
 
+   public boolean isSessionValid(String sessionId);
+
+   public void invalidateSession(String sessionId);
 }

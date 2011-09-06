@@ -18,6 +18,9 @@ public interface Session
 
    public InetAddress getUserAddress();
 
+   public boolean isValid();
+
    public void invalidate();
 
+   public void updateSessionValues(Object sessionObj);
 }
