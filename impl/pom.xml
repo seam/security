@@ -67,6 +67,11 @@
       </dependency>
 
       <dependency>
+         <groupId>org.jboss.seam.servlet</groupId>
+         <artifactId>seam-servlet</artifactId>
+      </dependency>
+
+      <dependency>
          <groupId>org.jboss.seam.international</groupId>
          <artifactId>seam-international</artifactId>
       </dependency>
