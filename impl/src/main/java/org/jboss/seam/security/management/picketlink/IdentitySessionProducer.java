@@ -40,7 +40,7 @@ import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
  */
 @ApplicationScoped
 public class IdentitySessionProducer implements EventListener {
-    private IdentitySessionFactory factory;
+    @Produces private IdentitySessionFactory factory;
     
     public static final String SESSION_OPTION_ENTITY_MANAGER = "ENTITY_MANAGER";
     public static final String SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT = "IDENTITY_OBJECT_CREATED_EVENT";

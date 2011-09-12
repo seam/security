@@ -1011,8 +1011,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             em.persist(identityInstance);
             
             // Fire an event that contains the new identity object
-            ((JpaIdentityStoreSessionImpl) ctx.getIdentityStoreSession()).getIdentityObjectCreatedEvent().fire(
-                    new IdentityObjectCreatedEvent(identityInstance));
+            Event<IdentityObjectCreatedEvent> event = ((JpaIdentityStoreSessionImpl) ctx.getIdentityStoreSession()).getIdentityObjectCreatedEvent();
+            
+            if (event != null) {
+                event.fire(new IdentityObjectCreatedEvent(identityInstance));
+            }                    
                         
             Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
             IdentityObject obj = new IdentityObjectImpl(

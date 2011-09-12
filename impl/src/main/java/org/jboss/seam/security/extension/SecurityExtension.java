@@ -164,7 +164,7 @@ public class SecurityExtension implements Extension {
                                          final BeanManager beanManager) {
         AnnotatedTypeBuilder<X> builder = null;
         AnnotatedType<X> type = event.getAnnotatedType();
-
+        
         boolean isSecured = false;
 
         // Add the security interceptor to the class if the class is annotated
