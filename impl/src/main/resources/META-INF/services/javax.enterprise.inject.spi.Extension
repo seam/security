@@ -1,2 +1,3 @@
 org.jboss.seam.security.contexts.AuthenticationScopedExtension
 org.jboss.seam.security.extension.SecurityExtension
+org.jboss.seam.security.management.picketlink.JpaIdentityStoreConfiguration

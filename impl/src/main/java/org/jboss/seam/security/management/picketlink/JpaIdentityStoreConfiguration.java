@@ -7,18 +7,13 @@ import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.persistence.Entity;
 
-import org.jboss.seam.security.annotations.management.EntityType;
 import org.jboss.seam.security.annotations.management.IdentityEntity;
-import org.jboss.seam.security.annotations.management.IdentityProperty;
-import org.jboss.seam.security.annotations.management.PropertyType;
-import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreConfigurationMetaDataImpl;
 
 /**
