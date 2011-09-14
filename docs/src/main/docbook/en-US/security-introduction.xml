@@ -148,6 +148,20 @@
     </section>
     
     <section>
+      <title>Enabling the Security Interceptor</title>
+      
+      <para>
+        To enable many of the features of Seam Security, the Security interceptor must be configured in your
+        application's <literal>beans.xml</literal> file.  Add the following configuration to your 
+        <literal>beans.xml</literal> to enable the Security Interceptor:
+      </para>
+      
+      <programlisting><![CDATA[    <interceptors>
+        <class>org.jboss.seam.security.SecurityInterceptor</class>
+    </interceptors>]]></programlisting>
+    </section>
+    
+    <section>
       <title>Third Party Dependencies</title>
     
     </section>
