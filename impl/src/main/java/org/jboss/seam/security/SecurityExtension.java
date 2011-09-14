@@ -1,4 +1,4 @@
-package org.jboss.seam.security.extension;
+package org.jboss.seam.security;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

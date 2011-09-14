@@ -1,6 +1,7 @@
-package org.jboss.seam.security.extension;
+package org.jboss.seam.security;
 
 import javax.enterprise.util.AnnotationLiteral;
+
 
 
 /**

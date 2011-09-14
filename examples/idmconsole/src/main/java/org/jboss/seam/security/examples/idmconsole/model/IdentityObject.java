@@ -24,7 +24,7 @@ public class IdentityObject implements Serializable {
     private static final long serialVersionUID = -4623023512038059728L;
 
     private Long id;
-    private String name;
+    @IdentityProperty(PropertyType.NAME) private String name;
     private IdentityObjectType type;
 
     @Id
@@ -37,7 +37,7 @@ public class IdentityObject implements Serializable {
         this.id = id;
     }
 
-    @IdentityProperty(PropertyType.NAME)
+    
     public String getName() {
         return name;
     }
