@@ -230,6 +230,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
      */
     private Map<String, MappedAttribute> attributeProperties = new HashMap<String, MappedAttribute>();
 
+    boolean namedRelationshipsSupported = false;
     private FeaturesMetaData featuresMetaData;
 
     private class PropertyTypeCriteria implements PropertyCriteria {
@@ -293,8 +294,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         } catch (ClassNotFoundException e) {
             throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid relationship entity class: " + clsName);
         }
-
-        boolean namedRelationshipsSupported = false;
 
         clsName = configurationContext.getStoreConfigurationMetaData()
                 .getOptionSingleValue(OPTION_ROLE_TYPE_CLASS_NAME);
@@ -708,11 +707,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     "Ambiguous relationship name property in relationship class " +
                             relationshipClass.getName());
         } else {
-            Property<Object> p = findNamedProperty(relationshipClass,
-                    "relationshipName", "name");
+            Property<Object> p = findNamedProperty(relationshipClass, "relationshipName", "name");
             if (p != null) {
                 modelProperties.put(PROPERTY_RELATIONSHIP_NAME, p);
             }
+        }
+        
+        if (modelProperties.containsKey(PROPERTY_RELATIONSHIP_NAME)) {
+            namedRelationshipsSupported = true;
         }
 
         if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_FROM)) {
@@ -1243,6 +1245,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             OperationNotSupportedException {
         Set<String> names = new HashSet<String>();
 
+        if (!featuresMetaData.isNamedRelationshipsSupported()) return names;
+        
         Property<Object> roleTypeNameProp = modelProperties.get(PROPERTY_ROLE_TYPE_NAME);
 
         if (roleTypeClass != null) {
@@ -1253,6 +1257,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             criteria.from(roleTypeClass);
 
             List<?> results = em.createQuery(criteria).getResultList();
+            
             for (Object result : results) {
                 names.add(roleTypeNameProp.getValue(result).toString());
             }
