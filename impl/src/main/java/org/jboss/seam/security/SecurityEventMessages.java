@@ -2,6 +2,7 @@ package org.jboss.seam.security;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 
 import org.jboss.seam.international.status.Messages;
@@ -10,6 +11,7 @@ import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
 import org.jboss.seam.security.events.NotLoggedInEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
+import org.jboss.seam.solder.core.Requires;
 
 /**
  * Produces FacesMessages in response of certain security events, and helps to
@@ -18,7 +20,7 @@ import org.jboss.seam.security.events.PostAuthenticateEvent;
  * @author Shane Bryzak
  */
 public
-@ApplicationScoped
+@ApplicationScoped @Alternative @Requires("org.jboss.seam.international.status.Messages")
 class SecurityEventMessages {
     private static final String LOGIN_FAILED_MESSAGE_KEY = "org.jboss.seam.loginFailed";
     private static final String LOGIN_SUCCESSFUL_MESSAGE_KEY = "org.jboss.seam.loginSuccessful";

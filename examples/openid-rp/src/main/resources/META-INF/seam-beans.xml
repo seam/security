@@ -18,9 +18,11 @@
     </openid:OpenIdRpBean>
     -->
 
-    <openid:OpenIdRpInApplicationScopeProducer>
+    <!--openid:OpenIdRpInApplicationScopeProducer>
         <s:modifies/>
-    </openid:OpenIdRpInApplicationScopeProducer>
+    </openid:OpenIdRpInApplicationScopeProducer-->
+    
+    org.jboss.seam.security.external.openid.OpenIdRpInApplicationScopeProducer
 
     <security:IdentityImpl>
         <s:modifies/>

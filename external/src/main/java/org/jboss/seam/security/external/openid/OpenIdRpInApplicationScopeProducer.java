@@ -12,7 +12,6 @@ import org.jboss.seam.solder.core.Veto;
  * 
  * @author Marcel Kolsteren
  */
-@Veto
 public class OpenIdRpInApplicationScopeProducer {
     @Produces
     @ApplicationScoped
