@@ -139,7 +139,7 @@ public class IdentitySessionProducer implements EventListener {
             throws IdentityException {
         
         if (metadata.getRepositories() == null || metadata.getRepositories().size() == 0) {
-            throw new IdentityException("Error creating IdentitySession - no repositories have been configured.");
+            throw new IdentityException("Error creating IdentitySession - no PicketLink IdentityStore repositories have been configured.");
         }
         
         Map<String, Object> sessionOptions = new HashMap<String, Object>();
