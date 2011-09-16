@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 
 import org.picketlink.idm.api.IdentitySession;
 import org.picketlink.idm.api.IdentitySessionFactory;
+import org.picketlink.idm.api.cfg.IdentityConfiguration;
 import org.picketlink.idm.api.event.EventListener;
 import org.picketlink.idm.common.exception.IdentityConfigurationException;
 import org.picketlink.idm.common.exception.IdentityException;
@@ -28,6 +29,7 @@ import org.picketlink.idm.impl.configuration.metadata.IdentityStoreConfiguration
 import org.picketlink.idm.impl.configuration.metadata.IdentityStoreMappingMetaDataImpl;
 import org.picketlink.idm.impl.configuration.metadata.RealmConfigurationMetaDataImpl;
 import org.picketlink.idm.impl.repository.WrapperIdentityStoreRepository;
+import org.picketlink.idm.spi.configuration.metadata.IdentityConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityRepositoryConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreConfigurationMetaData;
 import org.picketlink.idm.spi.configuration.metadata.IdentityStoreMappingMetaData;
@@ -40,21 +42,22 @@ import org.picketlink.idm.spi.configuration.metadata.RealmConfigurationMetaData;
  */
 @ApplicationScoped
 public class IdentitySessionProducer implements EventListener {
-    @Produces private IdentitySessionFactory factory;
-    
+   
     public static final String SESSION_OPTION_ENTITY_MANAGER = "ENTITY_MANAGER";
     public static final String SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT = "IDENTITY_OBJECT_CREATED_EVENT";
 
     private String defaultRealm = "default";
     private String defaultAttributeStoreId;
     private String defaultIdentityStoreId;
+    
+    IdentityConfigurationMetaData metadata; 
 
     @Inject
     BeanManager manager;
 
     @Inject
     public void init() throws IdentityConfigurationException, IdentityException {
-        IdentityConfigurationMetaDataImpl metadata = new IdentityConfigurationMetaDataImpl();
+        metadata = new IdentityConfigurationMetaDataImpl();
 
         // Create the identity store configuration
         List<IdentityStoreConfigurationMetaData> stores = new ArrayList<IdentityStoreConfigurationMetaData>();
@@ -78,7 +81,7 @@ public class IdentitySessionProducer implements EventListener {
             }
         }
 
-        metadata.setIdentityStores(stores);
+        ((IdentityConfigurationMetaDataImpl) metadata).setIdentityStores(stores);
 
         // Create the default realm
         RealmConfigurationMetaDataImpl realm = new RealmConfigurationMetaDataImpl();
@@ -88,7 +91,7 @@ public class IdentitySessionProducer implements EventListener {
         realm.setOptions(new HashMap<String, List<String>>());
         List<RealmConfigurationMetaData> realms = new ArrayList<RealmConfigurationMetaData>();
         realms.add(realm);
-        metadata.setRealms(realms);
+        ((IdentityConfigurationMetaDataImpl) metadata).setRealms(realms);
 
         if (stores.size() > 0) {
             List<IdentityRepositoryConfigurationMetaData> repositories = new ArrayList<IdentityRepositoryConfigurationMetaData>();
@@ -111,13 +114,10 @@ public class IdentitySessionProducer implements EventListener {
             repository.setIdentityStoreToIdentityObjectTypeMappings(mappings);
 
             repositories.add(repository);
-            metadata.setRepositories(repositories);
+            ((IdentityConfigurationMetaDataImpl) metadata).setRepositories(repositories);
         }
 
-        IdentityConfigurationImpl config = new IdentityConfigurationImpl();
-        config.configure(metadata);
-
-        factory = config.buildIdentitySessionFactory();
+        
     }
 
     @Inject
@@ -125,18 +125,30 @@ public class IdentitySessionProducer implements EventListener {
     
     @Inject
     Event<IdentityObjectCreatedEvent> identityObjectCreatedEvent;
+    
+    @Produces 
+    public IdentitySessionFactory produceFactory() throws IdentityConfigurationException {
+        IdentityConfigurationImpl config = new IdentityConfigurationImpl();
+        config.configure(metadata);
+        return config.buildIdentitySessionFactory();
+    }
 
     @Produces
     @RequestScoped
-    IdentitySession createIdentitySession()
+    IdentitySession createIdentitySession(IdentitySessionFactory factory)
             throws IdentityException {
+        
+        if (metadata.getRepositories() == null || metadata.getRepositories().size() == 0) {
+            throw new IdentityException("Error creating IdentitySession - no repositories have been configured.");
+        }
+        
         Map<String, Object> sessionOptions = new HashMap<String, Object>();
 
         if (!entityManagerInstance.isUnsatisfied() && !entityManagerInstance.isAmbiguous()) {
             sessionOptions.put(SESSION_OPTION_ENTITY_MANAGER, entityManagerInstance.get());
             sessionOptions.put(SESSION_OPTION_IDENTITY_OBJECT_CREATED_EVENT, identityObjectCreatedEvent);
         }
-
+            
         IdentitySession session = factory.createIdentitySession(getDefaultRealm(), sessionOptions);
         session.registerListener(this);
         return session;
