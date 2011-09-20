@@ -3,5 +3,6 @@ target
 .project
 .settings
 external/src/main/generated-source/
+*/src/META-INF/
 *.sw?
 .DS_Store
