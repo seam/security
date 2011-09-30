@@ -1,8 +1,0 @@
-<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
-<suite name="Seam IdmConsole Example" verbose="2" parallel="false">
-    <test name="idmconsole_ftest">
-        <packages>
-            <package name="org.jboss.seam.security.examples.idmconsole.ftest"/>
-        </packages>
-    </test>
-</suite>
