@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.openid;
+package org.jboss.seam.security.examples.id_consumer;
 
 import java.util.Properties;
 
