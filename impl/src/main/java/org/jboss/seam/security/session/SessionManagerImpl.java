@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.jboss.seam.security.events.SessionInvalidatedEvent;
-import org.jboss.seam.servlet.event.Destroyed;
-import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.solder.servlet.event.Destroyed;
+import org.jboss.solder.servlet.event.Initialized;
 
 public class SessionManagerImpl implements SessionManager
 {

@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.annotations.permission.PermissionProperty;
 import org.jboss.seam.security.annotations.permission.PermissionPropertyType;
 import org.jboss.seam.security.permission.PermissionMetadata.ActionSet;

@@ -4,7 +4,7 @@ import javax.enterprise.event.Observes;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.saml.api.SamlIdentityProviderConfigurationApi;
-import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.solder.servlet.event.Initialized;
 
 public class IdpCustomizer {
     public void servletInitialized(@Observes @Initialized final ServletContext context, SamlIdentityProviderConfigurationApi idp) {

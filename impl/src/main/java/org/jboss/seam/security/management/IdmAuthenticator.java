@@ -5,7 +5,7 @@ import java.util.Collection;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;

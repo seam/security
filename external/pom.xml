@@ -112,19 +112,8 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet-api</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.solder</groupId>
-         <artifactId>seam-solder</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.config</groupId>
-         <artifactId>seam-config-xml</artifactId>
-         <scope>test</scope>
+         <groupId>org.jboss.solder</groupId>
+         <artifactId>solder-impl</artifactId>
       </dependency>
 
       <dependency>

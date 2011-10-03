@@ -67,18 +67,13 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.servlet</groupId>
-         <artifactId>seam-servlet</artifactId>
-      </dependency>
-
-      <dependency>
          <groupId>org.jboss.seam.international</groupId>
          <artifactId>seam-international</artifactId>
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.solder</groupId>
-         <artifactId>seam-solder</artifactId>
+         <groupId>org.jboss.solder</groupId>
+         <artifactId>solder-impl</artifactId>
          <scope>compile</scope>
       </dependency>
 
