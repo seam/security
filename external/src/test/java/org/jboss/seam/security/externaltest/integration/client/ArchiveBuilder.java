@@ -44,7 +44,7 @@ class ArchiveBuilder {
         		.loadReposFromPom("pom.xml")
         		.artifact("org.jboss.seam.security:seam-security")
         		.artifact("org.jboss.seam.servlet:seam-servlet")
-        		.artifact("org.jboss.seam.solder:seam-solder")
+        		.artifact("org.jboss.solder:seam-solder")
         		.artifact("org.jboss.seam.config:seam-config-xml")
         		.artifact("org.openid4java:openid4java-consumer:pom").exclusion("xerces:xercesImpl")
         		.artifact("nekohtml:nekohtml")

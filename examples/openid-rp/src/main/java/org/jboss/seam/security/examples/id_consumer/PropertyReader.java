@@ -2,7 +2,7 @@ package org.jboss.seam.security.examples.openid;
 
 import java.util.Properties;
 
-import org.jboss.seam.solder.core.Veto;
+import org.jboss.solder.core.Veto;
 
 
 @Veto

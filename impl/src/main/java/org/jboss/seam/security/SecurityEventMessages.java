@@ -11,7 +11,7 @@ import org.jboss.seam.security.events.LoggedInEvent;
 import org.jboss.seam.security.events.LoginFailedEvent;
 import org.jboss.seam.security.events.NotLoggedInEvent;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
-import org.jboss.seam.solder.core.Requires;
+import org.jboss.solder.core.Requires;
 
 /**
  * Produces FacesMessages in response of certain security events, and helps to

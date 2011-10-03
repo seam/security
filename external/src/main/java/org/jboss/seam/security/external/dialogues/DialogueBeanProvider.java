@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.dialogues.api.Dialogue;
 import org.jboss.seam.security.external.dialogues.api.DialogueManager;
-import org.jboss.seam.solder.beanManager.BeanManagerLocator;
+import org.jboss.solder.beanManager.BeanManagerLocator;
 
 /**
  * Provides dialogue beans to classes that are not able to inject.

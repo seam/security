@@ -18,7 +18,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.jboss.seam.logging.Logger;
 import org.jboss.seam.security.qualifiers.Security;
-import org.jboss.seam.solder.resourceLoader.Resource;
+import org.jboss.solder.resourceLoader.Resource;
 
 /**
  * Workaround until we have a seam-drools release

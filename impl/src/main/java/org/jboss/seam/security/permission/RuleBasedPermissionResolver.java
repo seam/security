@@ -19,7 +19,7 @@ import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.qualifiers.Security;
-import org.jboss.seam.solder.core.Requires;
+import org.jboss.solder.core.Requires;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 
