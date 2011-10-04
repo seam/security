@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
-import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.solder.servlet.event.Initialized;
 import org.jboss.solder.resourceLoader.Resource;
 
 

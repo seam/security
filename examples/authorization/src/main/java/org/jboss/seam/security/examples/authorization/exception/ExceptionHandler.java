@@ -4,9 +4,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 
-import org.jboss.seam.exception.control.CaughtException;
-import org.jboss.seam.exception.control.Handles;
-import org.jboss.seam.exception.control.HandlesExceptions;
+import org.jboss.solder.exception.control.CaughtException;
+import org.jboss.solder.exception.control.Handles;
+import org.jboss.solder.exception.control.HandlesExceptions;
 import org.jboss.seam.security.AuthorizationException;
 
 /**
