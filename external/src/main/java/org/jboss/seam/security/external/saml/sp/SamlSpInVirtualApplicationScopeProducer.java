@@ -5,7 +5,7 @@ import javax.enterprise.inject.Produces;
 
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplication;
 import org.jboss.seam.security.external.virtualapplications.api.VirtualApplicationScoped;
-import org.jboss.seam.solder.core.Veto;
+import org.jboss.solder.core.Veto;
 
 /**
  * @author Marcel Kolsteren

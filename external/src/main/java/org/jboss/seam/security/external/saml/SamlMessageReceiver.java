@@ -19,7 +19,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.JaxbContext;
@@ -27,7 +27,6 @@ import org.jboss.seam.security.external.dialogues.api.DialogueManager;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.RequestAbstractType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.ResponseType;
 import org.jboss.seam.security.external.jaxb.samlv2.protocol.StatusResponseType;
-import org.jboss.seam.security.external.saml.idp.SamlIdpBean;
 import org.jboss.seam.security.external.saml.idp.SamlIdpBeanApi;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSingleLogoutService;
 import org.jboss.seam.security.external.saml.idp.SamlIdpSingleSignOnService;
@@ -41,7 +40,6 @@ import org.xml.sax.SAXException;
  * @author Marcel Kolsteren
  */
 @ApplicationScoped
-@SuppressWarnings("restriction")
 public class SamlMessageReceiver {
     @Inject
     private Logger log;

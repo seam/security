@@ -12,8 +12,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 
 import org.jboss.seam.security.external.virtualapplications.api.AfterVirtualApplicationCreation;
-import org.jboss.seam.servlet.event.Destroyed;
-import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.solder.servlet.event.Destroyed;
+import org.jboss.solder.servlet.event.Initialized;
 
 /**
  * @author Marcel Kolsteren

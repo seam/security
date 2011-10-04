@@ -20,7 +20,7 @@ public class OpenIdUser implements User {
     }
 
     public String getKey() {
-        return principal.getOpenIdProvider().toString() + ":" + principal.getIdentifier();
+        return getId();
     }
 
     public String getAttribute(String alias) {

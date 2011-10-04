@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.external.InvalidRequestException;
 import org.jboss.seam.security.external.ResponseHandler;
 import org.jboss.seam.security.external.SamlNameIdImpl;
@@ -42,7 +42,6 @@ import org.jboss.seam.security.external.spi.SamlServiceProviderSpi;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public class SamlSpSingleSignOnService {
     @Inject
     private Logger log;

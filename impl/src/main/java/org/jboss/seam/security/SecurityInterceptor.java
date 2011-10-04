@@ -1,4 +1,4 @@
-package org.jboss.seam.security.extension;
+package org.jboss.seam.security;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -8,7 +8,7 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-import org.jboss.seam.security.extension.SecurityExtension.Authorizer;
+import org.jboss.seam.security.SecurityExtension.Authorizer;
 
 /**
  * Provides authorization services for component invocations.

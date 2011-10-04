@@ -28,7 +28,6 @@ import org.openid4java.discovery.DiscoveryInformation;
  * @author Marcel Kolsteren
  */
 @Typed(OpenIdRpBean.class)
-@SuppressWarnings("restriction")
 public class OpenIdRpBean extends EntityBean implements OpenIdRpBeanApi {
     @Inject
     private OpenIdRpAuthenticationService openIdSingleLoginSender;
@@ -37,6 +36,14 @@ public class OpenIdRpBean extends EntityBean implements OpenIdRpBeanApi {
     private ServletContext servletContext;      
     
     private String returnToPath;
+    
+    @Inject public void init(OpenIdConfiguration config) {
+        setHostName(config.getHostName());
+        setPort(config.getPort());
+        setProtocol(config.getProtocol());
+        setReturnToPath(config.getReturnToPath());
+    }
+    
     
     public String getReturnToPath() {
         return returnToPath;

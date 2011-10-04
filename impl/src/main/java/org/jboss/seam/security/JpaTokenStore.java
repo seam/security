@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.jboss.seam.solder.properties.Property;
+import org.jboss.solder.properties.Property;
 
 //import org.jboss.seam.security.annotations.TokenUsername;
 //import org.jboss.seam.security.annotations.TokenValue;

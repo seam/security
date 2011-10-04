@@ -19,9 +19,6 @@
          [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
       -->
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <!-- To set the jboss.home environment variable the Maven way, set the jboss.home property in an active profile in the Maven 2 settings.xml file -->
-      <jboss.home>${env.JBOSS_HOME}</jboss.home>
-      <jboss.domain>default</jboss.domain>
    </properties>
 
    <dependencies>
@@ -51,71 +48,60 @@
          <scope>provided</scope>
       </dependency>
 
-      <!-- Optional, but highly recommended. -->
-      <dependency>
-         <groupId>org.testng</groupId>
-         <artifactId>testng</artifactId>
-         <version>5.10</version>
-         <scope>test</scope>
-         <classifier>jdk15</classifier>
-      </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-      <!-- Needed on JBoss AS as EL is out of date -->
-      <dependency>
-         <groupId>org.glassfish.web</groupId>
-         <artifactId>el-impl</artifactId>
-         <scope>runtime</scope>
-         <!-- FIXME this version should be in the Weld API BOM -->
-         <version>2.1.2-b04</version>
-         <exclusions>
-            <exclusion>
-               <groupId>javax.el</groupId>
-               <artifactId>el-api</artifactId>
-            </exclusion>
-         </exclusions>
-      </dependency>
-      
-      <dependency>
-         <groupId>org.seleniumhq.selenium.client-drivers</groupId>
-         <artifactId>selenium-java-client-driver</artifactId>
-         <version>${selenium.java.client.version}</version>
-         <scope>test</scope>
-      </dependency>
+        <!-- Arquillian Drone support in Arquillian tests -->
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-drone-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-      <dependency>
-         <groupId>org.jboss.test</groupId>
-         <artifactId>richfaces-selenium</artifactId>
-         <version>${richfaces.selenium.version}</version>
-         <scope>test</scope>
-      </dependency>
+        <!-- Support for Selenium in Arquillian Drone -->
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-drone-selenium</artifactId>
+            <scope>test</scope>
+        </dependency>
 
+        <!-- Support for Selenium Server in Arquillian Drone -->
+        <!-- Required only if you want Arquillian to control Selenium Server life cycle -->
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-drone-selenium-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Selenium Server -->
+        <!-- Required only if you want Arquillian to control Selenium Server life cycle -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.ajocado</groupId>
+            <artifactId>arquillian-ajocado-junit</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
    </dependencies>
    <build>
       <finalName>security-simple</finalName>
       <plugins>
-         <!-- Compiler plugin enforces Java 1.6 compatibility -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.6</source>
-               <target>1.6</target>
-            </configuration>
-         </plugin>
-
-         <!-- Configure the JBoss AS Maven deploy plugin -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jboss-maven-plugin</artifactId>
-            <configuration>
-               <jbossHome>${jboss.home}</jbossHome>
-               <serverName>${jboss.domain}</serverName>
-               <fileNames>
-                  <fileName>${project.build.directory}/simple.war</fileName>
-               </fileNames> 
-            </configuration>
-         </plugin>
-         
          <!-- Prevent us from running functional tests as unit tests-->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -128,9 +114,147 @@
    </build>
    <profiles>
       <profile>
-         <id>ftest</id>
+         <id>glassfish</id>
+         <activation>
+            <property>
+               <name>arquillian</name>
+               <value>glassfish-remote-3.1</value>
+            </property>
+         </activation>
+         <dependencies>
+           <dependency>
+             <groupId>joda-time</groupId>
+             <artifactId>joda-time</artifactId>         
+           </dependency>
+         </dependencies>
       </profile>
       
+      <!-- Functional test profiles -->
+        <profile>
+            <id>ftest</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.java</include>
+                            </includes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jbossas-managed-6</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                    <value>jbossas-managed-6</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.seam.test</groupId>
+                    <artifactId>jbossas-managed-6</artifactId>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jbossas-remote-6</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                    <value>jbossas-remote-6</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.seam.test</groupId>
+                    <artifactId>jbossas-remote-6</artifactId>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jbossas-remote-7</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                    <value>jbossas-remote-7</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.seam.test</groupId>
+                    <artifactId>jbossas-remote-7</artifactId>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jbossas-managed-7</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                    <value>jbossas-managed-7</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.seam.test</groupId>
+                    <artifactId>jbossas-managed-7</artifactId>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>glassfish-remote-3.1</id>
+            <activation>
+                <property>
+                    <name>arquillian</name>
+                    <value>glassfish-remote-3.1</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.seam.test</groupId>
+                    <artifactId>glassfish-remote-3.1</artifactId>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+                  
       <profile>
          <id>distribution</id>
          <activation>
@@ -147,15 +271,5 @@
             </plugins>
          </build>
       </profile>   
-      
-      <profile>
-         <id>glassfish</id>
-         <dependencies>
-           <dependency>
-             <groupId>joda-time</groupId>
-             <artifactId>joda-time</artifactId>         
-           </dependency>
-         </dependencies>
-      </profile>            
    </profiles>
 </project>

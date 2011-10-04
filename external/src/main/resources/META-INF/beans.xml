@@ -10,4 +10,5 @@
     <interceptors>
         <class>org.jboss.seam.security.external.dialogues.DialoguedInterceptor</class>
     </interceptors>
+
 </beans>

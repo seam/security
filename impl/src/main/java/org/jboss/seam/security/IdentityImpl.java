@@ -22,7 +22,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;
@@ -39,8 +39,8 @@ import org.jboss.seam.security.jaas.JaasAuthenticator;
 import org.jboss.seam.security.management.IdmAuthenticator;
 import org.jboss.seam.security.permission.PermissionMapper;
 import org.jboss.seam.security.util.Strings;
-import org.jboss.seam.solder.beanManager.BeanManagerLocator;
-import org.jboss.seam.solder.literal.NamedLiteral;
+import org.jboss.solder.beanManager.BeanManagerLocator;
+import org.jboss.solder.literal.NamedLiteral;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
@@ -63,19 +63,15 @@ class IdentityImpl implements Identity, Serializable {
 
     private static final Logger log = Logger.getLogger(IdentityImpl.class);
 
-    @Inject
-    BeanManager beanManager;
+    @Inject BeanManager beanManager;
 
-    @Inject
-    private Credentials credentials;
-    @Inject
-    private PermissionMapper permissionMapper;
+    @Inject private Credentials credentials;
+    
+    @Inject private PermissionMapper permissionMapper;
 
-    @Inject
-    Instance<RequestSecurityState> requestSecurityState;
-    @Inject
-    @Any
-    Instance<Authenticator> authenticators;
+    @Inject Instance<RequestSecurityState> requestSecurityState;
+    
+    @Inject @Any Instance<Authenticator> authenticators;
 
     private Authenticator activeAuthenticator;
 

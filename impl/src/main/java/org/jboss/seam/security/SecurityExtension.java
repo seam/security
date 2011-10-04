@@ -1,4 +1,4 @@
-package org.jboss.seam.security.extension;
+package org.jboss.seam.security;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -23,8 +23,8 @@ import org.jboss.seam.security.AuthorizationException;
 import org.jboss.seam.security.SecurityDefinitionException;
 import org.jboss.seam.security.annotations.Secures;
 import org.jboss.seam.security.annotations.SecurityBindingType;
-import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
-import org.jboss.seam.solder.reflection.annotated.InjectableMethod;
+import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
+import org.jboss.solder.reflection.annotated.InjectableMethod;
 
 /**
  * Extension for typesafe security annotations
@@ -164,7 +164,7 @@ public class SecurityExtension implements Extension {
                                          final BeanManager beanManager) {
         AnnotatedTypeBuilder<X> builder = null;
         AnnotatedType<X> type = event.getAnnotatedType();
-
+        
         boolean isSecured = false;
 
         // Add the security interceptor to the class if the class is annotated

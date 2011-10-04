@@ -4,7 +4,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>14</version>
+      <version>15</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -21,7 +21,7 @@
    </modules>
    
    <properties>
-      <seam.version>3.1.0.Beta2</seam.version>
+      <seam.version>3.1.0.Beta3</seam.version>
    </properties>
 
    <dependencyManagement>
@@ -88,46 +88,7 @@
             <!--module>examples/saml-idp</module>
             <module>examples/saml-sp</module-->            
          </modules>
-      </profile>
-      <profile>
-         <id>jboss-public-repository</id>
-         <activation>
-            <property>
-               <name>jboss-public-repository</name>
-               <value>!false</value>
-            </property>
-         </activation>
-         <repositories>
-            <repository>
-               <id>jboss-public-repository-group</id>
-               <name>JBoss Public Maven Repository Group</name>
-               <url>http://repository.jboss.org/nexus/content/groups/public</url>
-               <releases>
-                  <enabled>true</enabled>
-                  <updatePolicy>never</updatePolicy>
-               </releases>
-               <snapshots>
-                  <enabled>true</enabled>
-                  <updatePolicy>never</updatePolicy>
-               </snapshots>
-            </repository>
-         </repositories>
-         <pluginRepositories>
-            <pluginRepository>
-               <id>jboss-public-repository-group</id>
-               <name>JBoss Public Maven Repository Group</name>
-               <url>http://repository.jboss.org/nexus/content/groups/public</url>
-               <releases>
-                  <enabled>true</enabled>
-                  <updatePolicy>never</updatePolicy>
-               </releases>
-               <snapshots>
-                  <enabled>false</enabled>
-                  <updatePolicy>never</updatePolicy>
-               </snapshots>
-            </pluginRepository>
-         </pluginRepositories>
-      </profile>      
+      </profile>   
    </profiles>
 
    <scm>

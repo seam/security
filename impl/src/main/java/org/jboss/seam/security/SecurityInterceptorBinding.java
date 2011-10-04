@@ -1,4 +1,4 @@
-package org.jboss.seam.security.extension;
+package org.jboss.seam.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

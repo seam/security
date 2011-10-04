@@ -12,7 +12,6 @@ import javax.enterprise.context.spi.Contextual;
  * @author Marcel Kolsteren
  */
 public class HashMapBeanStore {
-    private static final long serialVersionUID = -8676730520345382886L;
 
     protected Map<Contextual<?>, ContextualInstance<? extends Object>> contextualInstanceMap;
 

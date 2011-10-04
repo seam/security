@@ -32,7 +32,6 @@ import org.jboss.seam.security.external.saml.api.SamlSpSession;
  * @author Marcel Kolsteren
  */
 @Typed(SamlSpBean.class)
-@SuppressWarnings("restriction")
 public class SamlSpBean extends SamlEntityBean implements SamlSpBeanApi, SamlMultiUserServiceProviderApi, SamlServiceProviderConfigurationApi {
     private List<SamlExternalIdentityProvider> identityProviders = new LinkedList<SamlExternalIdentityProvider>();
 

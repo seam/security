@@ -49,21 +49,6 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.seam.config</groupId>
-         <artifactId>seam-config-xml</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.catch</groupId>
-         <artifactId>seam-catch-api</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.seam.catch</groupId>
-         <artifactId>seam-catch</artifactId>
-      </dependency>
-
-      <dependency>
          <groupId>org.jboss.seam.faces</groupId>
          <artifactId>seam-faces</artifactId>
       </dependency>

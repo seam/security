@@ -61,11 +61,11 @@ public class GoogleOpenIdProvider implements OpenIdProvider {
         }
         
         if (requestFirstName) {
-           attributes.add(openIdApi.createOpenIdRequestedAttribute("firstname", "http://axschema.org/namePerson/first", true, 1));           
+           attributes.add(openIdApi.createOpenIdRequestedAttribute("firstName", "http://axschema.org/namePerson/first", true, 1));           
         }
         
         if (requestLastName) {
-            attributes.add(openIdApi.createOpenIdRequestedAttribute("lastname", "http://axschema.org/namePerson/last", true, 1));
+            attributes.add(openIdApi.createOpenIdRequestedAttribute("lastName", "http://axschema.org/namePerson/last", true, 1));
         }            
     }
 }

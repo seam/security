@@ -1,4 +1,4 @@
-package org.jboss.seam.security.examples.openid;
+package org.jboss.seam.security.examples.id_consumer;
 
 import java.util.Properties;
 
@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyConfigurationApi;
-import org.jboss.seam.servlet.event.Initialized;
-import org.jboss.seam.solder.resourceLoader.Resource;
+import org.jboss.solder.servlet.event.Initialized;
+import org.jboss.solder.resourceLoader.Resource;
 
 
 public class OpenIdRelyingPartyCustomizer {

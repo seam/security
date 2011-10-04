@@ -27,8 +27,6 @@ import org.jboss.seam.security.external.jaxb.xrds.Type;
 import org.jboss.seam.security.external.jaxb.xrds.URIPriorityAppendPattern;
 import org.jboss.seam.security.external.jaxb.xrds.XRD;
 import org.jboss.seam.security.external.jaxb.xrds.XRDS;
-import org.jboss.seam.security.external.openid.api.OpenIdProviderApi;
-import org.jboss.seam.security.external.openid.api.OpenIdProviderConfigurationApi;
 import org.jboss.seam.security.external.spi.OpenIdProviderSpi;
 import org.openid4java.discovery.DiscoveryInformation;
 
@@ -36,7 +34,6 @@ import org.openid4java.discovery.DiscoveryInformation;
  * @author Marcel Kolsteren
  */
 @Typed(OpenIdProviderBean.class)
-@SuppressWarnings("restriction")
 public class OpenIdProviderBean extends EntityBean implements OpenIdProviderBeanApi {
     @Inject
     private Instance<OpenIdProviderRequest> openIdProviderRequest;

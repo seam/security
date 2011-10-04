@@ -6,7 +6,7 @@ import org.jboss.seam.security.Authenticator;
 import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
-import org.jboss.seam.security.UserImpl;
+import org.picketlink.idm.impl.api.model.SimpleUser;
 
 /**
  * @author Shane Bryzak
@@ -29,6 +29,6 @@ public class AuthenticatorImpl extends BaseAuthenticator implements Authenticato
 
         // Let any user log in
         setStatus(AuthenticationStatus.SUCCESS);
-        setUser(new UserImpl(credentials.getUsername()));
+        setUser(new SimpleUser(credentials.getUsername()));
     }
 }

@@ -30,13 +30,13 @@ import org.jboss.seam.security.management.IdentityObjectImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipTypeImpl;
 import org.jboss.seam.security.management.IdentityObjectTypeImpl;
-import org.jboss.seam.solder.properties.Property;
-import org.jboss.seam.solder.properties.query.AnnotatedPropertyCriteria;
-import org.jboss.seam.solder.properties.query.NamedPropertyCriteria;
-import org.jboss.seam.solder.properties.query.PropertyCriteria;
-import org.jboss.seam.solder.properties.query.PropertyQueries;
-import org.jboss.seam.solder.properties.query.TypedPropertyCriteria;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.properties.Property;
+import org.jboss.solder.properties.query.AnnotatedPropertyCriteria;
+import org.jboss.solder.properties.query.NamedPropertyCriteria;
+import org.jboss.solder.properties.query.PropertyCriteria;
+import org.jboss.solder.properties.query.PropertyQueries;
+import org.jboss.solder.properties.query.TypedPropertyCriteria;
+import org.jboss.solder.reflection.Reflections;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
@@ -194,12 +194,43 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
      * Model properties
      */
     private Map<String, Property<Object>> modelProperties = new HashMap<String, Property<Object>>();
+    
+    /**
+     * Used to map attributes to properties spread across the object model 
+     * 
+     */
+    private class MappedAttribute {
+        /**
+         * The property of the IdentityObject class that references the object that 
+         * contains the attribute property
+         */
+        private Property<Object> identityProperty;
+        
+        /**
+         * The property of the mapped object that contains the attribute value
+         */
+        private Property<Object> attributeProperty;
+        
+        public MappedAttribute(Property<Object> identityProperty, Property<Object> attributeProperty) {
+            this.identityProperty = identityProperty;
+            this.attributeProperty = attributeProperty;
+        }
+        
+        public Property<Object> getIdentityProperty() {
+            return identityProperty;
+        }
+        
+        public Property<Object> getAttributeProperty() {
+            return attributeProperty;
+        }
+    }
 
     /**
      * Attribute properties
      */
-    private Map<String, Property<Object>> attributeProperties = new HashMap<String, Property<Object>>();
+    private Map<String, MappedAttribute> attributeProperties = new HashMap<String, MappedAttribute>();
 
+    boolean namedRelationshipsSupported = false;
     private FeaturesMetaData featuresMetaData;
 
     private class PropertyTypeCriteria implements PropertyCriteria {
@@ -263,8 +294,6 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         } catch (ClassNotFoundException e) {
             throw new IdentityException("Error bootstrapping JpaIdentityStore - invalid relationship entity class: " + clsName);
         }
-
-        boolean namedRelationshipsSupported = false;
 
         clsName = configurationContext.getStoreConfigurationMetaData()
                 .getOptionSingleValue(OPTION_ROLE_TYPE_CLASS_NAME);
@@ -678,11 +707,14 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     "Ambiguous relationship name property in relationship class " +
                             relationshipClass.getName());
         } else {
-            Property<Object> p = findNamedProperty(relationshipClass,
-                    "relationshipName", "name");
+            Property<Object> p = findNamedProperty(relationshipClass, "relationshipName", "name");
             if (p != null) {
                 modelProperties.put(PROPERTY_RELATIONSHIP_NAME, p);
             }
+        }
+        
+        if (modelProperties.containsKey(PROPERTY_RELATIONSHIP_NAME)) {
+            namedRelationshipsSupported = true;
         }
 
         if (!modelProperties.containsKey(PROPERTY_RELATIONSHIP_FROM)) {
@@ -803,14 +835,21 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                 .getResultList();
 
         for (Property<Object> p : props) {
-            attributeProperties.put(
-                    p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(),
-                    p);
+            String attribName = p.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName();
+            
+            if (attributeProperties.containsKey(attribName)) {
+                Property<Object> other = attributeProperties.get(attribName).getAttributeProperty(); 
+                
+                throw new IdentityException("Multiple properties defined for attribute [" + attribName + "] - " +
+                   "Property: " + other.getDeclaringClass().getName() + "." + other.getAnnotatedElement().toString() + 
+                   ", Property: " + p.getDeclaringClass().getName() + "." + p.getAnnotatedElement().toString());
+            }
+            
+            attributeProperties.put(attribName, new MappedAttribute(null, p));
         }
 
         // scan any entity classes referenced by the identity class also
-        props = PropertyQueries.createQuery(identityClass)
-                .getResultList();
+        props = PropertyQueries.createQuery(identityClass).getResultList();
 
         for (Property<Object> p : props) {
             if (!p.isReadOnly() && p.getJavaClass().isAnnotationPresent(Entity.class)) {
@@ -819,9 +858,17 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                         .getResultList();
 
                 for (Property<Object> attributeProperty : pp) {
-                    attributeProperties.put(
-                            attributeProperty.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName(),
-                            attributeProperty);
+                    String attribName = attributeProperty.getAnnotatedElement().getAnnotation(IdentityProperty.class).attributeName();
+                    
+                    if (attributeProperties.containsKey(attribName)) {
+                        Property<Object> other = attributeProperties.get(attribName).getAttributeProperty(); 
+                        
+                        throw new IdentityException("Multiple properties defined for attribute [" + attribName + "] - " +
+                           "Property: " + other.getDeclaringClass().getName() + "." + other.getAnnotatedElement().toString() + 
+                           ", Property: " + attributeProperty.getDeclaringClass().getName() + "." + attributeProperty.getAnnotatedElement().toString());                        
+                    }
+                    
+                    attributeProperties.put(attribName, new MappedAttribute(p, attributeProperty));
                 }
             }
         }
@@ -908,9 +955,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
     }
 
     protected Object lookupIdentityType(String identityType, EntityManager em) {
+        Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
+        
         try {
-            Property<Object> typeNameProp = modelProperties.get(PROPERTY_IDENTITY_TYPE_NAME);
-
             // If there is no identity type table, just return the name
             if (typeNameProp == null) return identityType;
 
@@ -922,7 +969,15 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     .getSingleResult();
             return val;
         } catch (NoResultException ex) {
-            return null;
+            try {
+                // The identity type wasn't found, so create it
+                Object instance = typeNameProp.getDeclaringClass().newInstance();
+                typeNameProp.setValue(instance, identityType);
+                em.persist(instance);
+                return instance;
+            } catch (Exception ex2) {
+                throw new RuntimeException("Error creating identity type", ex2);
+            }
         }
     }
 
@@ -938,18 +993,31 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
             if (String.class.equals(typeProp.getJavaClass())) {
                 typeProp.setValue(identityInstance, identityObjectType.getName());
-            } else {
+            } else {               
                 typeProp.setValue(identityInstance, lookupIdentityType(identityObjectType.getName(),
                         getEntityManager(ctx)));
             }
 
-            EntityManager em = getEntityManager(ctx);
+            EntityManager em = getEntityManager(ctx);            
+            
+            for (String attribName : attributeProperties.keySet()) {
+                MappedAttribute attrib = attributeProperties.get(attribName);
+                if (attrib.getIdentityProperty() != null && attrib.getIdentityProperty().getValue(identityInstance) == null) {
+                    Object instance = attrib.getIdentityProperty().getJavaClass().newInstance();                    
+                    attrib.getIdentityProperty().setValue(identityInstance, instance);
+                    
+                    em.persist(instance);
+                }
+            }
 
             em.persist(identityInstance);
             
             // Fire an event that contains the new identity object
-            ((JpaIdentityStoreSessionImpl) ctx.getIdentityStoreSession()).getIdentityObjectCreatedEvent().fire(
-                    new IdentityObjectCreatedEvent(identityInstance));
+            Event<IdentityObjectCreatedEvent> event = ((JpaIdentityStoreSessionImpl) ctx.getIdentityStoreSession()).getIdentityObjectCreatedEvent();
+            
+            if (event != null) {
+                event.fire(new IdentityObjectCreatedEvent(identityInstance));
+            }                    
                         
             Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
             IdentityObject obj = new IdentityObjectImpl(
@@ -966,6 +1034,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
                 updateAttributes(ctx, obj, attribs.toArray(new IdentityObjectAttribute[attribs.size()]));
             }
+            
+            em.flush();
 
             return obj;
         } catch (Exception ex) {
@@ -1175,6 +1245,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             OperationNotSupportedException {
         Set<String> names = new HashSet<String>();
 
+        if (!featuresMetaData.isNamedRelationshipsSupported()) return names;
+        
         Property<Object> roleTypeNameProp = modelProperties.get(PROPERTY_ROLE_TYPE_NAME);
 
         if (roleTypeClass != null) {
@@ -1185,6 +1257,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             criteria.from(roleTypeClass);
 
             List<?> results = em.createQuery(criteria).getResultList();
+            
             for (Object result : results) {
                 names.add(roleTypeNameProp.getValue(result).toString());
             }
@@ -1671,14 +1744,30 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
             Object identity = lookupIdentity(identityObject, em);
 
-            // TODO support for attributeProperties
+            Set<IdentityObjectAttribute> filteredAttribs = new HashSet<IdentityObjectAttribute>();
+            
+            // Filter out the mapped attributes, and update their values
+            for (IdentityObjectAttribute attrib : attributes) {
+                if (attributeProperties.containsKey(attrib.getName())) {
+                    MappedAttribute mappedAttribute = attributeProperties.get(attrib.getName());
+                    if (mappedAttribute.getIdentityProperty() == null) {
+                        mappedAttribute.getAttributeProperty().setValue(identity, attrib.getValue());
+                    } else {
+                        mappedAttribute.getAttributeProperty().setValue(mappedAttribute.getIdentityProperty().getValue(identity), 
+                                attrib.getValue());
+                    }
+                    
+                } else {
+                    filteredAttribs.add(attrib);
+                }
+            }
 
-            if (attributeClass != null) {
+            if (!filteredAttribs.isEmpty() && attributeClass != null) {
                 Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
                 Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
                 Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
 
-                for (IdentityObjectAttribute attrib : attributes) {
+                for (IdentityObjectAttribute attrib : filteredAttribs) {
                     if (attrib.getSize() == 1) {
                         Object attribute = attributeClass.newInstance();
                         attributeIdentityProp.setValue(attribute, identity);
@@ -1705,12 +1794,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                                                 IdentityObject identity, String name) throws IdentityException {
         EntityManager em = getEntityManager(ctx);
 
-        Property<?> attributeProperty = attributeProperties.get(name);
-        if (attributeProperty != null) {
-            // TODO implement attribute search for attributes scattered across the model
-
-
-            return new SimpleAttribute(name);
+        if (attributeProperties.containsKey(name)) {
+            return getMappedAttribute(ctx, identity, name);
         } else {
             // If there is no attributeClass set, we have nowhere else to look - return an empty attribute
             if (attributeClass == null) return new SimpleAttribute(name);
@@ -1748,17 +1833,45 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             }
         }
     }
+    
+    /**
+     * Returns an attribute value stored elsewhere than the IDENTITY_ATTRIBUTES table
+     * 
+     * @param ctx
+     * @param identity
+     * @param name
+     * @return
+     * @throws IdentityException
+     */
+    private IdentityObjectAttribute getMappedAttribute(IdentityStoreInvocationContext ctx,
+            IdentityObject identity, String name) throws IdentityException {
+        MappedAttribute mappedAttribute = attributeProperties.get(name);
+        
+        EntityManager em = getEntityManager(ctx);
+        
+        if (mappedAttribute.getIdentityProperty() == null) {
+            // The attribute value is stored in the identity object itself
+            return new SimpleAttribute(name, mappedAttribute.getAttributeProperty().getValue(lookupIdentity(identity, em)));
+        } else {
+            // The attribute value is stored in an object referenced by the identity object
+            return new SimpleAttribute(name, mappedAttribute.getAttributeProperty().getValue(
+                    mappedAttribute.getIdentityProperty().getValue(lookupIdentity(identity, em))));    
+        }                
+    }
 
     public Map<String, IdentityObjectAttribute> getAttributes(
             IdentityStoreInvocationContext ctx,
             IdentityObject identityObject) throws IdentityException {
+        
         Map<String, IdentityObjectAttribute> attributes = new HashMap<String, IdentityObjectAttribute>();
 
         EntityManager em = getEntityManager(ctx);
 
         Object identity = lookupIdentity(identityObject, em);
 
-        // TODO iterate through attributeProperties
+        for (String name : attributeProperties.keySet()) {
+            attributes.put(name, getMappedAttribute(ctx, identityObject, name));
+        }
 
         if (attributeClass != null) {
             Property<?> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
@@ -1793,6 +1906,10 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         return attributes;
     }
 
+    /**
+     * Removes the attributes specified by the attributeNames property.  Mapped attributes cannot be 
+     * removed via this method, instead their values must be overwritten using updateAttributes()
+     */
     public void removeAttributes(IdentityStoreInvocationContext ctx,
                                  IdentityObject identityObject, String[] attributeNames)
             throws IdentityException {
@@ -1835,14 +1952,33 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             EntityManager em = getEntityManager(ctx);
 
             Object identity = lookupIdentity(identityObject, em);
+            
+            Set<IdentityObjectAttribute> filteredAttribs = new HashSet<IdentityObjectAttribute>();
+            
+            // First we need to filter out the mapped attributes, and while we're at it we'll update their values
+            for (IdentityObjectAttribute attrib : attributes) {
+                if (attributeProperties.containsKey(attrib.getName())) {
+                    MappedAttribute mappedAttribute = attributeProperties.get(attrib.getName());
+                    if (mappedAttribute.getIdentityProperty() == null) {
+                        mappedAttribute.getAttributeProperty().setValue(identity, attrib.getValue());
+                    } else {
+                        mappedAttribute.getAttributeProperty().setValue(mappedAttribute.getIdentityProperty().getValue(identity), 
+                                attrib.getValue());
+                    }
+                    
+                } else {
+                    filteredAttribs.add(attrib);
+                }
+            }
 
+            // Now we'll update the remaining, non-mapped attribute values
             if (attributeClass != null) {
                 Property<Object> attributeIdentityProp = modelProperties.get(PROPERTY_ATTRIBUTE_IDENTITY);
                 Property<Object> attributeNameProp = modelProperties.get(PROPERTY_ATTRIBUTE_NAME);
                 Property<Object> attributeValueProp = modelProperties.get(PROPERTY_ATTRIBUTE_VALUE);
                 Property<Object> attributeTypeProp = modelProperties.get(PROPERTY_ATTRIBUTE_TYPE);
 
-                for (IdentityObjectAttribute attrib : attributes) {
+                for (IdentityObjectAttribute attrib : filteredAttribs) {
                     CriteriaBuilder builder = em.getCriteriaBuilder();
                     CriteriaQuery<?> criteria = builder.createQuery(attributeClass);
                     Root<?> root = criteria.from(attributeClass);

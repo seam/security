@@ -21,7 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jboss.seam.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.external.Base64;
 import org.jboss.seam.security.external.JaxbContext;
 import org.jboss.seam.security.external.ResponseHandler;
@@ -40,7 +40,6 @@ import org.w3c.dom.Node;
  * @author Marcel Kolsteren
  */
 @ApplicationScoped
-@SuppressWarnings("restriction")
 public class SamlMessageSender {
     @Inject
     private Logger log;

@@ -13,7 +13,6 @@ import org.jboss.seam.security.external.jaxb.xmldsig.X509DataType;
 /**
  * @author Marcel Kolsteren
  */
-@SuppressWarnings("restriction")
 public abstract class SamlExternalEntity {
 
     private String entityId;

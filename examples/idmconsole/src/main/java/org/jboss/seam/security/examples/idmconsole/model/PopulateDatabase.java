@@ -4,8 +4,8 @@ import javax.enterprise.event.Observes;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.jboss.seam.servlet.WebApplication;
-import org.jboss.seam.servlet.event.Initialized;
+import org.jboss.solder.servlet.WebApplication;
+import org.jboss.solder.servlet.event.Initialized;
 import org.jboss.seam.transaction.Transactional;
 
 /**

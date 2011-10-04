@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.jboss.seam.security.annotations.management.IdentityEntity;
+import static org.jboss.seam.security.annotations.management.EntityType.IDENTITY_OBJECT;
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
 
@@ -16,12 +18,13 @@ import org.jboss.seam.security.annotations.management.PropertyType;
  *
  * @author Shane Bryzak
  */
+@IdentityEntity(IDENTITY_OBJECT)
 @Entity
 public class IdentityObject implements Serializable {
     private static final long serialVersionUID = -4623023512038059728L;
 
     private Long id;
-    private String name;
+    @IdentityProperty(PropertyType.NAME) private String name;
     private IdentityObjectType type;
 
     @Id
@@ -34,7 +37,7 @@ public class IdentityObject implements Serializable {
         this.id = id;
     }
 
-    @IdentityProperty(PropertyType.NAME)
+    
     public String getName() {
         return name;
     }
