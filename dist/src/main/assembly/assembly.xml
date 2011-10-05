@@ -102,7 +102,7 @@
          <useProjectArtifact>false</useProjectArtifact>
          <includes>
             <include>org.jboss.seam.security:seam-security-api:*:sources</include>
-            <include>org.jboss.seam.security:seam-security-impl:*:sources</include>
+            <include>org.jboss.seam.security:seam-security:*:sources</include>
             <include>org.jboss.seam.security:seam-security-external:*:sources</include>
          </includes>
          <unpackOptions>
