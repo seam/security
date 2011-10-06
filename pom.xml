@@ -59,13 +59,6 @@
             <artifactId>jsf-api</artifactId>
             <version>2.0</version>
          </dependency>
-
-         <dependency>
-            <groupId>org.jboss.seam.faces</groupId>
-            <artifactId>seam-faces</artifactId>
-            <version>3.0.0.Final</version>
-         </dependency>
-
       </dependencies>
    </dependencyManagement>
 
