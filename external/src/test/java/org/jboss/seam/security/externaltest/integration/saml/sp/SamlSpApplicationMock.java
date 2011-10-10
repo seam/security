@@ -6,7 +6,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.external.SamlMultiUserServiceProviderApi;
 import org.jboss.seam.security.external.api.ResponseHolder;
 import org.jboss.seam.security.external.dialogues.api.Dialogued;

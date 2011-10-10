@@ -43,9 +43,7 @@ class ArchiveBuilder {
         war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class)
         		.loadReposFromPom("pom.xml")
         		.artifact("org.jboss.seam.security:seam-security")
-        		.artifact("org.jboss.seam.servlet:seam-servlet")
-        		.artifact("org.jboss.solder:seam-solder")
-        		.artifact("org.jboss.seam.config:seam-config-xml")
+        		.artifact("org.jboss.solder:solder-impl")
         		.artifact("org.openid4java:openid4java-consumer:pom").exclusion("xerces:xercesImpl")
         		.artifact("nekohtml:nekohtml")
         		.artifact("org.apache:xmlsec")
@@ -59,10 +57,10 @@ class ArchiveBuilder {
         war.addPackage(MetaDataLoader.class.getPackage());
         if (entity.equals("sp")) {
             war.addPackage(SpCustomizer.class.getPackage());
-            war.addAsWebInfResource("test_keystore.jks");
+            war.addAsWebInfResource("test_keystore.jks", "classes/test_keystore.jks");
         } else if (entity.equals("idp")) {
             war.addPackage(IdpCustomizer.class.getPackage());
-            war.addAsWebInfResource("test_keystore.jks");
+            war.addAsWebInfResource("test_keystore.jks", "classes/test_keystore.jks");
         } else if (entity.equals("op")) {
             war.addPackage(OpCustomizer.class.getPackage());
         } else if (entity.equals("rp")) {
