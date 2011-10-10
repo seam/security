@@ -3,6 +3,20 @@
 
 <chapter id="security-authorization">
   <title>Security - Authorization</title>
+  
+  <section>
+    <title>Configuration</title>
+    
+    <para>
+      Before using any of Seam's authorization features, you must enable the <code>SecurityInterceptor</code> 
+      by adding the following code to your application's <code>beans.xml</code>:
+      
+      <programlisting><![CDATA[  <interceptors>
+    <class>org.jboss.seam.security.SecurityInterceptor</class>
+  </interceptors>]]></programlisting>
+      
+    </para>
+  </section>
 
   <section>
     <title>Basic Concepts</title>
