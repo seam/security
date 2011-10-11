@@ -198,6 +198,12 @@
       <literal>setUser()</literal> and <literal>setStatus()</literal> methods for setting both the user and status values.
     </para>
     
+    <warning>
+      <para>
+        An <literal>Authenticator</literal> implementation cannot be a stateless session bean.
+      </para>
+    </warning>    
+    
     <para>
       To access the user's credentials from within the <literal>authenticate()</literal> method, you can inject the
       <literal>Credentials</literal> bean like so:
