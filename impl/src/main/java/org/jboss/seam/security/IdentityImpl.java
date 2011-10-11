@@ -22,7 +22,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;
@@ -41,6 +40,7 @@ import org.jboss.seam.security.permission.PermissionMapper;
 import org.jboss.seam.security.util.Strings;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.literal.NamedLiteral;
+import org.jboss.solder.logging.Logger;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
@@ -237,9 +237,6 @@ class IdentityImpl implements Identity, Serializable {
         } catch (Exception ex) {
             authenticating = false;
             if (ex instanceof AuthenticationException) throw (AuthenticationException) ex;
-
-            //throw new RuntimeException(ex);
-            this.beanManager.fireEvent(new LoginFailedEvent(ex));
             return false;
         }
     }

@@ -51,6 +51,18 @@
             <artifactId>seam-transaction</artifactId>
         </dependency>
 
+        <!-- Required for messages API -->
+        <dependency>
+            <groupId>org.jboss.seam.international</groupId>
+            <artifactId>seam-international</artifactId>
+        </dependency>
+
+        <!-- Seam Faces required for messages support -->
+        <dependency>
+            <groupId>org.jboss.seam.faces</groupId>
+	    <artifactId>seam-faces</artifactId>
+	</dependency>
+
         <dependency>
            <groupId>joda-time</groupId>
            <artifactId>joda-time</artifactId>
