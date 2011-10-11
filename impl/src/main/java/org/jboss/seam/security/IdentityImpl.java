@@ -66,11 +66,11 @@ class IdentityImpl implements Identity, Serializable {
     @Inject BeanManager beanManager;
 
     @Inject private Credentials credentials;
-    
+
     @Inject private PermissionMapper permissionMapper;
 
     @Inject Instance<RequestSecurityState> requestSecurityState;
-    
+
     @Inject @Any Instance<Authenticator> authenticators;
 
     private Authenticator activeAuthenticator;
@@ -238,7 +238,9 @@ class IdentityImpl implements Identity, Serializable {
             authenticating = false;
             if (ex instanceof AuthenticationException) throw (AuthenticationException) ex;
 
-            throw new RuntimeException(ex);
+            //throw new RuntimeException(ex);
+            this.beanManager.fireEvent(new LoginFailedEvent(ex));
+            return false;
         }
     }
 
@@ -253,7 +255,7 @@ class IdentityImpl implements Identity, Serializable {
     }
 
     protected void deferredAuthenticationObserver(@Observes DeferredAuthenticationEvent event) {
-        if (event.isSuccess()) {        
+        if (event.isSuccess()) {
             postAuthenticate();
         } else {
             authenticating = false;
@@ -368,11 +370,11 @@ class IdentityImpl implements Identity, Serializable {
 
         return selectedAuth;
     }
-    
-    
-    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {        
+
+
+    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {
         Class<?> cls = authClass;
-        
+
         while (cls != Object.class) {
             if (cls.getName().startsWith("org.jboss.seam.security.external.")) {
                 return true;
