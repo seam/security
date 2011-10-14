@@ -14,7 +14,9 @@ import org.jboss.solder.core.Veto;
 
 /**
  * Produces system messages in response to certain security events.  By default this bean
- * is not installed - use Seam Config to install it.
+ * is not installed - use Seam Config to install it.  If you wish to provide different
+ * messages, then we recommend that you create your own bean that declares its own security event
+ * observers.
  *
  * @author Shane Bryzak
  */

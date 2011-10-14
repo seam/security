@@ -5,6 +5,7 @@
        xmlns:security="urn:java:org.jboss.seam.security"
        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
 
+  <!-- Enable the default security event messages -->
   <security:SecurityEventMessages>
     <s:modifies/>
   </security:SecurityEventMessages>
