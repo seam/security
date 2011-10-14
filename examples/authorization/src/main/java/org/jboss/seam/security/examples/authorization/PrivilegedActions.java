@@ -41,4 +41,14 @@ class PrivilegedActions {
     public void doUserAction() {
         messages.info("doUserAction() invoked");
     }
+    
+    @Foo(bar = "demo")
+    public void doDemoUserRuleAction() {
+        messages.info("doDemoUserRuleAction() invoked");
+    }
+    
+    @Foo(bar = "user")
+    public void doInUserGroupRuleAction() {
+        messages.info("doInUserGroupRuleAction() invoked");
+    }
 }

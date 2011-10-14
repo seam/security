@@ -37,4 +37,13 @@ public class Restrictions {
     boolean isUser(Identity identity) {
         return identity.inGroup("USERS", "GROUP");
     }
+    
+    public @Secures @Foo(bar = "demo") boolean isDemoUser(Identity identity) {
+        return identity.hasPermission("foo", "execute");
+    }
+    
+    public @Secures @Foo(bar = "user") boolean isInUserGroup(Identity identity) {
+        return identity.hasPermission("bar", "execute");
+    }
+    
 }
