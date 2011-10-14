@@ -12,6 +12,7 @@ import java.net.URL;
 import org.jboss.arquillian.ajocado.framework.AjaxSelenium;
 import org.jboss.arquillian.ajocado.locator.IdLocator;
 import org.jboss.arquillian.ajocado.locator.XPathLocator;
+import org.jboss.arquillian.ajocado.utils.URLUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;
@@ -35,6 +36,7 @@ public class AuthorizationTest
 {
     public static final String ARCHIVE_NAME = "security-authorization.war";
     public static final String BUILD_DIRECTORY = "target";
+    public static final String HOME_PAGE = "/security-authorization/home.jsf";
 
     protected IdLocator USERNAME_INPUT = id("loginForm:name");
     protected IdLocator LOGIN = id("loginForm:login");
@@ -44,6 +46,8 @@ public class AuthorizationTest
     protected XPathLocator DO_FOO_DEF = xp("//input[contains(@value,'doFooDef')]");
     protected XPathLocator DO_LOGGED_IN = xp("//input[contains(@value,'doLoggedIn')]");
     protected XPathLocator DO_USER_ACTION = xp("//input[contains(@value,'doUserAction')]");
+    protected XPathLocator DO_DEMO_USER_RULE_ACTION = xp("//input[contains(@value,'doDemoUserRuleAction')]");
+    protected XPathLocator DO_USER_GROUP_RULE_ACTION = xp("//input[contains(@value,'doInUserGroupRuleAction')]");
     private final String WARNING = "You do not have the necessary permissions to perform that operation";
     private final String WARNING_INFO = "You do not have the necessary permissions to perform that operation";
     private final String GENERAL_USER = "martin";
@@ -65,8 +69,7 @@ public class AuthorizationTest
     @Before
     public void openStartUrl() throws MalformedURLException
     {
-        selenium.setSpeed(400);
-        selenium.open(new URL(contextPath.toString()));
+        selenium.open(URLUtils.buildUrl(contextPath, HOME_PAGE));
     }
 
     @Test
@@ -76,20 +79,17 @@ public class AuthorizationTest
         waitForHttp(selenium).click(DO_SOMETHING_RESTRICTED);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         //general user
-        selenium.type(USERNAME_INPUT, GENERAL_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(GENERAL_USER);
         waitForHttp(selenium).click(DO_SOMETHING_RESTRICTED);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
         //member user
-        selenium.type(USERNAME_INPUT, MEMBER_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(MEMBER_USER);
         waitForHttp(selenium).click(DO_SOMETHING_RESTRICTED);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
         //admin user
-        selenium.type(USERNAME_INPUT, ADMIN_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(ADMIN_USER);
         waitForHttp(selenium).click(DO_SOMETHING_RESTRICTED);
         assertTrue("doSomethingRestricted method should be invoked", selenium.isTextPresent("doSomethingRestricted() invoked"));
         waitForHttp(selenium).click(LOGOUT);
@@ -109,20 +109,17 @@ public class AuthorizationTest
         waitForHttp(selenium).click(DO_FOO_DEF);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         //general user
-        selenium.type(USERNAME_INPUT, GENERAL_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(GENERAL_USER);
         waitForHttp(selenium).click(DO_FOO_DEF);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
         //member user
-        selenium.type(USERNAME_INPUT, MEMBER_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(MEMBER_USER);
         waitForHttp(selenium).click(DO_FOO_DEF);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
         //admin user
-        selenium.type(USERNAME_INPUT, ADMIN_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(ADMIN_USER);
         waitForHttp(selenium).click(DO_FOO_DEF);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
@@ -135,20 +132,17 @@ public class AuthorizationTest
         waitForHttp(selenium).click(DO_LOGGED_IN);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         //general user
-        selenium.type(USERNAME_INPUT, MEMBER_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(GENERAL_USER);
         waitForHttp(selenium).click(DO_LOGGED_IN);
         assertTrue("doLoggedIn method should be invoked", selenium.isTextPresent("doLoggedIn() invoked"));
         waitForHttp(selenium).click(LOGOUT);
         //member user
-        selenium.type(USERNAME_INPUT, MEMBER_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(MEMBER_USER);
         waitForHttp(selenium).click(DO_LOGGED_IN);
         assertTrue("doLoggedIn method should be invoked", selenium.isTextPresent("doLoggedIn() invoked"));
         waitForHttp(selenium).click(LOGOUT);
         //admin user
-        selenium.type(USERNAME_INPUT, ADMIN_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(ADMIN_USER);
         waitForHttp(selenium).click(DO_LOGGED_IN);
         assertTrue("doLoggedIn method should be invoked", selenium.isTextPresent("doLoggedIn() invoked"));
         waitForHttp(selenium).click(LOGOUT);
@@ -161,19 +155,71 @@ public class AuthorizationTest
         waitForHttp(selenium).click(DO_USER_ACTION);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         //general user
+        login(GENERAL_USER);
         waitForHttp(selenium).click(DO_USER_ACTION);
         assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        waitForHttp(selenium).click(LOGOUT);
         //member user
-        selenium.type(USERNAME_INPUT, MEMBER_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(MEMBER_USER);
         waitForHttp(selenium).click(DO_USER_ACTION);
         assertTrue("doUserAction method should be invoked", selenium.isTextPresent("doUserAction() invoked"));
         waitForHttp(selenium).click(LOGOUT);
         //admin user
-        selenium.type(USERNAME_INPUT, ADMIN_USER);
-        waitForHttp(selenium).click(LOGIN);
+        login(ADMIN_USER);
         waitForHttp(selenium).click(DO_USER_ACTION);
-        assertTrue("doUserAction method should be invoked", selenium.isTextPresent("doUserAction() invoked"));
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
         waitForHttp(selenium).click(LOGOUT);
+    }
+    
+    @Test
+    public void testDemoUserRuleAction()
+    {
+        // not logged in
+        waitForHttp(selenium).click(DO_DEMO_USER_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        //general user
+        login(GENERAL_USER);
+        waitForHttp(selenium).click(DO_DEMO_USER_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        waitForHttp(selenium).click(LOGOUT);
+        //member user
+        login(MEMBER_USER);
+        waitForHttp(selenium).click(DO_DEMO_USER_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        waitForHttp(selenium).click(LOGOUT);
+        //admin user
+        login(ADMIN_USER);
+        waitForHttp(selenium).click(DO_DEMO_USER_RULE_ACTION);
+        assertTrue("doUserAction method should be invoked", selenium.isTextPresent("doDemoUserRuleAction() invoked"));
+        waitForHttp(selenium).click(LOGOUT);
+    }
+    
+    @Test
+    public void testUserGroupRuleAction()
+    {
+        // not logged in
+        waitForHttp(selenium).click(DO_USER_GROUP_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        //general user
+        login(GENERAL_USER);
+        waitForHttp(selenium).click(DO_USER_GROUP_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        waitForHttp(selenium).click(LOGOUT);
+        //member user
+        login(MEMBER_USER);
+        waitForHttp(selenium).click(DO_USER_GROUP_RULE_ACTION);
+        assertTrue("doUserAction method should be invoked", selenium.isTextPresent("doInUserGroupRuleAction() invoked "));
+        waitForHttp(selenium).click(LOGOUT);
+        //admin user
+        login(ADMIN_USER);
+        waitForHttp(selenium).click(DO_USER_GROUP_RULE_ACTION);
+        assertTrue(WARNING_INFO, selenium.isTextPresent(WARNING));
+        waitForHttp(selenium).click(LOGOUT);
+    }
+    
+    private void login(String name)
+    {
+        selenium.type(USERNAME_INPUT, name);
+        waitForHttp(selenium).click(LOGIN);
     }
 }
