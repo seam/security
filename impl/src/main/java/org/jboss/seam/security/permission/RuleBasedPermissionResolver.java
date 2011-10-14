@@ -20,6 +20,7 @@ import org.jboss.seam.security.events.PostAuthenticateEvent;
 import org.jboss.seam.security.events.PostLoggedOutEvent;
 import org.jboss.seam.security.qualifiers.Security;
 import org.jboss.solder.core.Requires;
+import org.jboss.solder.logging.Logger;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 
@@ -34,15 +35,14 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
     private static final long serialVersionUID = -7572627522601793024L;
 
     private StatefulKnowledgeSession securityContext;
+    
+    @Inject Logger log;
+   
+    @Inject SecurityRuleLoader securityRuleLoader;
 
-    @Inject
-    @Security
-    KnowledgeBase securityRules;
-
-    @Inject
-    BeanManager manager;
-    @Inject
-    Identity identity;
+    @Inject BeanManager manager;
+    
+    @Inject Identity identity;    
 
     @Inject
     public void init() {
@@ -60,6 +60,8 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
      * @return boolean True if the user has the specified permission
      */
     public boolean hasPermission(Object resource, String permission) {
+        if (getSecurityRules() == null) return false;
+        
         StatefulKnowledgeSession securityContext = getSecurityContext();
 
         if (securityContext == null) return false;
@@ -104,6 +106,8 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
     }
 
     public boolean checkConditionalRole(String roleName, Object target, String action) {
+        if (getSecurityRules() == null) return false;
+        
         StatefulKnowledgeSession securityContext = getSecurityContext();
         if (securityContext == null) return false;
 
@@ -230,11 +234,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
     }
 
     public KnowledgeBase getSecurityRules() {
-        return securityRules;
-    }
-
-    public void setSecurityRules(KnowledgeBase securityRules) {
-        this.securityRules = securityRules;
+        return securityRuleLoader.getKnowledgeBase();
     }
 
     /**
