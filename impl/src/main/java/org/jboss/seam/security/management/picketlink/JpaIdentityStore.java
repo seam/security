@@ -1069,6 +1069,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     relationshipName);
 
             em.persist(relationship);
+            em.flush();
 
             return new IdentityObjectRelationshipImpl(fromIdentity, toIdentity,
                     relationshipName, relationshipType);
@@ -1139,6 +1140,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             EntityManager em = getEntityManager(ctx);
 
             em.persist(roleTypeInstance);
+            em.flush();
             return name;
         } catch (Exception ex) {
             throw new IdentityException("Error creating relationship name", ex);

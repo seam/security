@@ -4,8 +4,4 @@
       http://java.sun.com/xml/ns/javaee
       http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
 
-    <interceptors>
-        <class>org.jboss.seam.transaction.TransactionInterceptor</class>
-    </interceptors>
-
 </beans>

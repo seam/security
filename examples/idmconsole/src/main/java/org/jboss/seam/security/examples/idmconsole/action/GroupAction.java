@@ -1,4 +1,4 @@
-package org.jboss.seam.security.management.action;
+package org.jboss.seam.security.examples.idmconsole.action;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.jboss.seam.security.management.action;
+package org.jboss.seam.security.examples.idmconsole.action;
 
 /**
  * Used to transfer user information to a view layer
