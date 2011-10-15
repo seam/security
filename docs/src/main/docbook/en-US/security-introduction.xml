@@ -89,7 +89,7 @@
       </para>
 
       <programlisting role="XML"><![CDATA[<properties>
-  <seam.version>3.0.0.Final</seam.version>
+  <seam.version>3.1.0.Final</seam.version>
 </properties>]]></programlisting>
 
       <para>
@@ -118,22 +118,6 @@
   <groupId>org.jboss.seam.security</groupId>
   <artifactId>seam-security</artifactId>
 </dependency>]]></programlisting>
-
-      <para>
-        It is also possible to import the security module as separate API and implementation modules, for situations
-        where you may not want to use the default implementation (such as testing environments where you may wish to substitute
-        mock objects instead of the actual implementation).  To do this, the following dependencies may be declared instead:
-      </para>
-      
-      <programlisting role="XML"><![CDATA[<dependency>
-  <groupId>org.jboss.seam.security</groupId>
-  <artifactId>seam-security-api</artifactId>
-</dependency>
-
-<dependency>
-  <groupId>org.jboss.seam.security</groupId>
-  <artifactId>seam-security-impl</artifactId>
-</dependency>]]></programlisting>      
 
       <para>
         If you wish to use the external authentication module in your application to allow authentication using OpenID or

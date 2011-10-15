@@ -101,7 +101,7 @@
       The <literal>Identity</literal> bean has an <literal>authenticatorClass</literal> property, which if set will be used
       to determine which <literal>Authenticator</literal> bean implementation to invoke during the
       authentication process.  This property may be set by configuring it with a predefined authenticator type,
-      for example by using the Seam Config module.  The following XML configuration example shows how you would configure the
+      for example by using Solder XML Config.  The following XML configuration example shows how you would configure the
       <literal>Identity</literal> bean to use the <literal>com.acme.MyCustomerAuthenticator</literal> bean for authentication:
     </para>
     

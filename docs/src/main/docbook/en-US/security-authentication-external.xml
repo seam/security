@@ -86,9 +86,10 @@
         <title>Using OpenID as your only authentication method</title>
         
         <para>
-          If your application only uses OpenID to provide authentication services, then it is recommended that <code>OpenIdAuthenticator</code>
-          is selected by configuring the <code>authenticatorClass</code> property of the <code>Identity</code> bean.  The following code sample
-          demonstrates how this might be done by using Seam Config:
+          If your application only uses OpenID to provide authentication services, then it is recommended 
+          that <code>OpenIdAuthenticator</code> is selected by configuring the <code>authenticatorClass</code>
+          property of the <code>Identity</code> bean.  The following code sample demonstrates how this might 
+          be done by using Solder:
         </para>
         
         <programlisting role="XML"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -100,7 +101,7 @@
 
    <security:Identity>
       <s:modifies/>
-      <security:authenticatorClass>org.jboss.seam.security.external.openid.OpenIdAuthenticator</security:authenticator>
+      <security:authenticatorClass>org.jboss.seam.security.external.openid.OpenIdAuthenticator</security:authenticatorClass>
    </security:Identity>]]></programlisting>
       </section>
       
@@ -216,13 +217,6 @@
     <section>
       <title>Managing the OpenID authentication process</title>
       
-      <note>
-        <para>
-          The API described in this section will likely be changed in a future version of Seam to allow for easier handling of
-          the OpenID authentication lifecycle.
-        </para>
-      </note>
-      
       <para>
         Your application must provide an implementation of the <code>OpenIdRelyingPartySpi</code> interface to process 
         OpenID callback events.  This interface declares the following methods:
@@ -300,13 +294,7 @@ public class OpenIdRelyingPartySpiImpl implements OpenIdRelyingPartySpi {
       }
    }
 }]]></programlisting>
-
-      <note>
-        <para>
-          The above example assumes that the Seam Servlet module is used to allow injection of the <code>ServletContext</code>.
-        </para>
-      </note>
-    
+   
     </section>  
   
   </section>

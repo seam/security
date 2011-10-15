@@ -175,6 +175,8 @@ public class IdentityObjectType implements Serializable {
 @IdentityEntity(IDENTITY_CREDENTIAL)      
 public class IdentityObjectCredential implements Serializable {   
    @Id @GeneratedValue private Long id;
+   
+   @ManyToOne @JoinColumn(name = "IDENTITY_OBJECT_ID")
    private IdentityObject identityObject;
    
    @ManyToOne @IdentityProperty(PropertyType.TYPE)
