@@ -12,5 +12,6 @@
    <xi:include href="security-authorization.xml"/>
    <xi:include href="security-identitymanagement.xml"/>   
    <xi:include href="security-authentication-external.xml"/>
+   <xi:include href="security-events.xml"/>
 
 </book>
