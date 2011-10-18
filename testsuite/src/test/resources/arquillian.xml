@@ -9,10 +9,14 @@
     </engine>
     -->
 
-    <container qualifier="jbossas-managed-7" default="true">
+    <container qualifier="jbossas-managed-7">
         <configuration>
             <property name="javaVmArguments">-client -noverify -XX:+UseFastAccessorMethods -Xms64m -Xmx1024m -XX:MaxPermSize=512m -Dsun.net.http.allowRestrictedHeaders=true</property>
-       </configuration>
+        </configuration>
+    </container>
+
+    <container qualifier="jbossas-remote-7">
+        
     </container>
 
 </arquillian>
