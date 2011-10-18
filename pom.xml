@@ -18,6 +18,7 @@
       <module>api</module>
       <module>impl</module>
       <module>external</module>
+      <module>testsuite</module>
    </modules>
    
    <properties>

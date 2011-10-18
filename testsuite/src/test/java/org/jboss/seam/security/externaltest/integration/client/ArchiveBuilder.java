@@ -1,5 +1,6 @@
 package org.jboss.seam.security.externaltest.integration.client;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.jboss.seam.security.externaltest.integration.saml.idp.IdpCustomizer;
 import org.jboss.seam.security.externaltest.integration.saml.sp.SpCustomizer;
 import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
@@ -41,14 +43,19 @@ class ArchiveBuilder {
         WebArchive war = ShrinkWrap.create(WebArchive.class, entity + ".war");
 
         war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class)
-        		.loadReposFromPom("pom.xml")
-        		.artifact("org.jboss.seam.security:seam-security")
+        		.loadReposFromPom("../external/pom.xml")
         		.artifact("org.jboss.solder:solder-impl")
+                .artifact("org.jboss.seam.security:seam-security")
         		.artifact("org.openid4java:openid4java-consumer:pom").exclusion("xerces:xercesImpl")
         		.artifact("nekohtml:nekohtml")
         		.artifact("org.apache:xmlsec")
         		.artifact("commons-httpclient:commons-httpclient")
         		.resolveAs(GenericArchive.class));
+
+        war.addAsLibraries(
+            ShrinkWrap.create(ZipImporter.class, "seam-security-external.jar")
+              .importFrom(new File("../external/target/seam-security-external.jar"))
+              .as(JavaArchive.class));
 
         war.addAsWebInfResource("WEB-INF/" + entity + "-beans.xml", "beans.xml");
         war.addAsWebInfResource("WEB-INF/" + entity + "-seam-beans.xml", "classes/META-INF/seam-beans.xml");
@@ -67,22 +74,6 @@ class ArchiveBuilder {
             war.addPackage(RpCustomizer.class.getPackage());
         }
 
-        war.addAsLibrary(createJarModule());
-
         return war;
-    }
-
-    private static JavaArchive createJarModule() {
-        JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "test.jar");
-
-        // Add the package "org.jboss.seam.security.external" and all its
-        // subpackages.
-        jar.addPackages(true, ResponseHandler.class.getPackage());
-
-        jar.addAsManifestResource("META-INF/beans.xml", "beans.xml");
-        jar.addAsManifestResource("META-INF/web-fragment.xml", "web-fragment.xml");
-        jar.addAsServiceProvider(Extension.class, VirtualApplicationContextExtension.class, DialogueContextExtension.class);
-
-        return jar;
     }
 }
