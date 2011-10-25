@@ -30,11 +30,6 @@
          <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-         <groupId>org.jboss.seam.faces</groupId>
-         <artifactId>seam-faces</artifactId>
-      </dependency>
-
       <!-- Required for Glassfish -->
       <dependency>
          <groupId>joda-time</groupId>
