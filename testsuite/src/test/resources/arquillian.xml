@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arquillian xmlns="http://jboss.com/arquillian"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!--Uncomment to have test archives exported to the file system for inspection -->
+    <!--
+    <engine>
+        <property name="deploymentExportPath">target/</property>
+    </engine>
+    -->
+
+    <container qualifier="jbossas-managed-7">
+        <configuration>
+            <property name="javaVmArguments">-client -noverify -XX:+UseFastAccessorMethods -Xms64m -Xmx1024m -XX:MaxPermSize=512m -Dsun.net.http.allowRestrictedHeaders=true</property>
+        </configuration>
+    </container>
+
+    <container qualifier="jbossas-remote-7">
+        
+    </container>
+
+</arquillian>

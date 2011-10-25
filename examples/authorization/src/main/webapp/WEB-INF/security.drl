@@ -1,53 +1,28 @@
-package IDMConsolePermissions;
+package Permissions;
 
 dialect 'mvel'
 
 import org.jboss.seam.security.permission.PermissionCheck;
 import org.picketlink.idm.api.Role;
+import org.picketlink.idm.api.User;
+import org.picketlink.idm.api.Group;
 
-# Allow all users to read the available roles
-
-rule ReadRoles
+rule IsDemoUser
   no-loop
   activation-group "permissions"
 when
-  check: PermissionCheck(resource == "seam.role", permission == "read", granted == false)
-  Role(roleType.name == "user")
+  check: PermissionCheck(resource == "foo", permission == "execute", granted == false)
+  User(id == "demo")
 then
   check.grant();
 end
 
-rule CreateAccount
+rule IsInUserGroup
   no-loop
   activation-group "permissions"
 when
-  check: PermissionCheck(resource == "seam.account", permission == "create", granted == false)
-  Role(roleType.name == "admin")
-then
-  check.grant();
-end
-
-/*****************************************************************************************
-
-  The Following Rules are for Identity Management
-  
-******************************************************************************************/
-
-rule ManageIdentities
-  no-loop
-  activation-group "permissions"
-when
-  check: PermissionCheck(resource == "seam.identity", granted == false)
-  Role(roleType.name == "admin")
-then
-  check.grant();
-end
-
-rule ManageRelationships
-  no-loop
-  activation-group "permissions"
-when
-  check: PermissionCheck(resource == "seam.relationship", granted == false)
+  check: PermissionCheck(resource == "bar", permission == "execute", granted == false)
+  Group(name == "USERS")
 then
   check.grant();
 end

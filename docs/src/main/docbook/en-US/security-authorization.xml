@@ -3,6 +3,20 @@
 
 <chapter id="security-authorization">
   <title>Security - Authorization</title>
+  
+  <section>
+    <title>Configuration</title>
+    
+    <para>
+      Before using any of Seam's authorization features, you must enable the <code>SecurityInterceptor</code> 
+      by adding the following code to your application's <code>beans.xml</code>:
+      
+      <programlisting><![CDATA[  <interceptors>
+    <class>org.jboss.seam.security.SecurityInterceptor</class>
+  </interceptors>]]></programlisting>
+      
+    </para>
+  </section>
 
   <section>
     <title>Basic Concepts</title>
@@ -266,7 +280,7 @@ public class Restrictions {
       
       <para>
         If a security check fails when invoking a method annotated with a security binding type, an 
-        <literal>AuthorizationException</literal> is thrown.  The Seam Catch module can be used to handle
+        <literal>AuthorizationException</literal> is thrown.  Solder can be used to handle
         this exception gracefully, for example by redirecting them to an error page or displaying an error
         message.  Here's an example of an exception handler that creates a JSF error message:
       </para>

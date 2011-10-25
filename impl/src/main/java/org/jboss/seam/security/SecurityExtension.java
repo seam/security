@@ -17,6 +17,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessSessionBean;
+import javax.enterprise.inject.spi.SessionBeanType;
 import javax.enterprise.util.Nonbinding;
 
 import org.jboss.seam.security.AuthorizationException;
@@ -386,4 +388,16 @@ public class SecurityExtension implements Extension {
         Authorizer authorizer = new Authorizer(binding, m);
         authorizers.add(authorizer);
     }
+    
+    /**
+     * Ensures that any implementations of the Authenticator interface are not stateless session beans.
+     *  
+     * @param event
+     */
+    public void validateAuthenticatorImplementation(@Observes ProcessSessionBean<Authenticator> event) {
+        if (SessionBeanType.STATELESS.equals(event.getSessionBeanType()))
+        {
+            event.addDefinitionError(new IllegalStateException("Authenticator " + event.getBean().getClass() + " cannot be a Stateless Session Bean"));
+        }
+    }    
 }

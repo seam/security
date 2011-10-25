@@ -22,7 +22,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.solder.logging.Logger;
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
 import org.jboss.seam.security.events.DeferredAuthenticationEvent;
@@ -41,6 +40,7 @@ import org.jboss.seam.security.permission.PermissionMapper;
 import org.jboss.seam.security.util.Strings;
 import org.jboss.solder.beanManager.BeanManagerLocator;
 import org.jboss.solder.literal.NamedLiteral;
+import org.jboss.solder.logging.Logger;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.Role;
 import org.picketlink.idm.api.User;
@@ -66,11 +66,11 @@ class IdentityImpl implements Identity, Serializable {
     @Inject BeanManager beanManager;
 
     @Inject private Credentials credentials;
-    
+
     @Inject private PermissionMapper permissionMapper;
 
     @Inject Instance<RequestSecurityState> requestSecurityState;
-    
+
     @Inject @Any Instance<Authenticator> authenticators;
 
     private Authenticator activeAuthenticator;
@@ -237,8 +237,7 @@ class IdentityImpl implements Identity, Serializable {
         } catch (Exception ex) {
             authenticating = false;
             if (ex instanceof AuthenticationException) throw (AuthenticationException) ex;
-
-            throw new RuntimeException(ex);
+            return false;
         }
     }
 
@@ -253,7 +252,7 @@ class IdentityImpl implements Identity, Serializable {
     }
 
     protected void deferredAuthenticationObserver(@Observes DeferredAuthenticationEvent event) {
-        if (event.isSuccess()) {        
+        if (event.isSuccess()) {
             postAuthenticate();
         } else {
             authenticating = false;
@@ -368,11 +367,11 @@ class IdentityImpl implements Identity, Serializable {
 
         return selectedAuth;
     }
-    
-    
-    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {        
+
+
+    private boolean isExternalAuthenticator(Class<? extends Authenticator> authClass) {
         Class<?> cls = authClass;
-        
+
         while (cls != Object.class) {
             if (cls.getName().startsWith("org.jboss.seam.security.external.")) {
                 return true;

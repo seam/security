@@ -51,6 +51,9 @@ public class IdentitySessionProducer implements EventListener {
     private String defaultIdentityStoreId;
     
     IdentityConfigurationMetaData metadata; 
+    
+    // Flag that indicates whether any identity stores have been configured.
+    private boolean configured;
 
     @Inject
     BeanManager manager;
@@ -115,9 +118,19 @@ public class IdentitySessionProducer implements EventListener {
 
             repositories.add(repository);
             ((IdentityConfigurationMetaDataImpl) metadata).setRepositories(repositories);
+            
+            configured = true;
         }
-
         
+    }
+    
+    /**
+     * This method can be used to determine whether identity management has been configured for the application.
+     * 
+     * @return
+     */
+    public boolean isConfigured() {
+        return configured;
     }
 
     @Inject

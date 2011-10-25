@@ -20,6 +20,7 @@ import org.jboss.seam.security.external.openid.api.OpenIdPrincipal;
 import org.jboss.seam.security.external.openid.api.OpenIdRelyingPartyApi;
 import org.jboss.seam.security.external.openid.api.OpenIdRequestedAttribute;
 import org.jboss.seam.security.external.openid.providers.OpenIdProvider;
+import org.jboss.seam.security.management.picketlink.IdentitySessionProducer;
 import org.jboss.seam.transaction.Transactional;
 import org.picketlink.idm.api.Group;
 import org.picketlink.idm.api.IdentitySession;
@@ -53,6 +54,8 @@ class OpenIdAuthenticator extends BaseAuthenticator implements Authenticator, Se
 
     @Inject
     Instance<IdentitySession> identitySession;
+    
+    @Inject IdentitySessionProducer identitySessionProducer;
     
     @Inject
     Identity identity;
@@ -127,8 +130,10 @@ class OpenIdAuthenticator extends BaseAuthenticator implements Authenticator, Se
             // By default we set the status to FAILURE, if we manage to get to the end
             // of this method we get rewarded with a SUCCESS
             setStatus(AuthenticationStatus.FAILURE);        
-            
-            validateManagedUser(principal);
+         
+            if (identitySessionProducer.isConfigured()) {
+               validateManagedUser(principal);
+            }
         }
         
         setUser(user);
