@@ -61,6 +61,13 @@
         <dependency>
             <groupId>org.jboss.seam.faces</groupId>
 	    <artifactId>seam-faces</artifactId>
+            <version>3.1.0.Beta3</version>
+	</dependency>
+
+	<dependency>
+	   <groupId>org.jboss.seam.faces</groupId>
+	   <artifactId>seam-faces-api</artifactId>
+	   <version>3.1.0.Beta3</version>
 	</dependency>
 
         <dependency>
