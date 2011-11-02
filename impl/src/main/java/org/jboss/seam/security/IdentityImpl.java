@@ -21,6 +21,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 
 import org.jboss.seam.security.Authenticator.AuthenticationStatus;
 import org.jboss.seam.security.events.AlreadyLoggedInEvent;
@@ -72,6 +73,8 @@ class IdentityImpl implements Identity, Serializable {
     @Inject Instance<RequestSecurityState> requestSecurityState;
 
     @Inject @Any Instance<Authenticator> authenticators;
+
+    @Inject HttpSession session;
 
     private Authenticator activeAuthenticator;
 
@@ -418,8 +421,7 @@ class IdentityImpl implements Identity, Serializable {
             beanManager.fireEvent(new PreLoggedOutEvent());
             unAuthenticate();
 
-            // TODO - invalidate the session
-            // Session.instance().invalidate();
+            session.invalidate();
 
             beanManager.fireEvent(loggedOutEvent);
         }
