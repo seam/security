@@ -35,6 +35,7 @@ public class BasicArchiveBuilder {
                 .loadMetadataFromPom("pom.xml")
                 .artifact("org.jboss.solder:solder-impl")
                 .artifact("org.jboss.seam.security:seam-security")
+                .artifact("org.jboss.seam.transaction:seam-transaction")
                 .artifact("joda-time:joda-time:1.6.2") // I think there's a bug here with modular servers
                 .resolveAs(JavaArchive.class));
 
