@@ -26,6 +26,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.seam.transaction</groupId>
+            <artifactId>seam-transaction</artifactId>
+            <version>${seam.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.solder</groupId>
             <artifactId>solder-impl</artifactId>
         </dependency>
@@ -73,6 +79,11 @@
             <artifactId>jboss-logging</artifactId>
             <version>3.0.0.GA</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
         </dependency>
 
     </dependencies>
@@ -145,6 +156,12 @@
                      <type>pom</type>
                      <scope>test</scope>
                 </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.protocol</groupId>
+                    <artifactId>arquillian-protocol-servlet</artifactId>
+                    <version>${arquillian.version}</version>
+                    <scope>test</scope>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -162,6 +179,12 @@
                      <artifactId>jbossas-remote-7</artifactId>
                      <type>pom</type>
                      <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.protocol</groupId>
+                    <artifactId>arquillian-protocol-servlet</artifactId>
+                    <version>${arquillian.version}</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
