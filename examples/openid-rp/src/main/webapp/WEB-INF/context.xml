@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Context>
-    <!--  log all incoming and outgoing messages. -->
-    <Valve className="org.apache.catalina.valves.RequestDumperValve"/>
-</Context>
