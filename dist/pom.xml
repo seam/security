@@ -102,64 +102,6 @@
          <optional>true</optional>
       </dependency>
       
-      <!-- Examples -->
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-example-authorization</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency>
-      
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-example-simple</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency>      
-
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-example-idmconsole</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency>
-      
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-example-openid-rp</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency>  
-
-      <!--dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>seam-security-example-openid-op</artifactId>
-         <version>${project.version}</version>
-         <type>zip</type>
-         <optional>true</optional>
-      </dependency-->
-      
-      <!--dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>saml-idp</artifactId>
-         <version>${project.version}</version>
-         <type>war</type>
-         <optional>true</optional>
-      </dependency>
-      
-      <dependency>
-         <groupId>org.jboss.seam.security</groupId>
-         <artifactId>saml-sp</artifactId>
-         <version>${project.version}</version>
-         <type>war</type>
-         <optional>true</optional>
-      </dependency-->                
-
    </dependencies>
 
    <build>

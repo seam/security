@@ -4,7 +4,7 @@
    <parent>
       <artifactId>seam-parent</artifactId>
       <groupId>org.jboss.seam</groupId>
-      <version>17</version>
+      <version>18</version>
    </parent>
 
    <groupId>org.jboss.seam.security</groupId>
@@ -22,7 +22,7 @@
    </modules>
    
    <properties>
-      <seam.version>3.1.0.Beta5</seam.version>
+      <seam.version>3.1.0.CR1</seam.version>
    </properties>
 
    <dependencyManagement>
@@ -55,18 +55,6 @@
             <version>${project.version}</version>
          </dependency>
 
-	 <dependency>
-	    <groupId>org.jboss.seam.faces</groupId>
-	    <artifactId>seam-faces</artifactId>
-	    <version>3.1.0.Beta3</version>
-	 </dependency>
-
-	 <dependency>
-	    <groupId>org.jboss.seam.faces</groupId>
-	    <artifactId>seam-faces-api</artifactId>
-	    <version>3.1.0.Beta3</version>
-	 </dependency>
-
          <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>
@@ -86,10 +74,6 @@
          <modules>
             <module>dist</module>
             <module>docs</module>
-            <module>examples/authorization</module>
-            <module>examples/simple</module>
-            <module>examples/idmconsole</module>
-            <module>examples/openid-rp</module>
             <!--module>examples/openid-op</module-->
             <!--module>examples/saml-idp</module>
             <module>examples/saml-sp</module-->            
