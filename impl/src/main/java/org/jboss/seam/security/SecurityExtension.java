@@ -153,9 +153,9 @@ public class SecurityExtension implements Extension {
     private Set<AnnotatedType<?>> securedTypes = new HashSet<AnnotatedType<?>>();
 
     /**
-     * A mapping between a secured method and its authorizers
+     * A mapping between a secured method of a class and its authorizers
      */
-    private Map<Method, Set<Authorizer>> methodAuthorizers = new HashMap<Method, Set<Authorizer>>();
+    private Map<Class<?>, Map<Method, Set<Authorizer>>> methodAuthorizers = new HashMap<Class<?>, Map<Method, Set<Authorizer>>>();
 
     /**
      * @param <X>
@@ -243,7 +243,7 @@ public class SecurityExtension implements Extension {
             for (final AnnotatedMethod<?> method : type.getMethods()) {
                 for (final Annotation annotation : method.getAnnotations()) {
                     if (annotation.annotationType().isAnnotationPresent(SecurityBindingType.class)) {
-                        registerSecuredMethod(method.getJavaMember());
+                        registerSecuredMethod(method.getJavaMember(), type.getJavaClass());
                         break;
                     }
                 }
@@ -262,12 +262,12 @@ public class SecurityExtension implements Extension {
      * @param m
      * @return
      */
-    public Set<Authorizer> lookupAuthorizerStack(Method m) {
-        if (!methodAuthorizers.containsKey(m)) {
-            registerSecuredMethod(m);
+    public Set<Authorizer> lookupAuthorizerStack(Method m, Class<?> targetClass) {
+        if (!methodAuthorizers.containsKey(targetClass) || !methodAuthorizers.get(targetClass).containsKey(m)) {
+            registerSecuredMethod(m, targetClass);
         }
 
-        return methodAuthorizers.get(m);
+        return methodAuthorizers.get(targetClass).get(m);
     }
 
     void checkAuthorization(Annotation binding) {
@@ -287,15 +287,25 @@ public class SecurityExtension implements Extension {
         }
     }
 
-    protected void registerSecuredMethod(Method method) {
-        if (!methodAuthorizers.containsKey(method)) {
+    protected synchronized void registerSecuredMethod(Method method, Class<?> targetClass) {
+        if (!methodAuthorizers.containsKey(targetClass)) {
+            methodAuthorizers.put(targetClass, new HashMap<Method, Set<Authorizer>>());
+        }
+        
+        Map<Method, Set<Authorizer>> authz = methodAuthorizers.get(targetClass);
+        
+        if (!authz.containsKey(method)) {
             // Build a list of all security bindings on both the method and its declaring class
             Set<Annotation> bindings = new HashSet<Annotation>();
 
-            for (final Annotation annotation : method.getDeclaringClass().getAnnotations()) {
-                if (annotation.annotationType().isAnnotationPresent(SecurityBindingType.class)) {
-                    bindings.add(annotation);
+            Class<?> cls = targetClass;
+            while (!cls.equals(Object.class)) {
+                for (final Annotation annotation : cls.getAnnotations()) {
+                    if (annotation.annotationType().isAnnotationPresent(SecurityBindingType.class)) {
+                        bindings.add(annotation);
+                    }
                 }
+                cls = cls.getSuperclass();
             }
 
             for (final Annotation annotation : method.getAnnotations()) {
@@ -349,9 +359,8 @@ public class SecurityExtension implements Extension {
                                     method.getDeclaringClass().getName() + "." +
                                     method.getName() + "].");
                 }
-
-                methodAuthorizers.put(method, authorizerStack);
             }
+            authz.put(method, authorizerStack);
         }
     }
 
