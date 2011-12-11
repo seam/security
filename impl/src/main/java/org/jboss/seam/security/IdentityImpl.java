@@ -239,8 +239,11 @@ class IdentityImpl implements Identity, Serializable {
             return false;
         } catch (Exception ex) {
             authenticating = false;
-            if (ex instanceof AuthenticationException) throw (AuthenticationException) ex;
-            return false;
+            if (ex instanceof AuthenticationException) {
+                throw (AuthenticationException) ex;
+            } else {
+                throw new AuthenticationException("Authentication failed.", ex);
+            }
         }
     }
 

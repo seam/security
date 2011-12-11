@@ -63,6 +63,8 @@ class IdmAuthenticator extends BaseAuthenticator implements Authenticator {
                     setUser(u);
                     setStatus(AuthenticationStatus.SUCCESS);
                     return;
+                } else {
+                    log.info("Authentication failed for user '" + credentials.getUsername() + "'");
                 }
             } catch (IdentityException ex) {
                 log.error("Authentication error", ex);
