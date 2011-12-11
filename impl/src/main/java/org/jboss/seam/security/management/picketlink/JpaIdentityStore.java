@@ -22,11 +22,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
-import org.jboss.seam.security.management.IdentityObjectImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipTypeImpl;
 import org.jboss.seam.security.management.IdentityObjectTypeImpl;
@@ -40,6 +38,7 @@ import org.jboss.solder.reflection.Reflections;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
+import org.picketlink.idm.impl.types.SimpleIdentityObject;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
 import org.picketlink.idm.spi.exception.OperationNotSupportedException;
@@ -128,9 +127,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             if (cache.containsKey(entity)) {
                 return (IdentityObject) cache.get(entity);
             } else {
-                IdentityObject obj = new IdentityObjectImpl(
-                        identityIdProperty.getValue(entity).toString(),
+                IdentityObject obj = new SimpleIdentityObject(
                         identityNameProperty.getValue(entity).toString(),
+                        identityIdProperty.getValue(entity).toString(),                        
                         convertToIdentityObjectType(identityTypeProperty.getValue(entity)));
                 cache.put(entity, obj);
 
@@ -1023,9 +1022,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             }
 
             Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
-            IdentityObject obj = new IdentityObjectImpl(
-                    (id != null ? id.toString() : null),
-                    name, identityObjectType);
+            IdentityObject obj = new SimpleIdentityObject(name, (id != null ? id.toString() : null),
+                    identityObjectType);
 
             if (attributes != null) {
                 List<IdentityObjectAttribute> attribs = new ArrayList<IdentityObjectAttribute>();
@@ -1174,9 +1172,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     new IdentityObjectTypeImpl(modelProperties.get(PROPERTY_IDENTITY_TYPE).getValue(identity).toString());
 
 
-            return new IdentityObjectImpl(
-                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+            return new SimpleIdentityObject(                    
                     modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
                     type);
         } catch (NoResultException ex) {
             return null;
@@ -1203,9 +1201,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     .setParameter("type", identityType)
                     .getSingleResult();
 
-            return new IdentityObjectImpl(
-                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+            return new SimpleIdentityObject(
                     modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),                    
                     identityObjectType);
         } catch (NoResultException ex) {
             return null;
