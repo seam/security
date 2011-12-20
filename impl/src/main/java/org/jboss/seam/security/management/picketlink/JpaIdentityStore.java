@@ -22,11 +22,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
 
 import org.jboss.seam.security.annotations.management.IdentityProperty;
 import org.jboss.seam.security.annotations.management.PropertyType;
-import org.jboss.seam.security.management.IdentityObjectImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipImpl;
 import org.jboss.seam.security.management.IdentityObjectRelationshipTypeImpl;
 import org.jboss.seam.security.management.IdentityObjectTypeImpl;
@@ -40,6 +38,7 @@ import org.jboss.solder.reflection.Reflections;
 import org.picketlink.idm.common.exception.IdentityException;
 import org.picketlink.idm.impl.api.SimpleAttribute;
 import org.picketlink.idm.impl.store.FeaturesMetaDataImpl;
+import org.picketlink.idm.impl.types.SimpleIdentityObject;
 import org.picketlink.idm.spi.configuration.IdentityStoreConfigurationContext;
 import org.picketlink.idm.spi.configuration.metadata.IdentityObjectAttributeMetaData;
 import org.picketlink.idm.spi.exception.OperationNotSupportedException;
@@ -128,9 +127,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             if (cache.containsKey(entity)) {
                 return (IdentityObject) cache.get(entity);
             } else {
-                IdentityObject obj = new IdentityObjectImpl(
-                        identityIdProperty.getValue(entity).toString(),
+                IdentityObject obj = new SimpleIdentityObject(
                         identityNameProperty.getValue(entity).toString(),
+                        identityIdProperty.getValue(entity).toString(),                        
                         convertToIdentityObjectType(identityTypeProperty.getValue(entity)));
                 cache.put(entity, obj);
 
@@ -961,8 +960,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             // If there is no identity type table, just return the name
             if (typeNameProp == null) return identityType;
 
+            final String identTypeEntityAnnotationValue = typeNameProp.getDeclaringClass().getAnnotation(Entity.class).name();
+            final String identTypeEntityName = ("".equals(identTypeEntityAnnotationValue) ? typeNameProp.getDeclaringClass().getSimpleName() : identTypeEntityAnnotationValue);
+
             Object val = em.createQuery(
-                    "select t from " + typeNameProp.getDeclaringClass().getSimpleName() +
+                    "select t from " + identTypeEntityName +
                             " t where t." + typeNameProp.getName() +
                             " = :identityType")
                     .setParameter("identityType", identityType)
@@ -1020,9 +1022,8 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             }
 
             Object id = modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identityInstance);
-            IdentityObject obj = new IdentityObjectImpl(
-                    (id != null ? id.toString() : null),
-                    name, identityObjectType);
+            IdentityObject obj = new SimpleIdentityObject(name, (id != null ? id.toString() : null),
+                    identityObjectType);
 
             if (attributes != null) {
                 List<IdentityObjectAttribute> attribs = new ArrayList<IdentityObjectAttribute>();
@@ -1154,8 +1155,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
     public IdentityObject findIdentityObject(IdentityStoreInvocationContext invocationContext, String id)
             throws IdentityException {
         try {
+            final String identEntityAnnotationValue = identityClass.getAnnotation(Entity.class).name();
+            final String identEntityName = ("".equals(identEntityAnnotationValue) ? identityClass.getSimpleName() : identEntityAnnotationValue);
+
             Object identity = getEntityManager(invocationContext).createQuery("select i from " +
-                    identityClass.getName() + " i where i." +
+                    identEntityName + " i where i." +
                     modelProperties.get(PROPERTY_IDENTITY_ID).getName() +
                     " = :id")
                     .setParameter("id", id)
@@ -1168,9 +1172,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     new IdentityObjectTypeImpl(modelProperties.get(PROPERTY_IDENTITY_TYPE).getValue(identity).toString());
 
 
-            return new IdentityObjectImpl(
-                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+            return new SimpleIdentityObject(                    
                     modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
                     type);
         } catch (NoResultException ex) {
             return null;
@@ -1185,8 +1189,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     lookupIdentityType(identityObjectType.getName(), getEntityManager(invocationContext)) :
                     identityObjectType.getName();
 
+            final String identEntityAnnotationValue = identityClass.getAnnotation(Entity.class).name();
+            final String identEntityName = ("".equals(identEntityAnnotationValue) ? identityClass.getSimpleName() : identEntityAnnotationValue);
+
             Object identity = getEntityManager(invocationContext).createQuery("select i from " +
-                    identityClass.getName() + " i where i." +
+                    identEntityName + " i where i." +
                     modelProperties.get(PROPERTY_IDENTITY_NAME).getName() +
                     " = :name and i." + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() +
                     " = :type")
@@ -1194,9 +1201,9 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     .setParameter("type", identityType)
                     .getSingleResult();
 
-            return new IdentityObjectImpl(
-                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),
+            return new SimpleIdentityObject(
                     modelProperties.get(PROPERTY_IDENTITY_NAME).getValue(identity).toString(),
+                    modelProperties.get(PROPERTY_IDENTITY_ID).getValue(identity).toString(),                    
                     identityObjectType);
         } catch (NoResultException ex) {
             return null;
@@ -2078,17 +2085,26 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
         Object identType = modelProperties.containsKey(PROPERTY_IDENTITY_TYPE_NAME) ? lookupIdentityType(
                 identityType.getName(), getEntityManager(invocationCxt)) : identityType.getName();
 
+        final String identEntityAnnotationValue = identityClass.getAnnotation(Entity.class).name();
+        final String identEntityName = ("".equals(identEntityAnnotationValue) ? identityClass.getSimpleName() : identEntityAnnotationValue);
+
         Object ident = getEntityManager(invocationCxt).createQuery(
-                        "select i from " + identityClass.getName() + " i where i."
+                        "select i from " + identEntityName + " i where i."
                                 + modelProperties.get(PROPERTY_IDENTITY_NAME).getName() + " = :name and i."
                                 + modelProperties.get(PROPERTY_IDENTITY_TYPE).getName() + " = :type")
                 .setParameter("name", identity.getName()).setParameter("type", identType).getSingleResult();
 
-        // FIXME: This won't work if they use the table name attribute on the annotation
+        String relEntityName = "";
+        if (modelProperties.get(PROPERTY_RELATIONSHIP_NAME) != null) {
+            final Class<?> relationshipClass = modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getDeclaringClass();
+            final String relEntityAnnotationValue = relationshipClass.getAnnotation(Entity.class).name();
+            relEntityName = ("".equals(identEntityAnnotationValue) ? relationshipClass.getSimpleName() : relEntityAnnotationValue);
+        }
+
         if (parent) {
             if (relationshipType != null) {
                 queryString.append("select distinct ior." + modelProperties.get(PROPERTY_RELATIONSHIP_TO).getName() + " from "
-                        + modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getDeclaringClass().getSimpleName() + " ior where ior."
+                        + relEntityName + " ior where ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_TO).getName() + "."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getName() + " like :nameFilter and ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_TYPE).getName() + "."
@@ -2096,7 +2112,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + " = :identity");
             } else {
                 queryString.append("select distinct ior. " + modelProperties.get(PROPERTY_RELATIONSHIP_TO).getName() + "from "
-                        + modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getDeclaringClass().getSimpleName() + " ior where ior."
+                        + relEntityName + " ior where ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_TO).getName() + "."
                         + modelProperties.get(PROPERTY_IDENTITY_NAME).getName() + " like :nameFilter and ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + " = :identity");
@@ -2109,7 +2125,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             if (relationshipType != null) {
                 queryString.append("select distinct ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + " from "
-                        + modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getDeclaringClass().getSimpleName() + " ior where ior."
+                        + relEntityName + " ior where ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + "."
                         + modelProperties.get(PROPERTY_IDENTITY_NAME).getName() + " like :nameFilter and ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_TYPE).getName() + "."
@@ -2118,7 +2134,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             } else {
                 queryString.append("select distinct ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + " from "
-                        + modelProperties.get(PROPERTY_RELATIONSHIP_NAME).getDeclaringClass().getSimpleName() + " ior where ior."
+                        + relEntityName + " ior where ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_FROM).getName() + "."
                         + modelProperties.get(PROPERTY_IDENTITY_NAME).getName() + " like :nameFilter and ior."
                         + modelProperties.get(PROPERTY_RELATIONSHIP_TO).getName() + " = :identity");
