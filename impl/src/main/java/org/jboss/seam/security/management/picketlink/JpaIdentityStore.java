@@ -1379,7 +1379,7 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
                     em.remove(result);
                 }
             }
-
+            
             em.remove(instance);
         } catch (NoResultException ex) {
             throw new IdentityException(String.format(
@@ -1439,24 +1439,33 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
             IdentityObject identity1, IdentityObject identity2, boolean named)
             throws IdentityException {
         EntityManager em = getEntityManager(ctx);
-
+        
+        Object loadedIdentity1 = null;
+        if(identity1 != null) {
+        	loadedIdentity1 = lookupIdentity(identity1, em);
+        }
+        Object loadedIdentity2 = null;
+        if(identity2 != null) {
+        	loadedIdentity2 = lookupIdentity(identity2, em);
+        }
+        
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<?> criteria = builder.createQuery(relationshipClass);
         Root<?> root = criteria.from(relationshipClass);
-
+        
         Property<?> relationshipFromProp = modelProperties.get(PROPERTY_RELATIONSHIP_FROM);
         Property<?> relationshipToProp = modelProperties.get(PROPERTY_RELATIONSHIP_TO);
 
         List<Predicate> predicates = new ArrayList<Predicate>();
-
+        
         if (identity1 != null) {
             predicates.add(builder.equal(root.get(relationshipFromProp.getName()),
-                    lookupIdentity(identity1, em)));
+            		loadedIdentity1));
         }
 
         if (identity2 != null) {
             predicates.add(builder.equal(root.get(relationshipToProp.getName()),
-                    lookupIdentity(identity2, em)));
+            		loadedIdentity2));
         }
 
         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
@@ -1473,12 +1482,11 @@ public class JpaIdentityStore implements org.picketlink.idm.spi.store.IdentitySt
 
         if (identity2 != null) {
             predicates.add(builder.equal(root.get(relationshipFromProp.getName()),
-                    lookupIdentity(identity2, em)));
+            		loadedIdentity2));
         }
-
         if (identity1 != null) {
             predicates.add(builder.equal(root.get(relationshipToProp.getName()),
-                    lookupIdentity(identity1, em)));
+            		loadedIdentity1));
         }
 
         criteria.where(predicates.toArray(new Predicate[predicates.size()]));
