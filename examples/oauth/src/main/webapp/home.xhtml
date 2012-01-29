@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/templates/default.xhtml">
+	<ui:define name="content">
+		<h1>Seam Social Security Integration Example</h1>
+
+		<h:form>
+			<h:panelGroup rendered="#{not identity.loggedIn}">
+				<p>Please select the service Below to connect Seam Social to your
+			account on the given service</p>
+			
+					<ul>
+						<h:selectOneRadio value="#{oauthAuthenticator.serviceName}">
+	                		<f:selectItems value="#{oauthAuthenticator.listOfServices}" var="p" itemValue="#{p}" itemLabel="#{p}"/>
+	            		</h:selectOneRadio>
+	            
+		            	<h:commandButton action="#{identity.login}" value="login"/>	            				
+					</ul>
+			
+			</h:panelGroup>
+		
+			<h:panelGroup rendered="#{identity.loggedIn}">
+				<img src="#{identity.user.userProfile.profileImageUrl}"/>
+				<h:outputText value="Hello, #{identity.user.userProfile.fullName}!"/>
+				<h:commandButton action="#{identity.logout}" value="Logout"/>
+			</h:panelGroup>		
+
+		</h:form>		
+
+	</ui:define>
+</ui:composition>

@@ -192,6 +192,11 @@
          <version>1.9.12</version>
       </dependency>
 
+      <dependency>
+          <groupId>org.jboss.seam.social</groupId>
+          <artifactId>seam-social</artifactId>
+          <scope>provided</scope>
+       </dependency>
    </dependencies>
 
 </project>

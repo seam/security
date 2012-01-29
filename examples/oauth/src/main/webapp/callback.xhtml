@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:s="http://jboss.org/seam/faces"
+                template="/WEB-INF/templates/default.xhtml">
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="#{oauthAuthenticator.verifierParamName}" value="#{oauthAuthenticator.verifier}"
+                         required="true"
+                         requiredMessage="We didn't get the authorization from the service provider. Please go back and Try Again !"/>
+            <s:viewAction action="#{oauthAuthenticator.connect}"/>  
+        </f:metadata>
+        <h:messages/>
+        <h1>Seam Social Security Example</h1>
+
+        <p>Getting Authorization from the OAuth Service Provider</p>
+        You're ready to use Seam Social
+        <h:link outcome="home">client</h:link>
+
+    </ui:define>
+</ui:composition>
