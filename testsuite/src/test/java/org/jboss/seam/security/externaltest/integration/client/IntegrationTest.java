@@ -32,7 +32,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.logging.Logger;
+import org.jboss.solder.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Before;
 import org.junit.Test;
