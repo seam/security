@@ -12,8 +12,9 @@ import org.jboss.seam.security.SecurityExtension.Authorizer;
 
 /**
  * Provides authorization services for component invocations.
- *
+ * 
  * @author Shane Bryzak
+ * @author <a href="mailto:lincolnbaxter@gmail.com">Lincoln Baxter, III</a>
  */
 @SecurityInterceptorBinding
 @Interceptor
@@ -28,7 +29,7 @@ public class SecurityInterceptor implements Serializable {
         Method method = invocation.getMethod();
 
         for (Authorizer authorizer : extension.lookupAuthorizerStack(method, invocation.getTarget().getClass())) {
-            authorizer.authorize();
+            authorizer.authorize(invocation);
         }
 
         return invocation.proceed();
