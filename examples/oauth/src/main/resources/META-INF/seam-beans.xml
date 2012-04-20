@@ -17,40 +17,11 @@
 -->
 <beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:s="urn:java:ee"
-    xmlns:security="urn:java:org.jboss.seam.security"
-    xmlns:o="urn:java:org.jboss.seam.social:org.jboss.seam.social.oauth:org.jboss.seam.social.twitter.jackson:org.jboss.seam.social.linkedin.jackson:org.jboss.seam.social.facebook.jackson">
+    xmlns:security="urn:java:org.jboss.seam.security">
 
     <security:IdentityImpl>
         <s:modifies/>
         <security:authenticatorName>oauthAuthenticator</security:authenticatorName>
     </security:IdentityImpl>
-
-     <o:TwitterServiceImpl>
-        <s:modifies />
-        <o:Twitter/>
-        <s:ApplicationScoped />
-        <o:OAuthApplication apiKey="FQzlQC49UhvbMZoxUIvHTQ"
-            apiSecret="VQ5CZHG4qUoAkUUmckPn4iN4yyjBKcORTW0wnok4r1k"
-            callback="http://localhost:8080/security-oauth/callback.jsf" />
-    </o:TwitterServiceImpl>
-
-    <o:LinkedInServiceJackson>
-        <s:modifies />
-        <o:LinkedIn/>
-        <s:ApplicationScoped />
-        <o:OAuthApplication
-            apiKey="ympq1JR_oxeC3qZE4VwiDEr-9Rc9Am0YE1AJwwXJNREfqaF7J6hXfsncu_JFd13W"
-            apiSecret="RwDk21M6qQeGT_zi2icmZV6tc5VsjRZPm7DWDIVt0Wsqu2eYBXt4Csg-FUbBZIIH"
-            callback="http://localhost:8080/security-oauth/callback.jsf" />
-    </o:LinkedInServiceJackson>
-
-    <o:FacebookServiceJackson>
-        <s:modifies />
-        <o:Facebook/>
-        <s:ApplicationScoped />
-        <o:OAuthApplication apiKey="204631749555557"
-            apiSecret="5d3132b1448a66d28e5c420b267cd65e"
-            callback="http://localhost:8080/security-oauth/callback.jsf" />
-    </o:FacebookServiceJackson>
 
 </beans>
