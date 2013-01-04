@@ -10,7 +10,7 @@
    <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security-parent</artifactId>
    <packaging>pom</packaging>
-   <version>3.2.0.chtijbug-SNAPSHOT</version>
+   <version>3.2.0-SNAPSHOT</version>
    <name>Seam Security Parent</name>
    <url>http://www.seamframework.org/Seam3/SecurityModule</url>
 
@@ -96,16 +96,4 @@
 	<url>http://repository.jboss.org/nexus/content/groups/public/</url>
       </repository>
  </repositories>
-<distributionManagement>
-     <repository>
-        <id>chtijbug-release</id>
-        <name>chtijbug repo release</name>
-        <url>http://openesb-dev.org:8081/nexus/content/repositories/chtijbug-release/</url>
-      </repository>
-       <snapshotRepository>
-        <id>chtijbug-snapshot</id>
-        <name>chtijbug repo release</name>
-        <url>http://nexus.openesb-dev.org:8081/nexus/content/repositories/chtijbug-snapshot/</url>
-      </snapshotRepository> 
-  </distributionManagement>
 </project>
