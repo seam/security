@@ -21,6 +21,7 @@ import org.jboss.seam.security.BaseAuthenticator;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.impl.api.PasswordCredential;
+import org.picketlink.idm.impl.api.model.SimpleUser;
 
 /**
  * An authenticator for authenticating with JAAS.  The jaasConfigName property
@@ -58,6 +59,7 @@ class JaasAuthenticator extends BaseAuthenticator implements Authenticator {
         try {
             getLoginContext().login();
             setStatus(AuthenticationStatus.SUCCESS);
+            setUser(new SimpleUser(credentials.getUsername())); //SEAMSECURITY-98
         } catch (LoginException e) {
             setStatus(AuthenticationStatus.FAILURE);
             log.error("JAAS authentication failed", e);
