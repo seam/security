@@ -96,4 +96,16 @@
 	<url>http://repository.jboss.org/nexus/content/groups/public/</url>
       </repository>
  </repositories>
+<distributionManagement>
+     <repository>
+        <id>chtijbug-release</id>
+        <name>chtijbug repo release</name>
+        <url>http://openesb-dev.org:8081/nexus/content/repositories/chtijbug-release/</url>
+      </repository>
+       <snapshotRepository>
+        <id>chtijbug-snapshot</id>
+        <name>chtijbug repo release</name>
+        <url>http://nexus.openesb-dev.org:8081/nexus/content/repositories/chtijbug-snapshot/</url>
+      </snapshotRepository> 
+  </distributionManagement>
 </project>
