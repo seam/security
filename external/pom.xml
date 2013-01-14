@@ -195,14 +195,14 @@
       <dependency>
           <groupId>org.jboss.seam.social</groupId>
           <artifactId>seam-social</artifactId>
-          <version>${project.version}</version>
+          <version>3.2.0.Final</version>
           <scope>provided</scope>
        </dependency>
        
        <dependency>
           <groupId>org.jboss.seam.social</groupId>
           <artifactId>seam-social-api</artifactId>
-          <version>${project.version}</version>
+          <version>3.2.0.Final</version>
           <scope>provided</scope>
        </dependency>
    </dependencies>
