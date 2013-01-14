@@ -18,14 +18,14 @@ public class SamlExternalServiceProvider extends SamlExternalEntity {
 
     private boolean authnRequestsSigned;
 
-    public SamlExternalServiceProvider(String entityId, SPSSODescriptorType SPSSODescriptor) {
-        super(entityId, SPSSODescriptor.getKeyDescriptor());
+    public SamlExternalServiceProvider(String entityId, SPSSODescriptorType sPSSODescriptor) {
+        super(entityId, sPSSODescriptor.getKeyDescriptor());
 
-        wantAssertionsSigned = SPSSODescriptor.isWantAssertionsSigned();
-        authnRequestsSigned = SPSSODescriptor.isAuthnRequestsSigned();
+        wantAssertionsSigned = sPSSODescriptor.getWantAssertionsSigned();
+        authnRequestsSigned = sPSSODescriptor.getAuthnRequestsSigned();
 
-        services.put(SamlProfile.SINGLE_SIGN_ON, new SamlService(SamlProfile.SINGLE_SIGN_ON, SPSSODescriptor.getAssertionConsumerService()));
-        services.put(SamlProfile.SINGLE_LOGOUT, new SamlService(SamlProfile.SINGLE_LOGOUT, SPSSODescriptor.getSingleLogoutService()));
+        services.put(SamlProfile.SINGLE_SIGN_ON, new SamlService(SamlProfile.SINGLE_SIGN_ON, sPSSODescriptor.getAssertionConsumerService()));
+        services.put(SamlProfile.SINGLE_LOGOUT, new SamlService(SamlProfile.SINGLE_LOGOUT, sPSSODescriptor.getSingleLogoutService()));
     }
 
     public SamlService getService(SamlProfile service) {

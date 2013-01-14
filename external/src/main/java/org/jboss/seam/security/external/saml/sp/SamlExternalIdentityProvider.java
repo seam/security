@@ -16,13 +16,13 @@ public class SamlExternalIdentityProvider extends SamlExternalEntity {
 
     private boolean wantAuthnRequestsSigned;
 
-    public SamlExternalIdentityProvider(String entityId, IDPSSODescriptorType IDPSSODescriptor) {
-        super(entityId, IDPSSODescriptor.getKeyDescriptor());
+    public SamlExternalIdentityProvider(String entityId, IDPSSODescriptorType iDPSSODescriptor) {
+        super(entityId, iDPSSODescriptor.getKeyDescriptor());
 
-        wantAuthnRequestsSigned = IDPSSODescriptor.isWantAuthnRequestsSigned();
+        wantAuthnRequestsSigned = iDPSSODescriptor.getWantAuthnRequestsSigned();
 
-        services.put(SamlProfile.SINGLE_SIGN_ON, new SamlService(SamlProfile.SINGLE_SIGN_ON, IDPSSODescriptor.getSingleSignOnService()));
-        services.put(SamlProfile.SINGLE_LOGOUT, new SamlService(SamlProfile.SINGLE_LOGOUT, IDPSSODescriptor.getSingleLogoutService()));
+        services.put(SamlProfile.SINGLE_SIGN_ON, new SamlService(SamlProfile.SINGLE_SIGN_ON, iDPSSODescriptor.getSingleSignOnService()));
+        services.put(SamlProfile.SINGLE_LOGOUT, new SamlService(SamlProfile.SINGLE_LOGOUT, iDPSSODescriptor.getSingleLogoutService()));
     }
 
     public SamlService getService(SamlProfile service) {
