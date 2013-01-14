@@ -10,7 +10,7 @@
    <groupId>org.jboss.seam.security</groupId>
    <artifactId>seam-security-parent</artifactId>
    <packaging>pom</packaging>
-   <version>3.2.0-SNAPSHOT</version>
+   <version>3.2.0.Final</version>
    <name>Seam Security Parent</name>
    <url>http://www.seamframework.org/Seam3/SecurityModule</url>
 
